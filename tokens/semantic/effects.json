@@ -20,7 +20,8 @@
           "value": 0,
           "unit": "px"
         }
-      }
+      },
+      "$description": "Resting surfaces on the canvas: cards, tables."
     },
     "popover": {
       "$value": [
@@ -62,7 +63,8 @@
             "unit": "px"
           }
         }
-      ]
+      ],
+      "$description": "Menus, selects, tooltips: floats above the page, closes on its own."
     },
     "modal": {
       "$value": [
@@ -104,7 +106,8 @@
             "unit": "px"
           }
         }
-      ]
+      ],
+      "$description": "Dialogs and drawers above the scrim."
     }
   },
   "motion": {
@@ -116,7 +119,8 @@
         "starter.modes": {
           "reduced-motion": "{duration.0}"
         }
-      }
+      },
+      "$description": "Hover and press feedback, colour changes."
     },
     "base": {
       "$value": "{duration.200}",
@@ -124,7 +128,8 @@
         "starter.modes": {
           "reduced-motion": "{duration.0}"
         }
-      }
+      },
+      "$description": "Small moves: menus and popovers opening."
     },
     "slow": {
       "$value": "{duration.300}",
@@ -132,7 +137,8 @@
         "starter.modes": {
           "reduced-motion": "{duration.0}"
         }
-      }
+      },
+      "$description": "Larger moves: dialogs, drawers, toasts entering."
     },
     "spin": {
       "$value": "{duration.1000}",
@@ -151,16 +157,20 @@
   "ease": {
     "$type": "cubicBezier",
     "standard": {
-      "$value": "{easing.standard}"
+      "$value": "{easing.standard}",
+      "$description": "Movement within the page."
     },
     "enter": {
-      "$value": "{easing.decelerate}"
+      "$value": "{easing.decelerate}",
+      "$description": "Things arriving: decelerates into place."
     },
     "exit": {
-      "$value": "{easing.accelerate}"
+      "$value": "{easing.accelerate}",
+      "$description": "Things leaving: accelerates away."
     },
     "linear": {
-      "$value": "{easing.linear}"
+      "$value": "{easing.linear}",
+      "$description": "Continuous loops only: spinners, pulses."
     }
   },
   "z": {

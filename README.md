@@ -51,6 +51,7 @@ src/layouts/            AppShell: the frame every signed-in page renders inside
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (also a consumer lint target)
 src/index.ts            public entry point
+docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
 tests/unit/             Vitest suites
 tests/visual/           Playwright suite; __screenshots__/linux/ is committed
@@ -78,6 +79,9 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | The rules are actually loaded | `test:rules` (every rule has a fixture, fixtures must not be ignored or fail to parse, clean controls must pass) | `scripts/test-rules.ts` |
 | Gallery: every variant/size/state renders correctly in light and dark | Playwright screenshots against Linux baselines | `tests/visual/stories.spec.ts` |
 | Gallery is accessible | axe (WCAG 2.2 A/AA) on every story, both themes | `tests/visual/stories.spec.ts` |
+| Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
+| Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
+| Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
 | Agents know the rules | UI rules block | `CLAUDE.md` |
 
 ### Layers
@@ -143,6 +147,7 @@ Stop at the first yes:
    - `Name.tsx`: props typed with `Closed<…>` (no `className`/`style`), a required accessible name, variants as closed unions, and state via aria/native attributes. Wrap Radix here if you need behaviour. Never expose `asChild`.
    - `Name.css`: inside `@layer components`, BEM-lite classes, in the order block, parts, variants, states. Tokens only.
    - `Name.stories.tsx`: one story per variant, size and state. The visual and axe suite picks them up automatically.
+   - `docs/usage/Name.usage.tsx`: the usage section of its Docs tab (see Documentation below).
    - Export it from `src/components/index.ts`.
 4. **A new primitive?** The highest bar: domain-agnostic, token-driven, impossible to express as a composition. It changes tokens, component styles and `CLAUDE.md` in the same PR.
 
@@ -153,14 +158,48 @@ Then run `npm run check`, run the baseline workflow on the branch, and review th
 1. Pick the tier. **Semantic** is almost always right (`color.fg.muted`, `space.gap.md`). Add a **primitive** only for a new raw value. Add a **component** token only when one part needs its own override hook.
 2. Edit `tokens/<tier>/*.json` (DTCG: `$type`, `$value`, aliases as `{path.to.token}`). Keys are lowercase kebab-case. A semantic colour needs `"$extensions": { "starter.modes": { "dark": "{…}" } }`.
 3. `npm run tokens`, and commit the JSON together with the regenerated `src/styles/tokens.css` and `src/tokens/tokens.ts`.
-4. If it is a new text/background pair, add it to `tests/unit/contrast.test.ts`.
+4. If it is a new text/background pair, add it to `scripts/checks/contrast-pairs.ts` (tested in `tests/unit/contrast.test.ts`, shown on Foundations/Colour).
 5. Removing or renaming a semantic token is a breaking change. Keep an alias for a deprecation window.
+
+## Documentation
+
+The gallery is the documentation. Everything in it is rendered from the system, so it can't describe a system that no longer exists.
+
+| Section | Where | What |
+|---|---|---|
+| **Foundations** | `docs/foundations/` | Colour, typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, accessibility, content, escape hatches. |
+| **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
+
+- Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
+- **Docs can't fall behind the API.** `tests/unit/docs.test.tsx` fails when an export from `src/index.ts` has no usage doc (parts such as `TableRow` are listed in their parent's `covers`), and renders every do/don't example. The usage docs and Guides are linted as consumer code: no `className`, `style` or `UNSAFE_` props.
+- **Docs tabs render light only.** Storybook draws the docs page in its own light theme, so the theme toolbar applies to the Canvas tab only. The visual suite runs axe (not screenshots) on every Docs tab.
+- **Stories tagged `modal-open` also carry `'!autodocs'`**, and Examples, Foundations and Guides opt out of the Docs tab: an open modal inline on a Docs tab would cover the page.
+- `.storybook/preview.tsx` loads the docs page lazily. A static import pulls component stylesheets into chunks that load before the preview's CSS, which declares `@layer components` before the layer order and lets the reset win.
+
+## CI
+
+`.github/workflows/ci.yml` runs on every pull request and on pushes to `main`:
+
+| Job | Runs | What it does |
+|---|---|---|
+| Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
+| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json` or the workflow itself |
+| Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
+| Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact; each shard uploads its own report on failure |
+| Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
+
+- **Drafts while iterating.** Open pull requests as drafts: they run the check job only. Mark the pull request ready for review to run visual and axe (`ready_for_review` triggers it), and merge only once that ready run is green.
+- **Superseded runs are cancelled.** A new push to a pull request cancels the run it replaces; runs on `main` are never cancelled.
+- **Require the gate, not the shards, in branch protection.** A matrix job skipped by its `if` never expands, so a check named "(1/4)" would never report.
+- **Keep the `ui` filter complete.** Anything new that feeds the gallery (a folder of stories, a script the gallery imports) goes into the filter in the same change, or pull requests that touch only it skip the visual job.
+- The **Update visual baselines** workflow is deliberately not sharded: it rewrites every Linux baseline in one commit.
 
 ## Visual baselines
 
 - Screenshots live at `tests/visual/__screenshots__/{platform}/<story-id>--<theme>.png`. Only `linux/` is committed. It is produced by the **Update visual baselines** workflow on `ubuntu-24.04`, the same image CI compares on.
 - Without Docker you can't produce Linux baselines locally, and that's fine. Locally, `npm run test:visual:update` writes `darwin/` baselines (gitignored) so you can diff your own changes before pushing.
-- In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice. Once any exist, a story without a baseline fails, and so does any pixel difference.
+- In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
 - Stories tagged `modal-open` (open Dialog, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 

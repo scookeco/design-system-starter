@@ -1,0 +1,156 @@
+/*
+ * Docs-only helpers for the Foundations, Guides and usage pages. Not part of the library build.
+ * Swatches paint with values the pages resolve from the token source, passed in as
+ * --docs-swatch / --docs-sample-* custom properties; nothing here is a literal.
+ */
+@layer components {
+  .docs-page {
+    padding-block: var(--space-inset-xl);
+  }
+
+  .docs-usage {
+    margin-block: var(--space-gap-xl);
+    color: var(--color-fg-default);
+    font: var(--text-body);
+  }
+
+  .docs-example {
+    padding: var(--space-inset-md);
+    border: 1px dashed var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-canvas);
+  }
+
+  .docs-swatch {
+    display: inline-block;
+    flex: none;
+    inline-size: var(--size-control-sm);
+    block-size: var(--size-control-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--docs-swatch);
+  }
+
+  .docs-swatch-row {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  .docs-sample {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-control-md);
+    block-size: var(--size-control-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--docs-sample-bg);
+    color: var(--docs-sample-fg);
+    font: var(--text-label);
+  }
+
+  .docs-sample--stroke::after {
+    content: "";
+    inline-size: 50%;
+    block-size: 50%;
+    border: var(--focus-ring-width) solid var(--docs-sample-fg);
+    border-radius: var(--radius-indicator);
+  }
+
+  .docs-ramp {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap-sm);
+    padding: 0;
+    list-style: none;
+  }
+
+  .docs-ramp__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    min-inline-size: var(--size-control-lg);
+  }
+}
+
+@layer components {
+  .docs-type-sample {
+    font: var(--docs-font);
+  }
+
+  .docs-bar {
+    display: block;
+    inline-size: var(--docs-length);
+    max-inline-size: 100%;
+    block-size: var(--space-gap-sm);
+    border-radius: var(--radius-indicator);
+    background: var(--color-action-primary);
+  }
+
+  .docs-square {
+    display: block;
+    inline-size: var(--docs-length);
+    block-size: var(--docs-length);
+    border-radius: var(--radius-indicator);
+    background: var(--color-action-primary);
+  }
+
+  .docs-radius {
+    display: block;
+    inline-size: var(--size-control-lg);
+    block-size: var(--size-control-md);
+    border: var(--focus-ring-width) solid var(--color-border-strong);
+    border-radius: var(--docs-radius);
+    background: var(--color-bg-subtle);
+  }
+
+  .docs-elevation {
+    display: block;
+    inline-size: var(--size-grid-item-sm);
+    max-inline-size: 100%;
+    block-size: var(--size-control-lg);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-elevated);
+    box-shadow: var(--docs-shadow);
+  }
+
+  .docs-curve {
+    inline-size: var(--size-control-lg);
+    block-size: var(--size-control-lg);
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .docs-curve__axis {
+    stroke: var(--color-border-strong);
+    stroke-width: var(--icon-stroke);
+  }
+
+  .docs-curve__line {
+    stroke: var(--color-action-primary);
+    stroke-width: var(--focus-ring-width);
+  }
+
+  .docs-icon {
+    padding: var(--space-inset-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    color: var(--color-fg-default);
+    list-style: none;
+  }
+}
+
+@layer components {
+  .docs-code {
+    overflow-x: auto;
+    margin: 0;
+    padding: var(--space-inset-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-default);
+    font: var(--text-code);
+  }
+}

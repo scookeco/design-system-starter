@@ -4,8 +4,9 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * One screenshot test and one axe test per story per theme, generated from the
- * built Storybook's index.json, so a new story is covered without touching this file.
+ * One screenshot test and one axe test per story per theme, plus one axe test per Docs tab,
+ * generated from the built Storybook's index.json, so a new story or Docs tab is covered
+ * without touching this file.
  */
 
 interface IndexEntry {
@@ -23,6 +24,7 @@ if (!existsSync(indexPath)) {
 const index = JSON.parse(readFileSync(indexPath, 'utf8')) as { entries: Record<string, IndexEntry> };
 const stories = Object.values(index.entries).filter((e) => e.type === 'story' && !e.tags?.includes('no-visual'));
 if (stories.length === 0) throw new Error('index.json lists no stories');
+const docsPages = Object.values(index.entries).filter((e) => e.type === 'docs');
 
 const THEMES = ['light', 'dark'] as const;
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -47,6 +49,40 @@ const openStory = async (page: Page, id: string, theme: (typeof THEMES)[number])
     );
   });
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+  await page.evaluate(() => document.fonts.ready);
+  await waitForStableHeight(page);
+};
+
+/**
+ * Wait until the document height has not changed for several frames. Slow runners can still be
+ * laying out tall pages when capture starts, and a full-page screenshot of a page that is still
+ * growing never matches its own next capture.
+ */
+const waitForStableHeight = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let last = -1;
+        let steady = 0;
+        const started = performance.now();
+        const tick = () => {
+          const height = document.documentElement.scrollHeight;
+          steady = height === last ? steady + 1 : 0;
+          last = height;
+          if (steady >= 10 || performance.now() - started > 10_000) resolve();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+
+/** A Docs tab: the page, then every inline story on it, rendered. */
+const openDocs = async (page: Page, id: string) => {
+  await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=docs&globals=theme:light`);
+  await page.waitForFunction(() => document.body.classList.contains('sb-show-main'));
+  await page.locator('#storybook-docs .sbdocs-content').waitFor();
+  await page.waitForFunction(() => [...document.querySelectorAll('#storybook-docs .sb-story')].every((el) => el.childElementCount > 0));
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.evaluate(() => document.fonts.ready);
 };
 
@@ -81,7 +117,9 @@ for (const story of stories) {
         test.skip(true, `no ${process.platform} baselines yet`);
       }
       await openStory(page, story.id, theme);
-      await expect(page).toHaveScreenshot(name, { fullPage: true });
+      // Tall pages (Foundations run to ~5,000px) need longer than the 5s default to produce two
+      // identical full-page captures on a CI runner.
+      await expect(page).toHaveScreenshot(name, { fullPage: true, timeout: 30_000 });
     });
 
     test(`${story.title} / ${story.name} [${theme}] @a11y`, async ({ page }) => {
@@ -91,4 +129,17 @@ for (const story of stories) {
       expect(summary, `axe violations in ${story.id} [${theme}]`).toEqual([]);
     });
   }
+}
+
+/**
+ * Docs tabs get axe, not screenshots: the page is mostly Storybook's own chrome, and every
+ * story on it is already captured on its own. Docs tabs render light only (see .storybook/preview.tsx).
+ */
+for (const docs of docsPages) {
+  test(`${docs.title} / ${docs.name} [light] @a11y`, async ({ page }) => {
+    await openDocs(page, docs.id);
+    const results = await runAxe(page, []);
+    const summary = results.violations.map((v) => `${v.id} (${v.impact ?? 'n/a'}): ${v.help}\n  ${v.nodes.map((n) => n.target.join(' ')).join('\n  ')}`);
+    expect(summary, `axe violations in ${docs.id}`).toEqual([]);
+  });
 }

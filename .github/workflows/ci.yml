@@ -2,15 +2,18 @@ name: CI
 
 on:
   pull_request:
+    # ready_for_review: marking a draft ready starts the full visual run.
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
 
 permissions:
   contents: read
 
+# A new push to a pull request cancels its superseded run. Runs on main are never cancelled.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -25,8 +28,41 @@ jobs:
       - run: npm ci
       - run: npm run check
 
+  # Decides whether anything that can change a rendered pixel (or an axe result) changed.
+  # Anything new that feeds the gallery must be added to the `ui` filter, or it skips the visual job.
+  changes:
+    name: Detect UI changes
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      ui: ${{ steps.filter.outputs.ui }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            ui:
+              - 'src/**'
+              - 'docs/**'
+              - 'tokens/**'
+              - 'scripts/checks/**'
+              - '.storybook/**'
+              - 'tests/visual/**'
+              - 'playwright.config.ts'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+
   storybook:
     name: Build Storybook
+    needs: changes
+    # Push to main: always. Pull request: only when ready (not a draft) and something visual changed.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.changes.outputs.ui == 'true')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -43,9 +79,17 @@ jobs:
           retention-days: 7
 
   visual:
-    name: Visual regression and axe
-    needs: storybook
+    name: Visual regression and axe (${{ matrix.shard }}/4)
+    needs: [changes, storybook]
+    # Push to main: always. Pull request: only when ready (not a draft) and something visual changed.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.changes.outputs.ui == 'true')
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -61,16 +105,43 @@ jobs:
       - name: Report baseline status
         run: |
           if ls tests/visual/__screenshots__/linux/*.png >/dev/null 2>&1; then
-            echo "Linux baselines found: any screenshot difference, or a story without a baseline, fails this job."
+            echo "Linux baselines found: any screenshot difference, or a story without a baseline, fails this shard."
           else
             echo "::notice title=No visual baselines yet::No Linux baselines are committed, so screenshot tests are skipped (axe still runs). Run the 'Update visual baselines' workflow on this branch."
           fi
-      - run: npx playwright test
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: |
             playwright-report
             test-results
           retention-days: 14
+
+  # One stable check name for branch protection. A matrix job skipped by its `if` never
+  # expands, so "(1/4)" … "(4/4)" would never report; require this job instead of the shards.
+  # It passes when the shards were skipped (a draft, or nothing visual changed).
+  visual-gate:
+    name: Visual regression and axe
+    needs: [changes, storybook, visual]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Every shard passed, or nothing visual changed
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          STORYBOOK: ${{ needs.storybook.result }}
+          VISUAL: ${{ needs.visual.result }}
+        run: |
+          echo "changes: $CHANGES, storybook: $STORYBOOK, visual: $VISUAL"
+          if [ "$CHANGES" != "success" ]; then
+            echo "::error::Change detection did not succeed."
+            exit 1
+          fi
+          for result in "$STORYBOOK" "$VISUAL"; do
+            case "$result" in
+              success|skipped) ;;
+              *) echo "::error::A visual job ended with '$result'."; exit 1 ;;
+            esac
+          done

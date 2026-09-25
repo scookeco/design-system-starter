@@ -4,6 +4,7 @@ import { SettingsPage } from './SettingsPage';
 const meta = {
   title: 'Examples/Settings page',
   component: SettingsPage,
+  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof SettingsPage>;
 

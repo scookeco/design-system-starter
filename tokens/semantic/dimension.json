@@ -67,7 +67,8 @@
       },
       "md": {
         "$value": "{size.5}"
-      }
+      },
+      "$description": "Icon sizes: sm inline with body text and in controls, md beside larger text."
     },
     "target-min": {
       "$value": "{size.6}",
@@ -118,7 +119,8 @@
       },
       "lg": {
         "$value": "{container.2xl}"
-      }
+      },
+      "$description": "Dialog widths: sm for confirmations, md for short forms, lg for longer forms."
     },
     "overlay-max": {
       "$value": "{container.sm}",
@@ -191,7 +193,8 @@
     "$type": "dimension",
     "width": {
       "default": {
-        "$value": "{border-width.1}"
+        "$value": "{border-width.1}",
+        "$description": "Hairline borders on controls and surfaces."
       }
     }
   },
@@ -199,10 +202,12 @@
     "$type": "dimension",
     "ring": {
       "width": {
-        "$value": "{border-width.2}"
+        "$value": "{border-width.2}",
+        "$description": "Thickness of the focus outline."
       },
       "offset": {
-        "$value": "{space.half}"
+        "$value": "{space.half}",
+        "$description": "Gap between an element and its focus outline."
       }
     }
   }

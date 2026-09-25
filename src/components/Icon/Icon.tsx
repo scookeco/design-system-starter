@@ -31,6 +31,9 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS;
 
+/** Every icon name, for the Foundations icon page. Internal: not exported from src/index.ts. */
+export const ICON_NAMES = Object.keys(PATHS) as IconName[];
+
 export interface IconProps {
   name: IconName;
   size?: 'sm' | 'md';

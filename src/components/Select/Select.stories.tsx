@@ -25,4 +25,4 @@ export const WithError: Story = { args: { error: 'Choose a status.' } };
 export const Disabled: Story = { args: { disabled: true, defaultValue: 'active' } };
 export const Small: Story = { args: { size: 'sm', defaultValue: 'active' } };
 export const Large: Story = { args: { size: 'lg', defaultValue: 'active' } };
-export const Open: Story = { tags: ['modal-open'], args: { defaultOpen: true, defaultValue: 'pending' } };
+export const Open: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true, defaultValue: 'pending' } };

@@ -23,9 +23,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Closed: Story = {};
-export const Open: Story = { tags: ['modal-open'], args: { defaultOpen: true } };
+export const Open: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true } };
 export const AccountMenu: Story = {
-  tags: ['modal-open'],
+  tags: ['modal-open', '!autodocs'],
   args: {
     defaultOpen: true,
     align: 'end',

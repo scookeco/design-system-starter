@@ -23,6 +23,11 @@ Work on a branch. Never commit to `main` directly.
 - `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
+- `docs/`: gallery-only pages. `foundations/` (rendered from the token source), `guides/`, and `usage/<Name>.usage.tsx`, the usage section of each component's Docs tab.
+
+## Read the Guides first
+
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Accessibility, Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 
@@ -45,7 +50,10 @@ UI rules (design system v0)
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.
-- Every new variant, size or state gets a story. Lint, npm run check and the
-  gallery (visual + axe) must pass.
+- Every new variant, size or state gets a story. Every new exported component,
+  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
+  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
+  without one. Lint, npm run check and the gallery (visual + axe) must pass.
+- A story that renders an open modal is tagged ['modal-open', '!autodocs'].
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 ```

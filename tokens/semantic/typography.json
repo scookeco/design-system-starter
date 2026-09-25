@@ -3,19 +3,23 @@
     "family": {
       "$type": "fontFamily",
       "body": {
-        "$value": "{font.family.sans}"
+        "$value": "{font.family.sans}",
+        "$description": "All interface text."
       },
       "code": {
-        "$value": "{font.family.mono}"
+        "$value": "{font.family.mono}",
+        "$description": "Code, IDs and other machine-readable values."
       }
     },
     "weight": {
       "$type": "fontWeight",
       "body": {
-        "$value": "{font.weight.regular}"
+        "$value": "{font.weight.regular}",
+        "$description": "Running text."
       },
       "strong": {
-        "$value": "{font.weight.semibold}"
+        "$value": "{font.weight.semibold}",
+        "$description": "Emphasis inside running text."
       }
     }
   },
@@ -28,7 +32,8 @@
         "fontSize": "{font.size.200}",
         "fontWeight": "{font.weight.regular}",
         "lineHeight": "{font.line-height.normal}"
-      }
+      },
+      "$description": "Default for paragraphs, table cells and form values."
     },
     "body-lg": {
       "$value": {
@@ -36,7 +41,8 @@
         "fontSize": "{font.size.300}",
         "fontWeight": "{font.weight.regular}",
         "lineHeight": "{font.line-height.normal}"
-      }
+      },
+      "$description": "Lead paragraphs and page introductions."
     },
     "label": {
       "$value": {
@@ -44,7 +50,8 @@
         "fontSize": "{font.size.200}",
         "fontWeight": "{font.weight.medium}",
         "lineHeight": "{font.line-height.tight}"
-      }
+      },
+      "$description": "Form labels, buttons, tabs and navigation."
     },
     "caption": {
       "$value": {
@@ -52,7 +59,8 @@
         "fontSize": "{font.size.100}",
         "fontWeight": "{font.weight.regular}",
         "lineHeight": "{font.line-height.snug}"
-      }
+      },
+      "$description": "Helper text, metadata and timestamps."
     },
     "code": {
       "$value": {
@@ -60,7 +68,8 @@
         "fontSize": "{font.size.200}",
         "fontWeight": "{font.weight.regular}",
         "lineHeight": "{font.line-height.normal}"
-      }
+      },
+      "$description": "Inline code and identifiers."
     },
     "heading-1": {
       "$value": {
@@ -68,7 +77,8 @@
         "fontSize": "{font.size.700}",
         "fontWeight": "{font.weight.bold}",
         "lineHeight": "{font.line-height.tight}"
-      }
+      },
+      "$description": "The page title. One per page."
     },
     "heading-2": {
       "$value": {
@@ -76,7 +86,8 @@
         "fontSize": "{font.size.600}",
         "fontWeight": "{font.weight.semibold}",
         "lineHeight": "{font.line-height.tight}"
-      }
+      },
+      "$description": "Page sections and card titles."
     },
     "heading-3": {
       "$value": {
@@ -84,7 +95,8 @@
         "fontSize": "{font.size.500}",
         "fontWeight": "{font.weight.semibold}",
         "lineHeight": "{font.line-height.snug}"
-      }
+      },
+      "$description": "Subsections."
     },
     "heading-4": {
       "$value": {
@@ -92,7 +104,8 @@
         "fontSize": "{font.size.400}",
         "fontWeight": "{font.weight.semibold}",
         "lineHeight": "{font.line-height.snug}"
-      }
+      },
+      "$description": "Small groups, card headers."
     }
   }
 }

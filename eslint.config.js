@@ -10,8 +10,11 @@ import globals from 'globals';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
-/** Code that consumes the system: the golden example and anything built like it. */
-const CONSUMER = ['src/examples/**'];
+/**
+ * Code that consumes the system: the golden examples and anything built like them, including
+ * the usage docs' live do/don't examples and the Guides pages, which must not restyle either.
+ */
+const CONSUMER = ['src/examples/**', 'docs/usage/*.usage.tsx', 'docs/guides/**'];
 
 // Vendor UI (headless or themed component libraries, icon sets) may only be imported inside
 // src/components and src/primitives. Add any new vendor UI package to this group.

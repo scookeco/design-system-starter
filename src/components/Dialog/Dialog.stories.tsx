@@ -25,9 +25,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Closed: Story = { args: { trigger: <Button>Open dialog</Button> } };
-export const Open: Story = { tags: ['modal-open'], args: { defaultOpen: true } };
+export const Open: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true } };
 export const Small: Story = {
-  tags: ['modal-open'],
+  tags: ['modal-open', '!autodocs'],
   args: {
     defaultOpen: true,
     size: 'sm',
@@ -42,5 +42,5 @@ export const Small: Story = {
     ),
   },
 };
-export const Large: Story = { tags: ['modal-open'], args: { defaultOpen: true, size: 'lg' } };
-export const WithoutDescription: Story = { tags: ['modal-open'], args: { defaultOpen: true, description: undefined } };
+export const Large: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true, size: 'lg' } };
+export const WithoutDescription: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true, description: undefined } };

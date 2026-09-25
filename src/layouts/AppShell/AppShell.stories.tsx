@@ -81,7 +81,7 @@ export const WithActionBar: Story = {
     ),
   },
 };
-export const UserMenuOpen: Story = { tags: ['modal-open'], args: { userMenu: userMenu(true) } };
+export const UserMenuOpen: Story = { tags: ['modal-open', '!autodocs'], args: { userMenu: userMenu(true) } };
 export const NarrowCollapsed: Story = {
   decorators: [
     (Story) => (
