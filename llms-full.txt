@@ -41,20 +41,24 @@ UI rules (design system v0)
   never block paste, pass AppShell's help from the shell composition, never
   ask twice in a multi-step flow, and any drag declares data-drag-alternative.
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
+- Format every number, date, amount and list with useFormat() (LocaleProvider
+  sets locale and time zone). Money is integer minor units + currency code.
 ```
 
 ## Guides
 
-- [Getting started](docs/guides/GettingStarted.stories.tsx): Four steps: bring the system in, load its styles once, render every…
+- [Getting started](docs/guides/GettingStarted.stories.tsx): Five steps: bring the system in, load its styles once, render every…
 - [Principles](docs/guides/Principles.stories.tsx): Three rules the whole system is built around.
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Before building anything new, walk the ladder from the top and stop…
 - [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eight layout primitives arrange everything…
 - [Page archetypes](docs/guides/PageArchetypes.stories.tsx): Most pages are one of a few archetypes.
+- [Data](docs/guides/Data.stories.tsx): The design system draws; the app layer knows.
 - [Accessibility](docs/guides/Accessibility.stories.tsx): The target is WCAG 2.2 AA.
 - [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx): What the build checks against WCAG 2.2 AA, what it can’t, and how to…
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
+- [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
 
 ## Foundations
 
@@ -125,6 +129,10 @@ UI rules (design system v0)
 
 ## Utilities
 
+- [LocaleProvider](docs/usage/LocaleProvider.usage.tsx): Sets the locale and time zone every system and app format reads.
+- [createFormatter](docs/usage/LocaleProvider.usage.tsx): Formats for one locale and time zone.
+- [currencyDigits](docs/usage/LocaleProvider.usage.tsx): Decimal places a currency's minor unit has: USD 2, JPY 0, BHD 3.
+- [useFormat](docs/usage/LocaleProvider.usage.tsx): The named formats for the current locale and time zone…
 - [vars](src/tokens/tokens.ts): Semantic and component tokens as var() references, for inline custom…
 
 ## Examples
@@ -505,6 +513,7 @@ component · `src/components/Checkbox/Checkbox.tsx` · usage: `docs/usage/Checkb
 
 Props:
 - `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean` = `false`: Keep the label for assistive tech only, when the context makes it obvious visually: a row's checkbox in a table ("Select Hardware lease"). The name must still say what is selected.
 - `description?: string`
 - `checked?: CheckedState`
 - `defaultChecked?: CheckedState`
@@ -515,12 +524,13 @@ Props:
 - `value?: string`
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
-States: disabled, required.
+States: hideLabel, disabled, required.
 
 **When to use**
 
 - An independent yes/no inside a form that is saved with the form.
 - Several independent choices from a short list; `indeterminate` for a “select all” parent.
+- Row selection in a table: `hideLabel`, with a label naming the row (“Select Hardware lease”), so the name still says what is ticked.
 
 **When not to use**
 
@@ -547,7 +557,7 @@ States: disabled, required.
 - `label` is required and clicking it toggles the box; `description` is linked to the control.
 - The mixed state is exposed as `aria-checked="mixed"`, not only drawn.
 
-Stories: `components-checkbox--unchecked`, `components-checkbox--checked`, `components-checkbox--indeterminate`, `components-checkbox--with-description`, `components-checkbox--disabled`, `components-checkbox--disabled-checked`.
+Stories: `components-checkbox--unchecked`, `components-checkbox--checked`, `components-checkbox--indeterminate`, `components-checkbox--with-description`, `components-checkbox--disabled`, `components-checkbox--disabled-checked`, `components-checkbox--hidden-label`.
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.fg.on-action`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.xs`, `text.body`, `text.caption`.
 
@@ -1172,7 +1182,7 @@ Props:
 - `previousLabel?: string` = `'Previous'`
 - `nextLabel?: string` = `'Next'`
 - `pageLabel?: (page: number) => string` = `(p) => 'Page ${String(p)}'`: Accessible name of a page button, from its number ("Page 3").
-- `formatNumber?: (n: number) => string` = `defaultFormat`: Formats counts in the summary. Defaults to the runtime locale's grouping ("1,284").
+- `formatNumber?: (n: number) => string`: Formats counts in the summary. Defaults to the LocaleProvider's number format ("1,284", "1.284").
 - `announce?: boolean` = `false`: Make the summary ("1–25 of 1,284") a polite live region, so a new page or a new total after filtering is announced. Use it when nothing else on the page announces the count.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
@@ -1872,6 +1882,9 @@ Closed styling API: no `className`/`style`.
 #### TableRow
 
 component, part of Table.
+
+Props:
+- `selected?: boolean` = `false`: The row is in the current selection: it is filled, not just checked, so the selection reads at a glance. Pair it with a row checkbox named after the row ("Select Hardware lease"); the checkbox carries the state for assistive tech.
 - …plus the native attributes of `AriaAttributes`, `Attributes`, `DOMAttributes`, `HTMLAttributes`, `RefAttributes`.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
@@ -1880,6 +1893,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 - Records people compare across the same attributes: the default for a list page.
 - Numbers right-aligned with `numeric`; the first cell of each row is its `rowHeader`.
+- Selectable rows: a first column of `Checkbox` with `hideLabel`, named after each row, and `selected` on the `TableRow` so a selected row is filled, not just ticked. Bulk actions go in a bar that shows the count (see the List page example).
 
 **When not to use**
 
@@ -1933,9 +1947,9 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - Sortable headers are buttons, and the sorted column carries `aria-sort`.
 - The scroll container is focusable, so keyboard users can scroll a wide or capped table.
 
-Stories: `components-table--sorted-ascending`, `components-table--sorted-descending`, `components-table--sticky-header`.
+Stories: `components-table--sorted-ascending`, `components-table--sorted-descending`, `components-table--sticky-header`, `components-table--selectable`.
 Composes: Icon.
-Tokens read: `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `size.scroll-region.md`, `size.scroll-region.sm`, `space.gap.2xs`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.start`, `text.body`, `text.label`, `z.sticky`.
+Tokens read: `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `size.scroll-region.md`, `size.scroll-region.sm`, `space.gap.2xs`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.start`, `text.body`, `text.label`, `z.sticky`.
 
 ### Tabs
 
@@ -3153,6 +3167,76 @@ Tokens read: `size.sidebar.lg`, `size.sidebar.sm`, `space.gap.lg`.
 
 ## Utilities reference
 
+### LocaleProvider
+
+utility · `src/format/LocaleProvider.tsx` · usage: `docs/usage/LocaleProvider.usage.tsx`
+
+Sets the locale and time zone every system and app format reads. Wrap the app once, near the root, with the signed-in user's settings. The formatting locale is separate from the UI language: an English UI can format German dates.
+
+Props:
+- `locale?: string` = `DEFAULT_LOCALE`: BCP 47 locale for formatting, from the user's profile (defaulting from the browser).
+- `timeZone?: string` = `DEFAULT_TIME_ZONE`: IANA time zone, from the user's profile. Travelling users and shared screens break auto-detection.
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Wrap the app once, near the root, with the signed-in user’s locale and time zone (a profile setting that defaults from the browser).
+- Format every number, date, amount, list and file size a person reads with `useFormat()`: `format.money(minor, currency)`, `format.date(iso)`, `format.relative(iso)`. One named format per concept keeps every screen consistent.
+- Money arrives as integer minor units plus an ISO 4217 code. Format the account’s currency in the reader’s locale: a German reader billed in USD sees `12.500,50 $`.
+- An ISO date with no time (`2026-09-30`) is a calendar date and never shifts by zone; a timestamp is an instant, shown in the provider’s time zone.
+- Outside React (tests, exports), `createFormatter({ locale, timeZone })` gives the same formats.
+- Turning typed money into minor units: multiply by `10 ** currencyDigits(code)` (2 for USD, 0 for JPY, 3 for BHD) and round.
+
+**When not to use**
+
+- Dates and numbers in APIs, exports and logs → ISO 8601 and plain numbers; format only for people
+- Translating UI copy → the app’s message catalogue; formatting locale and UI language are separate settings
+- A one-off `Intl.NumberFormat` or `toFixed` in a page → a named format here, or a new one added to it
+
+**Do:** The value is formatted by the provider: the reader’s separators, the account’s currency.
+
+```tsx
+<LocaleProvider locale="de-DE" timeZone="Europe/Berlin">
+  <Balance />
+</LocaleProvider>
+```
+
+**Don't:** A hand-built string: US separators and a “$” for every reader, whatever the currency.
+
+```tsx
+<Text>{`$${(1200000).toFixed(2)}`}</Text>
+```
+
+**Accessibility**
+
+- Locale formats are what screen readers expect: “12.5%” and “Sep 12, 2026” are read naturally; “12.5 pct” and “09/12/26” are not.
+- Prefer month names over numeric dates in the UI: `03/04/2026` means different days in different regions.
+- Show relative times (“3 days ago”) with the absolute date nearby or on hover when precision matters.
+- Numbers in tables still need `numeric` cells, so digits line up in every locale.
+
+### createFormatter
+
+utility · `src/format/format.ts` · usage: `docs/usage/LocaleProvider.usage.tsx`
+
+Formats for one locale and time zone. Prefer `useFormat()` inside React; this is for tests and non-React code.
+Signature: `({ locale, timeZone }: LocaleSettings) => Formatter`
+
+### currencyDigits
+
+utility · `src/format/format.ts` · usage: `docs/usage/LocaleProvider.usage.tsx`
+
+Decimal places a currency's minor unit has: USD 2, JPY 0, BHD 3.
+Signature: `(currency: string) => number`
+
+### useFormat
+
+utility · `src/format/LocaleProvider.tsx` · usage: `docs/usage/LocaleProvider.usage.tsx`
+
+The named formats for the current locale and time zone: `format.money(minor, 'USD')`, `format.date(iso)`.
+Signature: `() => Formatter`
+
 ### vars
 
 utility · `src/tokens/tokens.ts`
@@ -3169,8 +3253,11 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ButtonVariant` (`src/components/Button/Button.tsx`): `type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'`
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
+- `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
+- `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long'`
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
+- `Formatter` (`src/format/format.ts`): `interface Formatter extends LocaleSettings { date: (value: DateInput, style?: DateStyle) => string; time: (value: DateInput) => string; dateTime: (value: DateInput, options?: { withZone?: boolean; }) => string; relative: (value: DateInput, now?: DateInput) => string; number: (value: number, options?: { maximumFractionDigits?: number; }) => string; percent: (value: number, options?: { maximumFractionDigits?: number; }) => string; compact: (value: number) => string; money: (minor: number, currency: string, options?: { compact?: boolean; }) => string; list: (items: readonly string[], type?: 'conjunction' | 'disjunction') => string; fileSize: (bytes: number) => string; }`
 - `GapToken` (`src/tokens/tokens.ts`): `type GapToken = keyof typeof vars.space.gap`
 - `GridItemToken` (`src/tokens/tokens.ts`): `type GridItemToken = keyof typeof vars.size['grid-item']`
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
@@ -3179,6 +3266,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `LayoutElement` (`src/primitives/types.ts`): `type LayoutElement = 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav' | 'form' | 'fieldset' | 'ul' | 'ol' | 'li' | 'dl'` Elements a layout primitive may render as. Closed on purpose: layout, not widgets.
 - `LinkComponent` (`src/components/Link/Link.tsx`): `type LinkComponent = ComponentType<LinkComponentProps>` An app's router link, adapted to take `href`: React Router's `<Link to>`, Next's `<Link href>`.
 - `LinkComponentProps` (`src/components/Link/Link.tsx`): `type LinkComponentProps = Omit<ComponentPropsWithRef<'a'>, 'href'> & { href: string; }` What the system hands an app's link component: every anchor prop, with `href` always set and `ref` included. The component must spread the rest onto its anchor and forward `ref` (tooltips and focus management attach to it).
+- `LocaleSettings` (`src/format/format.ts`): `interface LocaleSettings { locale: string; timeZone: string; }` Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings ("$" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.
 - `MenuEntry` (`src/components/Menu/Menu.tsx`): `type MenuEntry = MenuItem | 'separator'` An item, or 'separator' for a divider between groups.
 - `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; }`
 - `MeterStatus` (`src/components/Meter/Meter.tsx`): `type MeterStatus = 'ok' | 'warning' | 'danger'`
@@ -3206,7 +3294,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 
 ### Getting started
 
-Four steps: bring the system in, load its styles once, render every signed-in page inside AppShell, and route its links through your router.
+Five steps: bring the system in, load its styles once, render every signed-in page inside AppShell, route its links through your router, and set the reader’s locale.
 
 #### 1. Install
 
@@ -3284,9 +3372,27 @@ function AppLink(props: LinkComponentProps) {
 
 Modified clicks (new tab, new window) keep working, because the router link is still an anchor with a real `href`.
 
+#### 5. Set the locale and time zone
+
+Wrap the app once in `LocaleProvider` with the signed-in person’s locale and time zone (a profile setting that defaults from the browser). Then format every value a person reads with `useFormat()`. System components that show numbers, such as Pagination, follow it too.
+
+```
+<LocaleProvider locale={user.locale} timeZone={user.timeZone}>
+  <LinkProvider component={AppLink}>{/* the app */}</LinkProvider>
+</LocaleProvider>
+
+const format = useFormat();
+format.money(1_250_050, 'EUR');   // "€12,500.50" in en-US, "12.500,50 €" in de-DE
+format.date('2026-09-12');        // a calendar date: never shifts by time zone
+format.relative(record.updatedAt);  // "3 days ago"
+```
+
+Data is the app’s job, not the system’s: the examples read and write through `src/app` (a query cache, named mutations, URL state). The Data guide explains that layer.
+
 #### Then
 
 - Pick the page archetype and copy its example: see Page archetypes.
+- Wire its data the way the examples do: see Data.
 - Style nothing. If a component doesn’t look right for the job, walk the Decision ladder.
 - Before a pull request: `npm run check`, then the visual and axe suite (`npm run test:visual`).
 
@@ -3422,9 +3528,9 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 
 | Archetype | Choose when | Copy | It shows |
 |---|---|---|---|
-| List / index | Users come to find, compare or act on many records: records, people, invoices, an audit log. | [List page](src/examples/ListPage.tsx)`src/examples/ListPage.tsx` | PageHeader with one primary action, SearchField and a Filters popover with removable chips, a sortable table, Pagination; loading, first use, no results and load error states. |
-| Record / detail | One record is the subject: its status, properties, activity and the actions on it. | [Record page](src/examples/RecordPage.tsx)`src/examples/RecordPage.tsx` | Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside in PageLayout. |
-| Create and edit | Someone fills in a record: a full page for heavy records, a quick-create dialog for light ones. | [Create and edit](src/examples/CreateEditFlow.tsx)`src/examples/CreateEditFlow.tsx` | Errors on blur and submit, a focused error summary linking to fields, a pending submit in the sticky action bar. |
+| List / index | Users come to find, compare or act on many records: records, people, invoices, an audit log. | [List page](src/examples/ListPage.tsx)`src/examples/ListPage.tsx` | PageHeader with one primary action, view tabs with server counts, SearchField and a Filters popover with removable chips, a sortable table, Pagination; view, search, filters, sort and page in the URL; row selection with “Select all N matching” and a bulk bar; loading, first use, no results and load error states. |
+| Record / detail | One record is the subject: its status, properties, activity and the actions on it. | [Record page](src/examples/RecordPage.tsx)`src/examples/RecordPage.tsx` | Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside rendered from the field registry; an optimistic rename with rollback and a conflict banner, a pessimistic archive. |
+| Create and edit | Someone fills in a record: a full page for heavy records, a quick-create dialog for light ones. | [Create and edit](src/examples/CreateEditFlow.tsx)`src/examples/CreateEditFlow.tsx` | Errors on blur and submit, a focused error summary linking to fields, registry-rendered fields, a pending submit in the sticky action bar, a create that is safe to retry (idempotency key). |
 | Settings | Personal or workspace preferences, grouped by category. | [Settings page](src/examples/SettingsPage.tsx)`src/examples/SettingsPage.tsx` | A grouped sub-nav in PageLayout’s nav slot, one card per category with its own Save, a success banner. |
 | Sign-in (signed out) | Any signed-out page: sign-in, sign-up, password reset, a verification code. | [Sign in](src/examples/SignInPage.tsx)`src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step. |
 | Wizard | A task whose later steps depend on earlier ones: first-run setup, a multi-step create. | [Setup wizard](src/examples/SetupWizard.tsx)`src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit. |
@@ -3435,8 +3541,119 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 
 - Signed-in pages render inside the app’s one shell composition (the examples share `ExampleShell`); signed-out pages in AuthLayout; a focused multi-step task in FocusedLayout. Every page starts with a `PageHeader`.
 - Keep every state the example has: loading, empty, error. A page without them isn’t finished.
-- Map domain statuses to badge tones in one place, as the examples’ status-to-tone map does.
+- Read and write through the app layer, as the list, record and create examples do: queries and named mutations from `src/app/model`, never a fetch in a page. See the Data guide.
+- Map domain statuses to badge tones in one place (`src/app/model/status.ts`), and define each “what counts as X” as one named predicate.
+- Format every number, date and amount with `useFormat()`; never by hand.
 - A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.
+
+<!-- docs/guides/Data.stories.tsx -->
+
+### Data
+
+The design system draws; the app layer knows. Everything about fetching, caching, validating and writing data lives in src/app, which the golden examples use and the system never imports.
+
+#### Why the system stays UI-only
+
+- The system’s runtime dependencies are exactly `react`, `react-dom` and `radix-ui`. A unit test fails the build if that list changes.
+- Data libraries (`msw`, `@tanstack/react-query`, `zod`) are devDependencies. ESLint rejects them, and any import from `src/app`, in `src/components`, `src/primitives` and `src/layouts`, with a fixture per boundary in `npm run test:rules`.
+- So components take values and callbacks, never queries. An app is free to choose another cache or another server, and the system doesn’t change.
+- The one data-shaped part the system does ship is formatting: `LocaleProvider` and `useFormat()`. Every number, date and amount a person reads goes through it.
+
+```
+tokens → primitives → components → layouts        the design system (src/index.ts)
+                                         ↑
+src/app   api/        the client and zod schemas: every response is parsed at the boundary
+          model/      cache keys, queries, named predicates, projections, mutations, selection
+          url/        useUrlState and the list page's URL codec
+          registries/ the field registry and which fields a record has
+          mocks/      the mock API (MSW), its seeded database and gallery wiring
+                                         ↑
+src/examples          golden pages: compose the system, read and write through src/app
+```
+
+#### The cache model
+
+- One server cache (TanStack Query), chosen on purpose: this is server-driven CRUD with server-side search, filter, sort and paging. A normalized store would earn its cost only if many views edited the same entities at once.
+- Keys are `[tenant, resource, params]`: `['acme', 'records', { view, q, status, sort, page }]`, `['acme', 'record', { id }]`. The tenant leads every key and every request path, so one workspace’s data can never answer for another’s, and invalidation can be as narrow as one resource in one tenant.
+- A query cache doesn’t normalize: patching a record doesn’t update a list that contains it. That’s why each mutation says which lists and counts it invalidates (below).
+- Only trusted data enters the cache. Every response is parsed with a zod schema in `src/app/api/client.ts`. A payload that breaks the contract is reported and becomes the page’s error state; it never reaches the cache (see [the invalid payload story](src/examples/ListPage.tsx)).
+- Views are projections, never copies: rows are `toRow(record)`. “What counts as open” is one predicate, `isOpen`. The Open tab, its count, the filter options, the badges, the bulk-delete guard (`canDelete`) and the mock server all call the same functions, so they can’t disagree.
+
+#### Where state lives
+
+**State homes**
+
+| Home | Holds | In the list and record pages |
+|---|---|---|
+| Local state | What one component owns: an open menu, a half-typed search, a form draft | The rename dialog’s typed name |
+| Lifted state | What two parts of one page coordinate on | The list’s selection (the table and the footer bar share it) |
+| Server cache | Confirmed domain data, read through queries | A page of records, a record, the tab counts |
+| URL | What a copied link must reproduce: view, search, filters, sort, page, tab | /records?view=open&q=lease&sort=-amount&page=2 |
+
+- `useUrlState(codec)` reads and writes a validated query string. The codec never throws: an unknown view, sort or status falls back to its default, so a stale or hand-edited link still opens a sensible view.
+- History is decided per write. **Push** for navigation (a tab, a page), so Back returns there. **Replace** for refinements (a filter, a sort, the search once typing pauses for 300 ms), so Back never steps through keystrokes.
+- Ids go in the URL, never the data behind them or anything personal. The half-typed search stays local until it’s committed.
+
+#### Writes: one named mutation per verb
+
+Components never write the cache. They call a mutation from `src/app/model/mutations.ts`, named for the domain verb. How it presents depends on whether failure is cheap to reverse: optimistic for a person’s own frequent edit, pessimistic when the server decides or the change is hard to take back.
+
+**The mutation matrix**
+
+| Mutation | Presents | Patches | Invalidates | On failure |
+|---|---|---|---|---|
+| `renameRecord` | Optimistic | The record, at once; rolled back on failure unless a newer write landed | The record, every list (counts can’t change) | Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload |
+| `archiveRecord` | Pessimistic | The record, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
+| `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count | The draft stays; a retry sends the same key, so no duplicate |
+| `bulkDeleteRecords` | Pessimistic, confirmed | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
+| `addPerson` | Pessimistic | Appends to people | People | The dialog stays open with an error |
+
+- An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
+- Edits send the version they were based on. The server answers `409` if someone changed the record since, and the page says so instead of silently overwriting their change.
+- A pending write disables the controls that would start it again. Errors that need action stay on screen until dismissed.
+- See them on the [record page](src/examples/RecordPage.tsx) (rename pending, succeeded, failed and rolled back, conflict; archive pending) and the [create form](src/examples/CreateEditFlow.tsx).
+
+#### Selection and bulk actions
+
+- A checkbox per row, named after the row (`Checkbox hideLabel`, “Select Hardware lease”); selected rows are filled (`TableRow selected`).
+- The header box selects the page, then offers “Select all N matching”. That selection is the *filter*, sent to the server as a filter, never as a list of ids it would have to load.
+- A selection belongs to one filter: change the search, a filter or the view and it clears. Paging and sorting keep it.
+- While anything is selected the shell’s sticky footer shows the count (announced politely), Clear selection, and Delete last, disabled when the `canDelete` predicate rules every selected row out.
+- Delete asks with the count in the question. A partial failure stays on screen (“50 deleted, 9 failed”) with the reasons and Retry. See [the partial failure story](src/examples/ListPage.tsx).
+
+#### Registries: fields as config
+
+- `src/app/registries/fields.tsx` maps each field type (`text`, `money`, `date`, `status`, `person`, `tags`) to how it displays and how it edits. `RECORD_PROPERTIES` drives the record page’s properties; `CREATE_FIELDS` drives the create form. One registry, two surfaces.
+- A new field is one line of config. A new field type is one registry entry: the registry is keyed on the type union, so a missing entry fails to compile.
+- Data can still be newer than the code. A field whose type has no entry renders “Not available” and is reported once. It never throws.
+
+#### The mock API and the gallery
+
+- Stories and tests talk to a real HTTP mock (MSW) over a seeded, deterministic database: 240 and 120 records for two tenants, the same on every run.
+- The toolbar’s **Latency** and **Failures** controls change how the mock server behaves. Failures are real 500 responses through the real client, so the error states you see are the ones users would.
+- The visual suite pins latency and failures to 0 in the story URL, freezes the page clock at the instant the data was seeded for (so “3 days ago” holds), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose (a loading or pending state) is tagged `busy`.
+- Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`. The database is reset before every story.
+
+```
+const meta = {
+  title: 'Examples/List page',
+  component: ListPage,
+  tags: ['!autodocs', 'data'],   // written out: Storybook reads tags statically
+  ...mockApiMeta,                // providers, handlers, a fresh database per story
+} satisfies Meta<typeof ListPage>;
+
+export const LoadError: Story = { parameters: mswOverrides(fail('get', '/records')) };
+export const Loading: Story = { tags: ['busy'], parameters: mswOverrides(hold('get', '/records')) };
+export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=lease' }) };
+```
+
+#### Adding an entity
+
+- Its schema in `src/app/api/schemas.ts`, and its endpoints (the tenant first) beside the record ones.
+- Its predicates and status map in `src/app/model`; its projections for lists.
+- Its keys, queries and named mutations, each mutation with its row in the matrix above.
+- Its field definitions for the record page and the form; registry entries only for genuinely new field types.
+- Its URL codec if it has a list; mock handlers and seed data so its stories and tests run.
 
 <!-- docs/guides/Accessibility.stories.tsx -->
 
@@ -3668,6 +3885,97 @@ Consumer code can’t use an `UNSAFE_` prop without an ESLint disable, and the d
 - Count the disables. A rising count is drift made visible; review it like any other health metric.
 - The same override twice is a missing variant. Propose it and remove both overrides when it lands.
 - When the removal condition is met, the escape hatch goes in the same pull request as its replacement.
+
+<!-- docs/guides/Agents.stories.tsx -->
+
+### Agents
+
+Coding agents read the system from three files at the repo root, generated from the code. Point an agent at llms.txt first: it holds the rules and links to everything else.
+
+#### The three files
+
+- `llms.txt` is the entry point, small enough to read whole at the start of every session (under 8 KB). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
+- `llms-full.txt` adds every component’s props, variants and states, its usage doc (with the do and don’t code), its stories and tokens, then every guide as Markdown and every semantic token with its light and dark value. Give it to an agent that takes a whole document as context.
+- `design-system.manifest.json` holds the same facts as data, for tools and targeted lookups. Its schema, `design-system.manifest.schema.json`, documents every field.
+
+#### How an agent should use them
+
+- Read llms.txt before any UI work and follow its rules. They are the rules below, word for word.
+- Building a page: find its archetype under Examples and copy that golden example’s structure. Never copy another screen.
+- Before using a component, look it up: its props with their defaults and allowed values, its variants, and “when not to use”, which names what to use instead.
+- Need a value: find the semantic token by what it is for (each token carries a description and its light and dark values). Never write a literal.
+- Import every `component`, `primitive`, `layout` and `utility` from `src/index.ts`; a `type-only` export with `import type`. No component accepts `className` or `style`: the manifest records that for every one.
+- Agent output goes through the same gates as anyone’s: lint, `npm run check` and the gallery.
+
+```
+# One component: its props, variants, and what to use instead
+jq '.exports[] | select(.name == "Button") | {props: [.props[].name], variants, instead: [.usage.whenNotToUse[].instead]}' design-system.manifest.json
+
+# Which units read a token
+jq -r '.exports[] | select(.unit.tokens // [] | index("color.fg.muted")) | .name' design-system.manifest.json
+
+# Text colours, with what each is for
+jq -c '.tokens | to_entries[] | select(.key | startswith("color.fg.")) | {token: .key, light: .value.value, dark: .value.modes.dark, use: .value.description}' design-system.manifest.json
+```
+
+#### What the manifest holds
+
+- `exports`: every public export of `src/index.ts`, with its kind, source file, status and description. A part (`TableRow`) names the unit it belongs to; a props type names its component.
+- For components, primitives and layouts: props (TypeScript type, required, default, description, allowed values), the React DOM attributes they pass through, the closed styling API, variants and states, the usage doc, story ids, the units it composes and every token it reads.
+- `tokens`: every semantic and component token with its CSS variable, value, dark value, description and alias chain.
+- `guides`, `foundations` and `examples` with a one-line summary each; `rules`; and `commands`, the repo’s scripts.
+
+#### The agent rules
+
+Copied verbatim from CLAUDE.md, between its agent-rules markers. Edit them there.
+
+```
+UI rules (design system v0)
+- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
+  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
+- Compose system components and layout primitives, imported from src/index.ts.
+  Never import radix-ui outside src/components or src/primitives.
+- Never restyle a system component with className or style. Need a new look?
+  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
+  a lint disable with a reason, an owner and a removal condition.
+- Before creating a component, walk the decision ladder: template → variant →
+  component → primitive. Stop at the first yes.
+- Missing token? Add a semantic token in tokens/ (with a dark value for colours),
+  run npm run tokens. Never write a literal instead.
+- New pages start from PageHeader (the one h1, status, actions) inside the right
+  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),
+  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout
+  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
+  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
+  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
+  error/404 → ErrorPages. Not other screens.
+- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
+  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
+- CSS: inside a declared @layer, BEM-lite classes, logical properties only,
+  variants as closed data-* attributes, state via aria/native attributes,
+  specificity ≤ 0,3,0, no !important, no ids.
+- Every new variant, size or state gets a story. Every new exported component,
+  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
+  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
+  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
+- A story that renders an open modal is tagged ['modal-open', '!autodocs'].
+- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
+  focus never hidden behind sticky content (scroll containers use
+  space.scroll-padding.*), password fields as TextField type="password" with
+  autoComplete (username, current-password or new-password, one-time-code),
+  never block paste, pass AppShell's help from the shell composition, never
+  ask twice in a multi-step flow, and any drag declares data-drag-alternative.
+- Never add an eslint-disable or stylelint-disable without a reason after "--".
+- Format every number, date, amount and list with useFormat() (LocaleProvider
+  sets locale and time zone). Money is integer minor units + currency code.
+```
+
+#### Keeping them current
+
+Nothing in the three files is written by hand. `npm run manifest` regenerates them, and `npm run check` runs `manifest:check`, which fails when any committed file differs from a fresh build.
+
+- They go stale when an export, a prop, a JSDoc comment, a story, a usage doc, a guide, the token usage map, the agent rules or the README’s Scripts table changes. Run `npm run manifest` and commit the result with the change.
+- A description comes from the JSDoc on the export, or else the first “when to use” line of its usage doc. To improve an entry, improve those, never the generated files.
 
 ## Semantic tokens
 

@@ -47,6 +47,7 @@ tokens/                 DTCG token source: primitive/ → semantic/ → componen
 scripts/build-tokens.ts Style Dictionary build and --check mode
 scripts/token-usage.ts  token usage map (src/tokens/token-usage.json) and --check mode
 scripts/check-tree-shaking.ts  single-component imports pull in only what they compose
+scripts/manifest.ts     the files for coding agents (manifest, llms.txt, llms-full.txt) and --check mode; collector in manifest-collect.ts
 scripts/checks/         token, contrast, chart palette, token usage and CSS checks (used by Vitest)
 scripts/test-rules.ts   proves every lint and type rule fires
 scripts/eslint/         local ESLint rules (drag-needs-alternative)
@@ -63,12 +64,13 @@ src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (also a consumer lint target)
 src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
-fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
+fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls; fixtures/manifest/ = the manifest extractor's test entry
 tests/unit/             Vitest suites
 tests/visual/           Playwright suite: screenshots + axe, WCAG 2.2 checks (shared story opening in storybook.ts); __screenshots__/linux/ is committed
 tests/visual/fixtures/  check-fixture stories that each WCAG 2.2 check must fail (hidden from the gallery)
 .storybook/             gallery config, theme, width, locale, latency and failure toolbars, the Tokens panel (manager.tsx); public/ holds MSW's service worker
 .size-limit.json        bundle size budgets
+llms.txt, llms-full.txt, design-system.manifest.json   generated: the system for coding agents (schema: design-system.manifest.schema.json)
 .github/workflows/      ci.yml, update-visual-baselines.yml
 ```
 
@@ -105,7 +107,8 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
 | The library stays small, and one import doesn't pull in the rest | size-limit budgets; tree-shaking check per exported unit | `.size-limit.json`, `scripts/check-tree-shaking.ts` |
-| Agents know the rules | UI rules block | `CLAUDE.md` |
+| Agents know the rules | UI rules block, extracted between markers into `llms.txt` and the manifest | `CLAUDE.md` |
+| Agents see the system as it is: every export, prop, variant, story, token and usage rule | Generated from the code; `manifest:check` and Vitest fail when a file is stale, an export is missing, a component has no stories or tokens, or any props accept `className`/`style` | `scripts/manifest.ts`, `tests/unit/manifest.test.ts`, `design-system.manifest.schema.json` |
 
 ### Layers
 
@@ -233,7 +236,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches. |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches, agents (how coding agents use the generated files). |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
@@ -242,6 +245,26 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 - **Stories tagged `modal-open` also carry `'!autodocs'`**, and Examples, Foundations and Guides opt out of the Docs tab: an open modal inline on a Docs tab would cover the page. An open non-modal overlay (Popover) carries only `'!autodocs'`: the page behind stays reachable, so axe needs no relaxation.
 - `.storybook/preview.tsx` loads the docs page lazily. A static import pulls component stylesheets into chunks that load before the preview's CSS, which declares `@layer components` before the layer order and lets the reset win.
 
+## For coding agents
+
+Three generated files at the repo root describe the system to coding agents. `npm run manifest` writes them from the code; nothing in them is written by hand. The gallery's **Guides/Agents** page says how an agent should use them.
+
+| File | What it holds | Read it |
+|---|---|---|
+| `llms.txt` | The [llms.txt](https://llmstxt.org) entry point: name, summary, the agent rules block, then one line per guide, foundation page, component, primitive, layout, utility and golden example, linking to its file. Kept under 8 KB by a test. | whole, at the start of every session |
+| `llms-full.txt` | The same, plus every unit's props, variants, states, usage doc (with the do and don't code), stories and tokens, every guide flattened to Markdown, and every semantic token with light and dark values. | when an agent takes a whole document as context |
+| `design-system.manifest.json` | The same facts as data, documented by `design-system.manifest.schema.json`: every public export (component, primitive, layout, utility or type-only) with its source, JSDoc, props (TypeScript type, required, default, description, allowed values), closed-API facts, variants, states, usage rules, story ids, composition and tokens read; every semantic and component token; guides, foundations and examples; the rules; the commands. | for tools and targeted lookups (`jq`) |
+
+Where the facts come from:
+
+- **Exports and props**: the TypeScript compiler API over `src/index.ts`, so a new export appears on the next run. Own and third-party (Radix) props are listed one by one; React's DOM attribute interfaces are named in `inherits`, not expanded. Defaults come from the component's parameter destructuring.
+- **Descriptions**: the JSDoc on the export; a unit without one falls back to the first "when to use" line of its usage doc. Improve the JSDoc or the usage doc, never the generated files.
+- **Stories**: Storybook's own CSF parser over every `*.stories.tsx`, so the ids match the gallery.
+- **Usage rules, guides**: the usage docs are imported and the guides rendered (in a Vite SSR server), then flattened to Markdown.
+- **Tokens and composition**: `src/tokens/token-usage.json` and the token source. **Rules**: `CLAUDE.md` between the `agent-rules` markers. **Commands**: this README's Scripts table.
+
+**Staleness.** `npm run manifest:check` (part of `npm run check`) regenerates all three in memory and fails if any committed file differs, so a change to an export, a prop or its JSDoc, a story, a usage doc, a guide, the token usage map, the rules block or the Scripts table must commit the regenerated files with it. `tests/unit/manifest.test.ts` also checks the schema, that every public export is listed, that every component, primitive and layout has stories, tokens and a usage doc, that no props accept `className`/`style`, that no absolute path leaks, that every link resolves, and the `llms.txt` budget.
+
 ## CI
 
 `.github/workflows/ci.yml` runs on every pull request and on pushes to `main`:
@@ -249,7 +272,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Job | Runs | What it does |
 |---|---|---|
 | Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
-| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.nvmrc` or the workflow itself |
+| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `CLAUDE.md` (the Agents guide shows its rules block), `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.nvmrc` or the workflow itself |
 | Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
 | Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact, running every spec: screenshots, axe and the WCAG 2.2 checks; each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |

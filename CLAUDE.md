@@ -5,8 +5,9 @@ Reference design system in which drift fails the build. See `README.md` for the 
 ## Commands
 
 ```sh
-npm run check          # tokens:check + typecheck + lint + test + test:rules + build + size. Must pass.
+npm run check          # tokens:check + manifest:check + typecheck + lint + test + test:rules + build + size. Must pass.
 npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
+npm run manifest       # regenerate llms.txt, llms-full.txt and design-system.manifest.json after changing exports, props, JSDoc, stories, usage docs, guides or the rules below
 npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first
 npm run dev            # Storybook gallery
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
@@ -37,9 +38,15 @@ Work on a branch. Never commit to `main` directly.
 - Charts use `color.chart.*` only (categorical slots in order, sequential, diverging), never status colours, and never colour alone. The rules and numbers are on Foundations/Data visualisation.
 - The gallery's Width toolbar shows layouts at narrow, medium and wide container widths; the Tokens panel lists what a component reads.
 
+## Machine-readable docs
+
+- Start from `llms.txt` (rules + a link per guide, component, primitive, layout and example). `llms-full.txt` has every usage doc and guide in full; `design-system.manifest.json` has every export's props, variants, stories, tokens and usage rules as data (schema beside it). Look a component up there before using it.
+- All three are **generated** by `npm run manifest`; `manifest:check` fails when they are stale. Never edit them: fix the JSDoc, usage doc, story or guide they come from.
+- The rules block below is the source for all three. Keep it between the `agent-rules` markers.
+
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Escape hatches, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 

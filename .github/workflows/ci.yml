@@ -50,6 +50,7 @@ jobs:
               - 'tokens/**'
               - 'scripts/checks/**'
               - '.storybook/**'
+              - 'CLAUDE.md'
               - 'tests/visual/**'
               - 'playwright.config.ts'
               - 'package.json'

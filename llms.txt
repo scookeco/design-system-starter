@@ -41,20 +41,24 @@ UI rules (design system v0)
   never block paste, pass AppShell's help from the shell composition, never
   ask twice in a multi-step flow, and any drag declares data-drag-alternative.
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
+- Format every number, date, amount and list with useFormat() (LocaleProvider
+  sets locale and time zone). Money is integer minor units + currency code.
 ```
 
 ## Guides
 
-- [Getting started](docs/guides/GettingStarted.stories.tsx): Four steps: bring the system in, load its styles once, render every…
+- [Getting started](docs/guides/GettingStarted.stories.tsx): Five steps: bring the system in, load its styles once, render every…
 - [Principles](docs/guides/Principles.stories.tsx): Three rules the whole system is built around.
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Before building anything new, walk the ladder from the top and stop…
 - [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eight layout primitives arrange everything…
 - [Page archetypes](docs/guides/PageArchetypes.stories.tsx): Most pages are one of a few archetypes.
+- [Data](docs/guides/Data.stories.tsx): The design system draws; the app layer knows.
 - [Accessibility](docs/guides/Accessibility.stories.tsx): The target is WCAG 2.2 AA.
 - [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx): What the build checks against WCAG 2.2 AA, what it can’t, and how to…
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
+- [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
 
 ## Foundations
 
@@ -125,6 +129,10 @@ UI rules (design system v0)
 
 ## Utilities
 
+- [LocaleProvider](docs/usage/LocaleProvider.usage.tsx): Sets the locale and time zone every system and app format reads.
+- [createFormatter](docs/usage/LocaleProvider.usage.tsx): Formats for one locale and time zone.
+- [currencyDigits](docs/usage/LocaleProvider.usage.tsx): Decimal places a currency's minor unit has: USD 2, JPY 0, BHD 3.
+- [useFormat](docs/usage/LocaleProvider.usage.tsx): The named formats for the current locale and time zone…
 - [vars](src/tokens/tokens.ts): Semantic and component tokens as var() references, for inline custom…
 
 ## Examples

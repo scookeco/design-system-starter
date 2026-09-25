@@ -137,6 +137,12 @@
       "summary": "Every system component and primitive takes UNSAFE_className and UNSAFE_style. They exist so a deadline never forces a fork, and they are loud on purpose.",
       "path": "docs/guides/EscapeHatches.stories.tsx",
       "story": "guides-escape-hatches--escape-hatches-guide"
+    },
+    {
+      "title": "Agents",
+      "summary": "Coding agents read the system from three files at the repo root, generated from the code. Point an agent at llms.txt first: it holds the rules and links to everything else.",
+      "path": "docs/guides/Agents.stories.tsx",
+      "story": "guides-agents--agents-guide"
     }
   ],
   "foundations": [
@@ -4260,11 +4266,11 @@
         ],
         "do": {
           "caption": "The value is formatted by the provider: the reader’s separators, the account’s currency.",
-          "code": "      <LocaleProvider locale=\"de-DE\" timeZone=\"Europe/Berlin\">\n  <Balance />\n</LocaleProvider>"
+          "code": "<LocaleProvider locale=\"de-DE\" timeZone=\"Europe/Berlin\">\n  <Balance />\n</LocaleProvider>"
         },
         "dont": {
           "caption": "A hand-built string: US separators and a “$” for every reader, whatever the currency.",
-          "code": "                  <Text>{`$${(1200000).toFixed(2)}`}</Text>"
+          "code": "<Text>{`$${(1200000).toFixed(2)}`}</Text>"
         },
         "accessibility": [
           "Locale formats are what screen readers expect: “12.5%” and “Sep 12, 2026” are read naturally; “12.5 pct” and “09/12/26” are not.",
