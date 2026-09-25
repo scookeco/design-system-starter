@@ -838,6 +838,19 @@
           ]
         },
         {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "AppShell",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -3364,6 +3377,15 @@
           ]
         },
         {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -3992,6 +4014,15 @@
         },
         {
           "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "FocusedLayout",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
           "readBy": [
             {
               "unit": "FocusedLayout",
@@ -7998,6 +8029,15 @@
           ]
         },
         {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Table",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -8351,9 +8391,12 @@
       "exports": [
         "TextField"
       ],
-      "stylesheets": [],
+      "stylesheets": [
+        "src/components/TextField/TextField.css"
+      ],
       "composes": [
-        "Field"
+        "Field",
+        "Icon"
       ],
       "composesAll": [
         "Field",
@@ -8361,10 +8404,23 @@
       ],
       "tokens": [
         {
+          "token": "color.bg.hover",
+          "readBy": [
+            {
+              "unit": "TextField",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.subtle",
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "TextField",
               "how": "css"
             }
           ]
@@ -8384,6 +8440,10 @@
             {
               "unit": "Field",
               "how": "css"
+            },
+            {
+              "unit": "TextField",
+              "how": "css"
             }
           ]
         },
@@ -8402,6 +8462,10 @@
             {
               "unit": "Field",
               "how": "css"
+            },
+            {
+              "unit": "TextField",
+              "how": "css"
             }
           ]
         },
@@ -8410,6 +8474,10 @@
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "TextField",
               "how": "css"
             }
           ]
@@ -8420,6 +8488,19 @@
             {
               "unit": "Field",
               "how": "css"
+            },
+            {
+              "unit": "TextField",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "TextField",
+              "how": "css"
             }
           ]
         },
@@ -8428,6 +8509,28 @@
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "TextField",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "TextField",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "TextField",
               "how": "css"
             }
           ]
@@ -8446,6 +8549,10 @@
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "TextField",
               "how": "css"
             }
           ]
@@ -8496,6 +8603,15 @@
           ]
         },
         {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "TextField",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.gap.2xs",
           "readBy": [
             {
@@ -8509,6 +8625,15 @@
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "TextField",
               "how": "css"
             }
           ]
@@ -10875,6 +11000,30 @@
       "chain": [
         "space.inset.xs",
         "space.1"
+      ],
+      "modes": {}
+    },
+    "space.scroll-padding.end": {
+      "cssVar": "--space-scroll-padding-end",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Above a sticky action bar (AppShell, FocusedLayout and Drawer footers). At least the tallest bar.",
+      "value": "80px",
+      "chain": [
+        "space.scroll-padding.end",
+        "space.20"
+      ],
+      "modes": {}
+    },
+    "space.scroll-padding.start": {
+      "cssVar": "--space-scroll-padding-start",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Below a sticky header row (Table). At least the header's height.",
+      "value": "48px",
+      "chain": [
+        "space.scroll-padding.start",
+        "space.12"
       ],
       "modes": {}
     },

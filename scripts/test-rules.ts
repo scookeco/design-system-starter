@@ -30,6 +30,7 @@ const REQUIRED = {
     'unused-disable-directive',
     '@typescript-eslint/no-explicit-any',
     'react-hooks/rules-of-hooks',
+    'starter/drag-needs-alternative',
   ],
   stylelint: [
     'scale-unlimited/declaration-strict-value',

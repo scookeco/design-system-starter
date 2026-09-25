@@ -100,7 +100,7 @@ const preview: Preview = {
           'Foundations',
           ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Elevation and motion', 'Icons'],
           'Guides',
-          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Accessibility', 'Content', 'Escape hatches'],
+          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Escape hatches'],
           'Components',
           'Primitives',
           'Layouts',

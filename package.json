@@ -21,7 +21,8 @@
     "check": "npm run tokens:check && npm run typecheck && npm run lint && npm run test && npm run test:rules && npm run build && npm run size",
     "build-storybook": "storybook build --quiet",
     "test:visual": "npm run build-storybook && playwright test",
-    "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=all"
+    "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=all",
+    "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22"
   },
   "dependencies": {
     "radix-ui": "^1.6.7",

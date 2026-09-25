@@ -3,7 +3,10 @@ import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
   covers: [TextField],
-  whenToUse: ['Short free text: names, emails, amounts, search.', 'Set `type` so mobile keyboards and autofill do the right thing.'],
+  whenToUse: [
+    'Short free text: names, emails, amounts, search, passwords.',
+    'Set `type` and `autoComplete` so mobile keyboards, autofill and password managers do the right thing.',
+  ],
   whenNotToUse: [
     { situation: 'More than one line of text', instead: '`Textarea`' },
     { situation: 'Picking from a known list', instead: '`Select` (many options) or `RadioGroup` (a few)' },
@@ -30,5 +33,6 @@ export const usage: UsageDoc = {
     '`label` is required and is the accessible name; `hideLabel` is for fields whose context makes the question obvious, such as a search box.',
     '`description` and `error` are linked with `aria-describedby`; `error` sets `aria-invalid`.',
     'Pass `id` when an error summary links to the field.',
+    '`type="password"` adds a show-password toggle (a button with `aria-pressed` and `aria-controls`), so nobody has to type a password blind or remember it to retype it (WCAG 2.2 SC 3.3.8). Give it `autoComplete="current-password"` (sign-in) or `"new-password"` (sign-up, reset) so password managers fill it. Never block paste.',
   ],
 };

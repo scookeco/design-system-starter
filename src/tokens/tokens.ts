@@ -127,6 +127,10 @@ export const vars = {
       "md": "var(--space-inset-md)",
       "lg": "var(--space-inset-lg)",
       "xl": "var(--space-inset-xl)"
+    },
+    "scroll-padding": {
+      "start": "var(--space-scroll-padding-start)",
+      "end": "var(--space-scroll-padding-end)"
     }
   },
   "size": {

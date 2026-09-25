@@ -172,6 +172,7 @@
     --space-10: 40px;
     --space-12: 48px;
     --space-16: 64px;
+    --space-20: 80px;
     --space-half: 2px;
     --size-4: 16px;
     --size-5: 20px;
@@ -309,6 +310,8 @@
     --space-inset-md: var(--space-4);
     --space-inset-lg: var(--space-6);
     --space-inset-xl: var(--space-8);
+    --space-scroll-padding-start: var(--space-12);
+    --space-scroll-padding-end: var(--space-20);
     --size-control-sm: var(--size-8);
     --size-control-md: var(--size-10);
     --size-control-lg: var(--size-12);

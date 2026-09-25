@@ -65,6 +65,11 @@
     background: var(--color-bg-surface);
   }
 
+  /* Focus scrolls clear of the sticky action bar, never under it (WCAG 2.4.11). */
+  .focused-layout__main:has(> .focused-layout__footer) {
+    scroll-padding-block-end: var(--space-scroll-padding-end);
+  }
+
   /* Without an action bar, main still ends with breathing room. */
   .focused-layout__main:not(:has(> .focused-layout__footer)) {
     padding-block-end: var(--space-inset-lg);

@@ -9,7 +9,8 @@ npm run check          # tokens:check + typecheck + lint + test + test:rules + b
 npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
 npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first
 npm run dev            # Storybook gallery
-npm run test:visual    # screenshots + axe for every story, light and dark (local baselines are gitignored)
+npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
+npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
 ```
 
 Work on a branch. Never commit to `main` directly.
@@ -25,6 +26,7 @@ Work on a branch. Never commit to `main` directly.
 - `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
+- `tests/visual/fixtures/`: one story per WCAG 2.2 check that the check must fail (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`).
 - `docs/`: gallery-only pages. `foundations/` (rendered from the token source), `guides/`, and `usage/<Name>.usage.tsx`, the usage section of each component's Docs tab.
 
 ## Budgets and gallery tools
@@ -35,7 +37,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Accessibility, Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Accessibility (and Accessibility conformance), Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 
@@ -67,7 +69,13 @@ UI rules (design system v0)
 - Every new variant, size or state gets a story. Every new exported component,
   layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
   use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
-  without one. Lint, npm run check and the gallery (visual + axe) must pass.
+  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
 - A story that renders an open modal is tagged ['modal-open', '!autodocs'].
+- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
+  focus never hidden behind sticky content (scroll containers use
+  space.scroll-padding.*), password fields as TextField type="password" with
+  autoComplete (username, current-password or new-password, one-time-code),
+  never block paste, pass AppShell's help from the shell composition, never
+  ask twice in a multi-step flow, and any drag declares data-drag-alternative.
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 ```

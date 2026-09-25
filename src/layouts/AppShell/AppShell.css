@@ -110,6 +110,12 @@
     gap: var(--space-gap-xs);
   }
 
+  /* Named slots that fix the order (actions · help · account); they add no box of their own. */
+  .app-shell__help,
+  .app-shell__user {
+    display: contents;
+  }
+
   /* Positioned, so absolutely positioned descendants (hidden form inputs) scroll and clip with it. */
   .app-shell__main {
     position: relative;
@@ -120,6 +126,9 @@
 
   .app-shell__main:has(> .app-shell__footer) {
     padding-block-end: 0;
+
+    /* Focus scrolls clear of the sticky action bar, never under it (WCAG 2.4.11). */
+    scroll-padding-block-end: var(--space-scroll-padding-end);
   }
 
   .app-shell__footer {

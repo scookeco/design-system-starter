@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 6007;
+// PLAYWRIGHT_PORT lets parallel checkouts each serve their own storybook-static.
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 6007);
 const CI = Boolean(process.env.CI);
 
 /**

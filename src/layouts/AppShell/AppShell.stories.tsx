@@ -73,6 +73,12 @@ export const Default: Story = {};
 export const SidebarCollapsed: Story = { args: { defaultSidebarCollapsed: true } };
 export const WithoutBreadcrumbs: Story = { args: { breadcrumbs: undefined } };
 export const WithGlobalAction: Story = { args: { actions: <Button icon="plus">New record</Button> } };
+export const WithHelp: Story = {
+  args: {
+    actions: <Button icon="plus">New record</Button>,
+    help: <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />,
+  },
+};
 export const WithActionBar: Story = {
   args: {
     footer: (

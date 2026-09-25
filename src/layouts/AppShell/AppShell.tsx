@@ -39,6 +39,12 @@ export interface AppShellProps extends EscapeHatch {
   breadcrumbs?: ReactNode;
   /** Global actions in the header (search, one global create). Never page navigation. */
   actions?: ReactNode;
+  /**
+   * Help, in the same place on every page (WCAG 2.2 SC 3.2.6 Consistent Help): a Help menu with
+   * self-help and a way to contact a person. Rendered in the header, after the global actions and
+   * right before the account menu. Pass it from the app's one shell composition, never per page.
+   */
+  help?: ReactNode;
   /** Account menu, anchored at the header's inline end: <Menu trigger={…Avatar…}>. */
   userMenu?: ReactNode;
   /** The page. Rendered inside <main>, the only region that scrolls. */
@@ -89,6 +95,7 @@ export function AppShell({
   nav,
   breadcrumbs,
   actions,
+  help,
   userMenu,
   children,
   footer,
@@ -177,10 +184,11 @@ export function AppShell({
               </Drawer>
             </div>
             <div className="app-shell__context">{breadcrumbs}</div>
-            {actions || userMenu ? (
+            {actions || help || userMenu ? (
               <div className="app-shell__actions">
                 {actions}
-                {userMenu}
+                {help ? <div className="app-shell__help">{help}</div> : null}
+                {userMenu ? <div className="app-shell__user">{userMenu}</div> : null}
               </div>
             ) : null}
           </header>

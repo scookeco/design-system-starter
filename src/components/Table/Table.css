@@ -4,6 +4,9 @@
 
     overflow: auto;
     max-block-size: var(--table-max-height);
+
+    /* Focus scrolls clear of the sticky header row, never under it (WCAG 2.4.11). */
+    scroll-padding-block-start: var(--space-scroll-padding-start);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-surface);
     background: var(--color-bg-surface);
