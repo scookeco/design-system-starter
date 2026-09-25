@@ -5,7 +5,10 @@ import { createFormatter, type Formatter } from './format';
 export const DEFAULT_LOCALE = 'en-US';
 export const DEFAULT_TIME_ZONE = 'UTC';
 
-const FormatContext = createContext<Formatter>(createFormatter({ locale: DEFAULT_LOCALE, timeZone: DEFAULT_TIME_ZONE }));
+// null, not a formatter: building one at module scope is a side effect bundlers can't drop, so
+// every import of the library (even just Button) would carry the formatting code.
+const FormatContext = createContext<Formatter | null>(null);
+let fallback: Formatter | undefined;
 
 export interface LocaleProviderProps {
   /** BCP 47 locale for formatting, from the user's profile (defaulting from the browser). */
@@ -27,5 +30,5 @@ export function LocaleProvider({ locale = DEFAULT_LOCALE, timeZone = DEFAULT_TIM
 
 /** The named formats for the current locale and time zone: `format.money(minor, 'USD')`, `format.date(iso)`. */
 export function useFormat(): Formatter {
-  return useContext(FormatContext);
+  return useContext(FormatContext) ?? (fallback ??= createFormatter({ locale: DEFAULT_LOCALE, timeZone: DEFAULT_TIME_ZONE }));
 }
