@@ -9,6 +9,7 @@ import type { Decorator } from '@storybook/react-vite';
 import type { HttpHandler } from 'msw';
 import type { Tenant } from '../api/schemas';
 import { AppProviders } from '../providers';
+import { createMemoryHistory } from '../url/history';
 import { resetDb } from './db';
 import { handlers } from './handlers';
 
@@ -47,24 +48,33 @@ function SettledSignal({ client }: { client: QueryClientType }) {
 /** Stories never retry and never go stale: a failure shows at once, and nothing refetches mid-capture. */
 const storyClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 
-function StoryProviders({ tenant, children }: { tenant: Tenant; children: ReactNode }) {
+function StoryProviders({ tenant, url, children }: { tenant: Tenant; url: string; children: ReactNode }) {
   const [client] = useState(storyClient);
+  const [history] = useState(() => createMemoryHistory(url));
   return (
-    <AppProviders tenant={tenant} queryClient={client}>
+    <AppProviders tenant={tenant} queryClient={client} history={history}>
       <SettledSignal client={client} />
       {children}
     </AppProviders>
   );
 }
 
-/** Wraps a story in the app providers for a tenant (default: acme). */
-export const withMockApi =
-  (tenant: Tenant = 'acme'): Decorator =>
-  (Story) => (
-    <StoryProviders tenant={tenant}>
+export interface MockApiParameters {
+  /** The workspace the story runs in (default acme). */
+  tenant?: Tenant;
+  /** The URL the page opens at, kept in an in-memory history so the gallery's own URL is never rewritten. */
+  url?: string;
+}
+
+/** Wraps a story in the app providers, from its `parameters.mockApi`. */
+const withMockApi: Decorator = (Story, context) => {
+  const { tenant = 'acme', url = '/' } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  return (
+    <StoryProviders tenant={tenant} url={url}>
       <Story />
     </StoryProviders>
   );
+};
 
 /**
  * Meta fields for a story file that reads from the mock API: the handlers, a reset database before
@@ -73,6 +83,7 @@ export const withMockApi =
  */
 export const mockApiMeta = {
   tags: ['!autodocs', 'data'],
+  decorators: [withMockApi],
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: handlers } } },
   beforeEach: () => {
@@ -82,3 +93,6 @@ export const mockApiMeta = {
 
 /** Story parameters that put these handlers in front of the defaults. */
 export const mswOverrides = (...overrides: HttpHandler[]) => ({ msw: { handlers: { overrides } } });
+
+/** Story parameters: open the page at this URL, in this tenant. */
+export const mockApi = (settings: MockApiParameters) => ({ mockApi: settings });

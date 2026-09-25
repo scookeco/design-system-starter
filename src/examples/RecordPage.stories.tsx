@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fail, hold } from '../app/mocks/overrides';
-import { mockApiMeta, mswOverrides, withMockApi } from '../app/mocks/storybook';
+import { mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { RecordPage } from './RecordPage';
 
 const meta = {
   title: 'Examples/Record page',
   component: RecordPage,
   ...mockApiMeta,
-  decorators: [withMockApi()],
 } satisfies Meta<typeof RecordPage>;
 
 export default meta;

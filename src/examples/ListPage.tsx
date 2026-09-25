@@ -21,8 +21,12 @@
  *
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
+ *
+ * URL: the view, search, filters, sort and page live in the query string (useUrlState), so any
+ * view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
+ * debounced search is a refinement (replace). The half-typed search stays out of the URL.
  */
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   Badge,
   Button,
@@ -52,11 +56,13 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { RecordQuery, RecordStatus, RecordView, SortKey } from '../app/api/schemas';
+import type { RecordStatus, SortKey } from '../app/api/schemas';
 import { useCreateRecord } from '../app/model/mutations';
 import { statusOptionsFor, toRow, VIEWS } from '../app/model/projections';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { listCodec, type ListUrlState } from '../app/url/listState';
+import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { ExampleShell } from './ExampleShell';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
@@ -70,11 +76,8 @@ const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | '
   direction: sort.startsWith('-') ? 'descending' : 'ascending',
 });
 
+/** The page's search, filters, sort, page and view come from the URL (/records?view=open&q=…). */
 export interface ListPageProps {
-  initialQuery?: string;
-  initialStatuses?: readonly RecordStatus[];
-  initialView?: RecordView;
-  initialPage?: number;
   initialDialogOpen?: boolean;
   /** Open the Filters popover on first render (gallery and tests). */
   initialFiltersOpen?: boolean;
@@ -88,28 +91,17 @@ export function ListPage(props: ListPageProps) {
   );
 }
 
-function ListPageContent({
-  initialQuery = '',
-  initialStatuses = [],
-  initialView = 'all',
-  initialPage = 1,
-  initialDialogOpen = false,
-  initialFiltersOpen = false,
-}: ListPageProps) {
+function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false }: ListPageProps) {
   const toast = useToast();
   const format = useFormat();
   const createRecord = useCreateRecord();
 
-  const [query, setQuery] = useState<RecordQuery>({
-    q: initialQuery,
-    status: initialStatuses,
-    view: initialView,
-    sort: 'name',
-    page: initialPage,
-    pageSize: PAGE_SIZE,
-  });
+  const [url, nav] = useUrlState(listCodec);
+  const query = { ...url, q: url.q.trim(), pageSize: PAGE_SIZE };
   const list = useRecordList(query);
   const counts = useRecordCounts({ q: query.q, status: query.status });
+  const commitSearch = useCallback((q: string) => nav.replace({ q, page: 1 }), [nav]);
+  const [searchText, setSearchText] = useDebouncedUrlText(url.q, commitSearch);
 
   const [filtersOpen, setFiltersOpen] = useState(initialFiltersOpen);
   const filtersRef = useRef<HTMLButtonElement>(null);
@@ -125,8 +117,8 @@ function ListPageContent({
   const filtered = query.q.trim() !== '' || query.status.length > 0;
   const sort = sortOf(query.sort);
 
-  /** A refinement: new search or filters start again at page 1. */
-  const refine = (next: Partial<Pick<RecordQuery, 'q' | 'status' | 'view'>>) => setQuery((current) => ({ ...current, ...next, page: 1 }));
+  /** A refinement of this view: rewrite the URL entry, back to page 1. */
+  const refine = (next: Partial<ListUrlState>) => nav.replace({ ...next, page: 1 });
 
   // Removing a chip moves focus to the chip now in its place (or the last one), or to Filters when none are left.
   useEffect(() => {
@@ -146,8 +138,7 @@ function ListPageContent({
     setFocusChip(index);
   };
 
-  const toggleSort = (column: SortColumn) =>
-    setQuery((current) => ({ ...current, sort: current.sort === column ? `-${column}` : column, page: 1 }) as RecordQuery);
+  const toggleSort = (column: SortColumn) => refine({ sort: (query.sort === column ? `-${column}` : column) as SortKey });
 
   const submitCreate = (event?: FormEvent) => {
     event?.preventDefault();
@@ -232,10 +223,11 @@ function ListPageContent({
               label="Record views"
               items={VIEWS.map(({ view, label }) => ({
                 label: counts.data ? `${label} (${format.number(counts.data[view])})` : label,
-                href: `/records?view=${view}`,
+                // A tab keeps the search, drops filters the new view can't use, and starts at page 1.
+                href: nav.href({ view, status: [], page: 1 }),
               }))}
-              current={`/records?view=${query.view}`}
-              onNavigate={(href) => refine({ view: (new URLSearchParams(href.split('?')[1]).get('view') ?? 'all') as RecordView, status: [] })}
+              current={nav.href({ view: url.view, status: [], page: 1 })}
+              onNavigate={(href) => nav.push(listCodec.parse(href.slice(href.indexOf('?') + 1)))}
             />
 
             <Stack gap="sm">
@@ -244,8 +236,8 @@ function ListPageContent({
                   label="Search records"
                   hideLabel
                   placeholder="Search by name or owner"
-                  value={query.q}
-                  onValueChange={(q) => refine({ q })}
+                  value={searchText}
+                  onValueChange={setSearchText}
                 />
                 <Popover
                   label="Filter by status"
@@ -321,7 +313,7 @@ function ListPageContent({
                 description={filtered ? 'Try a different search term or status.' : 'Nothing in this view yet.'}
                 action={
                   filtered ? (
-                    <Button variant="secondary" onClick={() => refine({ q: '', status: [] })}>
+                    <Button variant="secondary" onClick={() => refine({ q: '', status: [], page: 1 })}>
                       Clear filters
                     </Button>
                   ) : undefined
@@ -371,7 +363,7 @@ function ListPageContent({
                 page={query.page}
                 pageSize={PAGE_SIZE}
                 total={total}
-                onPageChange={(page) => setQuery((current) => ({ ...current, page }))}
+                onPageChange={(page) => nav.push({ page })}
                 announce
               />
             ) : (

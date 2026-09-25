@@ -12,6 +12,7 @@ import { configureMocks } from '../../src/app/mocks/config';
 import { resetDb } from '../../src/app/mocks/db';
 import { handlers } from '../../src/app/mocks/handlers';
 import { AppProviders } from '../../src/app/providers';
+import { createMemoryHistory, type MemoryHistory } from '../../src/app/url/history';
 
 export const server = setupServer(...handlers);
 
@@ -28,11 +29,18 @@ export const setupMockApi = () => {
 
 export const testClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
 
-export const renderWithApp = (ui: ReactElement, { tenant = 'acme', client = testClient() }: { tenant?: Tenant; client?: QueryClient } = {}): RenderResult & { client: QueryClient } => ({
-  ...render(
-    <AppProviders tenant={tenant} queryClient={client}>
-      {ui}
-    </AppProviders>,
-  ),
-  client,
-});
+export const renderWithApp = (
+  ui: ReactElement,
+  { tenant = 'acme', client = testClient(), url = '/' }: { tenant?: Tenant; client?: QueryClient; url?: string } = {},
+): RenderResult & { client: QueryClient; history: MemoryHistory } => {
+  const history = createMemoryHistory(url);
+  return {
+    ...render(
+      <AppProviders tenant={tenant} queryClient={client} history={history}>
+        {ui}
+      </AppProviders>,
+    ),
+    client,
+    history,
+  };
+};

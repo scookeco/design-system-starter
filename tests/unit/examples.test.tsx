@@ -117,11 +117,11 @@ describe('Setup wizard example', () => {
 
 describe('List page example', () => {
   it('shows active filters as chips; removing one moves focus to the next chip, then to Filters', async () => {
-    renderWithApp(<ListPage initialStatuses={['active', 'pending']} />);
+    renderWithApp(<ListPage />, { url: '/records?status=pending,active' });
     const chips = screen.getByRole('list', { name: 'Active filters' });
-    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
-    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Pending' })));
     fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Pending' }));
+    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Active' })));
+    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
     expect(screen.queryByRole('list', { name: 'Active filters' })).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Filters' })));
   });
@@ -145,7 +145,7 @@ describe('List page example', () => {
   });
 
   it('clears the search from its clear button and keeps focus in the field', () => {
-    renderWithApp(<ListPage initialQuery="lease" />);
+    renderWithApp(<ListPage />, { url: '/records?q=lease' });
     const search = screen.getByRole('searchbox', { name: 'Search records' });
     fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
     expect((search as HTMLInputElement).value).toBe('');
