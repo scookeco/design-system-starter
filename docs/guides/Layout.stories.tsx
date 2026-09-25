@@ -11,6 +11,9 @@ const PRIMITIVES = [
   { name: 'Sidebar', id: 'primitives-sidebar--start', choose: 'A narrow region beside a wider one inside a card, panel or dialog, stacking when space runs out.', avoid: 'A page’s properties rail or sub-nav (PageLayout), or the app’s navigation (AppShell).' },
   { name: 'Center', id: 'primitives-center--default', choose: 'The page column inside AppShell’s main, with a bounded measure and gutters; empty states (intrinsic).', avoid: 'Centring a single control in a row (Cluster justify="center").' },
   { name: 'Cover', id: 'primitives-cover--header-and-footer', choose: 'One block centred vertically in the available height, with a header and footer pinned to the edges.', avoid: 'A signed-out page: AuthLayout already composes it.' },
+  { name: 'Box', id: 'primitives-box--default', choose: 'Padding from the inset scale inside a region with no component of its own: a toolbar strip, a panel body.', avoid: 'A titled surface (Card), or space between siblings (the parent’s gap).' },
+  { name: 'Reel', id: 'primitives-reel--default', choose: 'One row of like items that scrolls sideways with snapping: recent files, thumbnails, suggestions.', avoid: 'Items people compare or must all see (Grid), or wide data (Table).' },
+  { name: 'Imposter', id: 'primitives-imposter--default', choose: 'An overlay centred over one region, not the page: a notice over an empty chart, a prompt over a locked panel.', avoid: 'Anything that takes focus and blocks the page (Dialog).' },
   { name: 'Frame', id: 'primitives-frame--landscape', choose: 'Media held to a ratio token and cropped to fill: file previews, covers, video.', avoid: 'A person’s picture (Avatar), or a box that holds text.' },
 ] as const;
 
@@ -25,7 +28,7 @@ function Layout() {
   return (
     <DocPage
       title="Layout"
-      lead="Four layouts frame a page; eight layout primitives arrange everything inside it. They take gaps, widths and ratios as tokens, so a layout can’t drift off the scale, and they hold no domain knowledge."
+      lead="Four layouts frame a page; eleven layout primitives arrange everything inside it. They take gaps, widths and ratios as tokens, so a layout can’t drift off the scale, and they hold no domain knowledge."
     >
       <DocSection title="Which layout" intro="Pick the frame first. Each page starts from a PageHeader inside it.">
         <Table caption="Layouts">

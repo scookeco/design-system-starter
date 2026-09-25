@@ -46,7 +46,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Escape hatches, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Motion, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 

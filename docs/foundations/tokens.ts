@@ -13,6 +13,7 @@ import { contrastRatio } from '../../scripts/checks/contrast';
 import { pairs, type ContrastPair } from '../../scripts/checks/contrast-pairs';
 import { aliasTarget, parseTokens, resolveColor, resolveValue, type Tier, type SourceToken, type TokenMap } from '../../scripts/checks/token-model';
 import { vars } from '../../src/index';
+import usageMap from '../../src/tokens/token-usage.json';
 
 const files = import.meta.glob<Record<string, unknown>>('../../tokens/**/*.json', { eager: true, import: 'default' });
 
@@ -126,3 +127,20 @@ export const scaleGroup = (entries: VarEntry[]) => {
     rows: entries.map((e) => ({ ...e, value: formatValue(e.path), note: shared ? undefined : token(e.path).description })),
   };
 };
+
+interface UsageToken {
+  tier: string;
+  type: string;
+  chain: string[];
+  modes: { dark?: { chain: string[] } };
+}
+
+/**
+ * Semantic colours whose light or dark value resolves into a primitive ramp ("color.indigo."),
+ * with the primitive each mode lands on. Read from the generated token usage map.
+ */
+export const semanticColoursFrom = (ramp: string) =>
+  Object.entries(usageMap.tokens as Record<string, UsageToken>)
+    .filter(([, t]) => t.tier === 'semantic' && t.type === 'color')
+    .map(([path, t]) => ({ path, light: t.chain.at(-1) ?? '', dark: t.modes.dark?.chain.at(-1) ?? '' }))
+    .filter((t) => t.light.startsWith(ramp) || t.dark.startsWith(ramp));
