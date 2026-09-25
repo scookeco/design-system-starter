@@ -206,6 +206,7 @@
     --size-icon-sm: var(--size-4);
     --size-icon-md: var(--size-5);
     --size-target-min: var(--size-6);
+    --size-content-xs: var(--container-md);
     --size-content-sm: var(--container-xl);
     --size-content-md: var(--container-3xl);
     --size-content-lg: var(--container-4xl);

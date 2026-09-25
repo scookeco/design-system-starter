@@ -115,6 +115,7 @@ export const vars = {
     },
     "target-min": "var(--size-target-min)",
     "content": {
+      "xs": "var(--size-content-xs)",
       "sm": "var(--size-content-sm)",
       "md": "var(--size-content-md)",
       "lg": "var(--size-content-lg)"

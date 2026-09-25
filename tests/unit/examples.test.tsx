@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, describe, expect, it } from 'vitest';
 import { CreateEditFlow } from '../../src/examples/CreateEditFlow';
 import { SettingsPage } from '../../src/examples/SettingsPage';
+import { SignInPage } from '../../src/examples/SignInPage';
 
 afterEach(cleanup);
 
@@ -59,5 +60,32 @@ describe('Settings example', () => {
   it('announces a successful save in a status banner', () => {
     render(<SettingsPage initialSaved />);
     expect(screen.getByRole('status').textContent).toContain('Notification preferences saved.');
+  });
+});
+
+describe('Sign-in example', () => {
+  it('announces a failed sign-in as an alert and validates the verification code', () => {
+    render(<SignInPage initialStep="password" initialError="That email and password don’t match." />);
+    expect(screen.getByRole('alert').textContent).toContain('don’t match');
+    cleanup();
+
+    render(<SignInPage initialStep="verify" />);
+    const code = screen.getByRole('textbox', { name: '6-digit code' });
+    expect(code.getAttribute('autocomplete')).toBe('one-time-code');
+    fireEvent.change(code, { target: { value: '12' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Verify' }));
+    expect(code.getAttribute('aria-invalid')).toBe('true');
+    fireEvent.change(code, { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Verify' }));
+    expect(code.getAttribute('aria-invalid')).toBeNull();
+  });
+
+  it('checks the email before sending a sign-in link', () => {
+    render(<SignInPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Email me a sign-in link' }));
+    expect(screen.getByRole('textbox', { name: 'Work email' }).getAttribute('aria-invalid')).toBe('true');
+    fireEvent.change(screen.getByRole('textbox', { name: 'Work email' }), { target: { value: 'sam@example.com' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Email me a sign-in link' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Check your email' })).toBeTruthy();
   });
 });

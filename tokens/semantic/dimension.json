@@ -76,6 +76,10 @@
     },
     "content": {
       "$description": "Max measure for Center.",
+      "xs": {
+        "$value": "{container.md}",
+        "$description": "Sign-in and other single-card pages."
+      },
       "sm": {
         "$value": "{container.xl}"
       },

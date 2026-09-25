@@ -1,0 +1,19 @@
+@layer primitives {
+  .cover {
+    --cover-gap: var(--space-gap-lg);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--cover-gap);
+    min-block-size: 100%;
+  }
+
+  .cover[data-min-block-size="viewport"] {
+    min-block-size: var(--size-viewport-block);
+  }
+
+  /* Auto margins take the free space equally above and below, so the content sits in the middle. */
+  .cover__centered {
+    margin-block: auto;
+  }
+}
