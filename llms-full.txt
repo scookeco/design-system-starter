@@ -71,69 +71,69 @@ UI rules (design system v0)
 
 ## Components
 
-- [Avatar](docs/usage/Avatar.usage.tsx)
-- [Badge](docs/usage/Badge.usage.tsx)
-- [Banner](docs/usage/Banner.usage.tsx)
-- [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx)
-- [Button](docs/usage/Button.usage.tsx)
-- [Card](docs/usage/Card.usage.tsx)
-- [Checkbox](docs/usage/Checkbox.usage.tsx)
-- [Dialog](docs/usage/Dialog.usage.tsx)
-- [Drawer](docs/usage/Drawer.usage.tsx)
-- [EmptyState](docs/usage/EmptyState.usage.tsx)
-- [Heading](docs/usage/Heading.usage.tsx)
-- [Link](docs/usage/Link.usage.tsx)
-- [Menu](docs/usage/Menu.usage.tsx)
-- [Meter](docs/usage/Meter.usage.tsx)
-- [Nav](docs/usage/Nav.usage.tsx)
-- [NavTabs](docs/usage/NavTabs.usage.tsx)
-- [PageHeader](docs/usage/PageHeader.usage.tsx)
-- [Pagination](docs/usage/Pagination.usage.tsx)
-- [Popover](docs/usage/Popover.usage.tsx)
-- [Progress](docs/usage/Progress.usage.tsx)
-- [RadioGroup](docs/usage/RadioGroup.usage.tsx)
-- [SearchField](docs/usage/SearchField.usage.tsx)
-- [SegmentedControl](docs/usage/SegmentedControl.usage.tsx)
-- [Select](docs/usage/Select.usage.tsx)
-- [Skeleton](docs/usage/Skeleton.usage.tsx)
-- [Spinner](docs/usage/Spinner.usage.tsx)
-- [Stat](docs/usage/Stat.usage.tsx)
-- [Stepper](docs/usage/Stepper.usage.tsx)
-- [Switch](docs/usage/Switch.usage.tsx)
-- [Table](docs/usage/Table.usage.tsx)
-- [Tabs](docs/usage/Tabs.usage.tsx)
-- [Tag](docs/usage/Tag.usage.tsx)
-- [Text](docs/usage/Text.usage.tsx)
-- [TextField](docs/usage/TextField.usage.tsx)
-- [Textarea](docs/usage/Textarea.usage.tsx)
-- [Toast](docs/usage/Toast.usage.tsx)
-- [Tooltip](docs/usage/Tooltip.usage.tsx)
+- [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
+- [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
+- [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
+- [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
+- [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
+- [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
+- [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
+- [Menu](docs/usage/Menu.usage.tsx): Action menu
+- [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
+- [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
+- [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
+- [PageHeader](docs/usage/PageHeader.usage.tsx): The top of every page
+- [Pagination](docs/usage/Pagination.usage.tsx): Moves through a long, server-paged list
+- [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
+- [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
+- [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
+- [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
+- [Select](docs/usage/Select.usage.tsx): Single-choice list
+- [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
+- [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
+- [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
+- [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
+- [Switch](docs/usage/Switch.usage.tsx): An on/off setting that takes effect as a setting, not a form answer
+- [Table](docs/usage/Table.usage.tsx): Data table: native table semantics, sticky header, tabular numbers
+- [Tabs](docs/usage/Tabs.usage.tsx): Tabs: arrow-key roving focus and ARIA wiring come from Radix Tabs
+- [Tag](docs/usage/Tag.usage.tsx): A compact value: an active filter chip, a label on a record
+- [Text](docs/usage/Text.usage.tsx): Running text, descriptions and metadata
+- [TextField](docs/usage/TextField.usage.tsx): Short free text: names, emails, amounts, search, passwords
+- [Textarea](docs/usage/Textarea.usage.tsx): Multi-line text
+- [Toast](docs/usage/Toast.usage.tsx): Declarative toast
+- [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
 
 ## Primitives
 
-- [Center](docs/usage/Center.usage.tsx)
-- [Cluster](docs/usage/Cluster.usage.tsx)
-- [Cover](docs/usage/Cover.usage.tsx)
-- [Frame](docs/usage/Frame.usage.tsx)
-- [Grid](docs/usage/Grid.usage.tsx)
-- [Sidebar](docs/usage/Sidebar.usage.tsx)
-- [Stack](docs/usage/Stack.usage.tsx)
-- [Switcher](docs/usage/Switcher.usage.tsx)
+- [Center](docs/usage/Center.usage.tsx): Horizontally centred column with a bounded measure
+- [Cluster](docs/usage/Cluster.usage.tsx): Horizontal group that wraps gracefully
+- [Cover](docs/usage/Cover.usage.tsx): Vertically centres its content in the available block size
+- [Frame](docs/usage/Frame.usage.tsx): Holds media to a fixed aspect ratio and crops it to fill
+- [Grid](docs/usage/Grid.usage.tsx): Auto-fit card grid
+- [Sidebar](docs/usage/Sidebar.usage.tsx): Side region beside main content
+- [Stack](docs/usage/Stack.usage.tsx): Vertical flow with consistent spacing
+- [Switcher](docs/usage/Switcher.usage.tsx): A row of equal items that becomes a column, all at once
 
 ## Layouts
 
-- [AppShell](docs/usage/AppShell.usage.tsx)
-- [AuthLayout](docs/usage/AuthLayout.usage.tsx)
-- [FocusedLayout](docs/usage/FocusedLayout.usage.tsx)
-- [PageLayout](docs/usage/PageLayout.usage.tsx)
+- [AppShell](docs/usage/AppShell.usage.tsx): The app frame every signed-in page renders inside
+- [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
+- [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
+- [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
 
 ## Utilities
 
-- [LocaleProvider](docs/usage/LocaleProvider.usage.tsx): Sets the locale and time zone every system and app format reads.
-- [createFormatter](docs/usage/LocaleProvider.usage.tsx): Formats for one locale and time zone.
-- [currencyDigits](docs/usage/LocaleProvider.usage.tsx): Decimal places a currency's minor unit has: USD 2, JPY 0, BHD 3.
-- [useFormat](docs/usage/LocaleProvider.usage.tsx): The named formats for the current locale and time zone…
-- [vars](src/tokens/tokens.ts): Semantic and component tokens as var() references, for inline custom…
+- [LocaleProvider](docs/usage/LocaleProvider.usage.tsx): Sets the locale and time zone every system and app format reads
+- [createFormatter](docs/usage/LocaleProvider.usage.tsx): Formats for one locale and time zone
+- [currencyDigits](docs/usage/LocaleProvider.usage.tsx): Decimal places a currency's minor unit has: USD 2, JPY 0, BHD 3
+- [useFormat](docs/usage/LocaleProvider.usage.tsx): The named formats for the current locale and time zone
+- [vars](src/tokens/tokens.ts): Semantic and component tokens as var() references
 
 ## Examples
 
@@ -3435,13 +3435,13 @@ Before building anything new, walk the ladder from the top and stop at the first
 
 #### The ladder
 
-1. **1. Template: is it a new page?**
+1. **Template: is it a new page?**
    Copy the golden example for its archetype and render it inside AppShell. Compose existing parts. No new component.
-2. **2. Variant: does an existing component need a new look?**
+2. **Variant: does an existing component need a new look?**
    Add a value to its closed variant vocabulary, with a story. A new status extends the status-to-tone map; it doesn’t add a badge.
-3. **3. Component: is it a genuinely new region or intent?**
+3. **Component: is it a genuinely new region or intent?**
    Add a component with a focused contract, composed from existing parts where possible: closed props, a required accessible name, a story per variant and state, and a usage doc.
-4. **4. Primitive: can it not be expressed as a composition at all?**
+4. **Primitive: can it not be expressed as a composition at all?**
    The highest bar: domain-agnostic, token-driven. It changes tokens, component styles and the agent rules in the same pull request.
 
 #### Proposing a token
@@ -3894,7 +3894,7 @@ Coding agents read the system from three files at the repo root, generated from 
 
 #### The three files
 
-- `llms.txt` is the entry point, small enough to read whole at the start of every session (under 8 KB). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
+- `llms.txt` is the entry point, small enough to read whole at the start of every session (under 16 KB). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
 - `llms-full.txt` adds every component’s props, variants and states, its usage doc (with the do and don’t code), its stories and tokens, then every guide as Markdown and every semantic token with its light and dark value. Give it to an agent that takes a whole document as context.
 - `design-system.manifest.json` holds the same facts as data, for tools and targeted lookups. Its schema, `design-system.manifest.schema.json`, documents every field.
 

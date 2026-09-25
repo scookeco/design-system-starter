@@ -251,7 +251,7 @@ Three generated files at the repo root describe the system to coding agents. `np
 
 | File | What it holds | Read it |
 |---|---|---|
-| `llms.txt` | The [llms.txt](https://llmstxt.org) entry point: name, summary, the agent rules block, then one line per guide, foundation page, component, primitive, layout, utility and golden example, linking to its file. Kept under 8 KB by a test. | whole, at the start of every session |
+| `llms.txt` | The [llms.txt](https://llmstxt.org) entry point: name, summary, the agent rules block, then one line per guide, foundation page, component, primitive, layout, utility and golden example, linking to its file with a short description (examples by title). Kept under 16 KB by a test. | whole, at the start of every session |
 | `llms-full.txt` | The same, plus every unit's props, variants, states, usage doc (with the do and don't code), stories and tokens, every guide flattened to Markdown, and every semantic token with light and dark values. | when an agent takes a whole document as context |
 | `design-system.manifest.json` | The same facts as data, documented by `design-system.manifest.schema.json`: every public export (component, primitive, layout, utility or type-only) with its source, JSDoc, props (TypeScript type, required, default, description, allowed values), closed-API facts, variants, states, usage rules, story ids, composition and tokens read; every semantic and component token; guides, foundations and examples; the rules; the commands. | for tools and targeted lookups (`jq`) |
 

@@ -19,7 +19,7 @@ function Agents() {
         <Rules
           items={[
             <>
-              <code>llms.txt</code> is the entry point, small enough to read whole at the start of every session (under 8 KB). It follows the
+              <code>llms.txt</code> is the entry point, small enough to read whole at the start of every session (under 16 KB). It follows the
               llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive,
               layout, utility and golden example, each linking to its file.
             </>,

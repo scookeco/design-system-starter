@@ -3,7 +3,7 @@ import { join, resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { extractAgentRules } from '../../scripts/checks/agent-rules';
 import { htmlToMarkdown } from '../../scripts/checks/html-markdown';
-import { LLMS_BUDGET_BYTES, LLMS_FILE, LLMS_FULL_FILE, renderLlms, renderLlmsFull } from '../../scripts/checks/llms';
+import { firstClause, LLMS_BUDGET_BYTES, LLMS_FILE, LLMS_FULL_FILE, renderLlms, renderLlmsFull } from '../../scripts/checks/llms';
 import {
   buildManifest,
   classify,
@@ -123,6 +123,11 @@ describe('agent manifest and llms files', () => {
     // Between the H2s: only link-list items.
     const body = committed.llms.slice(committed.llms.indexOf('\n## '));
     for (const line of body.split('\n').filter((l) => l && !l.startsWith('## '))) expect(line).toMatch(/^- \[[^\]]+\]\([^)]+\)(: .+)?$/);
+    // Agents choose a unit from its line: every unit has a short description; examples are titles.
+    const unitLines = body.slice(body.indexOf('## Components'), body.indexOf('## Examples')).split('\n').filter((l) => l.startsWith('- '));
+    expect(unitLines.length).toBeGreaterThan(45);
+    for (const line of unitLines) expect(line.split('): ')[1]?.length ?? 0, line).toBeGreaterThan(5);
+    for (const line of unitLines) expect(line.split('): ')[1]?.length ?? 99, line).toBeLessThanOrEqual(70);
   });
 
   it('every link in llms.txt and llms-full.txt points at a file in the repo', () => {
@@ -231,6 +236,25 @@ describe('manifest extractor and checks', () => {
       { command: 'npm run a', description: 'Does a.' },
       { command: 'npm test', description: 'Tests.' },
     ]);
+  });
+
+  it('cuts a unit description to its first clause', () => {
+    expect(firstClause('Short enough. More after.')).toBe('Short enough');
+    expect(firstClause('Page titles (`level={1}`, one per page) and section titles, in outline order, for every page in the product.')).toBe('Page titles and section titles, in outline order');
+    expect(firstClause('One headline number in a tile: label, value and an optional change, shown with an icon.')).toBe('One headline number in a tile');
+    expect(firstClause('Showing who: record owners, activity authors, the signed-in user in the account menu trigger.')).toBe('Showing who: record owners, activity authors');
+    expect(firstClause('Tokens as var() references, for inline custom properties in system code everywhere.')).toBe('Tokens as var() references');
+    expect(firstClause('A single very long run of words without any clause break that goes on and on and on')).toMatch(/^A single very long run.*…$/);
+    expect(firstClause(null)).toBe('');
+  });
+
+  it('does not number an ordered list twice when items carry their own numbers', () => {
+    const own = '<ol><li><strong>1. Template</strong> copy it</li><li><strong>2. Variant</strong> add one</li></ol>';
+    expect(htmlToMarkdown(own)).toBe('1. **Template** copy it\n2. **Variant** add one');
+    expect(htmlToMarkdown('<ol start="3"><li>3) Third</li><li>Plain</li></ol>')).toBe('3. Third\n4. Plain');
+    // A number that isn't the item's own position is content, not a duplicate marker.
+    expect(htmlToMarkdown('<ol><li>2024 was the year</li><li>5. Out of order</li></ol>')).toBe('1. 2024 was the year\n2. 5. Out of order');
+    expect(htmlToMarkdown('<ul><li>1. Unordered keeps it</li></ul>')).toBe('- 1. Unordered keeps it');
   });
 
   it('flattens rendered pages to Markdown', () => {

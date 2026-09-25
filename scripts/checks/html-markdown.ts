@@ -59,15 +59,23 @@ export const htmlToMarkdown = (html: string, options: MarkdownOptions = {}): str
   };
   const text = (node: Node) => inline(node).replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
 
-  const list = (el: Element, ordered: boolean): string =>
-    [...el.children]
+  // An ordered item whose text already starts with its own number ("1. Template…") keeps only the
+  // list's marker, so the number isn't printed twice. Emphasis around the number stays.
+  const OWN_NUMBER = /^(\*{0,2})(\d+)[.)]\s+/;
+  const list = (el: Element, ordered: boolean): string => {
+    const start = Number(el.getAttribute('start') ?? 1) || 1;
+    return [...el.children]
       .filter((li) => li.tagName === 'LI')
       .map((li, i) => {
-        const marker = ordered ? `${String(i + 1)}. ` : '- ';
-        const body = blocks(li).replace(/\n{2,}/g, '\n');
+        const n = start + i;
+        const marker = ordered ? `${String(n)}. ` : '- ';
+        let body = blocks(li).replace(/\n{2,}/g, '\n');
+        const own = ordered ? OWN_NUMBER.exec(body) : null;
+        if (own && Number(own[2]) === n) body = `${own[1] ?? ''}${body.slice(own[0].length)}`;
         return marker + body.split('\n').join(`\n${' '.repeat(marker.length)}`);
       })
       .join('\n');
+  };
 
   const cell = (el: Element) => text(el).replace(/\|/g, '\\|').replace(/\n/g, ' ');
   const table = (el: Element): string => {
