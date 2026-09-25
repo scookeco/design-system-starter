@@ -158,8 +158,10 @@ StyleDictionary.registerFormat({
     }
     return [
       `// ${HEADER}`,
-      '// Semantic and component tokens as var() references. Primitives are deliberately absent:',
-      '// nothing outside the token source should read them.',
+      '/**',
+      ' * Semantic and component tokens as var() references, for inline custom properties in system code',
+      ' * (vars.space.gap.md). Primitives are deliberately absent: nothing outside the token source reads them.',
+      ' */',
       `export const vars = ${JSON.stringify(tree, null, 2)} as const;`,
       '',
       'export type GapToken = keyof typeof vars.space.gap;',
