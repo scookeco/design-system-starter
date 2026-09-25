@@ -33,8 +33,11 @@
 
   /* 4. responsive: below the breakpoint token the regions stack in DOM (reading) order */
   @container page-layout (inline-size < 40rem) {
+    /* The nav + aside pair needs its own selector: at 0,3,0 the three-column rule above would
+       otherwise outrank a 0,2,0 selector here and never stack. */
     .page-layout__grid[data-nav],
-    .page-layout__grid[data-aside] {
+    .page-layout__grid[data-aside],
+    .page-layout__grid[data-nav][data-aside] {
       grid-template-columns: minmax(0, 1fr);
     }
   }
