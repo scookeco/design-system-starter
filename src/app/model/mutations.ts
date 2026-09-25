@@ -3,10 +3,11 @@
  * The list of hooks here *is* the domain's verb list. Each one documents its presentation
  * (optimistic or pessimistic) and exactly which cache entries it patches and invalidates:
  *
- *   verb               presents     patches                    invalidates
- *   renameRecord       optimistic   detail (then rolls back)   detail, lists        (counts can't change)
- *   moveRecord         pessimistic  detail (server's answer)   lists, counts        (board column)
- *   archiveRecord      pessimistic  detail (server's answer)   lists, counts
+ *   verb               presents     patches                           invalidates
+ *   renameRecord       optimistic   detail + every cached list page   detail, lists   (counts can't change)
+ *                                   holding it (then rolls back)
+ *   moveRecord         pessimistic  detail + listed copies (answer)   lists, counts   (board column)
+ *   archiveRecord      pessimistic  detail + listed copies (answer)   lists, counts
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts
  *   addPerson          pessimistic  people (appends)           people
@@ -14,13 +15,35 @@
  *   updateAccount      pessimistic  directory entry, detail      nothing else: records hold the id, so
  *                                                               every join re-renders from the directory
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
-import type { Account, MovableStatus, Person, RecordEntity, RecordFilter } from '../api/schemas';
+import type { Account, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage, Tenant } from '../api/schemas';
 import { useTenant } from '../tenant';
 import { accountKeys, recordKeys } from './keys';
+
+/**
+ * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
+ * entry AND inside every cached list page that happens to hold it (the table, the board, an
+ * account's records, other tabs and pages visited earlier, mounted or not). Patching only the
+ * detail leaves every one of those showing the old value until it refetches, and an unmounted
+ * list with a long staleTime might not refetch for a while.
+ *
+ * So a record write patches the detail and then, with one setQueriesData over the lists prefix,
+ * the copy in every cached list page that contains it. Pages that don't hold it are left
+ * untouched (the updater returns undefined). Membership, order and totals can still change (a
+ * rename under sort-by-name, a move out of a tab), which is what the invalidation that follows is
+ * for; the patch makes the edit visible everywhere at once, before any refetch lands.
+ */
+export const patchListedRecord = (client: QueryClient, tenant: Tenant, id: string, patch: (listed: RecordEntity) => RecordEntity | undefined) =>
+  client.setQueriesData<RecordPage>({ queryKey: recordKeys.lists(tenant) }, (page) => {
+    const index = page?.items.findIndex((r) => r.id === id) ?? -1;
+    const listed = page?.items[index];
+    if (!page || !listed) return undefined;
+    const next = patch(listed);
+    return next ? { ...page, items: page.items.map((r, i) => (i === index ? next : r)) } : undefined;
+  });
 
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;
@@ -37,22 +60,33 @@ export function useRenameRecord(id: string) {
   return useMutation({
     mutationKey: [tenant, 'renameRecord', { id }],
     mutationFn: ({ name, version }: { name: string; version: number }) => patchRecordName(tenant, id, name, version),
-    onMutate: async ({ name }) => {
-      // A read in flight must not land on top of the optimistic name.
-      await client.cancelQueries({ queryKey: key, exact: true });
+    onMutate: async ({ name, version }) => {
+      // A read in flight must not land on top of the optimistic name: not the detail, not a list.
+      await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(tenant) })]);
       const previous = client.getQueryData<RecordEntity>(key);
       if (previous) client.setQueryData<RecordEntity>(key, { ...previous, name });
-      return { previous };
+      // Every cached list page holding this record shows the new name too (see patchListedRecord).
+      let listedName: string | undefined;
+      patchListedRecord(client, tenant, id, (listed) => {
+        listedName ??= listed.name;
+        return listed.version === version ? { ...listed, name } : undefined;
+      });
+      return { previous, previousName: previous?.name ?? listedName };
     },
-    onError: (_error, { name }, context) => {
+    onError: (_error, { name, version }, context) => {
       const current = client.getQueryData<RecordEntity>(key);
       // Roll back only our own optimistic patch: if something newer landed, leave it.
       if (context?.previous && current?.name === name && current.version === context.previous.version) {
         client.setQueryData(key, context.previous);
       }
+      const previousName = context?.previousName;
+      if (previousName !== undefined) {
+        patchListedRecord(client, tenant, id, (listed) => (listed.name === name && listed.version === version ? { ...listed, name: previousName } : undefined));
+      }
     },
     onSuccess: (renamed) => {
       client.setQueryData(key, renamed);
+      patchListedRecord(client, tenant, id, () => renamed);
     },
     // Returning the promise keeps the mutation pending until the refetch lands. After a conflict the
     // detail is left alone: the page says so and the person chooses when to reload.
@@ -76,6 +110,7 @@ export function useMoveRecord() {
     mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => postStatus(tenant, record.id, status, record.version),
     onSuccess: (moved) => {
       client.setQueryData(recordKeys.detail(tenant, moved.id), moved);
+      patchListedRecord(client, tenant, moved.id, () => moved);
       return Promise.all([
         client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
         client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
@@ -93,6 +128,7 @@ export function useArchiveRecord(id: string) {
     mutationFn: () => postArchive(tenant, id),
     onSuccess: (archived) => {
       client.setQueryData(recordKeys.detail(tenant, id), archived);
+      patchListedRecord(client, tenant, id, () => archived);
       return Promise.all([
         client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
         client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
