@@ -43,7 +43,7 @@ export function RecordsPage() {
     <AppShell brand="Acme" nav={<Nav label="Main" sections={NAV} current="/records" />} userMenu={accountMenu}>
       <Center max="lg" gutters="lg">
         <Stack gap="lg">
-          <Heading level={1}>Records</Heading>
+          <PageHeader title="Records" actions={<Button icon="plus">New record</Button>} />
           {/* the page */}
         </Stack>
       </Center>

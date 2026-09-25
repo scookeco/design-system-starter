@@ -10,7 +10,7 @@ const ARCHETYPES = [
     id: 'examples-list-page--default',
     example: 'List page',
     choose: 'Users come to find, compare or act on many records: records, people, invoices, an audit log.',
-    shows: 'One primary action, a filter bar, a sortable table; loading, first use, no results and load error states.',
+    shows: 'PageHeader with one primary action, SearchField and a Filters popover with removable chips, a sortable table, Pagination; loading, first use, no results and load error states.',
   },
   {
     archetype: 'Record / detail',
@@ -18,7 +18,7 @@ const ARCHETYPES = [
     id: 'examples-record-page--default',
     example: 'Record page',
     choose: 'One record is the subject: its status, properties, activity and the actions on it.',
-    shows: 'Breadcrumb, title with status and a “More” menu, a properties rail, an activity feed.',
+    shows: 'Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside in PageLayout.',
   },
   {
     archetype: 'Create and edit',
@@ -34,7 +34,39 @@ const ARCHETYPES = [
     id: 'examples-settings-page--personal-profile',
     example: 'Settings page',
     choose: 'Personal or workspace preferences, grouped by category.',
-    shows: 'A grouped sub-nav, one card per category with its own Save, a success banner.',
+    shows: 'A grouped sub-nav in PageLayout’s nav slot, one card per category with its own Save, a success banner.',
+  },
+  {
+    archetype: 'Sign-in (signed out)',
+    file: 'src/examples/SignInPage.tsx',
+    id: 'examples-sign-in--start',
+    example: 'Sign in',
+    choose: 'Any signed-out page: sign-in, sign-up, password reset, a verification code.',
+    shows: 'AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step.',
+  },
+  {
+    archetype: 'Wizard',
+    file: 'src/examples/SetupWizard.tsx',
+    id: 'examples-setup-wizard--first-step',
+    example: 'Setup wizard',
+    choose: 'A task whose later steps depend on earlier ones: first-run setup, a multi-step create.',
+    shows: 'FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit.',
+  },
+  {
+    archetype: 'Dashboard',
+    file: 'src/examples/DashboardPage.tsx',
+    id: 'examples-dashboard--default',
+    example: 'Dashboard',
+    choose: 'A home or overview page: how things are, and what needs attention.',
+    shows: 'A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table.',
+  },
+  {
+    archetype: 'Error and 404',
+    file: 'src/examples/ErrorPages.tsx',
+    id: 'examples-error-pages--not-found',
+    example: 'Error pages',
+    choose: 'A page that doesn’t exist (inside the shell), or a failure before the app can load (in AuthLayout).',
+    shows: 'EmptyState as the h1, plain words, Try again and a way home.',
   },
 ] as const;
 
@@ -74,7 +106,10 @@ function PageArchetypes() {
       <DocSection title="How to copy one">
         <Rules
           items={[
-            <>Render inside the app’s one shell composition (the examples share <code>ExampleShell</code>); pass only where the page is and its content.</>,
+            <>
+              Signed-in pages render inside the app’s one shell composition (the examples share <code>ExampleShell</code>); signed-out pages
+              in AuthLayout; a focused multi-step task in FocusedLayout. Every page starts with a <code>PageHeader</code>.
+            </>,
             <>Keep every state the example has: loading, empty, error. A page without them isn’t finished.</>,
             <>Map domain statuses to badge tones in one place, as the examples’ status-to-tone map does.</>,
             <>A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.</>,

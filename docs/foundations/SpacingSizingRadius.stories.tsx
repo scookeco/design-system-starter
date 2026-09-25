@@ -43,6 +43,9 @@ function SpacingPage() {
       <DocSection title="Radius" intro="Corner radius by what the element is, not by how round it looks.">
         <ScaleTable caption="Radius tokens" entries={varEntries(vars.radius, 'radius')} preview={corner} />
       </DocSection>
+      <DocSection title="Aspect ratios" intro="The shapes Frame holds media to: width divided by height.">
+        <ScaleTable caption="Ratio tokens" entries={varEntries(vars.ratio, 'ratio')} />
+      </DocSection>
       <DocSection title="Borders and focus">
         <ScaleTable
           caption="Border and focus tokens"

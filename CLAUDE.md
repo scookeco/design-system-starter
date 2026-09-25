@@ -17,10 +17,10 @@ Work on a branch. Never commit to `main` directly.
 
 - `tokens/`: DTCG source (primitive → semantic → component). The only place values live.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
-- `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar (token-typed props).
+- `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
-- `src/layouts/`: `AppShell`, the frame for every signed-in page. Imports components and primitives; nothing below imports it.
-- `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
+- `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks). Import components and primitives; nothing below imports them.
+- `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `docs/`: gallery-only pages. `foundations/` (rendered from the token source), `guides/`, and `usage/<Name>.usage.tsx`, the usage section of each component's Docs tab.
@@ -44,9 +44,15 @@ UI rules (design system v0)
   component → primitive. Stop at the first yes.
 - Missing token? Add a semantic token in tokens/ (with a dark value for colours),
   run npm run tokens. Never write a literal instead.
-- New pages compose into AppShell (fill its slots; never rebuild the frame) and
-  copy the matching golden example: list → ListPage, record → RecordPage,
-  create/edit → CreateEditFlow, settings → SettingsPage. Not other screens.
+- New pages start from PageHeader (the one h1, status, actions) inside the right
+  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),
+  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout
+  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
+  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
+  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
+  error/404 → ErrorPages. Not other screens.
+- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
+  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.
