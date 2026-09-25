@@ -1,0 +1,40 @@
+@layer components {
+  /* 1. block: text on the start side, actions on the end; actions wrap below when space runs out */
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-gap-md);
+  }
+
+  /* 2. parts */
+  .page-header__text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    min-inline-size: 0;
+  }
+
+  .page-header__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-sm);
+  }
+
+  /* Programmatic focus target only (tabIndex -1): no ring, as for main. */
+  .page-header__title > .heading:focus {
+    outline: none;
+  }
+
+  /* Pushed to the inline end, on the title row or on a row of their own once they wrap. */
+  .page-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-gap-xs);
+    margin-inline-start: auto;
+  }
+}

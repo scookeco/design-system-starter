@@ -6,7 +6,7 @@
  *
  * Anatomy:
  *   shell    breadcrumb (Records / <title>) · the Records nav item stays current
- *   header   title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
+ *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
  *   main     summary card · activity feed with a comment box
  *   rail     properties as a definition list (moves below main when the container is narrow)
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
@@ -24,8 +24,8 @@ import {
   Cluster,
   Dialog,
   EmptyState,
-  Heading,
   Menu,
+  PageHeader,
   Sidebar,
   Skeleton,
   Stack,
@@ -136,34 +136,32 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
-        <Cluster as="header" justify="between" align="start" gap="md">
-          <Stack gap="2xs">
-            <Cluster gap="sm" align="center">
-              <Heading level={1}>{record.name}</Heading>
-              <Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>
-            </Cluster>
-            <Text tone="muted">{`Owned by ${record.owner} · updated ${record.updated}`}</Text>
-          </Stack>
-          <Cluster gap="xs">
-            <Button variant="secondary">Share</Button>
-            <Button onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>Request approval</Button>
-            <Menu
-              defaultOpen={initialMenuOpen}
-              align="end"
-              trigger={
-                <Button variant="secondary" icon="more">
-                  More
-                </Button>
-              }
-              items={[
-                { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
-                { label: 'Export as CSV', icon: 'download' },
-                'separator',
-                { label: 'Delete record', tone: 'danger', onSelect: () => setConfirmDelete(true) },
-              ]}
-            />
-          </Cluster>
-        </Cluster>
+        <PageHeader
+          title={record.name}
+          status={<Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>}
+          description={`Owned by ${record.owner} · updated ${record.updated}`}
+          actions={
+            <>
+              <Button variant="secondary">Share</Button>
+              <Button onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>Request approval</Button>
+              <Menu
+                defaultOpen={initialMenuOpen}
+                align="end"
+                trigger={
+                  <Button variant="secondary" icon="more">
+                    More
+                  </Button>
+                }
+                items={[
+                  { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
+                  { label: 'Export as CSV', icon: 'download' },
+                  'separator',
+                  { label: 'Delete record', tone: 'danger', onSelect: () => setConfirmDelete(true) },
+                ]}
+              />
+            </>
+          }
+        />
 
         <Sidebar
           placement="end"

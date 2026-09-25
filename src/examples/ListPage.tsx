@@ -9,7 +9,7 @@
  * landmarks, navigation and the toast region; the page fills main.
  *
  * Anatomy:
- *   header   title + description | page actions
+ *   header   PageHeader: title + description | page actions
  *   toolbar  search · status filter · toggle        (role="search"; hidden until there are records)
  *   content  one of: skeleton rows (loading) · table · empty state (first use | no results | error)
  *   footer   result count
@@ -24,7 +24,7 @@ import {
   Cluster,
   Dialog,
   EmptyState,
-  Heading,
+  PageHeader,
   Select,
   Skeleton,
   Stack,
@@ -125,30 +125,30 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
-        <Cluster as="header" justify="between" align="end" gap="md">
-          <Stack gap="2xs">
-            <Heading level={1}>Records</Heading>
-            <Text tone="muted">Track every record, who owns it and where it stands.</Text>
-          </Stack>
-          <Cluster gap="xs">
-            <Tooltip content="Download the filtered list as CSV">
-              <Button variant="secondary" icon="download">
-                Export
-              </Button>
-            </Tooltip>
-            <Dialog
-              title="New record"
-              description="Records start as drafts until they are sent."
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              trigger={<Button icon="plus">New record</Button>}
-              footer={
-                <>
-                  <Button variant="secondary" onClick={() => setDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => createRecord()}>Create record</Button>
-                </>
+        <PageHeader
+          title="Records"
+          description="Track every record, who owns it and where it stands."
+          actions={
+            <>
+              <Tooltip content="Download the filtered list as CSV">
+                <Button variant="secondary" icon="download">
+                  Export
+                </Button>
+              </Tooltip>
+              <Dialog
+                title="New record"
+                description="Records start as drafts until they are sent."
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                trigger={<Button icon="plus">New record</Button>}
+                footer={
+                  <>
+                    <Button variant="secondary" onClick={() => setDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={() => createRecord()}>Create record</Button>
+    
+            </>
               }
             >
               <Stack as="form" gap="md" onSubmit={createRecord}>
@@ -167,8 +167,9 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
                 />
               </Stack>
             </Dialog>
-          </Cluster>
-        </Cluster>
+            </>
+          }
+        />
 
         {items.length > 0 ? (
           <Cluster as="form" role="search" gap="sm" align="center" onSubmit={(event) => event.preventDefault()}>
