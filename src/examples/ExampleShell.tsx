@@ -33,6 +33,7 @@ export function ExampleShell({ current, trail, footer, children }: ExampleShellP
       nav={<Nav label="Main" sections={NAV} current={current} />}
       breadcrumbs={trail ? <Breadcrumbs items={trail.items} current={trail.current} /> : undefined}
       footer={footer}
+      help={<Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />}
       userMenu={
         <Menu
           align="end"

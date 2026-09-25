@@ -110,6 +110,12 @@
     gap: var(--space-gap-xs);
   }
 
+  /* Named slots that fix the order (actions · help · account); they add no box of their own. */
+  .app-shell__help,
+  .app-shell__user {
+    display: contents;
+  }
+
   /* Positioned, so absolutely positioned descendants (hidden form inputs) scroll and clip with it. */
   .app-shell__main {
     position: relative;

@@ -13,7 +13,8 @@ export const usage: UsageDoc = {
   covers: [AppShell],
   whenToUse: [
     'Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.',
-    'Fill the slots: `breadcrumbs`, `actions` (global only), `userMenu`, `children` (the page), `footer` (a long form’s action bar).',
+    'Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).',
+    'Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.',
     'People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well.',
   ],
   whenNotToUse: [
@@ -51,5 +52,7 @@ export const usage: UsageDoc = {
     'The collapsed sidebar opens as a drawer that traps focus and returns it to the Menu button.',
     'The rail toggle has an accessible name that says what it will do, `aria-expanded` and a matching tooltip. In the rail, labels move into tooltips but stay each link’s accessible name.',
     'Product code owns the page’s h1 and moving focus to it after client-side navigation.',
+    'The `help` slot always renders after the global actions and right before the account menu, the same relative order on every page (WCAG 2.2 SC 3.2.6 Consistent Help). The WCAG 2.2 checks fail an example page that renders the shell without it.',
+    'A sticky `footer` reserves `space.scroll-padding.end` in main, so a field that gets focus scrolls clear of the bar instead of under it (SC 2.4.11).',
   ],
 };

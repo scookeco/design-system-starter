@@ -3,11 +3,19 @@
  * WCAG 2.2 criteria that are about a flow rather than a single rendered story, asserted on the
  * golden examples. Each audit is a function with a negative control that proves it can fail.
  */
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import { SetupWizard } from '../../src/examples/SetupWizard';
 import { SignInPage, type SignInStep } from '../../src/examples/SignInPage';
 
 afterEach(cleanup);
+
+// jsdom has no ResizeObserver; Radix measures its hidden form inputs with one inside a <form>.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 
 const TEXT_ENTRY = 'input:not([type]), input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], textarea';
 const labelOf = (input: Element) => ((input as HTMLInputElement).labels?.[0]?.textContent ?? '').trim();
@@ -121,5 +129,70 @@ describe('Accessible authentication (SC 3.3.8)', () => {
       'Security code: a verification code needs inputmode="numeric"',
       'a CAPTCHA-style cognitive test',
     ]);
+  });
+});
+
+/** The questions a step asks: the name of every text field and radio group in its form. */
+const questionsOn = (form: HTMLElement) => [
+  ...within(form)
+    .queryAllByRole('textbox')
+    .map((field) => labelOf(field)),
+  ...within(form)
+    .queryAllByRole('radiogroup')
+    .map((group) => document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent?.trim() ?? ''),
+];
+
+/** SC 3.3.7 Redundant Entry: questions asked on more than one step of the same process. */
+const askedAgain = (steps: readonly (readonly string[])[]) => {
+  const seen = new Set<string>();
+  const again = new Set<string>();
+  for (const questions of steps) {
+    for (const question of new Set(questions)) (seen.has(question) ? again : seen).add(question);
+  }
+  return [...again];
+};
+
+describe('Redundant entry (SC 3.3.7)', () => {
+  const form = () => document.getElementById('setup-step') as HTMLElement;
+  const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+
+  it('asks each question once, shows every earlier answer on review, and brings answers back when editing', () => {
+    render(<SetupWizard />);
+    const steps: string[][] = [];
+
+    steps.push(questionsOn(form()));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Workspace name' }), { target: { value: 'Acme Legal' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Workspace address' }), { target: { value: 'acme-legal' } });
+    next();
+
+    steps.push(questionsOn(form()));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Email addresses (optional)' }), { target: { value: 'priya@example.com' } });
+    next();
+
+    steps.push(questionsOn(form()));
+    fireEvent.click(screen.getByRole('radio', { name: /Team/ }));
+    next();
+
+    // Review asks nothing: it shows what was given.
+    steps.push(questionsOn(form()));
+    expect(steps).toEqual([['Workspace name', 'Workspace address'], ['Email addresses (optional)'], ['Plan'], []]);
+    expect(askedAgain(steps)).toEqual([]);
+    const review = within(form());
+    for (const answer of ['Acme Legal', 'acme.app/acme-legal', 'priya@example.com', 'Team']) expect(review.getByText(answer)).toBeTruthy();
+
+    // Editing an answer returns to its step with every answer still filled in.
+    fireEvent.click(screen.getByRole('button', { name: 'Edit workspace' }));
+    expect((screen.getByRole('textbox', { name: 'Workspace name' }) as HTMLInputElement).value).toBe('Acme Legal');
+    expect((screen.getByRole('textbox', { name: 'Workspace address' }) as HTMLInputElement).value).toBe('acme-legal');
+    next();
+    expect((screen.getByRole('textbox', { name: 'Email addresses (optional)' }) as HTMLTextAreaElement).value).toBe('priya@example.com');
+
+    // So does going back.
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect((screen.getByRole('textbox', { name: 'Workspace name' }) as HTMLInputElement).value).toBe('Acme Legal');
+  });
+
+  it('negative control: catches a flow that asks for the same thing twice', () => {
+    expect(askedAgain([['Workspace name', 'Workspace address'], ['Plan'], ['Workspace name', 'Billing email']])).toEqual(['Workspace name']);
   });
 });

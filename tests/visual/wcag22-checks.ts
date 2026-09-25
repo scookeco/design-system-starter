@@ -7,7 +7,7 @@
  */
 
 /** The ids of the checks, as the fixture stories name them in an `expect:<id>` tag. */
-export const CHECKS = ['target-size', 'accessible-authentication', 'focus-not-obscured'] as const;
+export const CHECKS = ['target-size', 'accessible-authentication', 'consistent-help', 'focus-not-obscured'] as const;
 export type CheckId = (typeof CHECKS)[number];
 
 /**
@@ -205,4 +205,20 @@ export function accessibleAuthenticationViolations(): string[] {
   const captcha = document.querySelector('iframe[src*="captcha" i], iframe[title*="captcha" i], [class*="captcha" i], [id*="captcha" i], [aria-label*="captcha" i]');
   if (captcha) violations.push(`${captcha.tagName.toLowerCase()} looks like a CAPTCHA: a cognitive function test needs an alternative (SC 3.3.8)`);
   return violations;
+}
+
+/**
+ * SC 3.2.6 Consistent Help, A, for an app page: when the page renders the AppShell, its help slot
+ * is present, not empty, in the header, after the global actions and before the account menu, the
+ * same relative order on every page.
+ */
+export function consistentHelpViolations(): string[] {
+  const shell = document.querySelector('.app-shell');
+  if (!shell) return [];
+  const help = shell.querySelector('.app-shell__help');
+  if (!help || help.textContent?.trim() === '') return ['AppShell renders without help: pass its help slot on every app page (SC 3.2.6)'];
+  if (!help.closest('.app-shell__header')) return ['AppShell help is not in the header (SC 3.2.6)'];
+  const next = help.nextElementSibling;
+  if (next && !next.classList.contains('app-shell__user')) return ['AppShell help must come right before the account menu (SC 3.2.6)'];
+  return [];
 }

@@ -2,7 +2,14 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import { index, openStory, stories, type IndexEntry } from './storybook';
-import { accessibleAuthenticationViolations, CHECKS, focusObscuredViolation, targetSizeViolations, type CheckId } from './wcag22-checks';
+import {
+  accessibleAuthenticationViolations,
+  CHECKS,
+  consistentHelpViolations,
+  focusObscuredViolation,
+  targetSizeViolations,
+  type CheckId,
+} from './wcag22-checks';
 
 /**
  * WCAG 2.2 checks beyond axe, over every story in one pass each (light theme: none of them depends
@@ -41,6 +48,9 @@ const focusNotObscured = async (page: Page) => {
 const RUNNERS: Record<CheckId, (page: Page, story: IndexEntry) => Promise<string[]>> = {
   'target-size': (page) => page.evaluate(targetSizeViolations),
   'accessible-authentication': (page) => page.evaluate(accessibleAuthenticationViolations),
+  // App pages: the golden examples (and the fixtures). Layout stories show the shell's slots one by one.
+  'consistent-help': async (page, story) =>
+    story.title.startsWith('Examples/') || story.tags?.includes('check-fixture') ? page.evaluate(consistentHelpViolations) : [],
   // Last: tabbing opens tooltips and scrolls.
   'focus-not-obscured': focusNotObscured,
 };
