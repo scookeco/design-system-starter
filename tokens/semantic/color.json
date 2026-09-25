@@ -73,6 +73,15 @@
           }
         },
         "$description": "Backdrop behind modal overlays."
+      },
+      "placeholder": {
+        "$value": "{color.gray.200}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.700}"
+          }
+        },
+        "$description": "Skeleton bars standing in for loading content."
       }
     },
     "fg": {

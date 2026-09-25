@@ -56,6 +56,14 @@
     font: var(--text-body-lg);
   }
 
+  /* Textarea: grows by rows, text starts at the top, resizes on the block axis only. */
+  .field__control[data-multiline="true"] {
+    align-items: flex-start;
+    min-block-size: calc(var(--field-height) * 2);
+    padding-block: var(--space-inset-xs);
+    resize: vertical;
+  }
+
   .field__control::placeholder,
   .field__control[data-placeholder] {
     color: var(--color-fg-muted);

@@ -1,0 +1,32 @@
+@layer components {
+  .spinner {
+    --spinner-size: var(--size-icon-sm);
+
+    display: inline-block;
+    flex: none;
+    inline-size: var(--spinner-size);
+    block-size: var(--spinner-size);
+    border: var(--focus-ring-width) solid currentcolor;
+    border-inline-end-color: transparent;
+    border-radius: var(--radius-pill);
+    animation-name: spinner-spin;
+    animation-duration: var(--motion-spin);
+    animation-timing-function: var(--ease-linear);
+    animation-iteration-count: infinite;
+  }
+
+  .spinner-status {
+    display: inline-flex;
+    color: var(--color-fg-muted);
+  }
+
+  .spinner[data-size="md"] {
+    --spinner-size: var(--size-icon-md);
+  }
+
+  @keyframes spinner-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+}

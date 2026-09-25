@@ -29,20 +29,7 @@
     transition-timing-function: var(--ease-standard);
   }
 
-  /* 2. parts */
-  .button__spinner {
-    inline-size: var(--size-icon-sm);
-    block-size: var(--size-icon-sm);
-    border: var(--focus-ring-width) solid currentcolor;
-    border-inline-end-color: transparent;
-    border-radius: var(--radius-pill);
-    animation-name: button-spin;
-    animation-duration: var(--motion-spin);
-    animation-timing-function: var(--ease-linear);
-    animation-iteration-count: infinite;
-  }
-
-  /* 3. variants */
+  /* 2. variants */
   .button[data-variant="secondary"] {
     --button-bg: var(--button-secondary-bg);
     --button-bg-hover: var(--button-secondary-bg-hover);
@@ -76,7 +63,7 @@
     font: var(--text-body-lg);
   }
 
-  /* 4. states */
+  /* 3. states */
   .button:where(:hover):not(:disabled, [aria-disabled="true"]) {
     background: var(--button-bg-hover);
   }
@@ -90,11 +77,5 @@
 
   .button[data-state="loading"] {
     cursor: progress;
-  }
-
-  @keyframes button-spin {
-    to {
-      transform: rotate(1turn);
-    }
   }
 }

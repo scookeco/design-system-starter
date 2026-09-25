@@ -1,0 +1,146 @@
+@layer layouts {
+  /* 1. block: the container every part of the shell responds to */
+  .app-shell {
+    position: relative;
+    container: app-shell / inline-size;
+    block-size: var(--size-viewport-block);
+    background: var(--color-bg-canvas);
+    color: var(--color-fg-default);
+  }
+
+  /* 2. parts */
+  .app-shell__skip {
+    position: absolute;
+    inset-block-start: var(--space-inset-sm);
+    inset-inline-start: var(--space-inset-sm);
+    z-index: var(--z-overlay);
+    padding-block: var(--space-inset-xs);
+    padding-inline: var(--space-inset-sm);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-inverse);
+    color: var(--color-fg-inverse);
+    font: var(--text-label);
+  }
+
+  .app-shell__skip:not(:focus) {
+    overflow: hidden;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    block-size: 1px;
+    white-space: nowrap;
+  }
+
+  /* Only main scrolls: the sidebar and header stay put. */
+  .app-shell__frame {
+    display: grid;
+    grid-template:
+      "sidebar header" auto
+      "sidebar main" minmax(0, 1fr)
+      / var(--size-sidebar-md) minmax(0, 1fr);
+    block-size: 100%;
+  }
+
+  .app-shell__sidebar {
+    display: flex;
+    flex-direction: column;
+    grid-area: sidebar;
+    gap: var(--space-gap-lg);
+    overflow: auto;
+    padding: var(--space-inset-md);
+    border-inline-end: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .app-shell__brand {
+    padding-inline: var(--space-inset-sm);
+    font: var(--text-heading-4);
+  }
+
+  .app-shell__header {
+    display: flex;
+    grid-area: header;
+    align-items: center;
+    gap: var(--space-gap-sm);
+    min-block-size: var(--size-control-lg);
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-lg);
+    border-block-end: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .app-shell__toggle {
+    display: none;
+  }
+
+  .app-shell__context {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .app-shell__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  /* Positioned, so absolutely positioned descendants (hidden form inputs) scroll and clip with it. */
+  .app-shell__main {
+    position: relative;
+    grid-area: main;
+    overflow: auto;
+    padding-block: var(--space-inset-lg);
+  }
+
+  .app-shell__main:has(> .app-shell__footer) {
+    padding-block-end: 0;
+  }
+
+  .app-shell__footer {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: var(--z-sticky);
+    margin-block-start: var(--space-gap-lg);
+    padding-block: var(--space-inset-sm);
+    border-block-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Focus lands here from the skip link; main is not in the tab order, so no ring. */
+  .app-shell__main:focus {
+    outline: none;
+  }
+
+  /* 3. responsive: below the breakpoint token the sidebar becomes a drawer behind a Menu button */
+  @container app-shell (inline-size < 48rem) {
+    .app-shell__frame {
+      grid-template-areas:
+        "header"
+        "main";
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app-shell__header {
+      padding-inline: var(--space-inset-md);
+    }
+
+    .app-shell__toggle {
+      display: flex;
+    }
+
+    .app-shell__sidebar {
+      display: none;
+    }
+
+    /* Open: the drawer shares main's grid cell and sits over it, below the header and its toggle. */
+    .app-shell__frame[data-nav="open"] .app-shell__sidebar {
+      z-index: var(--z-overlay);
+      display: flex;
+      grid-area: main;
+      justify-self: start;
+      inline-size: var(--size-sidebar-md);
+      max-inline-size: 100%;
+      box-shadow: var(--shadow-modal);
+    }
+  }
+}

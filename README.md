@@ -1,6 +1,6 @@
 # Design system starter
 
-A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, a gallery and one golden example page. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
+A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, an app shell layout, a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
 Stack: npm (Node 24), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint.
 
@@ -47,8 +47,9 @@ src/styles/             index.css (layer order) · reset · generated tokens.css
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar
 src/components/         the components; the only place (with primitives) Radix is imported
+src/layouts/            AppShell: the frame every signed-in page renders inside
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
-src/examples/           golden example: list page archetype (also a consumer lint target)
+src/examples/           golden example pages, one per archetype (also a consumer lint target)
 src/index.ts            public entry point
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
 tests/unit/             Vitest suites
@@ -70,6 +71,8 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Every `var()` used is defined; system CSS never reads primitives; one layer order; every rule in a layer | Vitest | `tests/unit/css.test.ts`, `scripts/checks/css.ts` |
 | Closed components: no `className`/`style` props | TypeScript props types (`Closed<>`), proved by a type fixture | `src/internal/closed-api.ts`, `fixtures/violations/typescript-closed-api.tsx` |
 | Vendor UI only inside the system; consumers use the public entry | `no-restricted-imports` (ESLint) | `eslint.config.js` |
+| Layers import downward only (see the layer table below) | `no-restricted-imports` per layer; `test:rules` needs a fixture for every direction | `eslint.config.js`, `scripts/test-rules.ts` |
+| Media and container queries use breakpoint tokens (queries can't read `var()`, and Stylelint only checks declarations) | Vitest: every query length equals a `size.breakpoint.*` value | `tests/unit/css.test.ts` |
 | Escape hatches are visible | `no-restricted-syntax` flags `className`, `style` and `UNSAFE_*` in consumer code | `eslint.config.js` |
 | Exceptions carry a reason | `eslint-comments/require-description`, unused disables are errors; Stylelint `reportDescriptionlessDisables` and `reportNeedlessDisables` | both configs |
 | The rules are actually loaded | `test:rules` (every rule has a fixture, fixtures must not be ignored or fail to parse, clean controls must pass) | `scripts/test-rules.ts` |
@@ -77,12 +80,24 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Gallery is accessible | axe (WCAG 2.2 A/AA) on every story, both themes | `tests/visual/stories.spec.ts` |
 | Agents know the rules | UI rules block | `CLAUDE.md` |
 
+### Layers
+
+Each layer imports only from the layers below it. Every arrow that is not allowed has a fixture in `fixtures/violations/`, and `test:rules` fails if one is missing.
+
+| Layer | Folder | May import | Cascade layer |
+|---|---|---|---|
+| Examples (consumer code) | `src/examples/` | the public entry `src/index.ts` only; no vendor UI, no `className`/`style` | none: no CSS |
+| Layouts | `src/layouts/` | components, primitives, tokens; no vendor UI, no examples | `layouts` |
+| Components | `src/components/` | other components, primitives, tokens, Radix; no layouts, no examples | `components` |
+| Primitives | `src/primitives/` | other primitives, tokens; no components, no layouts | `primitives` |
+| Tokens | `tokens/` → `src/styles/tokens.css`, `src/tokens/tokens.ts` | nothing | `tokens` |
+
 ### Rules worth knowing
 
 - **Allowed literals** in token-only properties: `inherit`, `currentColor`, `transparent`, `none`, `auto`, `0`, `1px`, `100%`. Anything else is a token.
 - **Transitions are written as longhands.** `transition-property` holds the property names; `transition-duration` and `transition-timing-function` take tokens. The shorthand is rejected because it mixes property names with values.
 - **Component-local custom properties** (`--button-bg`) must point at a token (`var(--…)`) or an allowed keyword.
-- **Component internals may use Flexbox/Grid.** Arranging a page is the layout primitives' job. This is the "less restrictive" policy. The golden example has no CSS at all.
+- **Component internals may use Flexbox/Grid.** Arranging a page is the layout primitives' job. This is the "less restrictive" policy. The golden examples have no CSS at all.
 - **Escape hatch format.** In consumer code every `UNSAFE_className`/`UNSAFE_style` needs:
   ```tsx
   {/* eslint-disable-next-line no-restricted-syntax -- <reason>; owner: <team>; remove when: <condition> */}
@@ -93,11 +108,36 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 
 Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` sets `color-scheme: light`, and `data-theme="dark"` on `<html>` switches to dark. Components contain no theme rules at all. The product ships light, and turning dark on is a one-line change. Contrast is tested in both themes, and the gallery captures both.
 
+## What's in the system
+
+| Kind | Parts |
+|---|---|
+| Layout | `AppShell`: skip link, sidebar (brand + `Nav`), header (breadcrumbs, actions, account menu), `main` as the only scrolling region, optional sticky action bar, toast region. Collapses to a drawer below `size.breakpoint.md`. |
+| Navigation | `Nav` (grouped, `aria-current`), `Breadcrumbs`, `Tabs`, `Menu` |
+| Actions | `Button`, `Menu` |
+| Forms | `TextField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Data display | `Table`, `Badge`, `Avatar`, `Card`, `Heading`, `Text` |
+| Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Tooltip`, `Dialog` |
+| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar` |
+
+## Which example to copy
+
+Every page renders inside `AppShell` and fills its slots; it never rebuilds the frame. Copy the example for the archetype, not another screen.
+
+| Archetype | Copy | It shows |
+|---|---|---|
+| List / index | `src/examples/ListPage.tsx` | header with one primary action, filter bar, sortable table; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
+| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, title + status + actions with a "More" menu, properties rail as a definition list, activity feed; loading and error with the shell up |
+| Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record, quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar |
+| Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav, one card per category with its own Save, a success banner |
+
+`src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. `src/examples/records.ts` holds the shared example domain, including the one status-to-tone map.
+
 ## Adding a component: walk the decision ladder
 
 Stop at the first yes:
 
-1. **Is it a new page?** Copy the structure of the golden example (`src/examples/ListPage.tsx`) and compose existing parts. No new component.
+1. **Is it a new page?** Copy the matching example (table above), render it inside `AppShell`, and compose existing parts. No new component.
 2. **Does an existing component need a new look?** Add a **variant** (a new value in its closed `data-*` vocabulary, plus a story). A new status extends the status-to-tone map; it doesn't add a badge.
 3. **Is it a genuinely new region or intent?** Add a **component** in `src/components/<Name>/`:
    - `Name.tsx`: props typed with `Closed<…>` (no `className`/`style`), a required accessible name, variants as closed unions, and state via aria/native attributes. Wrap Radix here if you need behaviour. Never expose `asChild`.
@@ -122,7 +162,7 @@ Then run `npm run check`, run the baseline workflow on the branch, and review th
 - Without Docker you can't produce Linux baselines locally, and that's fine. Locally, `npm run test:visual:update` writes `darwin/` baselines (gitignored) so you can diff your own changes before pushing.
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice. Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
-- Stories tagged `modal-open` (open Dialog or Select) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
+- Stories tagged `modal-open` (open Dialog, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 
 ## Deliberately not included yet
 
@@ -132,6 +172,8 @@ Then run `npm run check`, run the baseline workflow on the branch, and review th
 | **Versioned package publishing** (semver, changelog, changesets, deprecation windows) | A second app consumes the system. Until then it's one folder in one repo. |
 | **Codemods** for breaking changes (jscodeshift/ts-morph) | You ship a breaking change to more than one consumer. |
 | **Adoption scanning** (system vs local components, `UNSAFE_` uses, disable counts per app) | A second team builds on the system and you need system-coverage numbers. |
+| **Router integration** (a link adapter so `Nav`, `Breadcrumbs` and inline links render the router's link) | The system ships inside an app with client-side routing. Until then links are plain `<a>`, and `Nav` offers `onNavigate`. |
+| **Icon rail, remembered sidebar state, phone tab bar** | People outside the team use the app, or phones become a primary surface. Until then the sidebar collapses to a drawer. |
 | **Multi-brand / tenant token axis** (`data-brand` remapping primitives beside `color-scheme`) | A second brand or tenant arrives. Brand becomes another mode on the semantic tier, and the contrast and visual matrix run per brand × scheme. |
 
 ## Versions and compromises

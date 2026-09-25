@@ -244,5 +244,15 @@
       }
     },
     "$type": "dimension"
+  },
+  "viewport": {
+    "$type": "dimension",
+    "$description": "Dynamic viewport lengths.",
+    "block": {
+      "$value": {
+        "value": 100,
+        "unit": "dvh"
+      }
+    }
   }
 }

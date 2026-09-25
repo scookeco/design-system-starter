@@ -2,9 +2,21 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  AppShell,
+  Avatar,
   Badge,
+  Banner,
+  Breadcrumbs,
   Button,
   Checkbox,
+  EmptyState,
+  Nav,
+  RadioGroup,
+  Select,
+  Skeleton,
+  Spinner,
+  Switch,
+  Textarea,
   Stack,
   Table,
   TableBody,
@@ -115,5 +127,195 @@ describe('layout primitives', () => {
     );
     const section = screen.getByRole('region', { name: 'Group' });
     expect(section.style.getPropertyValue('--stack-gap')).toBe('var(--space-gap-xl)');
+  });
+});
+
+describe('Nav', () => {
+  it('is a labelled landmark that marks the current page with aria-current, and names its groups', () => {
+    render(
+      <Nav
+        label="Settings"
+        current="/settings/profile"
+        sections={[{ label: 'Personal', items: [{ label: 'Profile', href: '/settings/profile' }, { label: 'Alerts', href: '/settings/alerts' }] }]}
+      />,
+    );
+    expect(screen.getByRole('navigation', { name: 'Settings' })).toBeTruthy();
+    expect(screen.getByRole('list', { name: 'Personal' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Profile' }).getAttribute('aria-current')).toBe('page');
+    expect(screen.getByRole('link', { name: 'Alerts' }).hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('hands plain clicks to onNavigate', () => {
+    const onNavigate = vi.fn();
+    render(<Nav label="Main" onNavigate={onNavigate} sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />);
+    fireEvent.click(screen.getByRole('link', { name: 'Home' }));
+    expect(onNavigate).toHaveBeenCalledWith('/home');
+  });
+});
+
+describe('Breadcrumbs', () => {
+  it('links every ancestor and marks the current page as plain text', () => {
+    render(<Breadcrumbs items={[{ label: 'Records', href: '/records' }]} current="Hardware lease" />);
+    const trail = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(trail.querySelector('[aria-current="page"]')?.textContent).toBe('Hardware lease');
+    expect(screen.getByRole('link', { name: 'Records' }).getAttribute('href')).toBe('/records');
+  });
+});
+
+describe('Avatar', () => {
+  it('is an image named by the person, showing initials, and falls back to initials when the photo fails', () => {
+    render(<Avatar name="Sam de la Rivera" src="/missing.png" />);
+    const avatar = screen.getByRole('img', { name: 'Sam de la Rivera' });
+    const photo = avatar.querySelector('img');
+    expect(photo).toBeTruthy();
+    fireEvent.error(photo as HTMLImageElement);
+    expect(avatar.textContent).toBe('SR');
+  });
+
+  it('is hidden from assistive tech when decorative', () => {
+    render(<Avatar name="Sam Rivera" decorative />);
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+});
+
+describe('AppShell', () => {
+  it('renders the landmarks, a skip link first, and a main that takes focus', () => {
+    render(
+      <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    );
+    const main = screen.getByRole('main');
+    expect(main.textContent).toBe('Page');
+    expect(screen.getByRole('banner')).toBeTruthy();
+    expect(screen.getByRole('navigation', { name: 'Main' })).toBeTruthy();
+    const skip = screen.getByRole('link', { name: 'Skip to content' });
+    expect(document.querySelector('a, button')).toBe(skip);
+    fireEvent.click(skip);
+    expect(document.activeElement).toBe(main);
+  });
+
+  it('toggles the collapsed sidebar, moves focus into it on open, and returns focus on Escape', () => {
+    render(
+      <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    );
+    const toggle = screen.getByRole('button', { name: 'Menu' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(document.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBeTruthy();
+    const home = screen.getByRole('link', { name: 'Home' });
+    expect(document.activeElement).toBe(home);
+    fireEvent.keyDown(home, { key: 'Escape' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(toggle);
+  });
+});
+
+describe('Banner', () => {
+  it.each([
+    ['danger', 'alert'],
+    ['warning', 'alert'],
+    ['info', 'status'],
+    ['success', 'status'],
+  ] as const)('announces a %s banner as role=%s, with an icon beside the text', (tone, role) => {
+    render(<Banner tone={tone}>Sync is failing.</Banner>);
+    const banner = screen.getByRole(role);
+    expect(banner.textContent).toBe('Sync is failing.');
+    expect(banner.querySelector('svg')).toBeTruthy();
+  });
+
+  it('drops the live role when focus will carry it instead, and dismisses by name', () => {
+    const onDismiss = vi.fn();
+    render(
+      <Banner tone="danger" announce={false} onDismiss={onDismiss}>
+        Fix 2 fields.
+      </Banner>,
+    );
+    expect(screen.queryByRole('alert')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+});
+
+describe('EmptyState', () => {
+  it('exposes its reason and titles the region with a heading', () => {
+    render(<EmptyState reason="no-results" title="No records match" headingLevel={3} />);
+    const heading = screen.getByRole('heading', { level: 3, name: 'No records match' });
+    expect(heading.closest('[data-reason]')?.getAttribute('data-reason')).toBe('no-results');
+  });
+});
+
+describe('Spinner', () => {
+  it('is a named status when standalone and decorative otherwise', () => {
+    render(<Spinner label="Loading records" />);
+    expect(screen.getByRole('status').textContent).toBe('Loading records');
+    cleanup();
+    const { container } = render(<Spinner />);
+    expect(container.firstElementChild?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('inside a loading Button stays decorative, so the name is the label', () => {
+    render(<Button loading>Save</Button>);
+    expect(screen.getByRole('button', { name: 'Save' })).toBeTruthy();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+});
+
+describe('Skeleton', () => {
+  it('is hidden from assistive tech in every shape', () => {
+    const { container } = render(
+      <>
+        <Skeleton lines={2} />
+        <Skeleton shape="block" />
+        <table>
+          <tbody>
+            <Skeleton shape="table-row" columns={3} />
+          </tbody>
+        </table>
+      </>,
+    );
+    const shapes = container.querySelectorAll('.skeleton');
+    expect(shapes).toHaveLength(3);
+    shapes.forEach((shape) => expect(shape.getAttribute('aria-hidden')).toBe('true'));
+    expect(container.querySelectorAll('tr.skeleton td')).toHaveLength(3);
+  });
+});
+
+describe('Field-based controls', () => {
+  it('take a consumer id for error-summary links, and wire errors with aria-invalid and aria-describedby', () => {
+    render(
+      <>
+        <TextField id="name" label="Name" error="Enter a name." />
+        <Textarea id="notes" label="Notes" error="Too long." />
+        <Select id="owner" label="Owner" options={[{ value: 'a', label: 'A' }]} error="Choose one." />
+        <RadioGroup id="renewal" label="Renewal" options={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} error="Choose one." />
+      </>,
+    );
+    for (const [id, message] of [
+      ['name', 'Enter a name.'],
+      ['notes', 'Too long.'],
+      ['owner', 'Choose one.'],
+    ] as const) {
+      const control = document.getElementById(id);
+      expect(control?.getAttribute('aria-invalid'), id).toBe('true');
+      expect(document.getElementById(control?.getAttribute('aria-describedby') ?? '')?.textContent).toBe(message);
+    }
+    const group = screen.getByRole('radiogroup', { name: 'Renewal' });
+    expect(group.getAttribute('aria-invalid')).toBe('true');
+    expect(document.getElementById('renewal')).toBe(screen.getByRole('radio', { name: 'A' }));
+  });
+});
+
+describe('Switch', () => {
+  it('is a named switch that toggles', () => {
+    render(<Switch label="Weekly digest" description="Every Monday." />);
+    const control = screen.getByRole('switch', { name: 'Weekly digest' });
+    expect(control.getAttribute('aria-checked')).toBe('false');
+    fireEvent.click(control);
+    expect(control.getAttribute('aria-checked')).toBe('true');
+    expect(document.getElementById(control.getAttribute('aria-describedby') ?? '')?.textContent).toBe('Every Monday.');
   });
 });

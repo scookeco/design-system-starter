@@ -20,7 +20,7 @@ const VENDOR_UI = {
   message: 'Vendor UI is wrapped by the design system. Import the system component from the public entry point instead.',
 };
 const SYSTEM_INTERNALS = {
-  group: ['**/components/**', '**/primitives/**', '**/internal/**', '**/tokens/**', '**/styles/**'],
+  group: ['**/components/**', '**/primitives/**', '**/layouts/**', '**/internal/**', '**/tokens/**', '**/styles/**'],
   message: 'Import from the design system public entry point (src/index.ts), not its internals.',
 };
 const UPWARD_FROM_SYSTEM = {
@@ -30,6 +30,15 @@ const UPWARD_FROM_SYSTEM = {
 const PRIMITIVE_TO_COMPONENT = {
   group: ['**/components/**', '**/components'],
   message: 'Layout primitives sit below components: they may import tokens and other primitives only.',
+};
+const CORE_TO_LAYOUT = {
+  group: ['**/layouts/**', '**/layouts'],
+  message: 'Layouts sit above components and primitives: the system core never imports a layout.',
+};
+// Layouts compose components and primitives. Vendor UI stays wrapped one layer down.
+const LAYOUT_VENDOR_UI = {
+  group: VENDOR_UI.group,
+  message: 'Layouts compose system components and primitives. Wrap vendor UI in src/components or src/primitives first.',
 };
 
 const ESCAPE_HATCH = 'Escape hatch. Needs "// eslint-disable-next-line no-restricted-syntax -- <reason>; owner: <team>; remove when: <condition>". Prefer proposing a variant.';
@@ -67,14 +76,21 @@ export default defineConfig(
     name: 'system/components',
     files: ['src/components/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT] }],
     },
   },
   {
     name: 'system/primitives',
     files: ['src/primitives/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT, CORE_TO_LAYOUT] }],
+    },
+  },
+  {
+    name: 'system/layouts',
+    files: ['src/layouts/**'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [LAYOUT_VENDOR_UI, UPWARD_FROM_SYSTEM] }],
     },
   },
   {

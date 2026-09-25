@@ -120,3 +120,15 @@ export const resolveColor = (tokens: TokenMap, path: string, mode: 'light' | 'da
   if (typeof value !== 'string') throw new Error(`${path} is not a colour`);
   return value;
 };
+
+/** Resolve a dimension token to its raw CSS length ("48rem"), following aliases down the tiers. */
+export const resolveDimension = (tokens: TokenMap, path: string, seen: string[] = []): string => {
+  const token = tokens.get(path);
+  if (!token) throw new Error(`Unknown token ${path}`);
+  if (seen.includes(path)) throw new Error(`Alias cycle: ${[...seen, path].join(' -> ')}`);
+  const target = aliasTarget(token.value);
+  if (target) return resolveDimension(tokens, target, [...seen, path]);
+  const { value, unit } = (token.value ?? {}) as { value?: unknown; unit?: unknown };
+  if (typeof value !== 'number' || typeof unit !== 'string') throw new Error(`${path} is not a dimension`);
+  return `${String(value)}${unit}`;
+};

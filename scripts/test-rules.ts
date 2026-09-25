@@ -10,7 +10,8 @@
  *  - every rule in REQUIRED must be covered by a fixture, and every fixture must expect a REQUIRED rule;
  *  - the expected rule must report at error severity;
  *  - a fixture that is ignored, or fails to parse, is a failure, not a pass;
- *  - the clean controls must lint with zero errors, so the harness can tell good from bad.
+ *  - the clean controls must lint with zero errors, so the harness can tell good from bad;
+ *  - every layer boundary in BOUNDARIES must be proved by a fixture linted as a file in the importing layer.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -49,6 +50,23 @@ const REQUIRED = {
   typescript: ['typescript-closed-api'],
 } as const;
 
+/**
+ * One entry per import direction in eslint.config.js. They all report as no-restricted-imports,
+ * so REQUIRED alone can't tell them apart: each needs its own fixture, linted as a file in `from`,
+ * caught with a message matching `message`.
+ */
+const BOUNDARIES = [
+  { direction: 'examples → system internals', from: 'src/examples/', message: /public entry point/ },
+  { direction: 'examples → vendor UI', from: 'src/examples/', message: /Vendor UI is wrapped/ },
+  { direction: 'components → examples', from: 'src/components/', message: /never imports consumer code/ },
+  { direction: 'components → layouts', from: 'src/components/', message: /never imports a layout/ },
+  { direction: 'primitives → examples', from: 'src/primitives/', message: /never imports consumer code/ },
+  { direction: 'primitives → components', from: 'src/primitives/', message: /Layout primitives sit below components/ },
+  { direction: 'primitives → layouts', from: 'src/primitives/', message: /never imports a layout/ },
+  { direction: 'layouts → examples', from: 'src/layouts/', message: /never imports consumer code/ },
+  { direction: 'layouts → vendor UI', from: 'src/layouts/', message: /Wrap vendor UI/ },
+] as const;
+
 interface Fixture {
   file: string;
   expect: string;
@@ -81,6 +99,7 @@ const fail = (fixture: Fixture, why: string) => failures.push(`✗ ${fixture.fil
 const pass = (fixture: Fixture, what: string) => passes.push(`✓ ${basename(fixture.file).padEnd(44)} ${what}`);
 
 const eslint = new ESLint({ cwd: root });
+const caughtImports: { as: string; message: string }[] = [];
 
 const runEslint = async (fixture: Fixture, clean: boolean) => {
   if (!fixture.as) return fail(fixture, 'missing "@as <path>" header');
@@ -101,6 +120,7 @@ const runEslint = async (fixture: Fixture, clean: boolean) => {
       ? m.ruleId === null && /Unused eslint-disable directive/.test(m.message)
       : m.ruleId === fixture.expect && (!fixture.message || fixture.message.test(m.message)),
   );
+  if (hit?.ruleId === 'no-restricted-imports') caughtImports.push({ as: fixture.as, message: hit.message });
   return hit
     ? pass(fixture, `caught by ${fixture.expect}`)
     : fail(fixture, `expected ${fixture.expect}${fixture.message ? ` ${String(fixture.message)}` : ''}; got ${errors.map((m) => m.ruleId ?? m.message).join(', ') || 'no errors'}`);
@@ -177,10 +197,18 @@ if (!(await eslint.isPathIgnored(join(root, violations[0]?.file ?? 'fixtures/x.t
 for (const fixture of violations) await run(fixture, false);
 for (const fixture of controls) await run(fixture, true);
 
+for (const boundary of BOUNDARIES) {
+  const proved = caughtImports.some((c) => c.as.startsWith(boundary.from) && boundary.message.test(c.message));
+  if (proved) passes.push(`✓ boundary ${boundary.direction.padEnd(35)} proved by a fixture in ${boundary.from}`);
+  else failures.push(`✗ no fixture proves the ${boundary.direction} boundary (linted as ${boundary.from}…, message ${String(boundary.message)})`);
+}
+
 console.log(passes.join('\n'));
 if (failures.length > 0) {
   console.error(`\n${failures.join('\n')}\n\ntest:rules: ${String(failures.length)} problem(s)`);
   process.exitCode = 1;
 } else {
-  console.log(`\ntest:rules: ${String(violations.length)} violations caught, ${String(controls.length)} clean controls, ${String(required.size)} rules covered`);
+  console.log(
+    `\ntest:rules: ${String(violations.length)} violations caught, ${String(controls.length)} clean controls, ${String(required.size)} rules covered, ${String(BOUNDARIES.length)} import boundaries proved`,
+  );
 }

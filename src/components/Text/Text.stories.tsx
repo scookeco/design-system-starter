@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Stack } from '../../primitives/Stack/Stack';
 import { Text } from './Text';
 
 const meta = {
@@ -15,3 +16,23 @@ export const BodyLarge: Story = { args: { size: 'body-lg' } };
 export const Caption: Story = { args: { size: 'caption' } };
 export const Muted: Story = { args: { tone: 'muted' } };
 export const Numeric: Story = { args: { numeric: true, children: '1,204.50 · 98,113.00 · 7.25' } };
+export const DefinitionList: Story = {
+  render: () => (
+    <Stack as="dl" gap="sm">
+      <Stack gap="2xs">
+        <Text as="dt" size="caption" tone="muted">
+          Owner
+        </Text>
+        <Text as="dd">Operations</Text>
+      </Stack>
+      <Stack gap="2xs">
+        <Text as="dt" size="caption" tone="muted">
+          Renewal date
+        </Text>
+        <Text as="dd" numeric>
+          2027-01-31
+        </Text>
+      </Stack>
+    </Stack>
+  ),
+};

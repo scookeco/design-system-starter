@@ -18,6 +18,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Inline links in running text. Components that render links (Nav, Breadcrumbs) style their own. */
+  a {
+    color: var(--color-fg-link);
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
   code,
   kbd,
   samp {

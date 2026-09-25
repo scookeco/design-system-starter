@@ -15,7 +15,8 @@ export type LayoutElement =
   | 'fieldset'
   | 'ul'
   | 'ol'
-  | 'li';
+  | 'li'
+  | 'dl';
 
 export type LayoutProps = Closed<HTMLAttributes<HTMLElement>> & {
   /** Semantic element to render. Defaults to div. */

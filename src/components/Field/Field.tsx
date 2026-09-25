@@ -23,13 +23,16 @@ export interface FieldProps {
   children: ReactNode;
 }
 
-/** Builds the id set for a field from one base id. */
-export const fieldIds = (baseId: string, description?: string, error?: string): FieldIds => {
+/**
+ * Builds the id set for a field from one base id. `controlId` lets a consumer name the control
+ * (an error summary links to it); the label and messages still derive from the base id.
+ */
+export const fieldIds = (baseId: string, description?: string, error?: string, controlId?: string): FieldIds => {
   const descriptionId = `${baseId}-description`;
   const errorId = `${baseId}-error`;
   const describedBy = [description ? descriptionId : '', error ? errorId : ''].filter(Boolean).join(' ');
   return {
-    controlId: `${baseId}-control`,
+    controlId: controlId ?? `${baseId}-control`,
     labelId: `${baseId}-label`,
     descriptionId,
     errorId,
@@ -40,7 +43,7 @@ export const fieldIds = (baseId: string, description?: string, error?: string): 
 
 /**
  * Internal: label, control, description and error in a fixed anatomy, shared by
- * TextField and Select so every form control has the same structure and spacing.
+ * TextField, Textarea, Select and RadioGroup so every form control has the same structure and spacing.
  */
 export function Field({ ids, label, hideLabel = false, description, error, nativeLabel = true, children }: FieldProps) {
   const labelClass = hideLabel ? 'field__label visually-hidden' : 'field__label';

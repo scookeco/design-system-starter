@@ -7,11 +7,12 @@ import {
   findPrimitiveReads,
   findUndefinedVars,
   findUnlayeredRules,
+  findUntokenedQueryLengths,
 } from '../../scripts/checks/css';
-import { loadTokenSource } from '../../scripts/checks/token-source';
+import { loadTokenSource, resolveDimension } from '../../scripts/checks/token-source';
 
 const root = resolve(import.meta.dirname, '../..');
-const LAYERS = ['reset', 'tokens', 'base', 'primitives', 'components', 'utilities'] as const;
+const LAYERS = ['reset', 'tokens', 'base', 'primitives', 'components', 'layouts', 'utilities'] as const;
 
 const cssFiles = (dir: string): string[] =>
   readdirSync(dir).flatMap((entry) => {
@@ -23,10 +24,12 @@ const all = cssFiles(join(root, 'src')).map((full) => ({ file: relative(root, fu
 const tokenCss = all.find((f) => f.file === 'src/styles/tokens.css');
 const entry = all.find((f) => f.file === 'src/styles/index.css');
 const authored = all.filter((f) => f !== tokenCss && f !== entry);
-const systemStyles = authored.filter((f) => /^src\/(components|primitives)\//.test(f.file));
+const systemStyles = authored.filter((f) => /^src\/(components|primitives|layouts)\//.test(f.file));
 
+const source = loadTokenSource(join(root, 'tokens'));
 const tokenNames = (tier: string) =>
-  new Set([...loadTokenSource(join(root, 'tokens')).values()].filter((t) => t.tier === tier).map((t) => `--${t.path.replaceAll('.', '-')}`));
+  new Set([...source.values()].filter((t) => t.tier === tier).map((t) => `--${t.path.replaceAll('.', '-')}`));
+const breakpoints = new Set([...source.keys()].filter((path) => path.startsWith('size.breakpoint.')).map((path) => resolveDimension(source, path)));
 
 describe('stylesheets', () => {
   it('found the generated tokens and the entry stylesheet', () => {
@@ -44,7 +47,15 @@ describe('stylesheets', () => {
     expect(declaredCustomProperties(tokenCss?.css ?? '')).toEqual(expected);
   });
 
-  it('components and primitives never read primitive tokens', () => {
+  it('found the breakpoint tokens', () => {
+    expect(breakpoints.size).toBeGreaterThan(0);
+  });
+
+  it('every media and container query length is a breakpoint token value', () => {
+    expect(findUntokenedQueryLengths(authored, breakpoints)).toEqual([]);
+  });
+
+  it('components, primitives and layouts never read primitive tokens', () => {
     expect(findPrimitiveReads(systemStyles, tokenNames('primitive'))).toEqual([]);
   });
 
@@ -81,6 +92,13 @@ describe('css checks catch violations', () => {
     expect(findUnlayeredRules([{ file: 'x.css', css }], LAYERS)).toEqual([
       'x.css: ".loose" is outside a declared layer',
       'x.css: "@layer mystery" is outside a declared layer',
+    ]);
+  });
+
+  it('reports a query length that is not a breakpoint token', () => {
+    const css = '@layer layouts { @container shell (inline-size < 47rem) { .x { display: none; } } @media (width >= 48rem) { .y { display: none; } } }';
+    expect(findUntokenedQueryLengths([{ file: 'x.css', css }], new Set(['48rem']))).toEqual([
+      'x.css: @container uses 47rem, which is not a size.breakpoint token value',
     ]);
   });
 

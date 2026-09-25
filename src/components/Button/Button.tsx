@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
 import { Icon, type IconName } from '../Icon/Icon';
+import { Spinner } from '../Spinner/Spinner';
 import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -52,7 +53,7 @@ export function Button({
       aria-disabled={loading ? true : rest['aria-disabled']}
       onClick={handleClick}
     >
-      {loading ? <span className="button__spinner" aria-hidden="true" /> : icon ? <Icon name={icon} /> : null}
+      {loading ? <Spinner /> : icon ? <Icon name={icon} /> : null}
       <span className="button__label">{children}</span>
     </button>
   );

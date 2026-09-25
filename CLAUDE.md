@@ -19,7 +19,8 @@ Work on a branch. Never commit to `main` directly.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
 - `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
-- `src/examples/ListPage.tsx`: **golden example** for the list page archetype.
+- `src/layouts/`: `AppShell`, the frame for every signed-in page. Imports components and primitives; nothing below imports it.
+- `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 
@@ -38,8 +39,9 @@ UI rules (design system v0)
   component → primitive. Stop at the first yes.
 - Missing token? Add a semantic token in tokens/ (with a dark value for colours),
   run npm run tokens. Never write a literal instead.
-- Copy structure from src/examples (the golden page for the archetype), not from
-  other screens.
+- New pages compose into AppShell (fill its slots; never rebuild the frame) and
+  copy the matching golden example: list → ListPage, record → RecordPage,
+  create/edit → CreateEditFlow, settings → SettingsPage. Not other screens.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.

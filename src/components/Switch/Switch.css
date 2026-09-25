@@ -1,0 +1,72 @@
+@layer components {
+  .switch {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-gap-md);
+  }
+
+  .switch__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    color: var(--color-fg-default);
+  }
+
+  .switch__label {
+    font: var(--text-body);
+    cursor: pointer;
+  }
+
+  .switch__description {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  /* Thumb travel uses justify-content, so it follows the writing direction. */
+  .switch__track {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: flex-start;
+    inline-size: var(--size-control-md);
+    block-size: var(--size-target-min);
+    padding: var(--space-inset-2xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+  }
+
+  .switch__thumb {
+    display: block;
+    inline-size: var(--size-icon-sm);
+    block-size: var(--size-icon-sm);
+    border-radius: var(--radius-pill);
+    background: var(--color-border-strong);
+  }
+
+  .switch__track[data-state="checked"] {
+    justify-content: flex-end;
+    border-color: var(--color-action-primary);
+    background: var(--color-action-primary);
+  }
+
+  .switch__track[data-state="checked"] .switch__thumb {
+    background: var(--color-fg-on-action);
+  }
+
+  .switch__track:disabled {
+    border-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+    cursor: not-allowed;
+  }
+
+  .switch__track:disabled .switch__thumb {
+    background: var(--color-fg-disabled);
+  }
+
+  .switch:has(:disabled) .switch__text {
+    color: var(--color-fg-disabled);
+  }
+}

@@ -1,0 +1,58 @@
+@layer components {
+  .skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+  }
+
+  .skeleton__bar,
+  .skeleton[data-shape="block"] {
+    display: block;
+    border-radius: var(--radius-indicator);
+    background: var(--color-bg-placeholder);
+    animation-name: skeleton-pulse;
+    animation-duration: var(--motion-pulse);
+    animation-timing-function: var(--ease-standard);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  .skeleton__bar {
+    inline-size: 100%;
+    block-size: var(--size-icon-sm);
+  }
+
+  .skeleton__cell {
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-md);
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .skeleton[data-shape="block"] {
+    inline-size: 100%;
+    block-size: var(--size-skeleton-block);
+    border-radius: var(--radius-surface);
+  }
+
+  .skeleton[data-shape="table-row"] {
+    display: table-row;
+  }
+
+  .skeleton__bar[data-length="long"] {
+    inline-size: 80%;
+  }
+
+  .skeleton__bar[data-length="medium"] {
+    inline-size: 60%;
+  }
+
+  .skeleton__bar[data-length="short"] {
+    inline-size: 40%;
+  }
+
+  @keyframes skeleton-pulse {
+    to {
+      opacity: 0.4;
+    }
+  }
+}

@@ -70,3 +70,20 @@ export const findUnlayeredRules = (files: { file: string; css: string }[], layer
       })
       .map((prelude) => `${file}: "${prelude}" is outside a declared layer`),
   );
+
+const QUERY_PRELUDE = /@(media|container)\b([^{;]*)\{/g;
+const QUERY_LENGTH = /-?\d*\.?\d+(px|rem|em)\b/g;
+
+/**
+ * Media and container queries cannot read var(), and Stylelint's raw-length ban only sees
+ * declarations. So every length in a query must equal a breakpoint token's resolved value.
+ */
+export const findUntokenedQueryLengths = (files: { file: string; css: string }[], breakpoints: Set<string>): string[] =>
+  files.flatMap(({ file, css }) =>
+    [...stripComments(css).matchAll(QUERY_PRELUDE)].flatMap((query) =>
+      [...(query[2] ?? '').matchAll(QUERY_LENGTH)]
+        .map((m) => m[0])
+        .filter((length) => !breakpoints.has(length))
+        .map((length) => `${file}: @${query[1] ?? ''} uses ${length}, which is not a size.breakpoint token value`),
+    ),
+  );

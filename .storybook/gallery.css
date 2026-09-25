@@ -9,3 +9,10 @@
     font: var(--text-label);
   }
 }
+
+@layer components {
+  .demo-narrow {
+    max-inline-size: var(--size-dialog-md);
+    border-inline-end: 1px dashed var(--color-border-strong);
+  }
+}

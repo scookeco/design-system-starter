@@ -137,6 +137,15 @@
     "spin": {
       "$value": "{duration.1000}",
       "$description": "One revolution of a loading spinner. Not reduced: the spinner is the only progress cue."
+    },
+    "pulse": {
+      "$value": "{duration.1000}",
+      "$extensions": {
+        "starter.modes": {
+          "reduced-motion": "{duration.0}"
+        }
+      },
+      "$description": "One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading."
     }
   },
   "ease": {

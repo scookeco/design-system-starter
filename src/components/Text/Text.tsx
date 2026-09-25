@@ -3,7 +3,8 @@ import { cx, type Closed } from '../../internal/closed-api';
 import './Text.css';
 
 export type TextProps = Closed<ComponentPropsWithRef<'p'>> & {
-  as?: 'p' | 'span' | 'div';
+  /** dt/dd for label–value pairs inside a <Stack as="dl"> (a record's properties). */
+  as?: 'p' | 'span' | 'div' | 'dt' | 'dd';
   size?: 'body' | 'body-lg' | 'caption';
   tone?: 'default' | 'muted';
   /** Tabular figures for numbers that line up in columns. */

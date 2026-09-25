@@ -111,6 +111,7 @@
     --radius-full: 9999px;
     --border-width-1: 1px;
     --border-width-2: 2px;
+    --viewport-block: 100dvh;
     --layer-0: 0;
     --layer-1: 100;
     --layer-2: 200;
@@ -156,6 +157,7 @@
     --color-bg-selected: light-dark(var(--color-indigo-50), var(--color-indigo-950));
     --color-bg-inverse: light-dark(var(--color-gray-900), var(--color-gray-100));
     --color-bg-scrim: light-dark(var(--color-black-alpha-40), var(--color-black-alpha-60));
+    --color-bg-placeholder: light-dark(var(--color-gray-200), var(--color-gray-700));
     --color-fg-default: light-dark(var(--color-gray-900), var(--color-gray-50));
     --color-fg-muted: light-dark(var(--color-gray-600), var(--color-gray-400));
     --color-fg-disabled: light-dark(var(--color-gray-400), var(--color-gray-600));
@@ -220,6 +222,12 @@
     --size-scroll-region-sm: var(--container-xs);
     --size-scroll-region-md: var(--container-lg);
     --size-scroll-region-lg: var(--container-2xl);
+    --size-viewport-block: var(--viewport-block);
+    --size-breakpoint-md: var(--container-2xl);
+    --size-avatar-sm: var(--size-6);
+    --size-avatar-md: var(--size-8);
+    --size-avatar-lg: var(--size-10);
+    --size-skeleton-block: var(--container-3xs);
     --radius-indicator: var(--radius-xs);
     --radius-control: var(--radius-md);
     --radius-surface: var(--radius-lg);
@@ -238,6 +246,7 @@
     --motion-base: var(--duration-200);
     --motion-slow: var(--duration-300);
     --motion-spin: var(--duration-1000);
+    --motion-pulse: var(--duration-1000);
     --ease-standard: var(--easing-standard);
     --ease-enter: var(--easing-decelerate);
     --ease-exit: var(--easing-accelerate);
@@ -279,6 +288,7 @@
       --motion-fast: var(--duration-0);
       --motion-base: var(--duration-0);
       --motion-slow: var(--duration-0);
+      --motion-pulse: var(--duration-0);
     }
   }
 }

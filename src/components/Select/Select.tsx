@@ -29,6 +29,8 @@ export interface SelectProps extends EscapeHatch {
   name?: string;
   /** Render the list open (gallery and tests). */
   defaultOpen?: boolean;
+  /** Id of the trigger, for an error summary link. Generated when omitted. */
+  id?: string;
 }
 
 /** Single-choice list. Behaviour (keyboard, typeahead, focus, ARIA) comes from Radix Select. */
@@ -40,11 +42,12 @@ export function Select({
   description,
   error,
   size = 'md',
+  id,
   UNSAFE_className,
   UNSAFE_style,
   ...rootProps
 }: SelectProps) {
-  const ids = fieldIds(useId(), description, error);
+  const ids = fieldIds(useId(), description, error, id);
   return (
     <Field ids={ids} label={label} hideLabel={hideLabel} description={description} error={error}>
       <SelectPrimitive.Root {...rootProps}>

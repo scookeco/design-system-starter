@@ -33,7 +33,8 @@ export const vars = {
       "hover": "var(--color-bg-hover)",
       "selected": "var(--color-bg-selected)",
       "inverse": "var(--color-bg-inverse)",
-      "scrim": "var(--color-bg-scrim)"
+      "scrim": "var(--color-bg-scrim)",
+      "placeholder": "var(--color-bg-placeholder)"
     },
     "fg": {
       "default": "var(--color-fg-default)",
@@ -138,6 +139,20 @@ export const vars = {
       "sm": "var(--size-scroll-region-sm)",
       "md": "var(--size-scroll-region-md)",
       "lg": "var(--size-scroll-region-lg)"
+    },
+    "viewport": {
+      "block": "var(--size-viewport-block)"
+    },
+    "breakpoint": {
+      "md": "var(--size-breakpoint-md)"
+    },
+    "avatar": {
+      "sm": "var(--size-avatar-sm)",
+      "md": "var(--size-avatar-md)",
+      "lg": "var(--size-avatar-lg)"
+    },
+    "skeleton": {
+      "block": "var(--size-skeleton-block)"
     }
   },
   "radius": {
@@ -176,7 +191,8 @@ export const vars = {
     "fast": "var(--motion-fast)",
     "base": "var(--motion-base)",
     "slow": "var(--motion-slow)",
-    "spin": "var(--motion-spin)"
+    "spin": "var(--motion-spin)",
+    "pulse": "var(--motion-pulse)"
   },
   "ease": {
     "standard": "var(--ease-standard)",

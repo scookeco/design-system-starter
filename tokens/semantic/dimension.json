@@ -135,6 +135,37 @@
       "lg": {
         "$value": "{container.2xl}"
       }
+    },
+    "viewport": {
+      "block": {
+        "$value": "{viewport.block}",
+        "$description": "Full viewport height: the app shell's block size."
+      }
+    },
+    "breakpoint": {
+      "$description": "Container-query widths. Queries cannot read var(): tests/unit/css.test.ts checks every query length equals one of these.",
+      "md": {
+        "$value": "{container.2xl}",
+        "$description": "Below this the app shell's sidebar collapses to a drawer."
+      }
+    },
+    "avatar": {
+      "$description": "Avatar diameters.",
+      "sm": {
+        "$value": "{size.6}"
+      },
+      "md": {
+        "$value": "{size.8}"
+      },
+      "lg": {
+        "$value": "{size.10}"
+      }
+    },
+    "skeleton": {
+      "block": {
+        "$value": "{container.3xs}",
+        "$description": "Default height of a block skeleton (card, chart, image)."
+      }
     }
   },
   "radius": {

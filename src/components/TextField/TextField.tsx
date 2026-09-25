@@ -2,7 +2,9 @@ import { useId, type ComponentPropsWithRef } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
 import { Field, fieldIds } from '../Field/Field';
 
-export type TextFieldProps = Closed<Omit<ComponentPropsWithRef<'input'>, 'size' | 'id'>> & {
+export type TextFieldProps = Closed<Omit<ComponentPropsWithRef<'input'>, 'size'>> & {
+  /** Id of the input, for an error summary link. Generated when omitted. */
+  id?: string;
   /** Visible label and accessible name. Required; use hideLabel only when context makes it obvious. */
   label: string;
   hideLabel?: boolean;
@@ -21,11 +23,12 @@ export function TextField({
   error,
   size = 'md',
   type = 'text',
+  id,
   UNSAFE_className,
   UNSAFE_style,
   ...rest
 }: TextFieldProps) {
-  const ids = fieldIds(useId(), description, error);
+  const ids = fieldIds(useId(), description, error, id);
   return (
     <Field ids={ids} label={label} hideLabel={hideLabel} description={description} error={error}>
       <input
