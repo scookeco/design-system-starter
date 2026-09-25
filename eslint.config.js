@@ -15,7 +15,7 @@ import starter from './scripts/eslint/drag-needs-alternative.js';
  * Code that consumes the system: the golden examples and anything built like them, including
  * the usage docs' live do/don't examples and the Guides pages, which must not restyle either.
  */
-const CONSUMER = ['src/examples/**', 'docs/usage/*.usage.tsx', 'docs/guides/**'];
+const CONSUMER = ['src/examples/**', 'src/app/**', 'docs/usage/*.usage.tsx', 'docs/guides/**'];
 
 // Vendor UI (headless or themed component libraries, icon sets) may only be imported inside
 // src/components and src/primitives. Add any new vendor UI package to this group.
@@ -28,7 +28,7 @@ const SYSTEM_INTERNALS = {
   message: 'Import from the design system public entry point (src/index.ts), not its internals.',
 };
 const UPWARD_FROM_SYSTEM = {
-  group: ['**/examples/**', '**/examples'],
+  group: ['**/examples/**', '**/examples', '**/app/**', '**/app'],
   message: 'The design system never imports consumer code.',
 };
 const PRIMITIVE_TO_COMPONENT = {
@@ -38,6 +38,12 @@ const PRIMITIVE_TO_COMPONENT = {
 const CORE_TO_LAYOUT = {
   group: ['**/layouts/**', '**/layouts'],
   message: 'Layouts sit above components and primitives: the system core never imports a layout.',
+};
+// The design system is UI-only. Data fetching, caching, mocking and schema validation belong to the
+// app layer (src/app) and the examples; add any new data library to this group.
+const DATA_LIBRARIES = {
+  group: ['msw', 'msw/*', 'msw-storybook-addon', 'msw-storybook-addon/*', '@tanstack/*', 'zod', 'zod/*'],
+  message: 'The design system is UI-only: data libraries (msw, TanStack Query, zod) belong to the app layer in src/app.',
 };
 // Layouts compose components and primitives. Vendor UI stays wrapped one layer down.
 const LAYOUT_VENDOR_UI = {
@@ -49,7 +55,8 @@ const ESCAPE_HATCH = 'Escape hatch. Needs "// eslint-disable-next-line no-restri
 
 export default defineConfig(
   {
-    ignores: ['dist/**', 'storybook-static/**', 'fixtures/**', 'playwright-report/**', 'test-results/**', 'node_modules/**'],
+    // .storybook/public holds MSW's generated service worker, which is not ours to lint.
+    ignores: ['dist/**', 'storybook-static/**', 'fixtures/**', 'playwright-report/**', 'test-results/**', 'node_modules/**', '.storybook/public/**'],
   },
   {
     linterOptions: {
@@ -80,23 +87,23 @@ export default defineConfig(
   },
   {
     name: 'system/components',
-    files: ['src/components/**'],
+    files: ['src/components/**', 'src/format/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT, DATA_LIBRARIES] }],
     },
   },
   {
     name: 'system/primitives',
     files: ['src/primitives/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT, CORE_TO_LAYOUT] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT, CORE_TO_LAYOUT, DATA_LIBRARIES] }],
     },
   },
   {
     name: 'system/layouts',
     files: ['src/layouts/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [LAYOUT_VENDOR_UI, UPWARD_FROM_SYSTEM] }],
+      'no-restricted-imports': ['error', { patterns: [LAYOUT_VENDOR_UI, UPWARD_FROM_SYSTEM, DATA_LIBRARIES] }],
     },
   },
   {

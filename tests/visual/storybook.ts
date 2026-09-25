@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page } from '@playwright/test';
+import { SEED_EPOCH } from '../../src/app/mocks/seed';
 
 /**
  * Shared by the Playwright specs in this folder: the built Storybook's index, and how to open a
@@ -37,14 +38,21 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
 export const MODAL_OPEN_EXCEPTIONS = ['aria-hidden-focus'];
 
 /**
- * Stories render against a frozen clock, so relative times ("3 days ago") never drift. Only Date
- * is fixed; timers and animation frames run normally.
+ * Stories render against a frozen clock, the instant the mock data was seeded for, so relative
+ * times ("3 days ago") never drift. Only Date is fixed; timers and animation frames run normally.
  */
-export const FROZEN_NOW = new Date('2026-09-25T12:00:00Z');
+export const FROZEN_NOW = new Date(SEED_EPOCH);
 
+/**
+ * Open a story once it has rendered and settled. Every spec gets the same determinism: the mock
+ * API answers instantly and never fails (latency:0;failure:0, whatever the gallery's toolbar
+ * defaults), the clock is frozen, and stories tagged `data` wait until their queries settle
+ * (html[data-queries-settled]). `busy` stories hold a request open on purpose and aren't waited on.
+ */
 export const openStory = async (page: Page, id: string, theme: (typeof THEMES)[number]) => {
+  const tags = index.entries[id]?.tags ?? [];
   await page.clock.setFixedTime(FROZEN_NOW);
-  await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=theme:${theme}`);
+  await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=theme:${theme};latency:0;failure:0`);
   await page.waitForFunction(() => document.body.classList.contains('sb-show-main'));
   // Rendered into the root, or (overlay-only stories) into a portal beside it.
   await page.waitForFunction(() => {
@@ -55,6 +63,7 @@ export const openStory = async (page: Page, id: string, theme: (typeof THEMES)[n
     );
   });
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+  if (tags.includes('data') && !tags.includes('busy')) await expect(page.locator('html')).toHaveAttribute('data-queries-settled', 'true');
   await page.evaluate(() => document.fonts.ready);
   await waitForStableHeight(page);
 };

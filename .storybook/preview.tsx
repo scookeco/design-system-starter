@@ -5,6 +5,9 @@ import './gallery.css';
 import '../docs/docs.css';
 // CSS-free on purpose (no component, no stylesheet): safe to import statically, unlike system components.
 import { LocaleProvider } from '../src/format/LocaleProvider';
+import { mswLoader } from 'msw-storybook-addon/csf3';
+// Import-free on purpose: the mock server's latency and failure settings.
+import { configureMocks } from '../src/app/mocks/config';
 
 /*
  * Loaded lazily on purpose. A static import would pull component stylesheets into chunks that
@@ -85,6 +88,16 @@ const withLocale: Decorator = (Story, context) => {
   );
 };
 
+/**
+ * The mock API follows the Latency and Failures toolbars. Failures are real HTTP 500 responses
+ * through the real client, so error states are the ones users would see. The visual suite pins
+ * both to 0 in the URL.
+ */
+const withMockSettings: Decorator = (Story, context) => {
+  configureMocks({ latencyMs: Number(context.globals.latency ?? 0) || 0, failureRate: Number(context.globals.failure ?? 0) || 0 });
+  return <Story />;
+};
+
 const preview: Preview = {
   globalTypes: {
     theme: {
@@ -127,9 +140,36 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    latency: {
+      description: 'Mock API latency',
+      toolbar: {
+        title: 'Latency',
+        icon: 'timer',
+        items: [
+          { value: '0', title: 'Instant' },
+          { value: '400', title: 'Realistic (400 ms)' },
+          { value: '2000', title: 'Slow (2 s)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    failure: {
+      description: 'Mock API failure rate',
+      toolbar: {
+        title: 'Failures',
+        icon: 'alert',
+        items: [
+          { value: '0', title: 'No failures' },
+          { value: '0.2', title: '1 in 5 requests fail' },
+          { value: '1', title: 'Every request fails' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US' },
-  decorators: [withContainerWidth, withTheme, withLocale],
+  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0' },
+  loaders: [mswLoader()],
+  decorators: [withContainerWidth, withTheme, withLocale, withMockSettings],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and
   // stories tagged `modal-open` opt out with '!autodocs' (an open modal would cover the docs page).
   tags: ['autodocs'],
