@@ -6,8 +6,12 @@ import { SettingsPage } from '../../src/examples/SettingsPage';
 import { SignInPage } from '../../src/examples/SignInPage';
 import { SetupWizard } from '../../src/examples/SetupWizard';
 import { ListPage } from '../../src/examples/ListPage';
+import { RecordPage } from '../../src/examples/RecordPage';
+import { http, HttpResponse } from 'msw';
+import { renderWithApp, server, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
+setupMockApi();
 
 // jsdom has no ResizeObserver; Radix measures its hidden form inputs with one inside a <form>.
 globalThis.ResizeObserver ??= class {
@@ -18,7 +22,7 @@ globalThis.ResizeObserver ??= class {
 
 describe('Create and edit example', () => {
   it('on a failed submit focuses an error summary whose links move focus to each invalid field', () => {
-    render(<CreateEditFlow />);
+    renderWithApp(<CreateEditFlow />);
     fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
 
     const summary = screen.getByText('There are 4 problems with this record').closest('[tabindex="-1"]');
@@ -37,12 +41,62 @@ describe('Create and edit example', () => {
   });
 
   it('clears a field error as soon as it is fixed, keeping what was typed', () => {
-    render(<CreateEditFlow initialSubmitted />);
+    renderWithApp(<CreateEditFlow initialSubmitted />);
     const name = screen.getByRole('textbox', { name: 'Name' });
     fireEvent.change(name, { target: { value: 'Hardware lease' } });
     expect(name.getAttribute('aria-invalid')).toBeNull();
     expect((name as HTMLInputElement).value).toBe('Hardware lease');
     expect(screen.getByText('There are 3 problems with this record')).toBeTruthy();
+  });
+});
+
+describe('Create and edit example: the write', () => {
+  const valid = { name: 'Hardware lease', owner: 'acme-p02', amount: '12500.5', renewal: 'end' };
+
+  it('keeps the draft on a server failure and retries with the same idempotency key', async () => {
+    const keys: (string | null)[] = [];
+    let fail = true;
+    server.use(
+      http.post('*/api/t/:tenant/records', ({ request }) => {
+        keys.push(request.headers.get('Idempotency-Key'));
+        if (fail) return HttpResponse.json({ error: { code: 'server_error', message: 'Boom.' } }, { status: 500 });
+        return undefined;
+      }),
+    );
+    renderWithApp(<CreateEditFlow initialDraft={valid} initialSubmitting />);
+    expect(await screen.findByText('The record wasn’t created')).toBeTruthy();
+    expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).value).toBe('Hardware lease');
+    fail = false;
+    fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
+    expect(await screen.findByText('Hardware lease was created as a draft.')).toBeTruthy();
+    expect(keys).toHaveLength(2);
+    expect(keys[0]).toBeTruthy();
+    expect(keys[1]).toBe(keys[0]);
+  });
+});
+
+describe('Record page example', () => {
+  it('shows a stale rename as a conflict banner, with Reload', async () => {
+    server.use(http.patch('*/api/t/:tenant/records/:id', () => HttpResponse.json({ error: { code: 'conflict', message: 'Changed.' } }, { status: 409 })));
+    renderWithApp(<RecordPage initialAction={{ kind: 'rename', name: 'New name' }} />);
+    expect(await screen.findByText('Someone else changed this record')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Master cleaning agreement');
+    fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
+    await waitFor(() => expect(screen.queryByText('Someone else changed this record')).toBeNull());
+  });
+
+  it('archives pessimistically: pending on More, other actions disabled, then the new status', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(http.post('*/api/t/:tenant/records/:id/archive', async () => gate.then(() => undefined)));
+    renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
+    expect(await screen.findByRole('button', { name: 'Archiving…' })).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Request approval' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryAllByText('Archived')).toHaveLength(0);
+    release();
+    await waitFor(() => expect(screen.getAllByText('Archived').length).toBeGreaterThan(0));
   });
 });
 
@@ -115,29 +169,35 @@ describe('Setup wizard example', () => {
 
 describe('List page example', () => {
   it('shows active filters as chips; removing one moves focus to the next chip, then to Filters', async () => {
-    render(<ListPage initialStatuses={['active', 'pending']} />);
+    renderWithApp(<ListPage />, { url: '/records?status=pending,active' });
     const chips = screen.getByRole('list', { name: 'Active filters' });
-    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
-    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Pending' })));
     fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Pending' }));
+    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Active' })));
+    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
     expect(screen.queryByRole('list', { name: 'Active filters' })).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Filters' })));
   });
 
-  it('pages the rows, marks the current page and keeps Previous focusable but inert on page 1', () => {
-    render(<ListPage />);
-    const pager = screen.getByRole('navigation', { name: 'Records pages' });
-    expect(within(pager).getByRole('status').textContent).toBe('1–5 of 7');
+  it('pages on the server: the summary shows the server’s total and the current page', async () => {
+    renderWithApp(<ListPage />);
+    const pager = await screen.findByRole('navigation', { name: 'Records pages' });
+    expect(within(pager).getByRole('status').textContent).toBe('1–10 of 219');
     expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page');
-    const previous = within(pager).getByRole('button', { name: 'Previous' });
-    expect(previous.getAttribute('aria-disabled')).toBe('true');
+    expect(within(pager).getByRole('button', { name: 'Previous' }).getAttribute('aria-disabled')).toBe('true');
     fireEvent.click(within(pager).getByRole('button', { name: 'Next' }));
-    expect(within(pager).getByRole('status').textContent).toBe('6–7 of 7');
+    await waitFor(() => expect(within(pager).getByRole('status').textContent).toBe('11–20 of 219'));
     expect(within(pager).getByRole('button', { name: 'Page 2' }).getAttribute('aria-current')).toBe('page');
   });
 
+  it('counts each view on the server and shows the counts in the tabs', async () => {
+    renderWithApp(<ListPage />);
+    const views = screen.getByRole('navigation', { name: 'Record views' });
+    await waitFor(() => expect(within(views).getByRole('link', { name: 'All (219)' }).getAttribute('aria-current')).toBe('page'));
+    expect(within(views).getByRole('link', { name: 'Archived (21)' })).toBeTruthy();
+  });
+
   it('clears the search from its clear button and keeps focus in the field', () => {
-    render(<ListPage initialQuery="lease" />);
+    renderWithApp(<ListPage />, { url: '/records?q=lease' });
     const search = screen.getByRole('searchbox', { name: 'Search records' });
     fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
     expect((search as HTMLInputElement).value).toBe('');

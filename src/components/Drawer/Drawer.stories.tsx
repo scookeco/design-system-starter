@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { createFormatter } from '../../format/format';
 import { Button } from '../Button/Button';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { Nav } from '../Nav/Nav';
 import { Text } from '../Text/Text';
 import { Drawer } from './Drawer';
+
+/** Stories format with the system's formats, like apps do (apps use useFormat()). */
+const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
 
 const filters = (
   <>
@@ -67,5 +71,5 @@ export const StartOpen: Story = {
 };
 export const WithoutFooter: Story = {
   tags: ['modal-open', '!autodocs'],
-  args: { defaultOpen: true, footer: undefined, description: undefined, title: 'Hardware lease', children: <Text>Owned by Facilities · updated 2026-09-10</Text> },
+  args: { defaultOpen: true, footer: undefined, description: undefined, title: 'Hardware lease', children: <Text>{`Owned by Facilities · updated ${f.date('2026-09-10')}`}</Text> },
 };

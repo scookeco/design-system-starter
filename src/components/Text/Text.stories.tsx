@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { createFormatter } from '../../format/format';
 import { Stack } from '../../primitives/Stack/Stack';
 import { Text } from './Text';
+
+/** Stories format with the system's formats, like apps do (apps use useFormat()). */
+const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
 
 const meta = {
   title: 'Components/Text',
@@ -30,7 +34,7 @@ export const DefinitionList: Story = {
           Renewal date
         </Text>
         <Text as="dd" numeric>
-          2027-01-31
+          {f.date('2027-01-31')}
         </Text>
       </Stack>
     </Stack>

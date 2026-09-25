@@ -32,6 +32,7 @@ import {
   Switch,
   Text,
   TextField,
+  useFormat,
   type NavSection,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
@@ -86,6 +87,7 @@ export interface SettingsPageProps {
 }
 
 export function SettingsPage({ initialSection = 'notifications', initialSaving = false, initialSaved = false }: SettingsPageProps) {
+  const format = useFormat();
   const [section, setSection] = useState<SettingsSection>(initialSection);
   const [saving, setSaving] = useState(initialSaving);
   const [saved, setSaved] = useState(initialSaved);
@@ -137,7 +139,7 @@ export function SettingsPage({ initialSection = 'notifications', initialSaving =
                   </CardBody>
                   <CardFooter justify="between">
                     <Text size="caption" tone="muted">
-                      {saving ? 'Saving…' : saved ? 'Saved just now' : 'Saved 2026-09-22'}
+                      {saving ? 'Saving…' : saved ? 'Saved just now' : `Saved ${format.date('2026-09-22')}`}
                     </Text>
                     <Button type="submit" loading={saving}>
                       Save

@@ -2,7 +2,7 @@
 
 A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, page layouts (app shell, page regions, signed-out and focused-task frames), a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
-Stack: npm (Node 24), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint.
+Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
 
 ## Quick start
 
@@ -54,15 +54,18 @@ src/tokens/token-usage.json  generated: tokens read by each component, primitive
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame
 src/components/         the components; the only place (with primitives) Radix is imported
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
+src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
+src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
+                        predicates, projections, mutations, selection), url/ (useUrlState), registries/ (field registry), mocks/ (MSW)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (also a consumer lint target)
 src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
 tests/unit/             Vitest suites
-tests/visual/           Playwright suite: screenshots + axe, WCAG 2.2 checks; __screenshots__/linux/ is committed
+tests/visual/           Playwright suite: screenshots + axe, WCAG 2.2 checks (shared story opening in storybook.ts); __screenshots__/linux/ is committed
 tests/visual/fixtures/  check-fixture stories that each WCAG 2.2 check must fail (hidden from the gallery)
-.storybook/             gallery config, theme and width toolbars, the Tokens panel (manager.tsx)
+.storybook/             gallery config, theme, width, locale, latency and failure toolbars, the Tokens panel (manager.tsx); public/ holds MSW's service worker
 .size-limit.json        bundle size budgets
 .github/workflows/      ci.yml, update-visual-baselines.yml
 ```
@@ -84,6 +87,10 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Vendor UI only inside the system; consumers use the public entry | `no-restricted-imports` (ESLint) | `eslint.config.js` |
 | Layers import downward only (see the layer table below) | `no-restricted-imports` per layer; `test:rules` needs a fixture for every direction | `eslint.config.js`, `scripts/test-rules.ts` |
 | Media and container queries use breakpoint tokens (queries can't read `var()`, and Stylelint only checks declarations) | Vitest: every query length equals a `size.breakpoint.*` value | `tests/unit/css.test.ts` |
+| The system is UI-only: runtime `dependencies` are exactly react, react-dom and radix-ui | Vitest | `tests/unit/dependencies.test.ts` |
+| Data libraries (msw, TanStack Query, zod) and `src/app` never enter the system | `no-restricted-imports` in the components, primitives and layouts blocks; a fixture per boundary | `eslint.config.js`, `fixtures/violations/eslint-*-imports-data.tsx` |
+| Only trusted data enters the cache: every API response is parsed with its zod schema | Vitest: an invalid payload becomes an error and the cache stays empty | `src/app/api/client.ts`, `tests/unit/api.test.ts` |
+| Every field type has a registry entry; unknown types fall back and never throw | TypeScript (registry keyed on the union, proved with `@ts-expect-error`) and Vitest | `src/app/registries/fields.tsx`, `tests/unit/registry.test.tsx` |
 | Escape hatches are visible | `no-restricted-syntax` flags `className`, `style` and `UNSAFE_*` in consumer code | `eslint.config.js` |
 | Exceptions carry a reason | `eslint-comments/require-description`, unused disables are errors; Stylelint `reportDescriptionlessDisables` and `reportNeedlessDisables` | both configs |
 | The rules are actually loaded | `test:rules` (every rule has a fixture, fixtures must not be ignored or fail to parse, clean controls must pass) | `scripts/test-rules.ts` |
@@ -104,10 +111,12 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Layer | Folder | May import | Cascade layer |
 |---|---|---|---|
-| Examples (consumer code) | `src/examples/` | the public entry `src/index.ts` only; no vendor UI, no `className`/`style` | none: no CSS |
-| Layouts | `src/layouts/` | components, primitives, tokens; no vendor UI, no examples | `layouts` |
-| Components | `src/components/` | other components, primitives, tokens, Radix; no layouts, no examples | `components` |
-| Primitives | `src/primitives/` | other primitives, tokens; no components, no layouts | `primitives` |
+| Examples (consumer code) | `src/examples/` | the public entry `src/index.ts` and `src/app`; no vendor UI, no `className`/`style` | none: no CSS |
+| App layer (consumer code) | `src/app/` | the public entry, the data libraries (TanStack Query, zod, MSW); no vendor UI, no `className`/`style` | none: no CSS |
+| Layouts | `src/layouts/` | components, primitives, tokens; no vendor UI, no examples, no `src/app`, no data libraries | `layouts` |
+| Components | `src/components/` | other components, primitives, tokens, `src/format`, Radix; no layouts, no examples, no `src/app`, no data libraries | `components` |
+| Formatting | `src/format/` | `Intl` only; no components, no data libraries | none: no CSS |
+| Primitives | `src/primitives/` | other primitives, tokens; no components, no layouts, no data libraries | `primitives` |
 | Tokens | `tokens/` → `src/styles/tokens.css`, `src/tokens/tokens.ts` | nothing | `tokens` |
 
 ### Rules worth knowing
@@ -128,13 +137,13 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 12 kB | `dist/index.js`, everything exported |
+| Library JS | 13.25 kB | `dist/index.js`, everything exported |
 | Library CSS | 11.5 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
 
-**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 15% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
+**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 10% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
 
 ## Theming
 
@@ -153,6 +162,7 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
 | Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip` |
 | Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame` |
+| Formatting | `LocaleProvider` (locale and time zone), `useFormat()` (date, time, relative time, number, percent, compact, money from integer minor units, list, file size), `createFormatter`, `currencyDigits` |
 
 ## Which example to copy
 
@@ -160,16 +170,28 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 
 | Archetype | Copy | It shows |
 |---|---|---|
-| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, SearchField and a Filters popover with removable chips, sortable table, pagination; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
-| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside in PageLayout; loading and error with the shell up |
-| Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record, quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar |
+| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, view tabs with server counts, SearchField and a Filters popover with removable chips, sortable table, pagination, all server-side and in the URL; row selection, "Select all N matching", a bulk bar and bulk delete with partial failure; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
+| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside rendered from the field registry; optimistic rename with rollback and a 409 conflict banner, pessimistic archive and delete; loading and error with the shell up |
+| Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record (fields from the field registry), quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar, a create that is safe to retry (idempotency key) |
 | Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav (PageLayout's nav slot), one card per category with its own Save, a success banner |
 | Sign-in | `src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed sign-in link, a password as the secondary route; a failed-sign-in banner; a verification-code step |
 | Wizard | `src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step, focus to each step's h1; a review step with Edit |
 | Dashboard | `src/examples/DashboardPage.tsx` | a date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table |
 | Error / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
 
-`src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. `src/examples/records.ts` holds the shared example domain, including the one status-to-tone map.
+`src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
+
+## Data: the app layer
+
+The design system draws; `src/app` knows. It is consumer code, like the examples, and the system never imports it. The **Guides → Data** page in the gallery explains it in full.
+
+- **One server cache** (TanStack Query) with keys `[tenant, resource, params]`. The tenant is in every key and every request.
+- **Validate at the boundary.** Every response is parsed with a zod schema in `src/app/api/client.ts`; a bad payload becomes an error state and never reaches the cache.
+- **Named predicates** (`isOpen`, `canDelete`, the view predicates) drive the filters, tab counts, badges, bulk guards and the mock server. Views are pure projections (`toRow`).
+- **URL state** (`useUrlState`) for view, search, filters, sort and page: push for navigation, replace for refinements, debounced search.
+- **One named mutation per verb** (`renameRecord` optimistic with rollback and 409 handling; `archiveRecord`, `createRecord` with an idempotency key, and `bulkDeleteRecords` pessimistic), each documenting what it patches and invalidates.
+- **A typed field registry** renders record properties and form fields; exhaustive at compile time, with a runtime fallback that reports and never throws.
+- **A mock API** (MSW) over a seeded database: 240 and 120 records for two tenants. The gallery's Latency and Failures toolbars change its behaviour, and failures are real 500 responses. The same handlers serve Vitest (`msw/node`).
 
 ## Adding a component: walk the decision ladder
 
@@ -209,7 +231,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches. |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches. |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
@@ -225,7 +247,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Job | Runs | What it does |
 |---|---|---|
 | Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
-| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json` or the workflow itself |
+| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.nvmrc` or the workflow itself |
 | Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
 | Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact, running every spec: screenshots, axe and the WCAG 2.2 checks; each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
@@ -243,6 +265,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
 - Stories tagged `no-visual` get no screenshot and no axe run. Only the WCAG 2.2 check fixtures use it: they are deliberate violations.
+- **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0` in its globals, freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
 - Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 
 ## Deliberately not included yet

@@ -37,10 +37,14 @@ import {
   TableHeaderCell,
   TableRow,
   Text,
+  useFormat,
+  type Formatter,
   type StatDelta,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
-import { SAMPLE_RECORDS, STATUS } from './records';
+import { isOpen } from '../app/model/predicates';
+import { STATUS } from '../app/model/status';
+import { SAMPLE_RECORDS } from './records';
 
 export type DateRange = '7d' | '30d' | '90d';
 
@@ -50,42 +54,67 @@ const RANGES: readonly { value: DateRange; label: string; comparison: string }[]
   { value: '90d', label: '90 days', comparison: 'vs previous 90 days' },
 ];
 
-/** Stats per range. A real page derives these from its query. */
-const STATS: Record<DateRange, readonly { label: string; value: string; delta: StatDelta }[]> = {
+/** How a stat's number reads: a count, or money in the workspace's currency. */
+type StatKind = 'count' | 'money';
+
+interface StatData {
+  label: string;
+  kind: StatKind;
+  /** A count, or money in minor units. */
+  value: number;
+  /** The change: a ratio (0.09 = 9%) or, for counts, an absolute number. */
+  delta: { by: 'ratio' | 'count'; value: number; direction: StatDelta['direction']; tone?: StatDelta['tone'] };
+}
+
+/** Stats per range, as numbers. A real page derives these from its query; formatting happens at render. */
+const STATS: Record<DateRange, readonly StatData[]> = {
   '7d': [
-    { label: 'Records created', value: '24', delta: { value: '9%', direction: 'up', tone: 'positive' } },
-    { label: 'Pending approvals', value: '9', delta: { value: '2', direction: 'down', tone: 'positive' } },
-    { label: 'Overdue records', value: '3', delta: { value: '1', direction: 'up', tone: 'negative' } },
-    { label: 'Contract value', value: '$182K', delta: { value: '0%', direction: 'flat' } },
+    { label: 'Records created', kind: 'count', value: 24, delta: { by: 'ratio', value: 0.09, direction: 'up', tone: 'positive' } },
+    { label: 'Pending approvals', kind: 'count', value: 9, delta: { by: 'count', value: 2, direction: 'down', tone: 'positive' } },
+    { label: 'Overdue records', kind: 'count', value: 3, delta: { by: 'count', value: 1, direction: 'up', tone: 'negative' } },
+    { label: 'Contract value', kind: 'money', value: 18_200_000, delta: { by: 'ratio', value: 0, direction: 'flat' } },
   ],
   '30d': [
-    { label: 'Records created', value: '86', delta: { value: '12%', direction: 'up', tone: 'positive' } },
-    { label: 'Pending approvals', value: '9', delta: { value: '25%', direction: 'down', tone: 'positive' } },
-    { label: 'Overdue records', value: '14', delta: { value: '3', direction: 'up', tone: 'negative' } },
-    { label: 'Contract value', value: '$1.2M', delta: { value: '4%', direction: 'down', tone: 'neutral' } },
+    { label: 'Records created', kind: 'count', value: 86, delta: { by: 'ratio', value: 0.12, direction: 'up', tone: 'positive' } },
+    { label: 'Pending approvals', kind: 'count', value: 9, delta: { by: 'ratio', value: 0.25, direction: 'down', tone: 'positive' } },
+    { label: 'Overdue records', kind: 'count', value: 14, delta: { by: 'count', value: 3, direction: 'up', tone: 'negative' } },
+    { label: 'Contract value', kind: 'money', value: 120_000_000, delta: { by: 'ratio', value: 0.04, direction: 'down', tone: 'neutral' } },
   ],
   '90d': [
-    { label: 'Records created', value: '241', delta: { value: '6%', direction: 'up', tone: 'positive' } },
-    { label: 'Pending approvals', value: '9', delta: { value: '10%', direction: 'down', tone: 'positive' } },
-    { label: 'Overdue records', value: '31', delta: { value: '8%', direction: 'down', tone: 'positive' } },
-    { label: 'Contract value', value: '$3.4M', delta: { value: '11%', direction: 'up', tone: 'positive' } },
+    { label: 'Records created', kind: 'count', value: 241, delta: { by: 'ratio', value: 0.06, direction: 'up', tone: 'positive' } },
+    { label: 'Pending approvals', kind: 'count', value: 9, delta: { by: 'ratio', value: 0.1, direction: 'down', tone: 'positive' } },
+    { label: 'Overdue records', kind: 'count', value: 31, delta: { by: 'ratio', value: 0.08, direction: 'down', tone: 'positive' } },
+    { label: 'Contract value', kind: 'money', value: 340_000_000, delta: { by: 'ratio', value: 0.11, direction: 'up', tone: 'positive' } },
   ],
 };
 
+/** The workspace's billing currency. Formatted in the reader's locale; the two are separate settings. */
+const CURRENCY = 'USD';
+
 const ACTIVITY = [
-  { id: 'a-1', who: 'Priya Natarajan', what: 'approved Hardware lease', when: '2026-09-24' },
-  { id: 'a-2', who: 'Sam Rivera', what: 'created Event venue', when: '2026-09-23' },
-  { id: 'a-3', who: 'Jo Okafor', what: 'commented on Consulting retainer', when: '2026-09-22' },
+  { id: 'a-1', who: 'Priya Natarajan', what: 'approved Hardware lease', when: '2026-09-24T15:20:00Z' },
+  { id: 'a-2', who: 'Sam Rivera', what: 'created Event venue', when: '2026-09-23T10:05:00Z' },
+  { id: 'a-3', who: 'Jo Okafor', what: 'commented on Consulting retainer', when: '2026-09-22T08:40:00Z' },
 ];
 
-const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-const attention = SAMPLE_RECORDS.filter((r) => r.status === 'overdue' || r.status === 'pending');
+/** Needs attention = open (pending or overdue): the same predicate as the list's Open tab. */
+const attention = SAMPLE_RECORDS.filter(isOpen);
+
+const statValue = (stat: StatData, format: Formatter) =>
+  stat.kind === 'money' ? format.money(stat.value, CURRENCY, { compact: true }) : format.number(stat.value);
+
+const statDelta = (stat: StatData, format: Formatter): StatDelta => ({
+  value: stat.delta.by === 'ratio' ? format.percent(stat.delta.value) : format.number(stat.delta.value),
+  direction: stat.delta.direction,
+  ...(stat.delta.tone ? { tone: stat.delta.tone } : {}),
+});
 
 export interface DashboardPageProps {
   initialRange?: DateRange;
 }
 
 export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
+  const format = useFormat();
   const [range, setRange] = useState<DateRange>(initialRange);
   const comparison = RANGES.find((r) => r.value === range)?.comparison;
 
@@ -109,7 +138,7 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
 
           <Switcher as="section" aria-label="Key numbers" threshold="sm" gap="md">
             {STATS[range].map((stat) => (
-              <Stat key={stat.label} label={stat.label} value={stat.value} delta={stat.delta} comparison={comparison} />
+              <Stat key={stat.label} label={stat.label} value={statValue(stat, format)} delta={statDelta(stat, format)} comparison={comparison} />
             ))}
           </Switcher>
 
@@ -124,7 +153,7 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
                       <Stack gap="2xs">
                         <Text>{`${item.who} ${item.what}`}</Text>
                         <Text size="caption" tone="muted" numeric>
-                          {item.when}
+                          {format.relative(item.when)}
                         </Text>
                       </Stack>
                     </Cluster>
@@ -136,9 +165,9 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
             <Card>
               <CardHeader title="Usage this month" description="Against the Team plan’s limits." />
               <CardBody>
-                <Meter label="Seats" value={42} max={50} valueText="42 of 50 seats" />
-                <Meter label="Storage" value={18} max={100} valueText="18 of 100 GB" />
-                <Meter label="API calls" value={10000} max={10000} valueText="10,000 of 10,000 calls" />
+                <Meter label="Seats" value={42} max={50} valueText={`${format.number(42)} of ${format.number(50)} seats`} />
+                <Meter label="Storage" value={18} max={100} valueText={`${format.fileSize(18_000_000_000)} of ${format.fileSize(100_000_000_000)}`} />
+                <Meter label="API calls" value={10000} max={10000} valueText={`${format.number(10000)} of ${format.number(10000)} calls`} />
               </CardBody>
             </Card>
           </Grid>
@@ -162,7 +191,7 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
                   <TableCell>
                     <Badge tone={STATUS[row.status].tone}>{STATUS[row.status].label}</Badge>
                   </TableCell>
-                  <TableCell numeric>{currency.format(row.amount)}</TableCell>
+                  <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

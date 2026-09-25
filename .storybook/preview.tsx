@@ -3,6 +3,11 @@ import { lazy, Suspense } from 'react';
 import '../src/styles/index.css';
 import './gallery.css';
 import '../docs/docs.css';
+// CSS-free on purpose (no component, no stylesheet): safe to import statically, unlike system components.
+import { LocaleProvider } from '../src/format/LocaleProvider';
+import { mswLoader } from 'msw-storybook-addon/csf3';
+// Import-free on purpose: the mock server's latency and failure settings.
+import { configureMocks } from '../src/app/mocks/config';
 
 /*
  * Loaded lazily on purpose. A static import would pull component stylesheets into chunks that
@@ -55,6 +60,44 @@ const withContainerWidth: Decorator = (Story, context) => {
   );
 };
 
+/** Formatting locales in the toolbar, each with a time zone that belongs to it. */
+const LOCALES: Record<string, { timeZone: string; dir: 'ltr' | 'rtl' }> = {
+  'en-US': { timeZone: 'UTC', dir: 'ltr' },
+  'de-DE': { timeZone: 'Europe/Berlin', dir: 'ltr' },
+  'ja-JP': { timeZone: 'Asia/Tokyo', dir: 'ltr' },
+  'ar-EG': { timeZone: 'Africa/Cairo', dir: 'rtl' },
+};
+
+/**
+ * Every story formats through LocaleProvider with the toolbar's locale. Arabic also sets dir="rtl"
+ * on the story root: the system's CSS is logical-properties only, so layouts mirror. Portalled
+ * overlays (Dialog, Menu) render outside the root and stay left-to-right.
+ */
+const withLocale: Decorator = (Story, context) => {
+  const locale = typeof context.globals.locale === 'string' && context.globals.locale in LOCALES ? context.globals.locale : 'en-US';
+  const settings = LOCALES[locale] ?? { timeZone: 'UTC', dir: 'ltr' };
+  const root = document.getElementById('storybook-root');
+  if (root && context.viewMode !== 'docs') {
+    root.dir = settings.dir;
+    root.lang = locale;
+  }
+  return (
+    <LocaleProvider locale={locale} timeZone={settings.timeZone}>
+      <Story />
+    </LocaleProvider>
+  );
+};
+
+/**
+ * The mock API follows the Latency and Failures toolbars. Failures are real HTTP 500 responses
+ * through the real client, so error states are the ones users would see. The visual suite pins
+ * both to 0 in the URL.
+ */
+const withMockSettings: Decorator = (Story, context) => {
+  configureMocks({ latencyMs: Number(context.globals.latency ?? 0) || 0, failureRate: Number(context.globals.failure ?? 0) || 0 });
+  return <Story />;
+};
+
 const preview: Preview = {
   globalTypes: {
     theme: {
@@ -83,9 +126,50 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    locale: {
+      description: 'Formatting locale and time zone',
+      toolbar: {
+        title: 'Locale',
+        icon: 'globe',
+        items: [
+          { value: 'en-US', title: 'English (US) · UTC' },
+          { value: 'de-DE', title: 'Deutsch (DE) · Berlin' },
+          { value: 'ja-JP', title: '日本語 (JP) · Tokyo' },
+          { value: 'ar-EG', title: 'العربية (EG) · Cairo · RTL' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    latency: {
+      description: 'Mock API latency',
+      toolbar: {
+        title: 'Latency',
+        icon: 'timer',
+        items: [
+          { value: '0', title: 'Instant' },
+          { value: '400', title: 'Realistic (400 ms)' },
+          { value: '2000', title: 'Slow (2 s)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    failure: {
+      description: 'Mock API failure rate',
+      toolbar: {
+        title: 'Failures',
+        icon: 'alert',
+        items: [
+          { value: '0', title: 'No failures' },
+          { value: '0.2', title: '1 in 5 requests fail' },
+          { value: '1', title: 'Every request fails' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: 'light', width: 'full' },
-  decorators: [withContainerWidth, withTheme],
+  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0' },
+  loaders: [mswLoader()],
+  decorators: [withContainerWidth, withTheme, withLocale, withMockSettings],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and
   // stories tagged `modal-open` opt out with '!autodocs' (an open modal would cover the docs page).
   tags: ['autodocs'],
@@ -100,10 +184,11 @@ const preview: Preview = {
           'Foundations',
           ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Elevation and motion', 'Icons'],
           'Guides',
-          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Escape hatches'],
+          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Data', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Escape hatches'],
           'Components',
           'Primitives',
           'Layouts',
+          'Utilities',
           'Examples',
         ],
       },

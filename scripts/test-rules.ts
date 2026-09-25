@@ -54,7 +54,8 @@ const REQUIRED = {
 /**
  * One entry per import direction in eslint.config.js. They all report as no-restricted-imports,
  * so REQUIRED alone can't tell them apart: each needs its own fixture, linted as a file in `from`,
- * caught with a message matching `message`.
+ * caught with a message matching `message` (and, where two directions share a message, from a
+ * fixture whose file name matches `fixture`).
  */
 const BOUNDARIES = [
   { direction: 'examples → system internals', from: 'src/examples/', message: /public entry point/ },
@@ -66,6 +67,10 @@ const BOUNDARIES = [
   { direction: 'primitives → layouts', from: 'src/primitives/', message: /never imports a layout/ },
   { direction: 'layouts → examples', from: 'src/layouts/', message: /never imports consumer code/ },
   { direction: 'layouts → vendor UI', from: 'src/layouts/', message: /Wrap vendor UI/ },
+  { direction: 'components → app layer', from: 'src/components/', message: /never imports consumer code/, fixture: /imports-app/ },
+  { direction: 'components → data libraries', from: 'src/components/', message: /UI-only: data libraries/ },
+  { direction: 'primitives → data libraries', from: 'src/primitives/', message: /UI-only: data libraries/ },
+  { direction: 'layouts → data libraries', from: 'src/layouts/', message: /UI-only: data libraries/ },
 ] as const;
 
 interface Fixture {
@@ -100,7 +105,7 @@ const fail = (fixture: Fixture, why: string) => failures.push(`✗ ${fixture.fil
 const pass = (fixture: Fixture, what: string) => passes.push(`✓ ${basename(fixture.file).padEnd(44)} ${what}`);
 
 const eslint = new ESLint({ cwd: root });
-const caughtImports: { as: string; message: string }[] = [];
+const caughtImports: { as: string; message: string; file: string }[] = [];
 
 const runEslint = async (fixture: Fixture, clean: boolean) => {
   if (!fixture.as) return fail(fixture, 'missing "@as <path>" header');
@@ -121,7 +126,7 @@ const runEslint = async (fixture: Fixture, clean: boolean) => {
       ? m.ruleId === null && /Unused eslint-disable directive/.test(m.message)
       : m.ruleId === fixture.expect && (!fixture.message || fixture.message.test(m.message)),
   );
-  if (hit?.ruleId === 'no-restricted-imports') caughtImports.push({ as: fixture.as, message: hit.message });
+  if (hit?.ruleId === 'no-restricted-imports') caughtImports.push({ as: fixture.as, message: hit.message, file: fixture.file });
   return hit
     ? pass(fixture, `caught by ${fixture.expect}`)
     : fail(fixture, `expected ${fixture.expect}${fixture.message ? ` ${String(fixture.message)}` : ''}; got ${errors.map((m) => m.ruleId ?? m.message).join(', ') || 'no errors'}`);
@@ -199,7 +204,10 @@ for (const fixture of violations) await run(fixture, false);
 for (const fixture of controls) await run(fixture, true);
 
 for (const boundary of BOUNDARIES) {
-  const proved = caughtImports.some((c) => c.as.startsWith(boundary.from) && boundary.message.test(c.message));
+  // Directions that share a message (→ examples, → app layer) also name the fixture that proves them.
+  const proved = caughtImports.some(
+    (c) => c.as.startsWith(boundary.from) && boundary.message.test(c.message) && (!('fixture' in boundary) || boundary.fixture.test(c.file)),
+  );
   if (proved) passes.push(`✓ boundary ${boundary.direction.padEnd(35)} proved by a fixture in ${boundary.from}`);
   else failures.push(`✗ no fixture proves the ${boundary.direction} boundary (linted as ${boundary.from}…, message ${String(boundary.message)})`);
 }

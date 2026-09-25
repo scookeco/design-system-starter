@@ -6,6 +6,7 @@ export const usage: UsageDoc = {
   whenToUse: [
     'An independent yes/no inside a form that is saved with the form.',
     'Several independent choices from a short list; `indeterminate` for a “select all” parent.',
+    'Row selection in a table: `hideLabel`, with a label naming the row (“Select Hardware lease”), so the name still says what is ticked.',
   ],
   whenNotToUse: [
     { situation: 'A setting that applies immediately', instead: '`Switch`' },

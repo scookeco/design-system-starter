@@ -23,7 +23,9 @@ Work on a branch. Never commit to `main` directly.
 - `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
 - `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks). Import components and primitives; nothing below imports them.
-- `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages`. `ExampleShell` is the app's shell composition; `records.ts` the example domain.
+- `src/format/`: locale formatting over Intl (`LocaleProvider`, `useFormat`). Part of the system; exported from `src/index.ts`.
+- `src/app/`: the **app layer** the examples use, NOT the design system: `api/` (client + zod schemas; every response is parsed at the boundary), `model/` (cache keys `[tenant, resource, params]`, queries, named predicates, projections, named mutations, selection), `url/` (`useUrlState`), `registries/` (field registry), `mocks/` (MSW handlers, seeded db, story wiring). TanStack Query, zod and MSW are devDependencies and may only be imported here and in examples.
+- `src/examples/`: **golden examples**, one per archetype: `ListPage`, `RecordPage`, `CreateEditFlow`, `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages`. `ExampleShell` is the app's shell composition. List, record and create read and write through `src/app`.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `tests/visual/fixtures/`: one story per WCAG 2.2 check that the check must fail (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`).
@@ -37,7 +39,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Accessibility (and Accessibility conformance), Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Escape hatches. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 
@@ -78,4 +80,16 @@ UI rules (design system v0)
   never block paste, pass AppShell's help from the shell composition, never
   ask twice in a multi-step flow, and any drag declares data-drag-alternative.
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
+- Format every number, date, amount and list with useFormat() (LocaleProvider
+  sets locale and time zone). Money is integer minor units + currency code.
 ```
+
+## Data rules (the app layer)
+
+- The design system is UI-only: runtime `dependencies` stay exactly react, react-dom and radix-ui (a unit test enforces it). Never import msw, @tanstack/*, zod or `src/app` from `src/components`, `src/primitives` or `src/layouts` (lint enforces it, with fixtures).
+- Pages never fetch or write the cache directly: read with the queries in `src/app/model/queries.ts`, write with one named mutation per domain verb in `src/app/model/mutations.ts`, and document what each patches and invalidates.
+- Parse every response with its zod schema (`src/app/api/client.ts`); add the schema before the endpoint.
+- "What counts as X" is one named predicate in `src/app/model/predicates.ts`, used by filters, counts, badges, guards and the mock server alike.
+- View, search, filters, sort and page live in the URL (`useUrlState`): push for navigation, replace for refinements.
+- New field types go in the field registry (`src/app/registries/fields.tsx`); new fields are config (`recordFields.ts`).
+- Stories that read the mock API spread `mockApiMeta` and write `tags: ['!autodocs', 'data']` literally (Storybook reads tags statically); a story holding a request open adds `busy`. Server behaviour per story comes from `src/app/mocks/overrides.ts`.

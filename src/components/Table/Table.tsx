@@ -45,10 +45,17 @@ export function TableBody({ children }: { children: ReactNode }) {
   return <tbody>{children}</tbody>;
 }
 
-export type TableRowProps = Closed<ComponentPropsWithRef<'tr'>>;
+export type TableRowProps = Closed<ComponentPropsWithRef<'tr'>> & {
+  /**
+   * The row is in the current selection: it is filled, not just checked, so the selection reads at
+   * a glance. Pair it with a row checkbox named after the row ("Select Hardware lease"); the
+   * checkbox carries the state for assistive tech.
+   */
+  selected?: boolean;
+};
 
-export function TableRow({ UNSAFE_className, UNSAFE_style, ...rest }: TableRowProps) {
-  return <tr {...rest} className={cx('table__row', UNSAFE_className)} style={UNSAFE_style} />;
+export function TableRow({ selected = false, UNSAFE_className, UNSAFE_style, ...rest }: TableRowProps) {
+  return <tr {...rest} className={cx('table__row', UNSAFE_className)} style={UNSAFE_style} data-selected={selected || undefined} />;
 }
 
 export type SortDirection = 'ascending' | 'descending';
