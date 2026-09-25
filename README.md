@@ -54,7 +54,7 @@ scripts/eslint/         local ESLint rules (drag-needs-alternative)
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
-src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame
+src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden
 src/components/         the components; the only place (with primitives) Radix is imported
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
@@ -161,12 +161,12 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 | Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
 | Page structure | `PageHeader` (the page's h1, status, description, actions) |
 | Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
-| Actions | `Button`, `Menu`, `SegmentedControl` |
-| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
-| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Heading`, `Text` |
+| Actions | `Button`, `Menu`, `SegmentedControl`, `Toggle`, `CopyButton` |
+| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text` |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
-| Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip` |
-| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame` |
+| Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip`, `HoverCard` |
+| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame`, `Box`, `Reel`, `Imposter`, `VisuallyHidden` |
 | Formatting | `LocaleProvider` (locale and time zone), `useFormat()` (date, time, relative time, number, percent, compact, money from integer minor units, list, file size), `createFormatter`, `currencyDigits` |
 
 ## Which example to copy

@@ -7,3 +7,7 @@ export { Cover, type CoverProps } from './Cover/Cover';
 export { Switcher, type SwitcherProps } from './Switcher/Switcher';
 export { Frame, type FrameProps } from './Frame/Frame';
 export type { LayoutElement } from './types';
+export { Box, type BoxProps } from './Box/Box';
+export { Reel, type ReelProps } from './Reel/Reel';
+export { Imposter, type ImposterProps } from './Imposter/Imposter';
+export { VisuallyHidden, type VisuallyHiddenProps } from './VisuallyHidden/VisuallyHidden';

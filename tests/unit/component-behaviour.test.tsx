@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CodeBlock, CopyButton, Divider, FileUpload, Slider, Timeline, Toggle, type FileUploadItem } from '../../src/index';
+import { Box, CodeBlock, CopyButton, Divider, FileUpload, Imposter, Reel, Slider, Timeline, Toggle, VisuallyHidden, type FileUploadItem } from '../../src/index';
 
 afterEach(() => {
   cleanup();
@@ -148,5 +148,43 @@ describe('Timeline, Divider and Toggle', () => {
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
     fireEvent.click(toggle);
     expect(screen.getByRole('button', { name: 'Show archived' }).getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('Box, Reel, Imposter and VisuallyHidden', () => {
+  it('Box maps inset tokens to token references, per axis', () => {
+    const { container } = render(<Box padding="lg" paddingBlock="xs" />);
+    const style = (container.firstElementChild as HTMLElement).style;
+    expect(style.getPropertyValue('--box-padding-block')).toBe('var(--space-inset-xs)');
+    expect(style.getPropertyValue('--box-padding-inline')).toBe('var(--space-inset-lg)');
+  });
+
+  it('Reel is a named region in the tab order', () => {
+    render(<Reel label="Recent files" />);
+    expect(screen.getByRole('region', { name: 'Recent files' }).tabIndex).toBe(0);
+  });
+
+  it('Imposter makes the content inert only while an overlay covers it', () => {
+    const { container, rerender } = render(
+      <Imposter inertContent overlay={<p>Locked</p>}>
+        <button type="button">Hidden action</button>
+      </Imposter>,
+    );
+    expect(container.querySelector('.imposter__content')?.hasAttribute('inert')).toBe(true);
+    rerender(
+      <Imposter inertContent>
+        <button type="button">Hidden action</button>
+      </Imposter>,
+    );
+    expect(container.querySelector('.imposter__content')?.hasAttribute('inert')).toBe(false);
+  });
+
+  it('VisuallyHidden stays in the accessibility tree', () => {
+    render(
+      <button type="button">
+        <VisuallyHidden>Delete</VisuallyHidden>
+      </button>,
+    );
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeTruthy();
   });
 });

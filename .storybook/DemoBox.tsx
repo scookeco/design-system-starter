@@ -12,3 +12,8 @@ export function DemoBox({ children }: { children: ReactNode }) {
 export function DemoNarrow({ children }: { children: ReactNode }) {
   return <div className="demo-narrow">{children}</div>;
 }
+
+/** Gallery-only dashed outline, to show the edge of a box and the padding inside it. */
+export function DemoOutline({ children }: { children: ReactNode }) {
+  return <div className="demo-outline">{children}</div>;
+}

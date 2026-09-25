@@ -1,0 +1,23 @@
+@layer primitives {
+  .reel {
+    --reel-gap: var(--space-gap-md);
+    --reel-item: var(--size-grid-item-md);
+
+    display: flex;
+    gap: var(--reel-gap);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-block-end: var(--space-inset-xs);
+    scroll-snap-type: inline proximity;
+    scroll-padding-inline: var(--reel-gap);
+  }
+
+  .reel > * {
+    flex: 0 0 var(--reel-item);
+    scroll-snap-align: start;
+  }
+
+  .reel[data-item-width="auto"] > * {
+    flex-basis: auto;
+  }
+}
