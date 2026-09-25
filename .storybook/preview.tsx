@@ -98,7 +98,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundations',
-          ['Colour', 'Typography', 'Spacing, sizing and radius', 'Elevation and motion', 'Icons'],
+          ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Elevation and motion', 'Icons'],
           'Guides',
           ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Accessibility', 'Content', 'Escape hatches'],
           'Components',

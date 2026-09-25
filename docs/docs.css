@@ -154,3 +154,17 @@
     font: var(--text-code);
   }
 }
+
+/* Data visualisation page: a stacked bar with a surface-coloured gap between segments. */
+@layer components {
+  .docs-stacked-bar {
+    display: flex;
+    gap: var(--space-gap-2xs);
+    block-size: var(--size-control-sm);
+  }
+
+  .docs-stacked-bar__segment {
+    border-radius: var(--radius-indicator);
+    background: var(--docs-swatch);
+  }
+}
