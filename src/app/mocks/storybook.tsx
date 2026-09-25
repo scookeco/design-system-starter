@@ -6,6 +6,7 @@
 import { QueryClient, type QueryClient as QueryClientType } from '@tanstack/react-query';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Decorator } from '@storybook/react-vite';
+import type { HttpHandler } from 'msw';
 import type { Tenant } from '../api/schemas';
 import { AppProviders } from '../providers';
 import { resetDb } from './db';
@@ -72,8 +73,12 @@ export const withMockApi =
  */
 export const mockApiMeta = {
   tags: ['!autodocs', 'data'],
-  parameters: { layout: 'fullscreen', msw: handlers },
+  // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
+  parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: handlers } } },
   beforeEach: () => {
     resetDb();
   },
 };
+
+/** Story parameters that put these handlers in front of the defaults. */
+export const mswOverrides = (...overrides: HttpHandler[]) => ({ msw: { handlers: { overrides } } });

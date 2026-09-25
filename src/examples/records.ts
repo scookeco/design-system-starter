@@ -1,24 +1,9 @@
 /**
- * The example domain, shared by every example page: one record type, one status-to-tone map.
- * In a product this lives in the model layer, not beside the pages.
+ * Static sample records for the pages that don't read from the mock API yet (the dashboard's
+ * "Needs attention" table). The record type, its statuses and the status-to-tone map live in the
+ * app layer (src/app); this file only holds a few fixed rows shaped like them.
  */
-import type { BadgeTone } from '../index';
-
-export type RecordStatus = 'active' | 'pending' | 'overdue' | 'draft';
-
-/** The one place a domain status maps to a tone. A new status extends this map; it never adds a badge. */
-export const STATUS: Record<RecordStatus, { label: string; tone: BadgeTone }> = {
-  active: { label: 'Active', tone: 'success' },
-  pending: { label: 'Pending', tone: 'info' },
-  overdue: { label: 'Overdue', tone: 'danger' },
-  draft: { label: 'Draft', tone: 'neutral' },
-};
-
-/** Money travels as integer minor units (cents) with its currency code; never as a float. */
-export interface Money {
-  minor: number;
-  currency: string;
-}
+import type { Money, RecordStatus } from '../app/api/schemas';
 
 export interface RecordItem {
   id: string;
@@ -39,6 +24,3 @@ export const SAMPLE_RECORDS: readonly RecordItem[] = [
   { id: 'r-1006', name: 'Software licences', owner: 'Engineering', status: 'active', amount: { minor: 9640000, currency: 'USD' }, updated: '2026-08-19' },
   { id: 'r-1007', name: 'Event venue', owner: 'Marketing', status: 'pending', amount: { minor: 1890000, currency: 'USD' }, updated: '2026-08-02' },
 ];
-
-/** Where a page's data stands. A real page derives this from its query; the examples take it as a prop. */
-export type LoadState = 'loading' | 'ready' | 'error';

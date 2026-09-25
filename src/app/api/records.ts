@@ -43,12 +43,13 @@ export const getRecord = (tenant: Tenant, id: string, signal?: AbortSignal) =>
 
 export const listPeople = (tenant: Tenant, signal?: AbortSignal) => request(PeopleSchema, `${base(tenant)}/people`, { signal });
 
+/** A new record. A quick create sends just the name; the server defaults the rest (owner: you). */
 export interface NewRecord {
   name: string;
-  ownerId: string;
-  amountMinor: number;
-  renewsOn: string;
-  tags: readonly string[];
+  ownerId?: string;
+  amountMinor?: number;
+  renewsOn?: string;
+  tags?: readonly string[];
 }
 
 /** Not naturally idempotent, so it carries a key: a retried or double-sent create makes one record. */

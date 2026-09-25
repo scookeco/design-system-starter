@@ -42,7 +42,9 @@ import {
   type StatDelta,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
-import { SAMPLE_RECORDS, STATUS } from './records';
+import { isOpen } from '../app/model/predicates';
+import { STATUS } from '../app/model/status';
+import { SAMPLE_RECORDS } from './records';
 
 export type DateRange = '7d' | '30d' | '90d';
 
@@ -95,7 +97,8 @@ const ACTIVITY = [
   { id: 'a-3', who: 'Jo Okafor', what: 'commented on Consulting retainer', when: '2026-09-22T08:40:00Z' },
 ];
 
-const attention = SAMPLE_RECORDS.filter((r) => r.status === 'overdue' || r.status === 'pending');
+/** Needs attention = open (pending or overdue): the same predicate as the list's Open tab. */
+const attention = SAMPLE_RECORDS.filter(isOpen);
 
 const statValue = (stat: StatData, format: Formatter) =>
   stat.kind === 'money' ? format.money(stat.value, CURRENCY, { compact: true }) : format.number(stat.value);

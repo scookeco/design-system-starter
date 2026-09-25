@@ -6,8 +6,10 @@ import { SettingsPage } from '../../src/examples/SettingsPage';
 import { SignInPage } from '../../src/examples/SignInPage';
 import { SetupWizard } from '../../src/examples/SetupWizard';
 import { ListPage } from '../../src/examples/ListPage';
+import { renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
+setupMockApi();
 
 // jsdom has no ResizeObserver; Radix measures its hidden form inputs with one inside a <form>.
 globalThis.ResizeObserver ??= class {
@@ -115,7 +117,7 @@ describe('Setup wizard example', () => {
 
 describe('List page example', () => {
   it('shows active filters as chips; removing one moves focus to the next chip, then to Filters', async () => {
-    render(<ListPage initialStatuses={['active', 'pending']} />);
+    renderWithApp(<ListPage initialStatuses={['active', 'pending']} />);
     const chips = screen.getByRole('list', { name: 'Active filters' });
     fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
     await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Pending' })));
@@ -124,20 +126,26 @@ describe('List page example', () => {
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Filters' })));
   });
 
-  it('pages the rows, marks the current page and keeps Previous focusable but inert on page 1', () => {
-    render(<ListPage />);
-    const pager = screen.getByRole('navigation', { name: 'Records pages' });
-    expect(within(pager).getByRole('status').textContent).toBe('1–5 of 7');
+  it('pages on the server: the summary shows the server’s total and the current page', async () => {
+    renderWithApp(<ListPage />);
+    const pager = await screen.findByRole('navigation', { name: 'Records pages' });
+    expect(within(pager).getByRole('status').textContent).toBe('1–10 of 219');
     expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page');
-    const previous = within(pager).getByRole('button', { name: 'Previous' });
-    expect(previous.getAttribute('aria-disabled')).toBe('true');
+    expect(within(pager).getByRole('button', { name: 'Previous' }).getAttribute('aria-disabled')).toBe('true');
     fireEvent.click(within(pager).getByRole('button', { name: 'Next' }));
-    expect(within(pager).getByRole('status').textContent).toBe('6–7 of 7');
+    await waitFor(() => expect(within(pager).getByRole('status').textContent).toBe('11–20 of 219'));
     expect(within(pager).getByRole('button', { name: 'Page 2' }).getAttribute('aria-current')).toBe('page');
   });
 
+  it('counts each view on the server and shows the counts in the tabs', async () => {
+    renderWithApp(<ListPage />);
+    const views = screen.getByRole('navigation', { name: 'Record views' });
+    await waitFor(() => expect(within(views).getByRole('link', { name: 'All (219)' }).getAttribute('aria-current')).toBe('page'));
+    expect(within(views).getByRole('link', { name: 'Archived (21)' })).toBeTruthy();
+  });
+
   it('clears the search from its clear button and keeps focus in the field', () => {
-    render(<ListPage initialQuery="lease" />);
+    renderWithApp(<ListPage initialQuery="lease" />);
     const search = screen.getByRole('searchbox', { name: 'Search records' });
     fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
     expect((search as HTMLInputElement).value).toBe('');

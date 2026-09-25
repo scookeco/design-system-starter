@@ -12,6 +12,8 @@
  *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays delete confirmation, toast on success
+ *
+ * Data: the record is read from the server cache with useRecord(id); the page holds no copy of it.
  */
 import { useState, type FormEvent } from 'react';
 import {
@@ -40,7 +42,10 @@ import {
   type Formatter,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
-import { SAMPLE_RECORDS, STATUS, type LoadState, type RecordItem } from './records';
+import type { RecordEntity } from '../app/api/schemas';
+import { isOnLegalHold } from '../app/model/predicates';
+import { useRecord } from '../app/model/queries';
+import { STATUS } from '../app/model/status';
 
 interface Activity {
   id: string;
@@ -100,45 +105,40 @@ const SECTIONS: readonly { section: RecordSection; label: string }[] = [
 ];
 
 /** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
-const sectionHref = (record: RecordItem, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
+const sectionHref = (record: RecordEntity, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
 
 /** The per-type part: which properties a record shows, in what order. Everything else is shared. */
-const properties = (record: RecordItem, format: Formatter) => [
-  { label: 'Owner', value: record.owner },
+const properties = (record: RecordEntity, format: Formatter) => [
+  { label: 'Owner', value: record.owner.name },
   { label: 'Status', value: STATUS[record.status].label },
   { label: 'Amount', value: format.money(record.amount.minor, record.amount.currency), numeric: true },
-  { label: 'Last updated', value: format.date(record.updated), numeric: true },
+  { label: 'Last updated', value: format.date(record.updatedAt), numeric: true },
   { label: 'ID', value: record.id, numeric: true },
 ];
 
 export interface RecordPageProps {
-  record?: RecordItem;
-  initialLoadState?: LoadState;
+  /** The record's id, from the route (/records/:id). */
+  recordId?: string;
   /** Open the "More" menu on first render (gallery and tests). */
   initialMenuOpen?: boolean;
   /** The section to show first. In a product this comes from the route. */
   initialSection?: RecordSection;
 }
 
-export function RecordPage({ record = SAMPLE_RECORDS[0], ...props }: RecordPageProps) {
-  const title = record?.name ?? 'Record';
+export function RecordPage({ recordId = 'r-1001', ...props }: RecordPageProps) {
+  const record = useRecord(recordId);
   return (
-    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: title }}>
-      {record ? <RecordPageContent record={record} {...props} /> : null}
+    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: record.data?.name ?? 'Record' }}>
+      <RecordPageContent recordId={recordId} {...props} />
     </ExampleShell>
   );
 }
 
-function RecordPageContent({
-  record,
-  initialLoadState = 'ready',
-  initialMenuOpen = false,
-  initialSection = 'overview',
-}: RecordPageProps & { record: RecordItem }) {
+function RecordPageContent({ recordId, initialMenuOpen = false, initialSection = 'overview' }: RecordPageProps & { recordId: string }) {
   const toast = useToast();
   const format = useFormat();
+  const query = useRecord(recordId);
   const [section, setSection] = useState<RecordSection>(initialSection);
-  const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
@@ -150,16 +150,16 @@ function RecordPageContent({
     setComment('');
   };
 
-  if (loadState === 'error') {
+  if (query.isError) {
     return (
       <Center max="lg" gutters="lg">
         <EmptyState
           reason="error"
           headingLevel={1}
           title="Couldn’t load this record"
-          description="The server didn’t answer in time. Nothing was lost."
+          description="The server didn’t answer as expected. Nothing was lost."
           action={
-            <Button variant="secondary" onClick={() => setLoadState('ready')}>
+            <Button variant="secondary" onClick={() => void query.refetch()}>
               Retry
             </Button>
           }
@@ -168,7 +168,7 @@ function RecordPageContent({
     );
   }
 
-  if (loadState === 'loading') {
+  if (query.isPending) {
     return (
       <Center max="lg" gutters="lg">
         <Stack gap="lg" aria-busy="true">
@@ -202,13 +202,20 @@ function RecordPageContent({
     );
   }
 
+  const record = query.data;
+
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
         <PageHeader
           title={record.name}
-          status={<Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>}
-          description={`Owned by ${record.owner} · updated ${format.date(record.updated)}`}
+          status={
+            <Cluster gap="2xs">
+              <Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>
+              {isOnLegalHold(record) ? <Badge tone="warning">Legal hold</Badge> : null}
+            </Cluster>
+          }
+          description={`Owned by ${record.owner.name} · updated ${format.relative(record.updatedAt)}`}
           actions={
             <>
               <Button variant="secondary">Share</Button>

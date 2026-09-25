@@ -122,8 +122,10 @@ export const handlers = [
       if (replay) return HttpResponse.json(replay, { status: 201 });
 
       const body = (await request.json()) as Partial<{ name: string; ownerId: string; amountMinor: number; renewsOn: string; tags: string[] }>;
-      const owner = partition.people.find((p) => p.id === body.ownerId);
-      if (!body.name?.trim() || !owner || typeof body.amountMinor !== 'number' || !body.renewsOn) {
+      // Defaults for a quick create: the signed-in person owns it, no amount yet, renews in a year.
+      const owner = body.ownerId === undefined ? partition.people[0] : partition.people.find((p) => p.id === body.ownerId);
+      const renewsOn = body.renewsOn ?? new Date(SEED_EPOCH + 365 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      if (!body.name?.trim() || !owner || (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')) {
         return error(422, 'invalid', 'Some fields are missing or invalid.');
       }
       const currency = partition.records[0]?.amount.currency ?? 'USD';
@@ -132,9 +134,9 @@ export const handlers = [
         name: body.name.trim(),
         owner,
         status: 'draft',
-        amount: { minor: Math.round(body.amountMinor), currency },
+        amount: { minor: Math.round(body.amountMinor ?? 0), currency },
         updatedAt: new Date(SEED_EPOCH).toISOString(),
-        renewsOn: body.renewsOn,
+        renewsOn,
         tags: body.tags ?? [],
         version: 0,
       });
