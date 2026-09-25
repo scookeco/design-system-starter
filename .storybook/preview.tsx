@@ -30,6 +30,31 @@ const withTheme: Decorator = (Story, context) => {
   return <Story />;
 };
 
+/**
+ * Container width (toolbar): wraps the story in a container of a fixed inline-size, so layouts
+ * that respond to their container (AppShell, PageLayout) can be seen in each state inside the
+ * fixed screenshot viewport. Widths come from the breakpoint tokens (.storybook/gallery.css):
+ *
+ * - narrow: half of size.breakpoint.sm — phone width; PageLayout stacks, the shell uses a drawer;
+ * - medium: size.breakpoint.sm — PageLayout's regions sit side by side, the shell still uses a drawer;
+ * - wide: size.breakpoint.md — the shell shows its sidebar;
+ * - full: no wrapper at all (the default), so stories and their screenshots are unchanged.
+ *
+ * Docs tabs always render at full width.
+ */
+const WIDTHS = ['narrow', 'medium', 'wide', 'full'] as const;
+type Width = (typeof WIDTHS)[number];
+
+const withContainerWidth: Decorator = (Story, context) => {
+  const width = context.globals.width as Width | undefined;
+  if (!width || width === 'full' || !WIDTHS.includes(width) || context.viewMode === 'docs') return <Story />;
+  return (
+    <div className="gallery-width" data-width={width}>
+      <Story />
+    </div>
+  );
+};
+
 const preview: Preview = {
   globalTypes: {
     theme: {
@@ -44,9 +69,23 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    width: {
+      description: 'Container width (from the breakpoint tokens)',
+      toolbar: {
+        title: 'Width',
+        icon: 'grow',
+        items: [
+          { value: 'narrow', title: 'Narrow', right: 'sm ÷ 2' },
+          { value: 'medium', title: 'Medium', right: 'sm' },
+          { value: 'wide', title: 'Wide', right: 'md' },
+          { value: 'full', title: 'Full', right: '100%' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: 'light' },
-  decorators: [withTheme],
+  initialGlobals: { theme: 'light', width: 'full' },
+  decorators: [withContainerWidth, withTheme],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and
   // stories tagged `modal-open` opt out with '!autodocs' (an open modal would cover the docs page).
   tags: ['autodocs'],

@@ -16,3 +16,27 @@
     border-inline-end: 1px dashed var(--color-border-strong);
   }
 }
+
+/*
+ * Container-width toolbar (.storybook/preview.tsx). An outline, not a border, marks the edge:
+ * a border would eat into the width and move a layout across its breakpoint.
+ */
+@layer components {
+  .gallery-width {
+    container-type: inline-size;
+    inline-size: 100%;
+    outline: 1px dashed var(--color-border-strong);
+  }
+
+  .gallery-width[data-width="narrow"] {
+    max-inline-size: calc(var(--size-breakpoint-sm) / 2);
+  }
+
+  .gallery-width[data-width="medium"] {
+    max-inline-size: var(--size-breakpoint-sm);
+  }
+
+  .gallery-width[data-width="wide"] {
+    max-inline-size: var(--size-breakpoint-md);
+  }
+}
