@@ -18,3 +18,7 @@ export const Disabled: Story = { args: { disabled: true, defaultValue: 'Locked v
 export const Small: Story = { args: { size: 'sm' } };
 export const Large: Story = { args: { size: 'lg' } };
 export const HiddenLabel: Story = { args: { label: 'Search records', hideLabel: true, type: 'search', placeholder: 'Search' } };
+export const Password: Story = {
+  args: { label: 'Password', type: 'password', autoComplete: 'current-password', defaultValue: 'correct horse', placeholder: undefined },
+};
+export const PasswordVisible: Story = { args: { ...Password.args, defaultPasswordVisible: true } };

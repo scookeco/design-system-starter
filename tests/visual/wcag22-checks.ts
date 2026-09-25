@@ -7,7 +7,7 @@
  */
 
 /** The ids of the checks, as the fixture stories name them in an `expect:<id>` tag. */
-export const CHECKS = ['target-size', 'focus-not-obscured'] as const;
+export const CHECKS = ['target-size', 'accessible-authentication', 'focus-not-obscured'] as const;
 export type CheckId = (typeof CHECKS)[number];
 
 /**
@@ -167,4 +167,42 @@ export function focusObscuredViolation(): { key: string | null; violations: stri
     return describe(n ?? c);
   });
   return result([`${describe(el)} has focus but is entirely hidden by ${[...new Set(covering)].join(', ')} (SC 2.4.11)`]);
+}
+
+/**
+ * SC 3.3.8 Accessible Authentication (Minimum), AA, as far as markup shows it: every password field
+ * can be filled by a password manager (autocomplete current-password or new-password) and has a
+ * show-password control (a button whose aria-controls names it); no text entry field blocks paste;
+ * no CAPTCHA-style cognitive test is on the page.
+ */
+export function accessibleAuthenticationViolations(): string[] {
+  const violations: string[] = [];
+  const describe = (node: Element) => {
+    const label = node.id ? document.querySelector(`label[for="${CSS.escape(node.id)}"]`)?.textContent?.trim() : undefined;
+    return `${node.tagName.toLowerCase()}[type="${node.getAttribute('type') ?? ''}"]${label ? ` "${label}"` : ''}`;
+  };
+
+  const passwords = [...document.querySelectorAll<HTMLInputElement>('input[type="password"]')];
+  for (const input of passwords) {
+    const tokens = (input.getAttribute('autocomplete') ?? '').split(/\s+/);
+    if (!tokens.includes('current-password') && !tokens.includes('new-password')) {
+      violations.push(`${describe(input)} needs autocomplete="current-password" or "new-password" so a password manager can fill it (SC 3.3.8)`);
+    }
+    const toggle = input.id ? document.querySelector(`button[aria-controls~="${CSS.escape(input.id)}"]`) : null;
+    if (!toggle) violations.push(`${describe(input)} has no show-password button (aria-controls="${input.id}") (SC 3.3.8)`);
+  }
+
+  const entries = document.querySelectorAll<HTMLElement>(
+    'input:not([type]), input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="url"], input[type="number"], input[type="search"], textarea',
+  );
+  for (const field of entries) {
+    if (field.closest('#storybook-docs')) continue;
+    const paste = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() });
+    field.dispatchEvent(paste);
+    if (paste.defaultPrevented) violations.push(`${describe(field)} blocks paste (SC 3.3.8)`);
+  }
+
+  const captcha = document.querySelector('iframe[src*="captcha" i], iframe[title*="captcha" i], [class*="captcha" i], [id*="captcha" i], [aria-label*="captcha" i]');
+  if (captcha) violations.push(`${captcha.tagName.toLowerCase()} looks like a CAPTCHA: a cognitive function test needs an alternative (SC 3.3.8)`);
+  return violations;
 }

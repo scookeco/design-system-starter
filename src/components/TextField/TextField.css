@@ -1,0 +1,64 @@
+@layer components {
+  /* 1. block: a password field. The field chrome (.field__control) wraps the input and the toggle. */
+  .text-field {
+    padding-inline-end: var(--space-inset-2xs);
+  }
+
+  /* The ring goes on the whole box, since the input inside has none of its own. */
+  .text-field:focus-within {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* 2. parts */
+  .text-field__input {
+    flex: 1;
+    min-inline-size: 0;
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .text-field__input:focus-visible {
+    outline: none;
+  }
+
+  .text-field__reveal {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .text-field__reveal:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
+  /* 4. states: the input's state paints the whole box */
+  .text-field:has(> .text-field__input[aria-invalid="true"]) {
+    border-color: var(--color-status-danger-fg);
+  }
+
+  .text-field:has(> .text-field__input:disabled) {
+    border-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-disabled);
+  }
+
+  .text-field__reveal:disabled {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+}
