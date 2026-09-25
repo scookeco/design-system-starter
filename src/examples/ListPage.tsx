@@ -43,6 +43,7 @@ import {
   Text,
   TextField,
   Tooltip,
+  useFormat,
   useToast,
   type SortDirection,
 } from '../index';
@@ -55,7 +56,6 @@ const STATUSES = Object.keys(STATUS) as RecordStatus[];
 const STATUS_OPTIONS = STATUSES.map((value) => ({ value, label: STATUS[value].label }));
 /** Server-side paging stands in here: a real list pages its query, with 25 or 50 rows a page. */
 const PAGE_SIZE = 5;
-const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
 
 export interface ListPageProps {
@@ -88,6 +88,7 @@ function ListPageContent({
   initialPage = 1,
 }: ListPageProps) {
   const toast = useToast();
+  const format = useFormat();
   const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [items, setItems] = useState(records);
   const [query, setQuery] = useState(initialQuery);
@@ -112,7 +113,7 @@ function ListPageContent({
     );
     const factor = sort.direction === 'ascending' ? 1 : -1;
     return [...filtered].sort((a, b) =>
-      sort.key === 'amount' ? (a.amount - b.amount) * factor : a.name.localeCompare(b.name) * factor,
+      sort.key === 'amount' ? (a.amount.minor - b.amount.minor) * factor : a.name.localeCompare(b.name) * factor,
     );
   }, [items, query, statuses, sort]);
 
@@ -159,7 +160,7 @@ function ListPageContent({
     }
     const id = `r-${String(1000 + items.length + 1)}`;
     setItems((current) => [
-      { id, name: draftName.trim(), owner: 'You', status: draftStatus, amount: 0, updated: '2026-09-25' },
+      { id, name: draftName.trim(), owner: 'You', status: draftStatus, amount: { minor: 0, currency: 'USD' }, updated: '2026-09-25' },
       ...current,
     ]);
     setDialogOpen(false);
@@ -355,8 +356,8 @@ function ListPageContent({
                   <TableCell>
                     <Badge tone={STATUS[row.status].tone}>{STATUS[row.status].label}</Badge>
                   </TableCell>
-                  <TableCell>{row.updated}</TableCell>
-                  <TableCell numeric>{currency.format(row.amount)}</TableCell>
+                  <TableCell>{format.date(row.updated)}</TableCell>
+                  <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

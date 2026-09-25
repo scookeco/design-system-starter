@@ -1,4 +1,5 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
+import { useFormat } from '../../format/LocaleProvider';
 import { Icon } from '../Icon/Icon';
 import './Pagination.css';
 
@@ -15,7 +16,7 @@ export interface PaginationProps extends EscapeHatch {
   nextLabel?: string;
   /** Accessible name of a page button, from its number ("Page 3"). */
   pageLabel?: (page: number) => string;
-  /** Formats counts in the summary. Defaults to the runtime locale's grouping ("1,284"). */
+  /** Formats counts in the summary. Defaults to the LocaleProvider's number format ("1,284", "1.284"). */
   formatNumber?: (n: number) => string;
   /**
    * Make the summary ("1–25 of 1,284") a polite live region, so a new page or a new total after
@@ -39,8 +40,6 @@ const slots = (page: number, pages: number): PageSlot[] => {
   return result;
 };
 
-const defaultFormat = new Intl.NumberFormat().format;
-
 /**
  * Moves through a long, server-paged list: a summary of what is shown, Previous and Next, and page
  * numbers around the current one. A labelled nav landmark; the current page has aria-current="page".
@@ -54,11 +53,13 @@ export function Pagination({
   previousLabel = 'Previous',
   nextLabel = 'Next',
   pageLabel = (p) => `Page ${String(p)}`,
-  formatNumber = defaultFormat,
+  formatNumber,
   announce = false,
   UNSAFE_className,
   UNSAFE_style,
 }: PaginationProps) {
+  const format = useFormat();
+  const formatCount = formatNumber ?? ((n: number) => format.number(n));
   const pages = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(Math.max(page, 1), pages);
   const first = total === 0 ? 0 : (current - 1) * pageSize + 1;
@@ -71,7 +72,7 @@ export function Pagination({
   return (
     <nav aria-label={label} className={cx('pagination', UNSAFE_className)} style={UNSAFE_style}>
       <p className="pagination__summary" role={announce ? 'status' : undefined}>
-        {`${formatNumber(first)}–${formatNumber(last)} of ${formatNumber(total)}`}
+        {`${formatCount(first)}–${formatCount(last)} of ${formatCount(total)}`}
       </p>
       <ul role="list" className="pagination__list">
         <li>
@@ -90,7 +91,7 @@ export function Pagination({
                 aria-current={slot === current ? 'page' : undefined}
                 onClick={() => go(slot)}
               >
-                {formatNumber(slot)}
+                {formatCount(slot)}
               </button>
             </li>
           ) : (

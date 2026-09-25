@@ -35,7 +35,9 @@ import {
   Stack,
   Text,
   TextField,
+  useFormat,
   useToast,
+  type Formatter,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
 import { SAMPLE_RECORDS, STATUS, type LoadState, type RecordItem } from './records';
@@ -48,14 +50,16 @@ interface Activity {
 }
 
 const ACTIVITY: readonly Activity[] = [
-  { id: 'a-3', who: 'Sam Rivera', what: 'changed the status to Active', when: '2026-09-12' },
-  { id: 'a-2', who: 'Priya Natarajan', what: 'commented: “Legal review is done.”', when: '2026-09-09' },
-  { id: 'a-1', who: 'Operations', what: 'created the record', when: '2026-08-30' },
+  { id: 'a-3', who: 'Sam Rivera', what: 'changed the status to Active', when: '2026-09-12T14:05:00Z' },
+  { id: 'a-2', who: 'Priya Natarajan', what: 'commented: “Legal review is done.”', when: '2026-09-09T09:30:00Z' },
+  { id: 'a-1', who: 'Operations', what: 'created the record', when: '2026-08-30T16:45:00Z' },
 ];
 
 interface RecordFile {
   name: string;
-  detail: string;
+  kind: string;
+  bytes: number;
+  added: string;
   /** Preview image URL. A real app gets these from its file service; the example inlines small drawings. */
   preview: string;
 }
@@ -66,17 +70,23 @@ const svg = (body: string) =>
 const FILES: readonly RecordFile[] = [
   {
     name: 'Signed agreement.pdf',
-    detail: 'PDF · 1.2 MB · 2026-08-30',
+    kind: 'PDF',
+    bytes: 1_200_000,
+    added: '2026-08-30',
     preview: svg('<rect x="44" y="12" width="72" height="96" fill="#fff" stroke="#cbd5e1"/><path d="M54 30h52M54 42h52M54 54h40M54 66h52M54 92h24" stroke="#94a3b8" stroke-width="3"/>'),
   },
   {
     name: 'Site plan.png',
-    detail: 'Image · 640 KB · 2026-09-02',
+    kind: 'Image',
+    bytes: 640_000,
+    added: '2026-09-02',
     preview: svg('<path d="M24 20h112v80H24zM24 60h56M80 20v48M104 60h32" fill="none" stroke="#6366f1" stroke-width="3"/>'),
   },
   {
     name: 'Pricing schedule.xlsx',
-    detail: 'Spreadsheet · 48 KB · 2026-09-09',
+    kind: 'Spreadsheet',
+    bytes: 48_000,
+    added: '2026-09-09',
     preview: svg('<rect x="28" y="20" width="104" height="80" fill="#fff" stroke="#cbd5e1"/><path d="M28 40h104M28 60h104M28 80h104M62 20v80M96 20v80" stroke="#94a3b8" stroke-width="2"/>'),
   },
 ];
@@ -92,14 +102,12 @@ const SECTIONS: readonly { section: RecordSection; label: string }[] = [
 /** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
 const sectionHref = (record: RecordItem, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
 
-const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-
 /** The per-type part: which properties a record shows, in what order. Everything else is shared. */
-const properties = (record: RecordItem) => [
+const properties = (record: RecordItem, format: Formatter) => [
   { label: 'Owner', value: record.owner },
   { label: 'Status', value: STATUS[record.status].label },
-  { label: 'Amount', value: currency.format(record.amount), numeric: true },
-  { label: 'Last updated', value: record.updated, numeric: true },
+  { label: 'Amount', value: format.money(record.amount.minor, record.amount.currency), numeric: true },
+  { label: 'Last updated', value: format.date(record.updated), numeric: true },
   { label: 'ID', value: record.id, numeric: true },
 ];
 
@@ -128,6 +136,7 @@ function RecordPageContent({
   initialSection = 'overview',
 }: RecordPageProps & { record: RecordItem }) {
   const toast = useToast();
+  const format = useFormat();
   const [section, setSection] = useState<RecordSection>(initialSection);
   const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -137,7 +146,7 @@ function RecordPageContent({
   const addComment = (event: FormEvent) => {
     event.preventDefault();
     if (comment.trim() === '') return;
-    setActivity((current) => [{ id: `a-${String(current.length + 1)}`, who: 'Sam Rivera', what: `commented: “${comment.trim()}”`, when: '2026-09-25' }, ...current]);
+    setActivity((current) => [{ id: `a-${String(current.length + 1)}`, who: 'Sam Rivera', what: `commented: “${comment.trim()}”`, when: new Date().toISOString() }, ...current]);
     setComment('');
   };
 
@@ -199,7 +208,7 @@ function RecordPageContent({
         <PageHeader
           title={record.name}
           status={<Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>}
-          description={`Owned by ${record.owner} · updated ${record.updated}`}
+          description={`Owned by ${record.owner} · updated ${format.date(record.updated)}`}
           actions={
             <>
               <Button variant="secondary">Share</Button>
@@ -237,7 +246,7 @@ function RecordPageContent({
               <CardHeader title="Properties" />
               <CardBody>
                 <Stack as="dl" gap="sm">
-                  {properties(record).map((property) => (
+                  {properties(record, format).map((property) => (
                     <Stack gap="2xs" key={property.label}>
                       <Text as="dt" size="caption" tone="muted">
                         {property.label}
@@ -282,7 +291,7 @@ function RecordPageContent({
                       <Stack gap="2xs">
                         <Text>{`${item.who} ${item.what}`}</Text>
                         <Text size="caption" tone="muted" numeric>
-                          {item.when}
+                          {format.relative(item.when)}
                         </Text>
                       </Stack>
                     </Cluster>
@@ -305,7 +314,7 @@ function RecordPageContent({
                       <Stack gap="2xs">
                         <Text>{file.name}</Text>
                         <Text size="caption" tone="muted" numeric>
-                          {file.detail}
+                          {`${file.kind} · ${format.fileSize(file.bytes)} · ${format.date(file.added)}`}
                         </Text>
                       </Stack>
                     </Stack>

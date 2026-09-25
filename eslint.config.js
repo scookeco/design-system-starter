@@ -24,7 +24,7 @@ const VENDOR_UI = {
   message: 'Vendor UI is wrapped by the design system. Import the system component from the public entry point instead.',
 };
 const SYSTEM_INTERNALS = {
-  group: ['**/components/**', '**/primitives/**', '**/layouts/**', '**/internal/**', '**/tokens/**', '**/styles/**'],
+  group: ['**/components/**', '**/primitives/**', '**/layouts/**', '**/internal/**', '**/tokens/**', '**/styles/**', '**/format/**'],
   message: 'Import from the design system public entry point (src/index.ts), not its internals.',
 };
 const UPWARD_FROM_SYSTEM = {

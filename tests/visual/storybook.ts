@@ -36,7 +36,14 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
  */
 export const MODAL_OPEN_EXCEPTIONS = ['aria-hidden-focus'];
 
+/**
+ * Stories render against a frozen clock, so relative times ("3 days ago") never drift. Only Date
+ * is fixed; timers and animation frames run normally.
+ */
+export const FROZEN_NOW = new Date('2026-09-25T12:00:00Z');
+
 export const openStory = async (page: Page, id: string, theme: (typeof THEMES)[number]) => {
+  await page.clock.setFixedTime(FROZEN_NOW);
   await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=theme:${theme}`);
   await page.waitForFunction(() => document.body.classList.contains('sb-show-main'));
   // Rendered into the root, or (overlay-only stories) into a portal beside it.
