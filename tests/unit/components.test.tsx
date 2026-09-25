@@ -11,6 +11,7 @@ import {
   Checkbox,
   EmptyState,
   Nav,
+  PageLayout,
   RadioGroup,
   Select,
   Skeleton,
@@ -317,5 +318,18 @@ describe('Switch', () => {
     fireEvent.click(control);
     expect(control.getAttribute('aria-checked')).toBe('true');
     expect(document.getElementById(control.getAttribute('aria-describedby') ?? '')?.textContent).toBe('Every Monday.');
+  });
+});
+
+describe('PageLayout', () => {
+  it('names the aside landmark and adds no landmark around the nav slot', () => {
+    render(
+      <PageLayout nav={<Nav label="Settings" sections={[{ items: [{ label: 'Profile', href: '/p' }] }]} />} aside={<p>Owner</p>} asideLabel="Properties">
+        <p>Main</p>
+      </PageLayout>,
+    );
+    expect(screen.getByRole('complementary', { name: 'Properties' }).textContent).toBe('Owner');
+    expect(screen.getAllByRole('navigation')).toHaveLength(1);
+    expect(screen.queryByRole('main')).toBeNull();
   });
 });

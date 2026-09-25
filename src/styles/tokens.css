@@ -223,6 +223,7 @@
     --size-scroll-region-md: var(--container-lg);
     --size-scroll-region-lg: var(--container-2xl);
     --size-viewport-block: var(--viewport-block);
+    --size-breakpoint-sm: var(--container-xl);
     --size-breakpoint-md: var(--container-2xl);
     --size-avatar-sm: var(--size-6);
     --size-avatar-md: var(--size-8);

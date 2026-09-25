@@ -144,6 +144,7 @@ export const vars = {
       "block": "var(--size-viewport-block)"
     },
     "breakpoint": {
+      "sm": "var(--size-breakpoint-sm)",
       "md": "var(--size-breakpoint-md)"
     },
     "avatar": {

@@ -146,6 +146,10 @@
     },
     "breakpoint": {
       "$description": "Container-query widths. Queries cannot read var(): tests/unit/css.test.ts checks every query length equals one of these.",
+      "sm": {
+        "$value": "{container.xl}",
+        "$description": "Below this PageLayout stacks its nav, main and aside regions."
+      },
       "md": {
         "$value": "{container.2xl}",
         "$description": "Below this the app shell's sidebar collapses to a drawer."

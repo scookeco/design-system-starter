@@ -8,7 +8,7 @@
  *   shell    breadcrumb (Records / <title>) · the Records nav item stays current
  *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
  *   main     summary card · activity feed with a comment box
- *   rail     properties as a definition list (moves below main when the container is narrow)
+ *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays delete confirmation, toast on success
  */
@@ -26,7 +26,7 @@ import {
   EmptyState,
   Menu,
   PageHeader,
-  Sidebar,
+  PageLayout,
   Skeleton,
   Stack,
   Text,
@@ -118,7 +118,16 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
               Loading record…
             </Text>
           </Stack>
-          <Sidebar placement="end" sideWidth="lg" gap="lg" side={<Card><CardBody><Skeleton lines={5} /></CardBody></Card>}>
+          <PageLayout
+            asideLabel="Properties"
+            aside={
+              <Card>
+                <CardBody>
+                  <Skeleton lines={5} />
+                </CardBody>
+              </Card>
+            }
+          >
             <Stack gap="lg">
               <Skeleton shape="block" />
               <Card>
@@ -127,7 +136,7 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </CardBody>
               </Card>
             </Stack>
-          </Sidebar>
+          </PageLayout>
         </Stack>
       </Center>
     );
@@ -163,11 +172,9 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
           }
         />
 
-        <Sidebar
-          placement="end"
-          sideWidth="lg"
-          gap="lg"
-          side={
+        <PageLayout
+          asideLabel="Properties"
+          aside={
             <Card>
               <CardHeader title="Properties" />
               <CardBody>
@@ -225,7 +232,7 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
               </CardBody>
             </Card>
           </Stack>
-        </Sidebar>
+        </PageLayout>
       </Stack>
 
       <Dialog
