@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { createFormatter } from '../../format/format';
 import { Button } from '../Button/Button';
 import { Text } from '../Text/Text';
 import { TextField } from '../TextField/TextField';
 import { Card, CardBody, CardFooter, CardHeader } from './Card';
+
+/** Stories format with the system's formats, like apps do (apps use useFormat()). */
+const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
 
 function ProfileCard({ header = true, footer = 'end', actions = false }: { header?: boolean; footer?: 'end' | 'between' | 'none'; actions?: boolean }) {
   return (
@@ -21,7 +25,7 @@ function ProfileCard({ header = true, footer = 'end', actions = false }: { heade
         <CardFooter justify={footer}>
           {footer === 'between' ? (
             <Text size="caption" tone="muted">
-              Saved 2026-09-22
+              {`Saved ${f.date('2026-09-22')}`}
             </Text>
           ) : null}
           <Button>Save</Button>
