@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "storybook dev --port 6006 --ci",
-    "tokens": "node scripts/build-tokens.ts",
-    "tokens:check": "node scripts/build-tokens.ts --check",
+    "tokens": "node scripts/build-tokens.ts && node scripts/token-usage.ts",
+    "tokens:check": "node scripts/build-tokens.ts --check && node scripts/token-usage.ts --check",
     "build": "vite build",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
