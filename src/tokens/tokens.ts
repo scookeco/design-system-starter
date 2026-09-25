@@ -115,6 +115,7 @@ export const vars = {
     },
     "target-min": "var(--size-target-min)",
     "content": {
+      "xs": "var(--size-content-xs)",
       "sm": "var(--size-content-sm)",
       "md": "var(--size-content-md)",
       "lg": "var(--size-content-lg)"
@@ -124,6 +125,8 @@ export const vars = {
       "md": "var(--size-sidebar-md)",
       "lg": "var(--size-sidebar-lg)"
     },
+    "rail": "var(--size-rail)",
+    "bar": "var(--size-bar)",
     "grid-item": {
       "sm": "var(--size-grid-item-sm)",
       "md": "var(--size-grid-item-md)",
@@ -133,6 +136,10 @@ export const vars = {
       "sm": "var(--size-dialog-sm)",
       "md": "var(--size-dialog-md)",
       "lg": "var(--size-dialog-lg)"
+    },
+    "drawer": {
+      "sm": "var(--size-drawer-sm)",
+      "md": "var(--size-drawer-md)"
     },
     "overlay-max": "var(--size-overlay-max)",
     "scroll-region": {
@@ -144,6 +151,7 @@ export const vars = {
       "block": "var(--size-viewport-block)"
     },
     "breakpoint": {
+      "sm": "var(--size-breakpoint-sm)",
       "md": "var(--size-breakpoint-md)"
     },
     "avatar": {
@@ -212,6 +220,11 @@ export const vars = {
   "icon": {
     "stroke": "var(--icon-stroke)"
   },
+  "ratio": {
+    "square": "var(--ratio-square)",
+    "landscape": "var(--ratio-landscape)",
+    "wide": "var(--ratio-wide)"
+  },
   "text": {
     "body": "var(--text-body)",
     "body-lg": "var(--text-body-lg)",
@@ -231,3 +244,4 @@ export type ContentWidthToken = keyof typeof vars.size.content;
 export type SidebarWidthToken = keyof typeof vars.size.sidebar;
 export type GridItemToken = keyof typeof vars.size['grid-item'];
 export type ScrollRegionToken = keyof typeof vars.size['scroll-region'];
+export type RatioToken = keyof typeof vars.ratio;

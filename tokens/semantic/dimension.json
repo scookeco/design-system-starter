@@ -76,6 +76,10 @@
     },
     "content": {
       "$description": "Max measure for Center.",
+      "xs": {
+        "$value": "{container.md}",
+        "$description": "Sign-in and other single-card pages."
+      },
       "sm": {
         "$value": "{container.xl}"
       },
@@ -97,6 +101,14 @@
       "lg": {
         "$value": "{container.xs}"
       }
+    },
+    "rail": {
+      "$value": "{size.12}",
+      "$description": "Width of AppShell’s collapsed sidebar: the icon rail."
+    },
+    "bar": {
+      "$value": "{space.2}",
+      "$description": "Thickness of Progress and Meter bars."
     },
     "grid-item": {
       "$description": "Minimum item width for auto-fit Grid.",
@@ -122,6 +134,15 @@
       },
       "$description": "Dialog widths: sm for confirmations, md for short forms, lg for longer forms."
     },
+    "drawer": {
+      "sm": {
+        "$value": "{container.2xs}"
+      },
+      "md": {
+        "$value": "{container.md}"
+      },
+      "$description": "Drawer widths: sm for navigation, md for details and filters."
+    },
     "overlay-max": {
       "$value": "{container.sm}",
       "$description": "Max width for tooltips and toasts."
@@ -146,6 +167,10 @@
     },
     "breakpoint": {
       "$description": "Container-query widths. Queries cannot read var(): tests/unit/css.test.ts checks every query length equals one of these.",
+      "sm": {
+        "$value": "{container.xl}",
+        "$description": "Below this PageLayout stacks its nav, main and aside regions."
+      },
       "md": {
         "$value": "{container.2xl}",
         "$description": "Below this the app shell's sidebar collapses to a drawer."

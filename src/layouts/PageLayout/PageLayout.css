@@ -1,0 +1,41 @@
+@layer layouts {
+  /* 1. block: the container the regions respond to */
+  .page-layout {
+    container: page-layout / inline-size;
+  }
+
+  .page-layout__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-gap-lg);
+  }
+
+  /* 2. parts */
+  .page-layout__nav,
+  .page-layout__main,
+  .page-layout__aside {
+    min-inline-size: 0;
+  }
+
+  /* 3. variants: which regions are present */
+  .page-layout__grid[data-nav="true"] {
+    grid-template-columns: var(--size-sidebar-sm) minmax(0, 1fr);
+  }
+
+  .page-layout__grid[data-aside="true"] {
+    grid-template-columns: minmax(0, 1fr) var(--size-sidebar-lg);
+  }
+
+  .page-layout__grid[data-nav="true"][data-aside="true"] {
+    grid-template-columns: var(--size-sidebar-sm) minmax(0, 1fr) var(--size-sidebar-lg);
+  }
+
+  /* 4. responsive: below the breakpoint token the regions stack in DOM (reading) order */
+  @container page-layout (inline-size < 40rem) {
+    .page-layout__grid[data-nav],
+    .page-layout__grid[data-aside] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

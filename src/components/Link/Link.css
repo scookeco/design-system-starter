@@ -1,0 +1,12 @@
+@layer components {
+  .link {
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    text-decoration-line: underline;
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
+  .link:hover {
+    text-decoration-thickness: var(--focus-ring-width);
+  }
+}

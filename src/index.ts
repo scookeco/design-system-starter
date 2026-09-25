@@ -11,5 +11,5 @@ export * from './primitives';
 export * from './components';
 export * from './layouts';
 export { vars } from './tokens/tokens';
-export type { GapToken, InsetToken, ContentWidthToken, SidebarWidthToken, GridItemToken, ScrollRegionToken } from './tokens/tokens';
+export type { GapToken, InsetToken, ContentWidthToken, SidebarWidthToken, GridItemToken, ScrollRegionToken, RatioToken } from './tokens/tokens';
 export type { EscapeHatch } from './internal/closed-api';

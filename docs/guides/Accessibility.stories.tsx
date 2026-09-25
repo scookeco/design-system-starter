@@ -10,13 +10,13 @@ const SPLIT = [
   },
   {
     area: 'Headings and landmarks',
-    system: 'AppShell provides the banner, navigation and main landmarks and a skip link. Heading takes a required level.',
+    system: 'AppShell, AuthLayout and FocusedLayout provide the banner and main landmarks (AppShell also navigation and a skip link). PageHeader renders the page’s one h1; PageLayout names its aside. Heading takes a required level.',
     product: 'One h1 per page, then levels in order. Pick the level for the outline; use size for the look.',
   },
   {
     area: 'Focus',
-    system: 'Visible focus ring on everything. Dialogs, menus and the drawer trap and restore focus. Pending buttons keep focus.',
-    product: 'After navigation, move focus to the new page’s h1 or main. After submit with errors, focus the error summary.',
+    system: 'Visible focus ring on everything. Dialogs, Drawers and menus trap and restore focus; Popovers restore it. Pending buttons and aria-disabled pagination ends keep focus.',
+    product: 'After navigation or a wizard step, move focus to the new h1 (PageHeader’s headingRef) or main. After submit with errors, focus the error summary or the first invalid field. After removing a chip, focus the next one.',
   },
   {
     area: 'Colour and contrast',

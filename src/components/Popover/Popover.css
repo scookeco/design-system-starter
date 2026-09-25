@@ -1,0 +1,16 @@
+@layer components {
+  .popover {
+    z-index: var(--z-dropdown);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    min-inline-size: var(--size-sidebar-sm);
+    max-inline-size: var(--size-overlay-max);
+    padding: var(--space-inset-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-elevated);
+    color: var(--color-fg-default);
+    box-shadow: var(--shadow-popover);
+  }
+}

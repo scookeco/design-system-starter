@@ -1,6 +1,6 @@
 # Design system starter
 
-A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, an app shell layout, a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
+A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, page layouts (app shell, page regions, signed-out and focused-task frames), a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
 Stack: npm (Node 24), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint.
 
@@ -45,9 +45,9 @@ scripts/checks/         token, contrast and CSS checks (used by Vitest)
 scripts/test-rules.ts   proves every lint and type rule fires
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
-src/primitives/         Stack, Cluster, Grid, Center, Sidebar
+src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame
 src/components/         the components; the only place (with primitives) Radix is imported
-src/layouts/            AppShell: the frame every signed-in page renders inside
+src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (also a consumer lint target)
 src/index.ts            public entry point
@@ -116,24 +116,30 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 
 | Kind | Parts |
 |---|---|
-| Layout | `AppShell`: skip link, sidebar (brand + `Nav`), header (breadcrumbs, actions, account menu), `main` as the only scrolling region, optional sticky action bar, toast region. Collapses to a drawer below `size.breakpoint.md`. |
-| Navigation | `Nav` (grouped, `aria-current`), `Breadcrumbs`, `Tabs`, `Menu` |
-| Actions | `Button`, `Menu` |
-| Forms | `TextField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
-| Data display | `Table`, `Badge`, `Avatar`, `Card`, `Heading`, `Text` |
-| Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Tooltip`, `Dialog` |
-| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar` |
+| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, account menu), `main` as the only scrolling region, optional sticky action bar, toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
+| Page structure | `PageHeader` (the page's h1, status, description, actions) |
+| Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
+| Actions | `Button`, `Menu`, `SegmentedControl` |
+| Forms | `TextField`, `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Heading`, `Text` |
+| Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
+| Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip` |
+| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame` |
 
 ## Which example to copy
 
-Every page renders inside `AppShell` and fills its slots; it never rebuilds the frame. Copy the example for the archetype, not another screen.
+Signed-in pages render inside `AppShell` and fill its slots; they never rebuild the frame. Signed-out pages use `AuthLayout`, and focused multi-step tasks use `FocusedLayout`. Every page starts with a `PageHeader`. Copy the example for the archetype, not another screen.
 
 | Archetype | Copy | It shows |
 |---|---|---|
-| List / index | `src/examples/ListPage.tsx` | header with one primary action, filter bar, sortable table; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
-| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, title + status + actions with a "More" menu, properties rail as a definition list, activity feed; loading and error with the shell up |
+| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, SearchField and a Filters popover with removable chips, sortable table, pagination; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
+| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside in PageLayout; loading and error with the shell up |
 | Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record, quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar |
-| Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav, one card per category with its own Save, a success banner |
+| Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav (PageLayout's nav slot), one card per category with its own Save, a success banner |
+| Sign-in | `src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed sign-in link, a password as the secondary route; a failed-sign-in banner; a verification-code step |
+| Wizard | `src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step, focus to each step's h1; a review step with Edit |
+| Dashboard | `src/examples/DashboardPage.tsx` | a date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table |
+| Error / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
 
 `src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. `src/examples/records.ts` holds the shared example domain, including the one status-to-tone map.
 
@@ -174,7 +180,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
 - **Docs can't fall behind the API.** `tests/unit/docs.test.tsx` fails when an export from `src/index.ts` has no usage doc (parts such as `TableRow` are listed in their parent's `covers`), and renders every do/don't example. The usage docs and Guides are linted as consumer code: no `className`, `style` or `UNSAFE_` props.
 - **Docs tabs render light only.** Storybook draws the docs page in its own light theme, so the theme toolbar applies to the Canvas tab only. The visual suite runs axe (not screenshots) on every Docs tab.
-- **Stories tagged `modal-open` also carry `'!autodocs'`**, and Examples, Foundations and Guides opt out of the Docs tab: an open modal inline on a Docs tab would cover the page.
+- **Stories tagged `modal-open` also carry `'!autodocs'`**, and Examples, Foundations and Guides opt out of the Docs tab: an open modal inline on a Docs tab would cover the page. An open non-modal overlay (Popover) carries only `'!autodocs'`: the page behind stays reachable, so axe needs no relaxation.
 - `.storybook/preview.tsx` loads the docs page lazily. A static import pulls component stylesheets into chunks that load before the preview's CSS, which declares `@layer components` before the layer order and lets the reset win.
 
 ## CI
@@ -201,7 +207,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 - Without Docker you can't produce Linux baselines locally, and that's fine. Locally, `npm run test:visual:update` writes `darwin/` baselines (gitignored) so you can diff your own changes before pushing.
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
-- Stories tagged `modal-open` (open Dialog, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
+- Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 
 ## Deliberately not included yet
 
@@ -211,8 +217,8 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | **Versioned package publishing** (semver, changelog, changesets, deprecation windows) | A second app consumes the system. Until then it's one folder in one repo. |
 | **Codemods** for breaking changes (jscodeshift/ts-morph) | You ship a breaking change to more than one consumer. |
 | **Adoption scanning** (system vs local components, `UNSAFE_` uses, disable counts per app) | A second team builds on the system and you need system-coverage numbers. |
-| **Router integration** (a link adapter so `Nav`, `Breadcrumbs` and inline links render the router's link) | The system ships inside an app with client-side routing. Until then links are plain `<a>`, and `Nav` offers `onNavigate`. |
-| **Icon rail, remembered sidebar state, phone tab bar** | People outside the team use the app, or phones become a primary surface. Until then the sidebar collapses to a drawer. |
+| **Phone tab bar** | Phones become a primary surface. Until then the narrow-screen nav opens in a Drawer. |
+| **Charts** | A page needs a trend, not just a number. Until then dashboards use Stat, Meter and tables. |
 | **Multi-brand / tenant token axis** (`data-brand` remapping primitives beside `color-scheme`) | A second brand or tenant arrives. Brand becomes another mode on the semantic tier, and the contrast and visual matrix run per brand × scheme. |
 
 ## Versions and compromises

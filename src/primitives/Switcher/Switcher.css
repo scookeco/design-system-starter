@@ -1,0 +1,20 @@
+@layer primitives {
+  .switcher {
+    --switcher-gap: var(--space-gap-md);
+    --switcher-threshold: var(--size-content-sm);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--switcher-gap);
+  }
+
+  /*
+   * Above the threshold the basis is hugely negative (every child fits on one row, growing equally);
+   * below it, hugely positive (each child takes a full row). The switch is the container's width.
+   */
+  .switcher > * {
+    flex-grow: 1;
+    flex-basis: calc((var(--switcher-threshold) - 100%) * 999);
+    min-inline-size: 0;
+  }
+}

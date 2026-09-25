@@ -1,0 +1,40 @@
+@layer layouts {
+  /* 1. block: a plain surface the size of the viewport */
+  .auth-layout {
+    padding-inline: var(--space-inset-md);
+    background: var(--color-bg-canvas);
+    color: var(--color-fg-default);
+  }
+
+  /* 2. parts */
+  .auth-layout__brand {
+    display: flex;
+    justify-content: center;
+    padding-block-start: var(--space-inset-xl);
+    font: var(--text-heading-3);
+  }
+
+  .auth-layout__main {
+    max-inline-size: var(--size-content-xs);
+    margin-inline: auto;
+  }
+
+  .auth-layout__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+    padding: var(--space-inset-xl);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .auth-layout__footer {
+    display: flex;
+    justify-content: center;
+    padding-block-end: var(--space-inset-lg);
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+}

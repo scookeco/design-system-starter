@@ -1,8 +1,34 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { useId, useState, type MouseEvent, type ReactNode } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../../components/Button/Button';
+import { Drawer } from '../../components/Drawer/Drawer';
+import { Icon } from '../../components/Icon/Icon';
+import { NavDisplayContext } from '../../components/Nav/Nav';
 import { ToastProvider } from '../../components/Toast/Toast';
+import { Tooltip } from '../../components/Tooltip/Tooltip';
 import './AppShell.css';
+
+const DEFAULT_STORAGE_KEY = 'app-shell.sidebar-collapsed';
+
+/** Storage can be missing or throw (private windows, blocked site data): remembering is best effort. */
+const readCollapsed = (key: string | null): boolean | undefined => {
+  if (key === null) return undefined;
+  try {
+    const stored = window.localStorage.getItem(key);
+    return stored === null ? undefined : stored === 'true';
+  } catch {
+    return undefined;
+  }
+};
+
+const writeCollapsed = (key: string | null, collapsed: boolean) => {
+  if (key === null) return;
+  try {
+    window.localStorage.setItem(key, String(collapsed));
+  } catch {
+    // Not remembered this time; the toggle still works.
+  }
+};
 
 export interface AppShellProps extends EscapeHatch {
   /** Product name or mark at the top of the sidebar. */
@@ -24,10 +50,27 @@ export interface AppShellProps extends EscapeHatch {
   footer?: ReactNode;
   /** First focusable element; jumps past the sidebar and header to main. */
   skipLinkLabel?: string;
-  /** Label of the button that opens the sidebar when the shell is too narrow to show it. */
+  /** Label of the button that opens the navigation drawer when the shell is too narrow to show the sidebar; also the drawer's name. */
   menuLabel?: string;
-  /** Start with the collapsed sidebar open (gallery and tests). */
+  /** Start with the narrow-screen navigation drawer open (gallery and tests). */
   defaultNavOpen?: boolean;
+  /**
+   * Controlled: the wide-screen sidebar is collapsed to an icon rail. Pair with
+   * onSidebarCollapsedChange. A controlled shell does not write to storage; the owner does.
+   */
+  sidebarCollapsed?: boolean;
+  /** Uncontrolled starting state, used when nothing is remembered yet. */
+  defaultSidebarCollapsed?: boolean;
+  onSidebarCollapsedChange?: (collapsed: boolean) => void;
+  /**
+   * localStorage key under which the uncontrolled collapsed state is remembered across visits.
+   * null turns remembering off (gallery and tests).
+   */
+  sidebarStorageKey?: string | null;
+  /** Accessible name and tooltip of the rail toggle while the sidebar is expanded. */
+  collapseSidebarLabel?: string;
+  /** Accessible name and tooltip of the rail toggle while the sidebar is collapsed. */
+  expandSidebarLabel?: string;
 }
 
 /**
@@ -35,8 +78,11 @@ export interface AppShellProps extends EscapeHatch {
  * header (breadcrumbs, actions, account menu) and main. Pages fill its slots; they never
  * rebuild the frame. The toast region is mounted here, once.
  *
- * Below the size.breakpoint.md container width the sidebar collapses behind a Menu button
- * and opens as a drawer over the content.
+ * Wide: a toggle at the foot of the sidebar collapses it to an icon rail (labels move into
+ * tooltips; accessible names stay). The choice is remembered in localStorage.
+ *
+ * Below the size.breakpoint.md container width the sidebar is replaced by a Menu button that
+ * opens the nav in a Drawer from the inline start: scrim, focus trap, Escape, focus return.
  */
 export function AppShell({
   brand,
@@ -49,6 +95,12 @@ export function AppShell({
   skipLinkLabel = 'Skip to content',
   menuLabel = 'Menu',
   defaultNavOpen = false,
+  sidebarCollapsed,
+  defaultSidebarCollapsed = false,
+  onSidebarCollapsedChange,
+  sidebarStorageKey = DEFAULT_STORAGE_KEY,
+  collapseSidebarLabel = 'Collapse sidebar',
+  expandSidebarLabel = 'Expand sidebar',
   UNSAFE_className,
   UNSAFE_style,
 }: AppShellProps) {
@@ -56,28 +108,18 @@ export function AppShell({
   const mainId = `${id}-main`;
   const sidebarId = `${id}-sidebar`;
   const [navOpen, setNavOpen] = useState(defaultNavOpen);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const openedByToggle = useRef(false);
+  const [storedCollapsed, setStoredCollapsed] = useState(() => readCollapsed(sidebarStorageKey) ?? defaultSidebarCollapsed);
+  const collapsed = sidebarCollapsed ?? storedCollapsed;
 
-  // The drawer comes before the header in the DOM, so opening it moves focus into it;
-  // otherwise Tab would carry on away from the nav that just appeared.
-  useEffect(() => {
-    if (!navOpen || !openedByToggle.current) return;
-    openedByToggle.current = false;
-    sidebarRef.current?.querySelector<HTMLElement>('a[href], button:not(:disabled)')?.focus();
-  }, [navOpen]);
-
-  const toggleNav = () => {
-    openedByToggle.current = !navOpen;
-    setNavOpen(!navOpen);
+  const toggleCollapsed = () => {
+    const next = !collapsed;
+    if (sidebarCollapsed === undefined) {
+      setStoredCollapsed(next);
+      writeCollapsed(sidebarStorageKey, next);
+    }
+    onSidebarCollapsedChange?.(next);
   };
 
-  const closeOnEscape = (event: KeyboardEvent) => {
-    if (event.key !== 'Escape' || !navOpen) return;
-    setNavOpen(false);
-    toggleRef.current?.focus();
-  };
   // Following a link inside the drawer closes it, so the new page is not covered.
   const closeOnNavigate = (event: MouseEvent) => {
     if (event.target instanceof Element && event.target.closest('a')) setNavOpen(false);
@@ -93,23 +135,46 @@ export function AppShell({
         <a className="app-shell__skip" href={`#${mainId}`} onClick={skipToMain}>
           {skipLinkLabel}
         </a>
-        <div className="app-shell__frame" data-nav={navOpen ? 'open' : 'closed'}>
-          <div className="app-shell__sidebar" id={sidebarId} ref={sidebarRef} onKeyDown={closeOnEscape} onClick={closeOnNavigate}>
+        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
+          <div className="app-shell__sidebar" id={sidebarId}>
             <div className="app-shell__brand">{brand}</div>
-            {nav}
+            <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>
+            <div className="app-shell__collapse">
+              <Tooltip content={collapsed ? expandSidebarLabel : collapseSidebarLabel} side="right">
+                <button
+                  type="button"
+                  className="app-shell__collapse-button"
+                  aria-label={collapsed ? expandSidebarLabel : collapseSidebarLabel}
+                  aria-expanded={!collapsed}
+                  aria-controls={sidebarId}
+                  onClick={toggleCollapsed}
+                >
+                  <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} />
+                </button>
+              </Tooltip>
+            </div>
           </div>
           <header className="app-shell__header">
             <div className="app-shell__toggle">
-              <Button
-                ref={toggleRef}
-                variant="ghost"
-                icon="menu"
-                aria-expanded={navOpen}
-                aria-controls={sidebarId}
-                onClick={toggleNav}
+              <Drawer
+                title={menuLabel}
+                hideTitle
+                side="start"
+                size="sm"
+                open={navOpen}
+                onOpenChange={setNavOpen}
+                trigger={
+                  <Button variant="ghost" icon="menu">
+                    {menuLabel}
+                  </Button>
+                }
               >
-                {menuLabel}
-              </Button>
+                {/* The drawer always shows full labels, whatever the wide sidebar's state. */}
+                <div className="app-shell__drawer-nav" onClick={closeOnNavigate}>
+                  <div className="app-shell__brand">{brand}</div>
+                  <NavDisplayContext value="full">{nav}</NavDisplayContext>
+                </div>
+              </Drawer>
             </div>
             <div className="app-shell__context">{breadcrumbs}</div>
             {actions || userMenu ? (

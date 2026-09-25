@@ -168,6 +168,7 @@ StyleDictionary.registerFormat({
       'export type SidebarWidthToken = keyof typeof vars.size.sidebar;',
       'export type GridItemToken = keyof typeof vars.size[\'grid-item\'];',
       'export type ScrollRegionToken = keyof typeof vars.size[\'scroll-region\'];',
+      'export type RatioToken = keyof typeof vars.ratio;',
       '',
     ].join('\n');
   },

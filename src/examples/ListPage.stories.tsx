@@ -17,3 +17,6 @@ export const FirstUse: Story = { args: { records: [] } };
 export const EmptyResults: Story = { args: { initialQuery: 'no such record' } };
 export const LoadError: Story = { args: { initialLoadState: 'error' } };
 export const CreateDialogOpen: Story = { tags: ['modal-open', '!autodocs'], args: { initialDialogOpen: true } };
+export const FiltersOpen: Story = { tags: ['!autodocs'], args: { initialFiltersOpen: true, initialStatuses: ['active', 'pending'] } };
+export const FilteredWithChips: Story = { args: { initialStatuses: ['active', 'pending'] } };
+export const SecondPage: Story = { args: { initialPage: 2 } };

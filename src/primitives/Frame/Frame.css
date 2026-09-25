@@ -1,0 +1,20 @@
+@layer primitives {
+  .frame {
+    --frame-ratio: var(--ratio-landscape);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: var(--frame-ratio);
+  }
+
+  /* Media fills the frame and is cropped, never stretched. */
+  .frame > img,
+  .frame > video,
+  .frame > iframe {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}

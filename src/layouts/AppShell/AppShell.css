@@ -56,6 +56,32 @@
     font: var(--text-heading-4);
   }
 
+  /* Pinned to the foot of the sidebar, at its inline end. */
+  .app-shell__collapse {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-start: auto;
+  }
+
+  .app-shell__collapse-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-control-sm);
+    block-size: var(--size-control-sm);
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .app-shell__collapse-button:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
   .app-shell__header {
     display: flex;
     grid-area: header;
@@ -111,7 +137,39 @@
     outline: none;
   }
 
-  /* 3. responsive: below the breakpoint token the sidebar becomes a drawer behind a Menu button */
+  /* 3. variant: the wide sidebar collapsed to an icon rail (the Nav hides its own labels) */
+  @container app-shell (inline-size >= 48rem) {
+    .app-shell__frame[data-sidebar="collapsed"] {
+      grid-template-columns: var(--size-rail) minmax(0, 1fr);
+    }
+
+    .app-shell__frame[data-sidebar="collapsed"] .app-shell__sidebar {
+      align-items: center;
+      padding-inline: var(--space-inset-xs);
+    }
+
+    .app-shell__frame[data-sidebar="collapsed"] .app-shell__brand {
+      position: absolute;
+      overflow: hidden;
+      clip-path: inset(50%);
+      inline-size: 1px;
+      block-size: 1px;
+      white-space: nowrap;
+    }
+
+    .app-shell__frame[data-sidebar="collapsed"] .app-shell__collapse {
+      justify-content: center;
+    }
+  }
+
+  /* The nav inside the narrow-screen Drawer (portalled, so outside the shell's container). */
+  .app-shell__drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+  }
+
+  /* 4. responsive: below the breakpoint token the sidebar gives way to a Menu button that opens a Drawer */
   @container app-shell (inline-size < 48rem) {
     .app-shell__frame {
       grid-template-areas:
@@ -128,19 +186,13 @@
       display: flex;
     }
 
-    .app-shell__sidebar {
+    /* The rail toggle is a wide-screen control; the drawer has its own Menu button. */
+    .app-shell__collapse {
       display: none;
     }
 
-    /* Open: the drawer shares main's grid cell and sits over it, below the header and its toggle. */
-    .app-shell__frame[data-nav="open"] .app-shell__sidebar {
-      z-index: var(--z-overlay);
-      display: flex;
-      grid-area: main;
-      justify-self: start;
-      inline-size: var(--size-sidebar-md);
-      max-inline-size: 100%;
-      box-shadow: var(--shadow-modal);
+    .app-shell__sidebar {
+      display: none;
     }
   }
 }

@@ -7,8 +7,8 @@
  *
  * Anatomy:
  *   shell    breadcrumb (Settings / <category>) · Settings is the current primary nav item
- *   header   title + one line on the two tiers
- *   sub-nav  <Nav label="Settings"> grouped Personal / Workspace; stacks above the panel when narrow
+ *   header   PageHeader: title + one line on the two tiers
+ *   sub-nav  PageLayout's nav slot: <Nav label="Settings"> grouped Personal / Workspace; stacks above the panel when narrow
  *   panel    one card per category: title, description, fields, own Save in the card footer
  *   saving   Save shows the pending state; a success banner (role=status) says it saved
  */
@@ -23,11 +23,11 @@ import {
   CardHeader,
   Center,
   Cluster,
-  Heading,
   Nav,
+  PageHeader,
+  PageLayout,
   RadioGroup,
   Select,
-  Sidebar,
   Stack,
   Switch,
   Text,
@@ -114,16 +114,9 @@ export function SettingsPage({ initialSection = 'notifications', initialSaving =
     <ExampleShell current="/settings" trail={{ items: [{ label: 'Settings', href: '/settings' }], current: meta.label }}>
       <Center max="lg" gutters="lg">
         <Stack gap="lg">
-          <Stack gap="2xs">
-            <Heading level={1}>Settings</Heading>
-            <Text tone="muted">Personal settings apply to you alone. Workspace settings apply to every member.</Text>
-          </Stack>
+          <PageHeader title="Settings" description="Personal settings apply to you alone. Workspace settings apply to every member." />
 
-          <Sidebar
-            sideWidth="sm"
-            gap="lg"
-            side={<Nav label="Settings" sections={NAV} current={hrefOf(section)} onNavigate={navigate} />}
-          >
+          <PageLayout nav={<Nav label="Settings" sections={NAV} current={hrefOf(section)} onNavigate={navigate} />}>
             <Stack gap="md">
               {saved ? (
                 <Banner tone="success" onDismiss={() => setSaved(false)}>
@@ -153,7 +146,7 @@ export function SettingsPage({ initialSection = 'notifications', initialSaving =
                 </Card>
               </Stack>
             </Stack>
-          </Sidebar>
+          </PageLayout>
         </Stack>
       </Center>
     </ExampleShell>

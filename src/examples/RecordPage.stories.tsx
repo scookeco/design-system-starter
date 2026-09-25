@@ -15,3 +15,5 @@ export const Default: Story = {};
 export const MoreActionsOpen: Story = { tags: ['modal-open', '!autodocs'], args: { initialMenuOpen: true } };
 export const Loading: Story = { args: { initialLoadState: 'loading' } };
 export const LoadError: Story = { args: { initialLoadState: 'error' } };
+export const ActivitySection: Story = { args: { initialSection: 'activity' } };
+export const FilesSection: Story = { args: { initialSection: 'files' } };

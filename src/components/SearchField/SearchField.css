@@ -1,0 +1,55 @@
+@layer components {
+  /* 1. block: the field chrome (from .field__control) wraps icon, input and clear button */
+  .search-field {
+    color: var(--color-fg-muted);
+  }
+
+  /* The ring goes on the whole box, since the input inside has none of its own. */
+  .search-field:focus-within {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* 2. parts */
+  .search-field__input {
+    flex: 1;
+    min-inline-size: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-fg-default);
+    font: inherit;
+  }
+
+  .search-field__input:focus-visible {
+    outline: none;
+  }
+
+  .search-field__input::placeholder {
+    color: var(--color-fg-muted);
+  }
+
+  /* Chromium adds its own clear button to type="search"; the component draws a labelled one instead. */
+  .search-field__input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .search-field__clear {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .search-field__clear:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+}

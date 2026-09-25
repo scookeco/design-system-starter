@@ -1,0 +1,55 @@
+@layer components {
+  /* 1. block: a tile */
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    padding: var(--space-inset-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* 2. parts */
+  .stat__label {
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+  }
+
+  .stat__value {
+    color: var(--color-fg-default);
+    font: var(--text-heading-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat__delta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    font: var(--text-caption);
+  }
+
+  .stat__change {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    color: var(--color-fg-muted);
+    font-weight: var(--font-weight-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat__comparison {
+    color: var(--color-fg-muted);
+  }
+
+  /* 3. variants: tone adds good or bad; the icon and words already carry the direction */
+  .stat__change[data-tone="positive"] {
+    color: var(--color-status-success-fg);
+  }
+
+  .stat__change[data-tone="negative"] {
+    color: var(--color-status-danger-fg);
+  }
+}

@@ -21,11 +21,14 @@ const PATHS = {
   minus: 'M4 10h12',
   download: 'M10 3v10M5.5 8.5L10 13l4.5-4.5M4 16h12',
   'chevron-right': 'M8 5l5 5-5 5',
+  'chevron-left': 'M12 5l-5 5 5 5',
   home: 'M3 9.5L10 3l7 6.5M5 8v9h10V8M8.5 17v-5h3v5',
   file: 'M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15M7.5 10h5M7.5 13h5',
   users: 'M7.5 9a3 3 0 100-6 3 3 0 000 6zM2 17a5.5 5.5 0 0111 0M13 3.3a3 3 0 010 5.4M15 11.8A5.5 5.5 0 0118 17',
   settings: 'M3 6h14M3 14h14M7 3.5v5M13 11.5v5',
   menu: 'M3 5h14M3 10h14M3 15h14',
+  'trend-up': 'M3 14l5-5 3 3 6-6M12 6h5v5',
+  'trend-down': 'M3 6l5 5 3-3 6 6M12 14h5v-5',
   more: 'M5 11a1 1 0 100-2 1 1 0 000 2zM10 11a1 1 0 100-2 1 1 0 000 2zM15 11a1 1 0 100-2 1 1 0 000 2z',
 } as const;
 

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { LinkComponentProps } from '../../src/index';
 import {
   AppShell,
   Avatar,
@@ -10,7 +11,14 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  Link,
+  LinkProvider,
+  Meter,
   Nav,
+  SegmentedControl,
+  Stat,
+  NavTabs,
+  PageLayout,
   RadioGroup,
   Select,
   Skeleton,
@@ -195,7 +203,7 @@ describe('AppShell', () => {
     expect(document.activeElement).toBe(main);
   });
 
-  it('toggles the collapsed sidebar, moves focus into it on open, and returns focus on Escape', () => {
+  it('opens the nav in a labelled modal drawer from the Menu button, and returns focus on Escape', async () => {
     render(
       <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
         <p>Page</p>
@@ -205,12 +213,75 @@ describe('AppShell', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(document.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBeTruthy();
-    const home = screen.getByRole('link', { name: 'Home' });
-    expect(document.activeElement).toBe(home);
-    fireEvent.keyDown(home, { key: 'Escape' });
+    const drawer = screen.getByRole('dialog', { name: 'Menu' });
+    expect(toggle.getAttribute('aria-controls')).toBe(drawer.id);
+    expect(drawer.contains(document.activeElement)).toBe(true);
+    // The drawer's nav shows full labels even when the wide sidebar is a rail.
+    expect(drawer.querySelector('nav')?.dataset.display).toBeUndefined();
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(toggle);
+    await waitFor(() => expect(document.activeElement).toBe(toggle));
+  });
+
+  it('closes the drawer when a link in it is followed', () => {
+    render(
+      <AppShell brand="Acme" defaultNavOpen nav={<Nav label="Main" onNavigate={() => undefined} sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    );
+    const drawer = screen.getByRole('dialog', { name: 'Menu' });
+    fireEvent.click(drawer.querySelector('a') as HTMLAnchorElement);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+
+describe('AppShell icon rail', () => {
+  const shell = (props: Partial<Parameters<typeof AppShell>[0]> = {}) => (
+    <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />} {...props}>
+      <p>Page</p>
+    </AppShell>
+  );
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it('collapses to a rail that keeps every link’s accessible name, and remembers the choice', () => {
+    render(shell());
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle.getAttribute('aria-label')).toBe('Expand sidebar');
+    expect(screen.getByRole('link', { name: 'Home' })).toBeTruthy();
+    expect(screen.getByRole('navigation', { name: 'Main' }).dataset.display).toBe('rail');
+    expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBe('true');
+    cleanup();
+    render(shell());
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('still toggles when storage throws', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    render(shell());
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('is controllable and does not write storage when controlled', () => {
+    const onChange = vi.fn();
+    render(shell({ sidebarCollapsed: true, onSidebarCollapsedChange: onChange }));
+    fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+    expect(onChange).toHaveBeenCalledWith(false);
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeTruthy();
+    expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBeNull();
   });
 });
 
@@ -317,5 +388,105 @@ describe('Switch', () => {
     fireEvent.click(control);
     expect(control.getAttribute('aria-checked')).toBe('true');
     expect(document.getElementById(control.getAttribute('aria-describedby') ?? '')?.textContent).toBe('Every Monday.');
+  });
+});
+
+describe('PageLayout', () => {
+  it('names the aside landmark and adds no landmark around the nav slot', () => {
+    render(
+      <PageLayout nav={<Nav label="Settings" sections={[{ items: [{ label: 'Profile', href: '/p' }] }]} />} aside={<p>Owner</p>} asideLabel="Properties">
+        <p>Main</p>
+      </PageLayout>,
+    );
+    expect(screen.getByRole('complementary', { name: 'Properties' }).textContent).toBe('Owner');
+    expect(screen.getAllByRole('navigation')).toHaveLength(1);
+    expect(screen.queryByRole('main')).toBeNull();
+  });
+});
+
+describe('NavTabs', () => {
+  it('is a labelled nav of links with aria-current on the current section, not a tablist', () => {
+    const onNavigate = vi.fn();
+    render(
+      <NavTabs
+        label="Record sections"
+        current="/r/1/files"
+        onNavigate={onNavigate}
+        items={[
+          { label: 'Overview', href: '/r/1' },
+          { label: 'Files', href: '/r/1/files' },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('navigation', { name: 'Record sections' })).toBeTruthy();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Files' }).getAttribute('aria-current')).toBe('page');
+    expect(screen.getByRole('link', { name: 'Overview' }).hasAttribute('aria-current')).toBe(false);
+    fireEvent.click(screen.getByRole('link', { name: 'Overview' }));
+    expect(onNavigate).toHaveBeenCalledWith('/r/1');
+  });
+});
+
+describe('LinkProvider', () => {
+  const RouterAnchor = ({ href, ...rest }: LinkComponentProps) => <a {...rest} href={`/app${href}`} data-routed="true" />;
+
+  it('routes Link, Nav, NavTabs and Breadcrumbs through the injected link component', () => {
+    render(
+      <LinkProvider component={RouterAnchor}>
+        <Link href="/a">Plain link</Link>
+        <Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} current="/home" />
+        <NavTabs label="Sections" items={[{ label: 'Files', href: '/r/1/files' }]} current="/r/1/files" />
+        <Breadcrumbs items={[{ label: 'Records', href: '/records' }]} current="Lease" />
+      </LinkProvider>,
+    );
+    for (const name of ['Plain link', 'Home', 'Files', 'Records']) {
+      const link = screen.getByRole('link', { name });
+      expect(link.dataset.routed).toBe('true');
+      expect(link.getAttribute('href')?.startsWith('/app/')).toBe(true);
+    }
+    // The system's own attributes still reach the anchor.
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBe('page');
+    expect(screen.getByRole('link', { name: 'Plain link' }).className).toBe('link');
+  });
+
+  it('renders plain anchors without a provider', () => {
+    render(<Link href="/a">Plain link</Link>);
+    const link = screen.getByRole('link', { name: 'Plain link' });
+    expect(link.getAttribute('href')).toBe('/a');
+    expect(link.dataset.routed).toBeUndefined();
+  });
+});
+
+describe('Dashboard parts', () => {
+  it('SegmentedControl is a named radiogroup with exactly one checked radio', () => {
+    render(
+      <SegmentedControl
+        label="Date range"
+        hideLabel
+        defaultValue="30d"
+        options={[
+          { value: '7d', label: '7 days' },
+          { value: '30d', label: '30 days' },
+        ]}
+      />,
+    );
+    const group = screen.getByRole('radiogroup', { name: 'Date range' });
+    expect(group).toBeTruthy();
+    expect(screen.getByRole('radio', { name: '30 days' }).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByRole('radio', { name: '7 days' }).getAttribute('aria-checked')).toBe('false');
+  });
+
+  it('Meter is a named meter whose value text includes the status past a threshold', () => {
+    render(<Meter label="Seats" value={42} max={50} valueText="42 of 50 seats" />);
+    const meter = screen.getByRole('meter', { name: 'Seats' });
+    expect(meter.getAttribute('aria-valuenow')).toBe('42');
+    expect(meter.getAttribute('aria-valuetext')).toBe('42 of 50 seats, Nearing limit');
+  });
+
+  it('Stat says the direction in words, separately from its tone', () => {
+    render(<Stat label="Overdue records" value="14" delta={{ value: '3', direction: 'up', tone: 'negative' }} />);
+    const change = screen.getByText('Up', { exact: false }).parentElement;
+    expect(change?.textContent).toBe('Up 3');
+    expect(change?.dataset.tone).toBe('negative');
   });
 });

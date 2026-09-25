@@ -6,9 +6,10 @@
  *
  * Anatomy:
  *   shell    breadcrumb (Records / <title>) · the Records nav item stays current
- *   header   title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
- *   main     summary card · activity feed with a comment box
- *   rail     properties as a definition list (moves below main when the container is narrow)
+ *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
+ *   sections NavTabs (Overview · Activity · Files): each section is its own URL, so links, not a tablist
+ *   main     the section: summary card | activity feed with a comment box | files (previews in a Frame)
+ *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays delete confirmation, toast on success
  */
@@ -24,9 +25,12 @@ import {
   Cluster,
   Dialog,
   EmptyState,
-  Heading,
+  Frame,
+  Grid,
   Menu,
-  Sidebar,
+  NavTabs,
+  PageHeader,
+  PageLayout,
   Skeleton,
   Stack,
   Text,
@@ -49,6 +53,45 @@ const ACTIVITY: readonly Activity[] = [
   { id: 'a-1', who: 'Operations', what: 'created the record', when: '2026-08-30' },
 ];
 
+interface RecordFile {
+  name: string;
+  detail: string;
+  /** Preview image URL. A real app gets these from its file service; the example inlines small drawings. */
+  preview: string;
+}
+
+const svg = (body: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120"><rect width="160" height="120" fill="#f1f5f9"/>${body}</svg>`)}`;
+
+const FILES: readonly RecordFile[] = [
+  {
+    name: 'Signed agreement.pdf',
+    detail: 'PDF · 1.2 MB · 2026-08-30',
+    preview: svg('<rect x="44" y="12" width="72" height="96" fill="#fff" stroke="#cbd5e1"/><path d="M54 30h52M54 42h52M54 54h40M54 66h52M54 92h24" stroke="#94a3b8" stroke-width="3"/>'),
+  },
+  {
+    name: 'Site plan.png',
+    detail: 'Image · 640 KB · 2026-09-02',
+    preview: svg('<path d="M24 20h112v80H24zM24 60h56M80 20v48M104 60h32" fill="none" stroke="#6366f1" stroke-width="3"/>'),
+  },
+  {
+    name: 'Pricing schedule.xlsx',
+    detail: 'Spreadsheet · 48 KB · 2026-09-09',
+    preview: svg('<rect x="28" y="20" width="104" height="80" fill="#fff" stroke="#cbd5e1"/><path d="M28 40h104M28 60h104M28 80h104M62 20v80M96 20v80" stroke="#94a3b8" stroke-width="2"/>'),
+  },
+];
+
+export type RecordSection = 'overview' | 'activity' | 'files';
+
+const SECTIONS: readonly { section: RecordSection; label: string }[] = [
+  { section: 'overview', label: 'Overview' },
+  { section: 'activity', label: 'Activity' },
+  { section: 'files', label: 'Files' },
+];
+
+/** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
+const sectionHref = (record: RecordItem, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
+
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 /** The per-type part: which properties a record shows, in what order. Everything else is shared. */
@@ -65,6 +108,8 @@ export interface RecordPageProps {
   initialLoadState?: LoadState;
   /** Open the "More" menu on first render (gallery and tests). */
   initialMenuOpen?: boolean;
+  /** The section to show first. In a product this comes from the route. */
+  initialSection?: RecordSection;
 }
 
 export function RecordPage({ record = SAMPLE_RECORDS[0], ...props }: RecordPageProps) {
@@ -76,8 +121,14 @@ export function RecordPage({ record = SAMPLE_RECORDS[0], ...props }: RecordPageP
   );
 }
 
-function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen = false }: RecordPageProps & { record: RecordItem }) {
+function RecordPageContent({
+  record,
+  initialLoadState = 'ready',
+  initialMenuOpen = false,
+  initialSection = 'overview',
+}: RecordPageProps & { record: RecordItem }) {
   const toast = useToast();
+  const [section, setSection] = useState<RecordSection>(initialSection);
   const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activity, setActivity] = useState(ACTIVITY);
@@ -118,7 +169,16 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
               Loading record…
             </Text>
           </Stack>
-          <Sidebar placement="end" sideWidth="lg" gap="lg" side={<Card><CardBody><Skeleton lines={5} /></CardBody></Card>}>
+          <PageLayout
+            asideLabel="Properties"
+            aside={
+              <Card>
+                <CardBody>
+                  <Skeleton lines={5} />
+                </CardBody>
+              </Card>
+            }
+          >
             <Stack gap="lg">
               <Skeleton shape="block" />
               <Card>
@@ -127,7 +187,7 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </CardBody>
               </Card>
             </Stack>
-          </Sidebar>
+          </PageLayout>
         </Stack>
       </Center>
     );
@@ -136,40 +196,43 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
-        <Cluster as="header" justify="between" align="start" gap="md">
-          <Stack gap="2xs">
-            <Cluster gap="sm" align="center">
-              <Heading level={1}>{record.name}</Heading>
-              <Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>
-            </Cluster>
-            <Text tone="muted">{`Owned by ${record.owner} · updated ${record.updated}`}</Text>
-          </Stack>
-          <Cluster gap="xs">
-            <Button variant="secondary">Share</Button>
-            <Button onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>Request approval</Button>
-            <Menu
-              defaultOpen={initialMenuOpen}
-              align="end"
-              trigger={
-                <Button variant="secondary" icon="more">
-                  More
-                </Button>
-              }
-              items={[
-                { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
-                { label: 'Export as CSV', icon: 'download' },
-                'separator',
-                { label: 'Delete record', tone: 'danger', onSelect: () => setConfirmDelete(true) },
-              ]}
-            />
-          </Cluster>
-        </Cluster>
+        <PageHeader
+          title={record.name}
+          status={<Badge tone={STATUS[record.status].tone}>{STATUS[record.status].label}</Badge>}
+          description={`Owned by ${record.owner} · updated ${record.updated}`}
+          actions={
+            <>
+              <Button variant="secondary">Share</Button>
+              <Button onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>Request approval</Button>
+              <Menu
+                defaultOpen={initialMenuOpen}
+                align="end"
+                trigger={
+                  <Button variant="secondary" icon="more">
+                    More
+                  </Button>
+                }
+                items={[
+                  { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
+                  { label: 'Export as CSV', icon: 'download' },
+                  'separator',
+                  { label: 'Delete record', tone: 'danger', onSelect: () => setConfirmDelete(true) },
+                ]}
+              />
+            </>
+          }
+        />
 
-        <Sidebar
-          placement="end"
-          sideWidth="lg"
-          gap="lg"
-          side={
+        <NavTabs
+          label="Record sections"
+          items={SECTIONS.map((item) => ({ label: item.label, href: sectionHref(record, item.section) }))}
+          current={sectionHref(record, section)}
+          onNavigate={(href) => setSection(SECTIONS.find((item) => sectionHref(record, item.section) === href)?.section ?? 'overview')}
+        />
+
+        <PageLayout
+          asideLabel="Properties"
+          aside={
             <Card>
               <CardHeader title="Properties" />
               <CardBody>
@@ -189,7 +252,7 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
             </Card>
           }
         >
-          <Stack gap="lg">
+          {section === 'overview' ? (
             <Card>
               <CardHeader title="Summary" />
               <CardBody>
@@ -199,7 +262,8 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </Text>
               </CardBody>
             </Card>
-
+          ) : null}
+          {section === 'activity' ? (
             <Card>
               <CardHeader title="Activity" />
               <CardBody>
@@ -226,8 +290,31 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </Stack>
               </CardBody>
             </Card>
-          </Stack>
-        </Sidebar>
+          ) : null}
+          {section === 'files' ? (
+            <Card>
+              <CardHeader title="Files" />
+              <CardBody>
+                <Grid as="ul" role="list" min="sm" gap="md">
+                  {FILES.map((file) => (
+                    <Stack as="li" gap="xs" key={file.name}>
+                      {/* Previews are held to one ratio, so the grid lines up whatever the file. The name beside it is the text alternative. */}
+                      <Frame ratio="landscape">
+                        <img src={file.preview} alt="" />
+                      </Frame>
+                      <Stack gap="2xs">
+                        <Text>{file.name}</Text>
+                        <Text size="caption" tone="muted" numeric>
+                          {file.detail}
+                        </Text>
+                      </Stack>
+                    </Stack>
+                  ))}
+                </Grid>
+              </CardBody>
+            </Card>
+          ) : null}
+        </PageLayout>
       </Stack>
 
       <Dialog

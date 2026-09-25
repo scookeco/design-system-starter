@@ -1,0 +1,72 @@
+@layer layouts {
+  /* 1. block: header over main; only main scrolls */
+  .focused-layout {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    block-size: var(--size-viewport-block);
+    background: var(--color-bg-canvas);
+    color: var(--color-fg-default);
+  }
+
+  /* 2. parts */
+  .focused-layout__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-md);
+    min-block-size: var(--size-control-lg);
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-lg);
+    border-block-end: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .focused-layout__brand {
+    font: var(--text-heading-4);
+  }
+
+  .focused-layout__task {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .focused-layout__exit {
+    display: flex;
+    flex: none;
+  }
+
+  .focused-layout__main {
+    position: relative;
+    overflow: auto;
+    padding-block-start: var(--space-inset-lg);
+  }
+
+  .focused-layout__column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+    box-sizing: content-box;
+    max-inline-size: var(--size-content-sm);
+    margin-inline: auto;
+    padding-inline: var(--space-inset-lg);
+  }
+
+  .focused-layout__footer {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: var(--z-sticky);
+    margin-block-start: var(--space-gap-xl);
+    padding-block: var(--space-inset-sm);
+    border-block-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Without an action bar, main still ends with breathing room. */
+  .focused-layout__main:not(:has(> .focused-layout__footer)) {
+    padding-block-end: var(--space-inset-lg);
+  }
+}

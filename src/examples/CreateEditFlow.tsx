@@ -26,12 +26,11 @@ import {
   Center,
   Cluster,
   Dialog,
-  Heading,
+  PageHeader,
   RadioGroup,
   Select,
   Stack,
   Switch,
-  Text,
   TextField,
   Textarea,
   type SelectOption,
@@ -173,10 +172,7 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
     >
       <Center max="sm" gutters="lg">
         <Stack gap="lg">
-          <Stack gap="2xs">
-            <Heading level={1}>New record</Heading>
-            <Text tone="muted">Records start as drafts. Nothing is sent until you choose to.</Text>
-          </Stack>
+          <PageHeader title="New record" description="Records start as drafts. Nothing is sent until you choose to." />
 
           {created ? <Banner tone="success">{`${created} was created as a draft.`}</Banner> : null}
 

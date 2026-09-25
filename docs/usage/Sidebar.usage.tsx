@@ -4,15 +4,16 @@ import type { UsageDoc } from './types';
 export const usage: UsageDoc = {
   covers: [Sidebar],
   whenToUse: [
-    'A narrow region beside the main one that stacks when space runs out: a record’s properties rail, a settings sub-nav.',
+    'A narrow region beside a wider one inside a card, panel or dialog, stacking when space runs out.',
     '`placement` sets the edge; DOM order follows, so reading order matches.',
   ],
   whenNotToUse: [
     { situation: 'The app’s navigation', instead: 'AppShell, which owns it and collapses it to a drawer' },
+    { situation: 'A page’s properties rail or section sub-nav', instead: '`PageLayout`, which names the aside and places the nav' },
     { situation: 'Equal columns', instead: '`Grid`' },
   ],
   do: {
-    caption: 'Main content first, properties in the rail at the end.',
+    caption: 'Main content first, a narrow region at the end that stacks below it when space runs out.',
     render: () => (
       <Sidebar
         placement="end"
@@ -52,7 +53,7 @@ export const usage: UsageDoc = {
     ),
   },
   accessibility: [
-    'Layout only. When the side region is navigation or complementary content, pass it as a `Nav` or give it `as="aside"`.',
+    'Layout only: it adds no landmark. For a page’s nav or aside regions use `PageLayout`, which does.',
     'Stacks in DOM order on narrow containers, so nothing is lost at 400% zoom.',
   ],
 };
