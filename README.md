@@ -137,7 +137,7 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 12 kB | `dist/index.js`, everything exported |
+| Library JS | 13.25 kB | `dist/index.js`, everything exported |
 | Library CSS | 11.5 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
