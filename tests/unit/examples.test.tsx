@@ -6,7 +6,9 @@ import { SettingsPage } from '../../src/examples/SettingsPage';
 import { SignInPage } from '../../src/examples/SignInPage';
 import { SetupWizard } from '../../src/examples/SetupWizard';
 import { ListPage } from '../../src/examples/ListPage';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { RecordPage } from '../../src/examples/RecordPage';
+import { http, HttpResponse } from 'msw';
+import { renderWithApp, server, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -20,7 +22,7 @@ globalThis.ResizeObserver ??= class {
 
 describe('Create and edit example', () => {
   it('on a failed submit focuses an error summary whose links move focus to each invalid field', () => {
-    render(<CreateEditFlow />);
+    renderWithApp(<CreateEditFlow />);
     fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
 
     const summary = screen.getByText('There are 4 problems with this record').closest('[tabindex="-1"]');
@@ -39,12 +41,62 @@ describe('Create and edit example', () => {
   });
 
   it('clears a field error as soon as it is fixed, keeping what was typed', () => {
-    render(<CreateEditFlow initialSubmitted />);
+    renderWithApp(<CreateEditFlow initialSubmitted />);
     const name = screen.getByRole('textbox', { name: 'Name' });
     fireEvent.change(name, { target: { value: 'Hardware lease' } });
     expect(name.getAttribute('aria-invalid')).toBeNull();
     expect((name as HTMLInputElement).value).toBe('Hardware lease');
     expect(screen.getByText('There are 3 problems with this record')).toBeTruthy();
+  });
+});
+
+describe('Create and edit example: the write', () => {
+  const valid = { name: 'Hardware lease', owner: 'acme-p02', amount: '12500.5', renewal: 'end' };
+
+  it('keeps the draft on a server failure and retries with the same idempotency key', async () => {
+    const keys: (string | null)[] = [];
+    let fail = true;
+    server.use(
+      http.post('*/api/t/:tenant/records', ({ request }) => {
+        keys.push(request.headers.get('Idempotency-Key'));
+        if (fail) return HttpResponse.json({ error: { code: 'server_error', message: 'Boom.' } }, { status: 500 });
+        return undefined;
+      }),
+    );
+    renderWithApp(<CreateEditFlow initialDraft={valid} initialSubmitting />);
+    expect(await screen.findByText('The record wasn’t created')).toBeTruthy();
+    expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).value).toBe('Hardware lease');
+    fail = false;
+    fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
+    expect(await screen.findByText('Hardware lease was created as a draft.')).toBeTruthy();
+    expect(keys).toHaveLength(2);
+    expect(keys[0]).toBeTruthy();
+    expect(keys[1]).toBe(keys[0]);
+  });
+});
+
+describe('Record page example', () => {
+  it('shows a stale rename as a conflict banner, with Reload', async () => {
+    server.use(http.patch('*/api/t/:tenant/records/:id', () => HttpResponse.json({ error: { code: 'conflict', message: 'Changed.' } }, { status: 409 })));
+    renderWithApp(<RecordPage initialAction={{ kind: 'rename', name: 'New name' }} />);
+    expect(await screen.findByText('Someone else changed this record')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Master cleaning agreement');
+    fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
+    await waitFor(() => expect(screen.queryByText('Someone else changed this record')).toBeNull());
+  });
+
+  it('archives pessimistically: pending on More, other actions disabled, then the new status', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(http.post('*/api/t/:tenant/records/:id/archive', async () => gate.then(() => undefined)));
+    renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
+    expect(await screen.findByRole('button', { name: 'Archiving…' })).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Request approval' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryAllByText('Archived')).toHaveLength(0);
+    release();
+    await waitFor(() => expect(screen.getAllByText('Archived').length).toBeGreaterThan(0));
   });
 });
 

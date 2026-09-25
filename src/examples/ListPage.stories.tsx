@@ -6,6 +6,7 @@ import { ListPage } from './ListPage';
 const meta = {
   title: 'Examples/List page',
   component: ListPage,
+  tags: ['!autodocs', 'data'],
   ...mockApiMeta,
 } satisfies Meta<typeof ListPage>;
 

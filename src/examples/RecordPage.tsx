@@ -11,14 +11,21 @@
  *   main     the section: summary card | activity feed with a comment box | files (previews in a Frame)
  *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
- *   overlays delete confirmation, toast on success
+ *   overlays rename dialog, delete confirmation; toasts for results
  *
  * Data: the record is read from the server cache with useRecord(id); the page holds no copy of it.
+ * Writes go through named mutations (src/app/model/mutations.ts), each presented its own way:
+ *   Rename   optimistic: the title changes at once ("Saving…"); a failure restores the old name
+ *            and says so in a toast that stays; the typed name is kept for another try.
+ *            A 409 (someone else changed it) shows a Banner with Reload instead.
+ *   Archive  pessimistic: "Archiving…" on More, the other actions disabled, then the new status.
+ *   Delete   pessimistic, confirmed; refused for records on legal hold (the canDelete predicate).
  */
-import { useState, type FormEvent } from 'react';
+import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import {
   Avatar,
   Badge,
+  Banner,
   Button,
   Card,
   CardBody,
@@ -29,6 +36,7 @@ import {
   EmptyState,
   Frame,
   Grid,
+  Link,
   Menu,
   NavTabs,
   PageHeader,
@@ -43,7 +51,8 @@ import {
 } from '../index';
 import { ExampleShell } from './ExampleShell';
 import type { RecordEntity } from '../app/api/schemas';
-import { isOnLegalHold } from '../app/model/predicates';
+import { isConflict, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
+import { canArchive, canDelete, canRename, isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
 
@@ -116,9 +125,14 @@ const properties = (record: RecordEntity, format: Formatter) => [
   { label: 'ID', value: record.id, numeric: true },
 ];
 
+/** A write to start on mount, so the gallery and tests can show each mutation state. */
+export type RecordPageAction = { kind: 'rename'; name: string } | { kind: 'archive' };
+
 export interface RecordPageProps {
   /** The record's id, from the route (/records/:id). */
   recordId?: string;
+  /** Start a write once the record has loaded (gallery and tests). */
+  initialAction?: RecordPageAction;
   /** Open the "More" menu on first render (gallery and tests). */
   initialMenuOpen?: boolean;
   /** The section to show first. In a product this comes from the route. */
@@ -134,12 +148,20 @@ export function RecordPage({ recordId = 'r-1001', ...props }: RecordPageProps) {
   );
 }
 
-function RecordPageContent({ recordId, initialMenuOpen = false, initialSection = 'overview' }: RecordPageProps & { recordId: string }) {
+function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, initialSection = 'overview' }: RecordPageProps & { recordId: string }) {
   const toast = useToast();
   const format = useFormat();
   const query = useRecord(recordId);
+  const rename = useRenameRecord(recordId);
+  const archive = useArchiveRecord(recordId);
+  const remove = useBulkDeleteRecords();
   const [section, setSection] = useState<RecordSection>(initialSection);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  /** The person's typed name: kept after a failure, so trying again doesn't mean typing again. */
+  const [nameDraft, setNameDraft] = useState<string | undefined>();
+  const [nameError, setNameError] = useState<string | undefined>();
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
 
@@ -149,6 +171,87 @@ function RecordPageContent({ recordId, initialMenuOpen = false, initialSection =
     setActivity((current) => [{ id: `a-${String(current.length + 1)}`, who: 'Sam Rivera', what: `commented: “${comment.trim()}”`, when: new Date().toISOString() }, ...current]);
     setComment('');
   };
+
+  const submitRename = (name: string) => {
+    const record = query.data;
+    if (!record) return;
+    rename.mutate(
+      { name, version: record.version },
+      {
+        onSuccess: () => setNameDraft(undefined),
+        onError: (error) => {
+          if (isConflict(error)) return; // The Banner explains it.
+          toast({
+            title: 'Couldn’t rename the record',
+            description: `It’s back to “${record.name}”. Choose Rename to try “${name}” again.`,
+            tone: 'danger',
+            duration: Infinity,
+          });
+        },
+      },
+    );
+  };
+
+  const saveRename = (event?: FormEvent) => {
+    event?.preventDefault();
+    const name = (nameDraft ?? '').trim();
+    if (name === '') {
+      setNameError('Enter a name for the record.');
+      return;
+    }
+    setRenameOpen(false);
+    setNameError(undefined);
+    if (name !== query.data?.name) submitRename(name);
+  };
+
+  const archiveRecord = () =>
+    archive.mutate(undefined, {
+      onSuccess: () => toast({ title: 'Record archived', description: 'It’s out of the active lists. Find it under Archived.', tone: 'success' }),
+      onError: () => toast({ title: 'Couldn’t archive the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+    });
+
+  const deleteRecord = () =>
+    remove.mutate(
+      { ids: [recordId] },
+      {
+        onSuccess: (result) => {
+          setConfirmDelete(false);
+          const failure = result.failed[0];
+          if (failure) toast({ title: 'Couldn’t delete the record', description: `It’s ${failure.reason}.`, tone: 'danger', duration: Infinity });
+          else setDeleted(true);
+        },
+        onError: () => toast({ title: 'Couldn’t delete the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+      },
+    );
+
+  // Gallery and tests: start one write as soon as the record is here, once.
+  const started = useRef(false);
+  const startInitialAction = useEffectEvent(() => {
+    if (!initialAction || started.current) return;
+    started.current = true;
+    if (initialAction.kind === 'rename') {
+      setNameDraft(initialAction.name);
+      submitRename(initialAction.name);
+    } else archiveRecord();
+  });
+  const loaded = query.isSuccess;
+  useEffect(() => {
+    if (loaded) startInitialAction();
+  }, [loaded]);
+
+  if (deleted) {
+    return (
+      <Center max="lg" gutters="lg">
+        <EmptyState
+          reason="no-results"
+          headingLevel={1}
+          title="Record deleted"
+          description="It’s gone from every list. Deleting can’t be undone."
+          action={<Link href="/records">Back to records</Link>}
+        />
+      </Center>
+    );
+  }
 
   if (query.isError) {
     return (
@@ -207,6 +310,26 @@ function RecordPageContent({ recordId, initialMenuOpen = false, initialSection =
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
+        {isConflict(rename.error) ? (
+          <Banner
+            tone="warning"
+            title="Someone else changed this record"
+            action={
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  rename.reset();
+                  void query.refetch();
+                }}
+              >
+                Reload
+              </Button>
+            }
+          >
+            {`Your name “${rename.variables?.name ?? ''}” wasn’t saved, so nothing of theirs was overwritten. Reload to see their version, then rename it again.`}
+          </Banner>
+        ) : null}
+
         <PageHeader
           title={record.name}
           status={
@@ -215,24 +338,37 @@ function RecordPageContent({ recordId, initialMenuOpen = false, initialSection =
               {isOnLegalHold(record) ? <Badge tone="warning">Legal hold</Badge> : null}
             </Cluster>
           }
-          description={`Owned by ${record.owner.name} · updated ${format.relative(record.updatedAt)}`}
+          description={rename.isPending ? 'Saving the new name…' : `Owned by ${record.owner.name} · updated ${format.relative(record.updatedAt)}`}
           actions={
             <>
-              <Button variant="secondary">Share</Button>
-              <Button onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>Request approval</Button>
+              <Button variant="secondary" disabled={archive.isPending}>
+                Share
+              </Button>
+              <Button disabled={archive.isPending} onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>
+                Request approval
+              </Button>
               <Menu
                 defaultOpen={initialMenuOpen}
                 align="end"
                 trigger={
-                  <Button variant="secondary" icon="more">
-                    More
+                  <Button variant="secondary" icon="more" loading={archive.isPending}>
+                    {archive.isPending ? 'Archiving…' : 'More'}
                   </Button>
                 }
                 items={[
+                  {
+                    label: 'Rename',
+                    disabled: !canRename(record) || rename.isPending,
+                    onSelect: () => {
+                      setNameDraft((draft) => draft ?? record.name);
+                      setRenameOpen(true);
+                    },
+                  },
                   { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
                   { label: 'Export as CSV', icon: 'download' },
+                  { label: 'Archive', disabled: !canArchive(record), onSelect: archiveRecord },
                   'separator',
-                  { label: 'Delete record', tone: 'danger', onSelect: () => setConfirmDelete(true) },
+                  { label: 'Delete record', tone: 'danger', disabled: !canDelete(record), onSelect: () => setConfirmDelete(true) },
                 ]}
               />
             </>
@@ -335,23 +471,38 @@ function RecordPageContent({ recordId, initialMenuOpen = false, initialSection =
 
       <Dialog
         size="sm"
-        title="Delete record?"
-        description={`${record.name} and its activity will be removed. This cannot be undone.`}
-        open={confirmDelete}
-        onOpenChange={setConfirmDelete}
+        title="Rename record"
+        open={renameOpen}
+        onOpenChange={setRenameOpen}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setConfirmDelete(false)}>
+            <Button variant="secondary" onClick={() => setRenameOpen(false)}>
               Cancel
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                setConfirmDelete(false);
-                toast({ title: 'Record deleted', tone: 'success' });
-              }}
-            >
-              Delete record
+            <Button onClick={() => saveRename()}>Save name</Button>
+          </>
+        }
+      >
+        <Stack as="form" gap="md" onSubmit={saveRename}>
+          <TextField label="Name" value={nameDraft ?? ''} onChange={(event) => setNameDraft(event.target.value)} error={nameError} autoComplete="off" />
+        </Stack>
+      </Dialog>
+
+      <Dialog
+        size="sm"
+        title="Delete record?"
+        description={`${record.name} and its activity will be removed. This can’t be undone.`}
+        open={confirmDelete}
+        onOpenChange={(open) => {
+          if (!remove.isPending) setConfirmDelete(open);
+        }}
+        footer={
+          <>
+            <Button variant="secondary" disabled={remove.isPending} onClick={() => setConfirmDelete(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" loading={remove.isPending} onClick={deleteRecord}>
+              {remove.isPending ? 'Deleting…' : 'Delete record'}
             </Button>
           </>
         }

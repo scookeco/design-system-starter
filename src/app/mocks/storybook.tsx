@@ -77,12 +77,14 @@ const withMockApi: Decorator = (Story, context) => {
 };
 
 /**
- * Meta fields for a story file that reads from the mock API: the handlers, a reset database before
- * each story, and the `data` tag (the visual suite waits for html[data-queries-settled="true"]).
- * A story that holds a request open on purpose adds the `busy` tag, and the suite doesn't wait.
+ * Meta fields for a story file that reads from the mock API: the providers, the handlers, and a
+ * reset database before each story. Spread it into the meta, and write the tags out literally
+ * beside it (Storybook's indexer reads tags statically, so a spread can't carry them):
+ *
+ *   tags: ['!autodocs', 'data']   the visual suite waits for html[data-queries-settled="true"]
+ *   tags: ['busy']                on a story that holds a request open on purpose: don't wait
  */
 export const mockApiMeta = {
-  tags: ['!autodocs', 'data'],
   decorators: [withMockApi],
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: handlers } } },

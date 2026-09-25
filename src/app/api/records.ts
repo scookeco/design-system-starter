@@ -6,6 +6,7 @@ import { request } from './client';
 import {
   BulkDeleteResultSchema,
   PeopleSchema,
+  PersonSchema,
   RecordCountsSchema,
   RecordPageSchema,
   RecordSchema,
@@ -42,6 +43,8 @@ export const getRecord = (tenant: Tenant, id: string, signal?: AbortSignal) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}`, { signal });
 
 export const listPeople = (tenant: Tenant, signal?: AbortSignal) => request(PeopleSchema, `${base(tenant)}/people`, { signal });
+
+export const postPerson = (tenant: Tenant, name: string) => request(PersonSchema, `${base(tenant)}/people`, { method: 'POST', body: { name } });
 
 /** A new record. A quick create sends just the name; the server defaults the rest (owner: you). */
 export interface NewRecord {

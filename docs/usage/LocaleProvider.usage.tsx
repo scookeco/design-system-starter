@@ -1,4 +1,4 @@
-import { createFormatter, LocaleProvider, Stat, Text, useFormat } from '../../src/index';
+import { createFormatter, currencyDigits, LocaleProvider, Stat, Text, useFormat } from '../../src/index';
 import type { UsageDoc } from './types';
 
 function Balance() {
@@ -7,13 +7,14 @@ function Balance() {
 }
 
 export const usage: UsageDoc = {
-  covers: [LocaleProvider, useFormat, createFormatter],
+  covers: [LocaleProvider, useFormat, createFormatter, currencyDigits],
   whenToUse: [
     'Wrap the app once, near the root, with the signed-in user’s locale and time zone (a profile setting that defaults from the browser).',
     'Format every number, date, amount, list and file size a person reads with `useFormat()`: `format.money(minor, currency)`, `format.date(iso)`, `format.relative(iso)`. One named format per concept keeps every screen consistent.',
     'Money arrives as integer minor units plus an ISO 4217 code. Format the account’s currency in the reader’s locale: a German reader billed in USD sees `12.500,50 $`.',
     'An ISO date with no time (`2026-09-30`) is a calendar date and never shifts by zone; a timestamp is an instant, shown in the provider’s time zone.',
     'Outside React (tests, exports), `createFormatter({ locale, timeZone })` gives the same formats.',
+    'Turning typed money into minor units: multiply by `10 ** currencyDigits(code)` (2 for USD, 0 for JPY, 3 for BHD) and round.',
   ],
   whenNotToUse: [
     { situation: 'Dates and numbers in APIs, exports and logs', instead: 'ISO 8601 and plain numbers; format only for people' },

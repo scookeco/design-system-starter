@@ -4,6 +4,7 @@
  * the clock. (The visual suite freezes the page clock at the same instant, so "3 days ago" holds.)
  */
 import type { Person, RecordEntity, RecordStatus, Tenant } from '../api/schemas';
+import { WORKSPACES } from '../workspaces';
 
 /** The "today" the data was generated for. Matches the visual harness's frozen clock. */
 export const SEED_EPOCH = Date.parse('2026-09-25T12:00:00Z');
@@ -23,7 +24,6 @@ export const seededRandom = (seed: number) => {
 interface TenantSpec {
   seed: number;
   count: number;
-  currency: string;
   people: readonly string[];
 }
 
@@ -31,13 +31,11 @@ export const TENANT_SPECS: Record<Tenant, TenantSpec> = {
   acme: {
     seed: 1001,
     count: 240,
-    currency: 'USD',
     people: ['Sam Rivera', 'Priya Natarajan', 'Jo Okafor', 'Mei Chen', 'Lucas Moreau', 'Amara Diallo', 'Noah Fischer', 'Sofia Rossi'],
   },
   globex: {
     seed: 2002,
     count: 120,
-    currency: 'EUR',
     people: ['Lena Vogel', 'Mateo García', 'Aiko Tanaka', 'Omar Haddad', 'Ingrid Berg'],
   },
 };
@@ -89,7 +87,7 @@ export const seedRecords = (tenant: Tenant): RecordEntity[] => {
       name,
       owner: pick(random, people),
       status,
-      amount: { minor: amount, currency: spec.currency },
+      amount: { minor: amount, currency: WORKSPACES[tenant].currency },
       updatedAt: new Date(updatedAt).toISOString(),
       renewsOn: isoDate(SEED_EPOCH + Math.floor(random() * 400) * DAY),
       tags,

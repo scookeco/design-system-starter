@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fail, hold } from '../app/mocks/overrides';
+import { mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { CreateEditFlow } from './CreateEditFlow';
 
-const valid = { name: 'Hardware lease', owner: 'operations', amount: '12500', renewal: 'end' };
+const valid = { name: 'Hardware lease', owner: 'acme-p02', amount: '12500', renewal: 'end' };
 
 const meta = {
   title: 'Examples/Create and edit',
   component: CreateEditFlow,
-  tags: ['!autodocs'],
-  parameters: { layout: 'fullscreen' },
+  tags: ['!autodocs', 'data'],
+  ...mockApiMeta,
 } satisfies Meta<typeof CreateEditFlow>;
 
 export default meta;
@@ -16,5 +18,9 @@ type Story = StoryObj<typeof meta>;
 export const Empty: Story = {};
 export const Valid: Story = { args: { initialDraft: valid } };
 export const Invalid: Story = { args: { initialDraft: { name: 'Hardware lease' }, initialSubmitted: true } };
-export const Submitting: Story = { args: { initialDraft: valid, initialSubmitting: true } };
-export const QuickCreateOpen: Story = { tags: ['modal-open', '!autodocs'], args: { initialQuickCreateOpen: true } };
+/** Pessimistic create: the button carries the pending state until the server answers. */
+export const Submitting: Story = { tags: ['busy'], args: { initialDraft: valid, initialSubmitting: true }, parameters: mswOverrides(hold('post', '/records')) };
+export const Created: Story = { args: { initialDraft: valid, initialSubmitting: true } };
+/** The server failed: the draft stays, and a retry reuses the idempotency key. */
+export const CreateFailed: Story = { args: { initialDraft: valid, initialSubmitting: true }, parameters: mswOverrides(fail('post', '/records')) };
+export const QuickCreateOpen: Story = { tags: ['modal-open'], args: { initialQuickCreateOpen: true } };

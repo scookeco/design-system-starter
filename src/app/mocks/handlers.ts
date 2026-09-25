@@ -24,6 +24,7 @@ import { canArchive, canDelete, canRename, matchesFilter } from '../model/predic
 import { mockConfig } from './config';
 import { db, touch } from './db';
 import { SEED_EPOCH } from './seed';
+import { WORKSPACES } from '../workspaces';
 
 const API = '*/api/t/:tenant';
 
@@ -104,6 +105,19 @@ export const handlers = [
     handle(({ tenant }) => HttpResponse.json({ items: db(tenant).people })),
   ),
 
+  http.post(
+    `${API}/people`,
+    handle(async ({ tenant, request }) => {
+      const partition = db(tenant);
+      const body = (await request.json()) as Partial<{ name: string }>;
+      const name = body.name?.trim();
+      if (!name) return error(422, 'invalid', 'Enter a name.');
+      const person = { id: `${tenant}-p${String(partition.people.length + 1).padStart(2, '0')}`, name };
+      partition.people.push(person);
+      return HttpResponse.json(person, { status: 201 });
+    }),
+  ),
+
   http.get(
     `${API}/records/:id`,
     handle(({ tenant, params }) => {
@@ -128,7 +142,7 @@ export const handlers = [
       if (!body.name?.trim() || !owner || (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')) {
         return error(422, 'invalid', 'Some fields are missing or invalid.');
       }
-      const currency = partition.records[0]?.amount.currency ?? 'USD';
+      const currency = WORKSPACES[tenant].currency;
       const record = touch({
         id: `${tenant === 'acme' ? 'r' : 'g'}-${String(partition.nextId)}`,
         name: body.name.trim(),
