@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../src/index';
+import { StoryLink } from '../ui/Code';
 import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
 const SPLIT = [
@@ -15,7 +16,7 @@ const SPLIT = [
   },
   {
     area: 'Focus',
-    system: 'Visible focus ring on everything. Dialogs, Drawers and menus trap and restore focus; Popovers restore it. Pending buttons and aria-disabled pagination ends keep focus.',
+    system: 'Visible focus ring on everything. Dialogs, Drawers and menus trap and restore focus; Popovers restore it. Pending buttons and aria-disabled pagination ends keep focus. Scroll containers with sticky bars or headers reserve scroll padding, so focus never lands behind them.',
     product: 'After navigation or a wizard step, move focus to the new h1 (PageHeader’s headingRef) or main. After submit with errors, focus the error summary or the first invalid field. After removing a chip, focus the next one.',
   },
   {
@@ -30,8 +31,18 @@ const SPLIT = [
   },
   {
     area: 'Motion and targets',
-    system: 'Durations collapse under reduced motion. Controls meet the 24px minimum target size.',
-    product: 'Don’t add motion that carries meaning. Keep custom hit areas at least the target-min size.',
+    system: 'Durations collapse under reduced motion. Every target is at least 24px or spaced so a 24px circle around it touches nothing else (checked on every story). Nothing is draggable yet; a lint rule makes any drag declare its single-pointer alternative.',
+    product: 'Don’t add motion that carries meaning. Keep custom hit areas at least the target-min size. Give every drag a button or menu alternative and name it in data-drag-alternative.',
+  },
+  {
+    area: 'Sign-in',
+    system: 'Password fields have a show-password toggle. Nothing blocks paste.',
+    product: 'Set autoComplete: username, current-password or new-password, one-time-code. No CAPTCHA or other memory or puzzle test without an alternative.',
+  },
+  {
+    area: 'Help and repeated input',
+    system: 'AppShell’s help slot sits in the same place on every page.',
+    product: 'Pass help once, from the app’s shell composition. In a multi-step flow, never ask again for what was already given: show it, prefill it, or let people pick it.',
   },
 ] as const;
 
@@ -66,8 +77,12 @@ function Accessibility() {
           items={[
             <>Contrast of every semantic pair, light and dark: a unit test on the token source.</>,
             <>axe (WCAG 2.2 A and AA) on every story in both themes, and on every Docs tab: the visual suite.</>,
+            <>WCAG 2.2 checks axe doesn’t make, on every story: target size, focus not obscured, accessible authentication, consistent help. Plus a lint rule for dragging and unit audits for sign-in and redundant entry.</>,
             <>Component behaviour (names, states, keyboard): component tests.</>,
             <>Automated checks find about a third of issues. Before shipping a new flow, use it with the keyboard only and with a screen reader.</>,
+            <>
+              What each check covers, what needs a person and how to run them: <StoryLink id="guides-accessibility-conformance--accessibility-conformance">Accessibility conformance</StoryLink>.
+            </>,
           ]}
         />
       </DocSection>

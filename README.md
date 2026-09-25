@@ -33,8 +33,9 @@ npm run check                     # everything CI runs except the visual job
 | `npm run build` | Library build (`dist/index.js`, `dist/styles.css`). |
 | `npm run size` | Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`. |
 | `npm run build-storybook` | Static gallery in `storybook-static/`. |
-| `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark. |
+| `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
+| `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
 | `npm run check` | `tokens:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
 
 ## Repo map
@@ -46,6 +47,7 @@ scripts/token-usage.ts  token usage map (src/tokens/token-usage.json) and --chec
 scripts/check-tree-shaking.ts  single-component imports pull in only what they compose
 scripts/checks/         token, contrast, chart palette, token usage and CSS checks (used by Vitest)
 scripts/test-rules.ts   proves every lint and type rule fires
+scripts/eslint/         local ESLint rules (drag-needs-alternative)
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
@@ -58,7 +60,8 @@ src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
 tests/unit/             Vitest suites
-tests/visual/           Playwright suite; __screenshots__/linux/ is committed
+tests/visual/           Playwright suite: screenshots + axe, WCAG 2.2 checks; __screenshots__/linux/ is committed
+tests/visual/fixtures/  check-fixture stories that each WCAG 2.2 check must fail (hidden from the gallery)
 .storybook/             gallery config, theme and width toolbars, the Tokens panel (manager.tsx)
 .size-limit.json        bundle size budgets
 .github/workflows/      ci.yml, update-visual-baselines.yml
@@ -86,6 +89,9 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | The rules are actually loaded | `test:rules` (every rule has a fixture, fixtures must not be ignored or fail to parse, clean controls must pass) | `scripts/test-rules.ts` |
 | Gallery: every variant/size/state renders correctly in light and dark | Playwright screenshots against Linux baselines | `tests/visual/stories.spec.ts` |
 | Gallery is accessible | axe (WCAG 2.2 A/AA) on every story, both themes | `tests/visual/stories.spec.ts` |
+| WCAG 2.2 criteria axe doesn't decide: target size (2.5.8), focus not obscured by sticky content (2.4.11), accessible authentication (3.3.8), consistent help (3.2.6) | Playwright on every story, one light pass; each check proved by a fixture story that must fail it | `tests/visual/wcag22.spec.ts`, `tests/visual/wcag22-checks.ts`, `tests/visual/fixtures/` |
+| Every drag has a single-pointer alternative (2.5.7) | `starter/drag-needs-alternative` (ESLint): `data-drag-alternative` on draggable elements and in files importing a drag-and-drop library | `scripts/eslint/drag-needs-alternative.js` |
+| Sign-in works with a password manager and paste; wizards never ask twice (3.3.8, 3.3.7) | Vitest audits on the sign-in and wizard examples, with negative controls | `tests/unit/wcag22.test.tsx` |
 | Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
@@ -138,11 +144,11 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 
 | Kind | Parts |
 |---|---|
-| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, account menu), `main` as the only scrolling region, optional sticky action bar, toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
+| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
 | Page structure | `PageHeader` (the page's h1, status, description, actions) |
 | Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
 | Actions | `Button`, `Menu`, `SegmentedControl` |
-| Forms | `TextField`, `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
 | Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Heading`, `Text` |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
 | Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip` |
@@ -203,7 +209,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, accessibility, content, escape hatches. |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches. |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
@@ -221,7 +227,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
 | Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json` or the workflow itself |
 | Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
-| Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact; each shard uploads its own report on failure |
+| Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact, running every spec: screenshots, axe and the WCAG 2.2 checks; each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
 
 - **Drafts while iterating.** Open pull requests as drafts: they run the check job only. Mark the pull request ready for review to run visual and axe (`ready_for_review` triggers it), and merge only once that ready run is green.
@@ -236,6 +242,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 - Without Docker you can't produce Linux baselines locally, and that's fine. Locally, `npm run test:visual:update` writes `darwin/` baselines (gitignored) so you can diff your own changes before pushing.
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
+- Stories tagged `no-visual` get no screenshot and no axe run. Only the WCAG 2.2 check fixtures use it: they are deliberate violations.
 - Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 
 ## Deliberately not included yet
