@@ -7,7 +7,8 @@
  * Anatomy:
  *   shell    breadcrumb (Records / <title>) · the Records nav item stays current
  *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
- *   main     summary card · activity feed with a comment box
+ *   sections NavTabs (Overview · Activity · Files): each section is its own URL, so links, not a tablist
+ *   main     the section: summary card | activity feed with a comment box | files
  *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays delete confirmation, toast on success
@@ -25,6 +26,7 @@ import {
   Dialog,
   EmptyState,
   Menu,
+  NavTabs,
   PageHeader,
   PageLayout,
   Skeleton,
@@ -49,6 +51,28 @@ const ACTIVITY: readonly Activity[] = [
   { id: 'a-1', who: 'Operations', what: 'created the record', when: '2026-08-30' },
 ];
 
+interface RecordFile {
+  name: string;
+  detail: string;
+}
+
+const FILES: readonly RecordFile[] = [
+  { name: 'Signed agreement.pdf', detail: 'PDF · 1.2 MB · 2026-08-30' },
+  { name: 'Site plan.png', detail: 'Image · 640 KB · 2026-09-02' },
+  { name: 'Pricing schedule.xlsx', detail: 'Spreadsheet · 48 KB · 2026-09-09' },
+];
+
+export type RecordSection = 'overview' | 'activity' | 'files';
+
+const SECTIONS: readonly { section: RecordSection; label: string }[] = [
+  { section: 'overview', label: 'Overview' },
+  { section: 'activity', label: 'Activity' },
+  { section: 'files', label: 'Files' },
+];
+
+/** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
+const sectionHref = (record: RecordItem, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
+
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 /** The per-type part: which properties a record shows, in what order. Everything else is shared. */
@@ -65,6 +89,8 @@ export interface RecordPageProps {
   initialLoadState?: LoadState;
   /** Open the "More" menu on first render (gallery and tests). */
   initialMenuOpen?: boolean;
+  /** The section to show first. In a product this comes from the route. */
+  initialSection?: RecordSection;
 }
 
 export function RecordPage({ record = SAMPLE_RECORDS[0], ...props }: RecordPageProps) {
@@ -76,8 +102,14 @@ export function RecordPage({ record = SAMPLE_RECORDS[0], ...props }: RecordPageP
   );
 }
 
-function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen = false }: RecordPageProps & { record: RecordItem }) {
+function RecordPageContent({
+  record,
+  initialLoadState = 'ready',
+  initialMenuOpen = false,
+  initialSection = 'overview',
+}: RecordPageProps & { record: RecordItem }) {
   const toast = useToast();
+  const [section, setSection] = useState<RecordSection>(initialSection);
   const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activity, setActivity] = useState(ACTIVITY);
@@ -172,6 +204,13 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
           }
         />
 
+        <NavTabs
+          label="Record sections"
+          items={SECTIONS.map((item) => ({ label: item.label, href: sectionHref(record, item.section) }))}
+          current={sectionHref(record, section)}
+          onNavigate={(href) => setSection(SECTIONS.find((item) => sectionHref(record, item.section) === href)?.section ?? 'overview')}
+        />
+
         <PageLayout
           asideLabel="Properties"
           aside={
@@ -194,7 +233,7 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
             </Card>
           }
         >
-          <Stack gap="lg">
+          {section === 'overview' ? (
             <Card>
               <CardHeader title="Summary" />
               <CardBody>
@@ -204,7 +243,8 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </Text>
               </CardBody>
             </Card>
-
+          ) : null}
+          {section === 'activity' ? (
             <Card>
               <CardHeader title="Activity" />
               <CardBody>
@@ -231,7 +271,24 @@ function RecordPageContent({ record, initialLoadState = 'ready', initialMenuOpen
                 </Stack>
               </CardBody>
             </Card>
-          </Stack>
+          ) : null}
+          {section === 'files' ? (
+            <Card>
+              <CardHeader title="Files" />
+              <CardBody>
+                <Stack as="ul" role="list" gap="md">
+                  {FILES.map((file) => (
+                    <Stack as="li" gap="2xs" key={file.name}>
+                      <Text>{file.name}</Text>
+                      <Text size="caption" tone="muted" numeric>
+                        {file.detail}
+                      </Text>
+                    </Stack>
+                  ))}
+                </Stack>
+              </CardBody>
+            </Card>
+          ) : null}
         </PageLayout>
       </Stack>
 

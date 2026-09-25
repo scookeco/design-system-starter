@@ -1,0 +1,40 @@
+@layer components {
+  /* 1. block: a row of links on a baseline rule; scrolls sideways rather than wrapping */
+  .nav-tabs {
+    overflow-x: auto;
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .nav-tabs__list {
+    display: flex;
+    gap: var(--space-gap-xs);
+  }
+
+  /* 2. parts */
+  .nav-tabs__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-control-md);
+    padding-inline: var(--space-inset-sm);
+    border-block-end: var(--focus-ring-width) solid transparent;
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* 3. states. The ring sits inside the link so the scroll container never clips it. */
+  .nav-tabs__link:focus-visible {
+    outline-offset: calc(-1 * var(--focus-ring-width));
+  }
+
+  .nav-tabs__link:hover {
+    color: var(--color-fg-default);
+  }
+
+  /* Current section: rule, colour and aria-current, never colour alone. */
+  .nav-tabs__link[aria-current="page"] {
+    border-block-end-color: var(--color-action-primary);
+    color: var(--color-fg-default);
+  }
+}

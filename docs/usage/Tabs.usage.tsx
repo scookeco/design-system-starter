@@ -3,9 +3,13 @@ import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
   covers: [Tabs, TabList, Tab, TabPanel],
-  whenToUse: ['Switching between views of the same record or object in place: overview, activity, history.'],
+  whenToUse: [
+    'Switching between views of the same record or object in place, on one page: overview, activity, history.',
+    'Tabs or NavTabs? If choosing one only swaps panels and the URL stays the same, it is `Tabs`. If it changes the URL, it is `NavTabs`.',
+  ],
   whenNotToUse: [
-    { situation: 'Moving between pages or sections of the app', instead: '`Nav`, or a settings sub-nav with `Nav`' },
+    { situation: 'Sections that are each their own route', instead: '`NavTabs`' },
+    { situation: 'Moving between pages or areas of the app', instead: '`Nav`, or a settings sub-nav with `Nav`' },
     { situation: 'Steps that must be done in order', instead: 'a full-page form with sections' },
     { situation: 'Content people need to compare side by side', instead: 'one page with sections' },
   ],

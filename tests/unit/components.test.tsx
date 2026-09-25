@@ -11,6 +11,7 @@ import {
   Checkbox,
   EmptyState,
   Nav,
+  NavTabs,
   PageLayout,
   RadioGroup,
   Select,
@@ -331,5 +332,28 @@ describe('PageLayout', () => {
     expect(screen.getByRole('complementary', { name: 'Properties' }).textContent).toBe('Owner');
     expect(screen.getAllByRole('navigation')).toHaveLength(1);
     expect(screen.queryByRole('main')).toBeNull();
+  });
+});
+
+describe('NavTabs', () => {
+  it('is a labelled nav of links with aria-current on the current section, not a tablist', () => {
+    const onNavigate = vi.fn();
+    render(
+      <NavTabs
+        label="Record sections"
+        current="/r/1/files"
+        onNavigate={onNavigate}
+        items={[
+          { label: 'Overview', href: '/r/1' },
+          { label: 'Files', href: '/r/1/files' },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('navigation', { name: 'Record sections' })).toBeTruthy();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Files' }).getAttribute('aria-current')).toBe('page');
+    expect(screen.getByRole('link', { name: 'Overview' }).hasAttribute('aria-current')).toBe(false);
+    fireEvent.click(screen.getByRole('link', { name: 'Overview' }));
+    expect(onNavigate).toHaveBeenCalledWith('/r/1');
   });
 });
