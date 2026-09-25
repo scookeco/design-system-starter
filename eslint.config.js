@@ -9,6 +9,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import starter from './scripts/eslint/drag-needs-alternative.js';
 
 /**
  * Code that consumes the system: the golden examples and anything built like them, including
@@ -65,10 +66,12 @@ export default defineConfig(
       sourceType: 'module',
       globals: { ...globals.browser, ...globals.node },
     },
-    plugins: { 'react-hooks': reactHooks },
+    plugins: { 'react-hooks': reactHooks, starter },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
+      // WCAG 2.2 SC 2.5.7: every drag declares its single-pointer alternative.
+      'starter/drag-needs-alternative': 'error',
       '@eslint-community/eslint-comments/require-description': ['error', { ignore: [] }],
       '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
       '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: false }],
