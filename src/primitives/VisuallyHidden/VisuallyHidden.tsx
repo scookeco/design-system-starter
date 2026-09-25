@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import './VisuallyHidden.css';
 
 export interface VisuallyHiddenProps {
   /** Text for assistive technology only. */
@@ -15,7 +16,7 @@ export interface VisuallyHiddenProps {
  */
 export function VisuallyHidden({ children, as: Element = 'span', id }: VisuallyHiddenProps) {
   return (
-    <Element className="visually-hidden" id={id}>
+    <Element className="screen-reader-only" id={id}>
       {children}
     </Element>
   );

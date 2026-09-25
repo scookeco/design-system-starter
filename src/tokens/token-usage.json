@@ -11791,7 +11791,9 @@
       "exports": [
         "VisuallyHidden"
       ],
-      "stylesheets": [],
+      "stylesheets": [
+        "src/primitives/VisuallyHidden/VisuallyHidden.css"
+      ],
       "composes": [],
       "composesAll": [],
       "tokens": []
