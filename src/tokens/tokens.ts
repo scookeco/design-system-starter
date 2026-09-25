@@ -135,6 +135,10 @@ export const vars = {
       "md": "var(--size-dialog-md)",
       "lg": "var(--size-dialog-lg)"
     },
+    "drawer": {
+      "sm": "var(--size-drawer-sm)",
+      "md": "var(--size-drawer-md)"
+    },
     "overlay-max": "var(--size-overlay-max)",
     "scroll-region": {
       "sm": "var(--size-scroll-region-sm)",

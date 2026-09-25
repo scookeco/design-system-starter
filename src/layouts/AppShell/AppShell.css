@@ -162,7 +162,14 @@
     }
   }
 
-  /* 4. responsive: below the breakpoint token the sidebar becomes a drawer behind a Menu button */
+  /* The nav inside the narrow-screen Drawer (portalled, so outside the shell's container). */
+  .app-shell__drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+  }
+
+  /* 4. responsive: below the breakpoint token the sidebar gives way to a Menu button that opens a Drawer */
   @container app-shell (inline-size < 48rem) {
     .app-shell__frame {
       grid-template-areas:
@@ -186,17 +193,6 @@
 
     .app-shell__sidebar {
       display: none;
-    }
-
-    /* Open: the drawer shares main's grid cell and sits over it, below the header and its toggle. */
-    .app-shell__frame[data-nav="open"] .app-shell__sidebar {
-      z-index: var(--z-overlay);
-      display: flex;
-      grid-area: main;
-      justify-self: start;
-      inline-size: var(--size-sidebar-md);
-      max-inline-size: 100%;
-      box-shadow: var(--shadow-modal);
     }
   }
 }

@@ -1,0 +1,103 @@
+@layer components {
+  /* 1. block: a full-height sheet along one edge, above the scrim */
+  .drawer__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    background: var(--color-bg-scrim);
+  }
+
+  .drawer {
+    --drawer-width: var(--size-drawer-md);
+
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    inline-size: 100%;
+    max-inline-size: var(--drawer-width);
+    overflow-y: auto;
+    border-inline-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-elevated);
+    color: var(--color-fg-default);
+    box-shadow: var(--shadow-modal);
+  }
+
+  /* 2. parts: each pads itself, so the sticky footer can run edge to edge */
+  .drawer__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-gap-sm);
+    padding-block-start: var(--space-inset-lg);
+    padding-inline: var(--space-inset-lg);
+  }
+
+  .drawer__title {
+    font: var(--text-heading-3);
+  }
+
+  .drawer__description {
+    padding-block-start: var(--space-inset-sm);
+    padding-inline: var(--space-inset-lg);
+    color: var(--color-fg-muted);
+    font: var(--text-body);
+  }
+
+  .drawer__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+    padding: var(--space-inset-lg);
+  }
+
+  /* Sticks to the bottom of the sheet while the body scrolls. */
+  .drawer__footer {
+    position: sticky;
+    inset-block-end: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-gap-xs);
+    margin-block-start: auto;
+    padding-block: var(--space-inset-md);
+    padding-inline: var(--space-inset-lg);
+    border-block-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-elevated);
+  }
+
+  .drawer__close {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-control-sm);
+    block-size: var(--size-control-sm);
+    margin-inline-start: auto; /* stays at the end when the title is visually hidden */
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .drawer__close:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
+  /* 3. variants */
+  .drawer[data-side="start"] {
+    inset-inline: 0 auto;
+    border-inline-start: 0;
+    border-inline-end: 1px solid var(--color-border-default);
+  }
+
+  .drawer[data-size="sm"] {
+    --drawer-width: var(--size-drawer-sm);
+  }
+}

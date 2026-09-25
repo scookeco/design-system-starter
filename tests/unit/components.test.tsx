@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { LinkComponentProps } from '../../src/index';
 import {
@@ -200,7 +200,7 @@ describe('AppShell', () => {
     expect(document.activeElement).toBe(main);
   });
 
-  it('toggles the collapsed sidebar, moves focus into it on open, and returns focus on Escape', () => {
+  it('opens the nav in a labelled modal drawer from the Menu button, and returns focus on Escape', async () => {
     render(
       <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
         <p>Page</p>
@@ -210,12 +210,26 @@ describe('AppShell', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(document.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBeTruthy();
-    const home = screen.getByRole('link', { name: 'Home' });
-    expect(document.activeElement).toBe(home);
-    fireEvent.keyDown(home, { key: 'Escape' });
+    const drawer = screen.getByRole('dialog', { name: 'Menu' });
+    expect(toggle.getAttribute('aria-controls')).toBe(drawer.id);
+    expect(drawer.contains(document.activeElement)).toBe(true);
+    // The drawer's nav shows full labels even when the wide sidebar is a rail.
+    expect(drawer.querySelector('nav')?.dataset.display).toBeUndefined();
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(toggle);
+    await waitFor(() => expect(document.activeElement).toBe(toggle));
+  });
+
+  it('closes the drawer when a link in it is followed', () => {
+    render(
+      <AppShell brand="Acme" defaultNavOpen nav={<Nav label="Main" onNavigate={() => undefined} sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    );
+    const drawer = screen.getByRole('dialog', { name: 'Menu' });
+    fireEvent.click(drawer.querySelector('a') as HTMLAnchorElement);
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 

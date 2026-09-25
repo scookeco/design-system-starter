@@ -1,6 +1,7 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { useId, useState, type MouseEvent, type ReactNode } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../../components/Button/Button';
+import { Drawer } from '../../components/Drawer/Drawer';
 import { Icon } from '../../components/Icon/Icon';
 import { NavDisplayContext } from '../../components/Nav/Nav';
 import { ToastProvider } from '../../components/Toast/Toast';
@@ -49,9 +50,9 @@ export interface AppShellProps extends EscapeHatch {
   footer?: ReactNode;
   /** First focusable element; jumps past the sidebar and header to main. */
   skipLinkLabel?: string;
-  /** Label of the button that opens the sidebar when the shell is too narrow to show it. */
+  /** Label of the button that opens the navigation drawer when the shell is too narrow to show the sidebar; also the drawer's name. */
   menuLabel?: string;
-  /** Start with the collapsed sidebar open (gallery and tests). */
+  /** Start with the narrow-screen navigation drawer open (gallery and tests). */
   defaultNavOpen?: boolean;
   /**
    * Controlled: the wide-screen sidebar is collapsed to an icon rail. Pair with
@@ -80,8 +81,8 @@ export interface AppShellProps extends EscapeHatch {
  * Wide: a toggle at the foot of the sidebar collapses it to an icon rail (labels move into
  * tooltips; accessible names stay). The choice is remembered in localStorage.
  *
- * Below the size.breakpoint.md container width the sidebar collapses behind a Menu button
- * and opens as a drawer over the content.
+ * Below the size.breakpoint.md container width the sidebar is replaced by a Menu button that
+ * opens the nav in a Drawer from the inline start: scrim, focus trap, Escape, focus return.
  */
 export function AppShell({
   brand,
@@ -107,9 +108,6 @@ export function AppShell({
   const mainId = `${id}-main`;
   const sidebarId = `${id}-sidebar`;
   const [navOpen, setNavOpen] = useState(defaultNavOpen);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const openedByToggle = useRef(false);
   const [storedCollapsed, setStoredCollapsed] = useState(() => readCollapsed(sidebarStorageKey) ?? defaultSidebarCollapsed);
   const collapsed = sidebarCollapsed ?? storedCollapsed;
 
@@ -122,24 +120,6 @@ export function AppShell({
     onSidebarCollapsedChange?.(next);
   };
 
-  // The drawer comes before the header in the DOM, so opening it moves focus into it;
-  // otherwise Tab would carry on away from the nav that just appeared.
-  useEffect(() => {
-    if (!navOpen || !openedByToggle.current) return;
-    openedByToggle.current = false;
-    sidebarRef.current?.querySelector<HTMLElement>('a[href], button:not(:disabled)')?.focus();
-  }, [navOpen]);
-
-  const toggleNav = () => {
-    openedByToggle.current = !navOpen;
-    setNavOpen(!navOpen);
-  };
-
-  const closeOnEscape = (event: KeyboardEvent) => {
-    if (event.key !== 'Escape' || !navOpen) return;
-    setNavOpen(false);
-    toggleRef.current?.focus();
-  };
   // Following a link inside the drawer closes it, so the new page is not covered.
   const closeOnNavigate = (event: MouseEvent) => {
     if (event.target instanceof Element && event.target.closest('a')) setNavOpen(false);
@@ -155,11 +135,10 @@ export function AppShell({
         <a className="app-shell__skip" href={`#${mainId}`} onClick={skipToMain}>
           {skipLinkLabel}
         </a>
-        <div className="app-shell__frame" data-nav={navOpen ? 'open' : 'closed'} data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
-          <div className="app-shell__sidebar" id={sidebarId} ref={sidebarRef} onKeyDown={closeOnEscape} onClick={closeOnNavigate}>
+        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
+          <div className="app-shell__sidebar" id={sidebarId}>
             <div className="app-shell__brand">{brand}</div>
-            {/* The narrow-screen drawer always shows full labels. */}
-            <NavDisplayContext value={collapsed && !navOpen ? 'rail' : 'full'}>{nav}</NavDisplayContext>
+            <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>
             <div className="app-shell__collapse">
               <Tooltip content={collapsed ? expandSidebarLabel : collapseSidebarLabel} side="right">
                 <button
@@ -177,16 +156,25 @@ export function AppShell({
           </div>
           <header className="app-shell__header">
             <div className="app-shell__toggle">
-              <Button
-                ref={toggleRef}
-                variant="ghost"
-                icon="menu"
-                aria-expanded={navOpen}
-                aria-controls={sidebarId}
-                onClick={toggleNav}
+              <Drawer
+                title={menuLabel}
+                hideTitle
+                side="start"
+                size="sm"
+                open={navOpen}
+                onOpenChange={setNavOpen}
+                trigger={
+                  <Button variant="ghost" icon="menu">
+                    {menuLabel}
+                  </Button>
+                }
               >
-                {menuLabel}
-              </Button>
+                {/* The drawer always shows full labels, whatever the wide sidebar's state. */}
+                <div className="app-shell__drawer-nav" onClick={closeOnNavigate}>
+                  <div className="app-shell__brand">{brand}</div>
+                  <NavDisplayContext value="full">{nav}</NavDisplayContext>
+                </div>
+              </Drawer>
             </div>
             <div className="app-shell__context">{breadcrumbs}</div>
             {actions || userMenu ? (

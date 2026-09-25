@@ -219,6 +219,8 @@
     --size-dialog-sm: var(--container-md);
     --size-dialog-md: var(--container-lg);
     --size-dialog-lg: var(--container-2xl);
+    --size-drawer-sm: var(--container-2xs);
+    --size-drawer-md: var(--container-md);
     --size-overlay-max: var(--container-sm);
     --size-scroll-region-sm: var(--container-xs);
     --size-scroll-region-md: var(--container-lg);

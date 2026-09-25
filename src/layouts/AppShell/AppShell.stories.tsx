@@ -94,4 +94,4 @@ export const NarrowCollapsed: Story = {
     ),
   ],
 };
-export const NarrowNavOpen: Story = { ...NarrowCollapsed, args: { defaultNavOpen: true } };
+export const NarrowNavOpen: Story = { ...NarrowCollapsed, tags: ['modal-open', '!autodocs'], args: { defaultNavOpen: true } };

@@ -126,6 +126,15 @@
       },
       "$description": "Dialog widths: sm for confirmations, md for short forms, lg for longer forms."
     },
+    "drawer": {
+      "sm": {
+        "$value": "{container.2xs}"
+      },
+      "md": {
+        "$value": "{container.md}"
+      },
+      "$description": "Drawer widths: sm for navigation, md for details and filters."
+    },
     "overlay-max": {
       "$value": "{container.sm}",
       "$description": "Max width for tooltips and toasts."
