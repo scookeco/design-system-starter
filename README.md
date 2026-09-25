@@ -105,6 +105,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Sign-in works with a password manager and paste; wizards never ask twice (3.3.8, 3.3.7) | Vitest audits on the sign-in and wizard examples, with negative controls | `tests/unit/wcag22.test.tsx` |
 | Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
+| Links in the docs lead somewhere: every `StoryLink` and story id in `docs/` names a story or Docs tab that exists | Vitest: ids computed from every CSF file with Storybook's csf-tools, with negative controls | `tests/unit/story-links.test.ts`, `scripts/checks/story-links.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
 | The library stays small, and one import doesn't pull in the rest | size-limit budgets; tree-shaking check per exported unit | `.size-limit.json`, `scripts/check-tree-shaking.ts` |
 | Agents know the rules | UI rules block, extracted between markers into `llms.txt` and the manifest | `CLAUDE.md` |
