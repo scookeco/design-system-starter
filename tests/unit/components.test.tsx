@@ -13,7 +13,10 @@ import {
   EmptyState,
   Link,
   LinkProvider,
+  Meter,
   Nav,
+  SegmentedControl,
+  Stat,
   NavTabs,
   PageLayout,
   RadioGroup,
@@ -451,5 +454,39 @@ describe('LinkProvider', () => {
     const link = screen.getByRole('link', { name: 'Plain link' });
     expect(link.getAttribute('href')).toBe('/a');
     expect(link.dataset.routed).toBeUndefined();
+  });
+});
+
+describe('Dashboard parts', () => {
+  it('SegmentedControl is a named radiogroup with exactly one checked radio', () => {
+    render(
+      <SegmentedControl
+        label="Date range"
+        hideLabel
+        defaultValue="30d"
+        options={[
+          { value: '7d', label: '7 days' },
+          { value: '30d', label: '30 days' },
+        ]}
+      />,
+    );
+    const group = screen.getByRole('radiogroup', { name: 'Date range' });
+    expect(group).toBeTruthy();
+    expect(screen.getByRole('radio', { name: '30 days' }).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByRole('radio', { name: '7 days' }).getAttribute('aria-checked')).toBe('false');
+  });
+
+  it('Meter is a named meter whose value text includes the status past a threshold', () => {
+    render(<Meter label="Seats" value={42} max={50} valueText="42 of 50 seats" />);
+    const meter = screen.getByRole('meter', { name: 'Seats' });
+    expect(meter.getAttribute('aria-valuenow')).toBe('42');
+    expect(meter.getAttribute('aria-valuetext')).toBe('42 of 50 seats, Nearing limit');
+  });
+
+  it('Stat says the direction in words, separately from its tone', () => {
+    render(<Stat label="Overdue records" value="14" delta={{ value: '3', direction: 'up', tone: 'negative' }} />);
+    const change = screen.getByText('Up', { exact: false }).parentElement;
+    expect(change?.textContent).toBe('Up 3');
+    expect(change?.dataset.tone).toBe('negative');
   });
 });

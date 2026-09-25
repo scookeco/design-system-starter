@@ -40,3 +40,6 @@ export { Link, LinkProvider, type LinkProps, type LinkProviderProps, type LinkCo
 export { Drawer, type DrawerProps } from './Drawer/Drawer';
 export { Stepper, type StepperProps, type StepperStep } from './Stepper/Stepper';
 export { Progress, type ProgressProps } from './Progress/Progress';
+export { Stat, type StatProps, type StatDelta, type StatDirection, type StatTone } from './Stat/Stat';
+export { Meter, type MeterProps, type MeterStatus } from './Meter/Meter';
+export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './SegmentedControl/SegmentedControl';

@@ -1,0 +1,57 @@
+@layer components {
+  /* 1. block */
+  .segmented-control {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+  }
+
+  /* 2. parts */
+  .segmented-control__label {
+    color: var(--color-fg-default);
+    font: var(--text-label);
+  }
+
+  .segmented-control__group {
+    display: inline-flex;
+    gap: var(--space-gap-2xs);
+    padding: var(--space-inset-2xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-subtle);
+  }
+
+  .segmented-control__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--size-control-sm);
+    padding-block: 0;
+    padding-inline: var(--space-inset-sm);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* 3. states. Checked: a raised, outlined segment and heavier text, not colour alone. */
+  .segmented-control__item:hover {
+    color: var(--color-fg-default);
+  }
+
+  .segmented-control__item[data-state="checked"] {
+    border-color: var(--color-border-strong);
+    background: var(--color-bg-surface);
+    color: var(--color-fg-default);
+    font-weight: var(--font-weight-strong);
+    box-shadow: var(--shadow-card);
+  }
+
+  .segmented-control__item:disabled {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+}

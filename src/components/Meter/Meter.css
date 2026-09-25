@@ -1,0 +1,62 @@
+@layer components {
+  /* 1. block */
+  .meter {
+    --meter-fill: var(--color-action-primary);
+    --meter-status: var(--color-fg-muted);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+  }
+
+  /* 2. parts */
+  .meter__header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-gap-sm);
+    font: var(--text-label);
+  }
+
+  .meter__label {
+    color: var(--color-fg-default);
+  }
+
+  .meter__value {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meter__track {
+    overflow: hidden;
+    block-size: var(--size-bar);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-subtle);
+  }
+
+  .meter__fill {
+    block-size: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--meter-fill);
+  }
+
+  .meter__status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    color: var(--meter-status);
+    font: var(--text-caption);
+    font-weight: var(--font-weight-strong);
+  }
+
+  /* 3. states: colour, plus the status icon and words */
+  .meter[data-status="warning"] {
+    --meter-fill: var(--color-status-warning-fg);
+    --meter-status: var(--color-status-warning-fg);
+  }
+
+  .meter[data-status="danger"] {
+    --meter-fill: var(--color-status-danger-fg);
+    --meter-status: var(--color-status-danger-fg);
+  }
+}
