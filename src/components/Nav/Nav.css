@@ -56,4 +56,21 @@
     color: var(--color-fg-default);
     font-weight: var(--font-weight-strong);
   }
+
+  .nav__initial {
+    inline-size: var(--size-icon-sm);
+    font: var(--text-label);
+    text-align: center;
+  }
+
+  /* Rail: icons only, centred in a square target; labels are visually hidden (still the names) */
+  .nav[data-display="rail"] {
+    align-items: center;
+  }
+
+  .nav[data-display="rail"] .nav__link {
+    justify-content: center;
+    inline-size: var(--size-control-sm);
+    padding-inline: 0;
+  }
 }

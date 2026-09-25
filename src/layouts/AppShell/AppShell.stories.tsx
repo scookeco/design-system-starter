@@ -60,6 +60,8 @@ const meta = {
     breadcrumbs: <Breadcrumbs items={[{ label: 'Home', href: '/home' }]} current="Records" />,
     userMenu: userMenu(),
     children: page,
+    // The gallery shows each story's own state, not what a previous visit remembered.
+    sidebarStorageKey: null,
   },
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof AppShell>;
@@ -68,6 +70,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+export const SidebarCollapsed: Story = { args: { defaultSidebarCollapsed: true } };
 export const WithoutBreadcrumbs: Story = { args: { breadcrumbs: undefined } };
 export const WithGlobalAction: Story = { args: { actions: <Button icon="plus">New record</Button> } };
 export const WithActionBar: Story = {

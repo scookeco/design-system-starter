@@ -14,6 +14,7 @@ export const usage: UsageDoc = {
   whenToUse: [
     'Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.',
     'Fill the slots: `breadcrumbs`, `actions` (global only), `userMenu`, `children` (the page), `footer` (a long form’s action bar).',
+    'People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well.',
   ],
   whenNotToUse: [
     { situation: 'Sign-in, sign-up and other signed-out pages', instead: 'a centred card without the shell' },
@@ -48,6 +49,7 @@ export const usage: UsageDoc = {
   accessibility: [
     'Provides the skip link, banner, navigation and main landmarks; `main` is the only scrolling region.',
     'The collapsed sidebar opens as a drawer that traps focus and returns it to the Menu button.',
+    'The rail toggle has an accessible name that says what it will do, `aria-expanded` and a matching tooltip. In the rail, labels move into tooltips but stay each link’s accessible name.',
     'Product code owns the page’s h1 and moving focus to it after client-side navigation.',
   ],
 };

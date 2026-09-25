@@ -21,6 +21,7 @@ const PATHS = {
   minus: 'M4 10h12',
   download: 'M10 3v10M5.5 8.5L10 13l4.5-4.5M4 16h12',
   'chevron-right': 'M8 5l5 5-5 5',
+  'chevron-left': 'M12 5l-5 5 5 5',
   home: 'M3 9.5L10 3l7 6.5M5 8v9h10V8M8.5 17v-5h3v5',
   file: 'M5 2.5h6.5L15 6v11.5H5zM11.5 2.5V6H15M7.5 10h5M7.5 13h5',
   users: 'M7.5 9a3 3 0 100-6 3 3 0 000 6zM2 17a5.5 5.5 0 0111 0M13 3.3a3 3 0 010 5.4M15 11.8A5.5 5.5 0 0118 17',

@@ -216,6 +216,55 @@ describe('AppShell', () => {
   });
 });
 
+describe('AppShell icon rail', () => {
+  const shell = (props: Partial<Parameters<typeof AppShell>[0]> = {}) => (
+    <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />} {...props}>
+      <p>Page</p>
+    </AppShell>
+  );
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it('collapses to a rail that keeps every link’s accessible name, and remembers the choice', () => {
+    render(shell());
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle.getAttribute('aria-label')).toBe('Expand sidebar');
+    expect(screen.getByRole('link', { name: 'Home' })).toBeTruthy();
+    expect(screen.getByRole('navigation', { name: 'Main' }).dataset.display).toBe('rail');
+    expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBe('true');
+    cleanup();
+    render(shell());
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('still toggles when storage throws', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    render(shell());
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('is controllable and does not write storage when controlled', () => {
+    const onChange = vi.fn();
+    render(shell({ sidebarCollapsed: true, onSidebarCollapsedChange: onChange }));
+    fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+    expect(onChange).toHaveBeenCalledWith(false);
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeTruthy();
+    expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBeNull();
+  });
+});
+
 describe('Banner', () => {
   it.each([
     ['danger', 'alert'],

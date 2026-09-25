@@ -98,6 +98,10 @@
         "$value": "{container.xs}"
       }
     },
+    "rail": {
+      "$value": "{size.12}",
+      "$description": "Width of AppShell’s collapsed sidebar: the icon rail."
+    },
     "grid-item": {
       "$description": "Minimum item width for auto-fit Grid.",
       "sm": {
