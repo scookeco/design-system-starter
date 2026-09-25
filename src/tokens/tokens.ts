@@ -220,6 +220,11 @@ export const vars = {
   "icon": {
     "stroke": "var(--icon-stroke)"
   },
+  "ratio": {
+    "square": "var(--ratio-square)",
+    "landscape": "var(--ratio-landscape)",
+    "wide": "var(--ratio-wide)"
+  },
   "text": {
     "body": "var(--text-body)",
     "body-lg": "var(--text-body-lg)",
@@ -239,3 +244,4 @@ export type ContentWidthToken = keyof typeof vars.size.content;
 export type SidebarWidthToken = keyof typeof vars.size.sidebar;
 export type GridItemToken = keyof typeof vars.size['grid-item'];
 export type ScrollRegionToken = keyof typeof vars.size['scroll-region'];
+export type RatioToken = keyof typeof vars.ratio;

@@ -5,4 +5,5 @@ export { Center, type CenterProps } from './Center/Center';
 export { Sidebar, type SidebarProps } from './Sidebar/Sidebar';
 export { Cover, type CoverProps } from './Cover/Cover';
 export { Switcher, type SwitcherProps } from './Switcher/Switcher';
+export { Frame, type FrameProps } from './Frame/Frame';
 export type { LayoutElement } from './types';

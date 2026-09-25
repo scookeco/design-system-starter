@@ -1,0 +1,66 @@
+@layer components {
+  /* 1. block: summary on the start side, controls on the end; they wrap when narrow */
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-gap-sm);
+  }
+
+  /* 2. parts */
+  .pagination__summary {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pagination__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+  }
+
+  .pagination__step,
+  .pagination__page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-gap-2xs);
+    min-inline-size: var(--size-control-sm);
+    min-block-size: var(--size-control-sm);
+    padding-block: 0;
+    padding-inline: var(--space-inset-xs);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-default);
+    font: var(--text-label);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .pagination__gap {
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+  }
+
+  /* 3. states */
+  .pagination__step:hover:not([aria-disabled="true"]),
+  .pagination__page:hover:not([aria-current="page"]) {
+    background: var(--color-bg-hover);
+  }
+
+  /* Current: outlined, filled and heavier, not colour alone; aria-current carries it to AT. */
+  .pagination__page[aria-current="page"] {
+    border-color: var(--color-action-primary);
+    background: var(--color-bg-selected);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .pagination__step[aria-disabled="true"] {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+}

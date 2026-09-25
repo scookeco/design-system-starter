@@ -10,12 +10,14 @@
  *
  * Anatomy:
  *   header   PageHeader: title + description | page actions
- *   toolbar  search · status filter · toggle        (role="search"; hidden until there are records)
+ *   toolbar  SearchField · Filters Popover (status checkboxes)   (role="search"; hidden until there are records)
+ *   chips    one removable Tag per active filter; removing one moves focus to the next chip, or to Filters
  *   content  one of: skeleton rows (loading) · table · empty state (first use | no results | error)
- *   footer   result count
+ *   footer   Pagination: "1–5 of 7", Previous · pages · Next. Its summary is the page's one live region
+ *            for the count; while loading or failed, a caption announces that instead.
  *   overlays create dialog, toast on success
  */
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   Badge,
   Button,
@@ -25,6 +27,9 @@ import {
   Dialog,
   EmptyState,
   PageHeader,
+  Pagination,
+  Popover,
+  SearchField,
   Select,
   Skeleton,
   Stack,
@@ -34,6 +39,7 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
+  Tag,
   Text,
   TextField,
   Tooltip,
@@ -44,10 +50,11 @@ import { ExampleShell } from './ExampleShell';
 import { SAMPLE_RECORDS, STATUS, type LoadState, type RecordItem, type RecordStatus } from './records';
 
 type SortKey = 'name' | 'amount';
-type StatusFilter = RecordStatus | 'all';
 
-const STATUS_OPTIONS = (Object.keys(STATUS) as RecordStatus[]).map((value) => ({ value, label: STATUS[value].label }));
-const FILTER_OPTIONS = [{ value: 'all', label: 'All statuses' }, ...STATUS_OPTIONS];
+const STATUSES = Object.keys(STATUS) as RecordStatus[];
+const STATUS_OPTIONS = STATUSES.map((value) => ({ value, label: STATUS[value].label }));
+/** Server-side paging stands in here: a real list pages its query, with 25 or 50 rows a page. */
+const PAGE_SIZE = 5;
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
 
@@ -56,6 +63,11 @@ export interface ListPageProps {
   initialQuery?: string;
   initialDialogOpen?: boolean;
   initialLoadState?: LoadState;
+  /** Status filters active on first render (gallery and tests). */
+  initialStatuses?: readonly RecordStatus[];
+  /** Open the Filters popover on first render (gallery and tests). */
+  initialFiltersOpen?: boolean;
+  initialPage?: number;
 }
 
 export function ListPage(props: ListPageProps) {
@@ -66,13 +78,25 @@ export function ListPage(props: ListPageProps) {
   );
 }
 
-function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialDialogOpen = false, initialLoadState = 'ready' }: ListPageProps) {
+function ListPageContent({
+  records = SAMPLE_RECORDS,
+  initialQuery = '',
+  initialDialogOpen = false,
+  initialLoadState = 'ready',
+  initialStatuses = [],
+  initialFiltersOpen = false,
+  initialPage = 1,
+}: ListPageProps) {
   const toast = useToast();
   const [loadState, setLoadState] = useState<LoadState>(initialLoadState);
   const [items, setItems] = useState(records);
   const [query, setQuery] = useState(initialQuery);
-  const [status, setStatus] = useState<StatusFilter>('all');
-  const [includeDrafts, setIncludeDrafts] = useState(true);
+  const [statuses, setStatuses] = useState<readonly RecordStatus[]>(initialStatuses);
+  const [filtersOpen, setFiltersOpen] = useState(initialFiltersOpen);
+  const [page, setPage] = useState(initialPage);
+  const filtersRef = useRef<HTMLButtonElement>(null);
+  const chipRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [focusChip, setFocusChip] = useState<number | undefined>();
   const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'name', direction: 'ascending' });
   const [dialogOpen, setDialogOpen] = useState(initialDialogOpen);
   const [draftName, setDraftName] = useState('');
@@ -83,15 +107,37 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
     const needle = query.trim().toLowerCase();
     const filtered = items.filter(
       (r) =>
-        (status === 'all' || r.status === status) &&
-        (includeDrafts || r.status !== 'draft') &&
+        (statuses.length === 0 || statuses.includes(r.status)) &&
         (needle === '' || r.name.toLowerCase().includes(needle) || r.owner.toLowerCase().includes(needle)),
     );
     const factor = sort.direction === 'ascending' ? 1 : -1;
     return [...filtered].sort((a, b) =>
       sort.key === 'amount' ? (a.amount - b.amount) * factor : a.name.localeCompare(b.name) * factor,
     );
-  }, [items, query, status, includeDrafts, sort]);
+  }, [items, query, statuses, sort]);
+
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pages);
+  const pageRows = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Removing a chip moves focus to the chip now in its place (or the last one), or to Filters when none are left.
+  useEffect(() => {
+    if (focusChip === undefined) return;
+    setFocusChip(undefined);
+    const next = chipRefs.current[Math.min(focusChip, statuses.length - 1)];
+    (next ?? filtersRef.current)?.focus();
+  }, [focusChip, statuses.length]);
+
+  const toggleStatus = (value: RecordStatus, checked: boolean) => {
+    setStatuses((current) => (checked ? STATUSES.filter((s) => s === value || current.includes(s)) : current.filter((s) => s !== value)));
+    setPage(1);
+  };
+
+  const removeStatus = (index: number) => {
+    setStatuses((current) => current.filter((_, i) => i !== index));
+    setPage(1);
+    setFocusChip(index);
+  };
 
   const toggleSort = (key: SortKey) =>
     setSort((current) => ({
@@ -101,8 +147,8 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
 
   const clearFilters = () => {
     setQuery('');
-    setStatus('all');
-    setIncludeDrafts(true);
+    setStatuses([]);
+    setPage(1);
   };
 
   const createRecord = (event?: FormEvent) => {
@@ -172,24 +218,59 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
         />
 
         {items.length > 0 ? (
-          <Cluster as="form" role="search" gap="sm" align="center" onSubmit={(event) => event.preventDefault()}>
-            <TextField
-              label="Search records"
-              hideLabel
-              type="search"
-              placeholder="Search by name or owner"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-            <Select
-              label="Filter by status"
-              hideLabel
-              options={FILTER_OPTIONS}
-              value={status}
-              onValueChange={(value) => setStatus(value as StatusFilter)}
-            />
-            <Checkbox label="Include drafts" checked={includeDrafts} onCheckedChange={(checked) => setIncludeDrafts(checked === true)} />
-          </Cluster>
+          <Stack gap="sm">
+            <Cluster as="form" role="search" gap="sm" align="end" onSubmit={(event) => event.preventDefault()}>
+              <SearchField
+                label="Search records"
+                hideLabel
+                placeholder="Search by name or owner"
+                value={query}
+                onValueChange={(value) => {
+                  setQuery(value);
+                  setPage(1);
+                }}
+              />
+              <Popover
+                label="Filter by status"
+                open={filtersOpen}
+                onOpenChange={setFiltersOpen}
+                trigger={
+                  <Button ref={filtersRef} variant="secondary" icon="settings">
+                    {statuses.length > 0 ? `Filters (${String(statuses.length)})` : 'Filters'}
+                  </Button>
+                }
+              >
+                <Text size="caption" tone="muted">
+                  Status
+                </Text>
+                {STATUSES.map((value) => (
+                  <Checkbox
+                    key={value}
+                    label={STATUS[value].label}
+                    checked={statuses.includes(value)}
+                    onCheckedChange={(checked) => toggleStatus(value, checked === true)}
+                  />
+                ))}
+              </Popover>
+            </Cluster>
+            {statuses.length > 0 ? (
+              <Cluster as="ul" role="list" aria-label="Active filters" gap="xs">
+                {statuses.map((value, index) => (
+                  <li key={value}>
+                    <Tag
+                      onRemove={() => removeStatus(index)}
+                      removeLabel={`Remove filter: status ${STATUS[value].label}`}
+                      removeRef={(element) => {
+                        chipRefs.current[index] = element;
+                      }}
+                    >
+                      {`Status: ${STATUS[value].label}`}
+                    </Tag>
+                  </li>
+                ))}
+              </Cluster>
+            ) : null}
+          </Stack>
         ) : null}
 
         {loadState === 'loading' ? (
@@ -267,7 +348,7 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {pageRows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell rowHeader>{row.name}</TableCell>
                   <TableCell>{row.owner}</TableCell>
@@ -282,13 +363,17 @@ function ListPageContent({ records = SAMPLE_RECORDS, initialQuery = '', initialD
           </Table>
         )}
 
-        <Text size="caption" tone="muted" numeric aria-live="polite">
-          {loadState === 'loading'
-            ? 'Loading records…'
-            : loadState === 'error'
-              ? 'Records couldn’t be loaded'
-              : `Showing ${String(rows.length)} of ${String(items.length)} records`}
-        </Text>
+        {loadState === 'ready' && rows.length > 0 ? (
+          <Pagination label="Records pages" page={currentPage} pageSize={PAGE_SIZE} total={rows.length} onPageChange={setPage} announce />
+        ) : (
+          <Text size="caption" tone="muted" aria-live="polite">
+            {loadState === 'loading'
+              ? 'Loading records…'
+              : loadState === 'error'
+                ? 'Records couldn’t be loaded'
+                : `0 of ${String(items.length)} records`}
+          </Text>
+        )}
       </Stack>
     </Center>
   );

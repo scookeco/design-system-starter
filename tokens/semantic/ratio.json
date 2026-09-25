@@ -1,0 +1,18 @@
+{
+  "ratio": {
+    "$type": "number",
+    "$description": "Aspect ratios Frame holds its media to.",
+    "square": {
+      "$value": "{aspect.1-1}",
+      "$description": "Avatars, logos, square thumbnails."
+    },
+    "landscape": {
+      "$value": "{aspect.4-3}",
+      "$description": "File and document previews."
+    },
+    "wide": {
+      "$value": "{aspect.16-9}",
+      "$description": "Video, cover images, banners."
+    }
+  }
+}

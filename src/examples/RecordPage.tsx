@@ -8,7 +8,7 @@
  *   shell    breadcrumb (Records / <title>) · the Records nav item stays current
  *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
  *   sections NavTabs (Overview · Activity · Files): each section is its own URL, so links, not a tablist
- *   main     the section: summary card | activity feed with a comment box | files
+ *   main     the section: summary card | activity feed with a comment box | files (previews in a Frame)
  *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays delete confirmation, toast on success
@@ -25,6 +25,8 @@ import {
   Cluster,
   Dialog,
   EmptyState,
+  Frame,
+  Grid,
   Menu,
   NavTabs,
   PageHeader,
@@ -54,12 +56,29 @@ const ACTIVITY: readonly Activity[] = [
 interface RecordFile {
   name: string;
   detail: string;
+  /** Preview image URL. A real app gets these from its file service; the example inlines small drawings. */
+  preview: string;
 }
 
+const svg = (body: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120"><rect width="160" height="120" fill="#f1f5f9"/>${body}</svg>`)}`;
+
 const FILES: readonly RecordFile[] = [
-  { name: 'Signed agreement.pdf', detail: 'PDF · 1.2 MB · 2026-08-30' },
-  { name: 'Site plan.png', detail: 'Image · 640 KB · 2026-09-02' },
-  { name: 'Pricing schedule.xlsx', detail: 'Spreadsheet · 48 KB · 2026-09-09' },
+  {
+    name: 'Signed agreement.pdf',
+    detail: 'PDF · 1.2 MB · 2026-08-30',
+    preview: svg('<rect x="44" y="12" width="72" height="96" fill="#fff" stroke="#cbd5e1"/><path d="M54 30h52M54 42h52M54 54h40M54 66h52M54 92h24" stroke="#94a3b8" stroke-width="3"/>'),
+  },
+  {
+    name: 'Site plan.png',
+    detail: 'Image · 640 KB · 2026-09-02',
+    preview: svg('<path d="M24 20h112v80H24zM24 60h56M80 20v48M104 60h32" fill="none" stroke="#6366f1" stroke-width="3"/>'),
+  },
+  {
+    name: 'Pricing schedule.xlsx',
+    detail: 'Spreadsheet · 48 KB · 2026-09-09',
+    preview: svg('<rect x="28" y="20" width="104" height="80" fill="#fff" stroke="#cbd5e1"/><path d="M28 40h104M28 60h104M28 80h104M62 20v80M96 20v80" stroke="#94a3b8" stroke-width="2"/>'),
+  },
 ];
 
 export type RecordSection = 'overview' | 'activity' | 'files';
@@ -276,16 +295,22 @@ function RecordPageContent({
             <Card>
               <CardHeader title="Files" />
               <CardBody>
-                <Stack as="ul" role="list" gap="md">
+                <Grid as="ul" role="list" min="sm" gap="md">
                   {FILES.map((file) => (
-                    <Stack as="li" gap="2xs" key={file.name}>
-                      <Text>{file.name}</Text>
-                      <Text size="caption" tone="muted" numeric>
-                        {file.detail}
-                      </Text>
+                    <Stack as="li" gap="xs" key={file.name}>
+                      {/* Previews are held to one ratio, so the grid lines up whatever the file. The name beside it is the text alternative. */}
+                      <Frame ratio="landscape">
+                        <img src={file.preview} alt="" />
+                      </Frame>
+                      <Stack gap="2xs">
+                        <Text>{file.name}</Text>
+                        <Text size="caption" tone="muted" numeric>
+                          {file.detail}
+                        </Text>
+                      </Stack>
                     </Stack>
                   ))}
-                </Stack>
+                </Grid>
               </CardBody>
             </Card>
           ) : null}

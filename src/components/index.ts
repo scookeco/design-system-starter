@@ -43,3 +43,7 @@ export { Progress, type ProgressProps } from './Progress/Progress';
 export { Stat, type StatProps, type StatDelta, type StatDirection, type StatTone } from './Stat/Stat';
 export { Meter, type MeterProps, type MeterStatus } from './Meter/Meter';
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './SegmentedControl/SegmentedControl';
+export { SearchField, type SearchFieldProps } from './SearchField/SearchField';
+export { Tag, type TagProps } from './Tag/Tag';
+export { Popover, type PopoverProps } from './Popover/Popover';
+export { Pagination, type PaginationProps } from './Pagination/Pagination';

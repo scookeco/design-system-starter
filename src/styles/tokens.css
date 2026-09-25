@@ -130,6 +130,9 @@
     --easing-standard: cubic-bezier(0.2, 0, 0, 1);
     --easing-decelerate: cubic-bezier(0, 0, 0, 1);
     --easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+    --aspect-1-1: 1;
+    --aspect-4-3: 1.3333;
+    --aspect-16-9: 1.7778;
     --stroke-regular: 1.75;
     --stroke-bold: 2.25;
     --font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -265,6 +268,9 @@
     --z-toast: var(--layer-5);
     --z-tooltip: var(--layer-6);
     --icon-stroke: var(--stroke-regular);
+    --ratio-square: var(--aspect-1-1);
+    --ratio-landscape: var(--aspect-4-3);
+    --ratio-wide: var(--aspect-16-9);
     --text-body: var(--font-weight-regular) var(--font-size-200)/var(--font-line-height-normal) var(--font-family-sans);
     --text-body-lg: var(--font-weight-regular) var(--font-size-300)/var(--font-line-height-normal) var(--font-family-sans);
     --text-label: var(--font-weight-medium) var(--font-size-200)/var(--font-line-height-tight) var(--font-family-sans);

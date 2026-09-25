@@ -5,6 +5,7 @@ import { CreateEditFlow } from '../../src/examples/CreateEditFlow';
 import { SettingsPage } from '../../src/examples/SettingsPage';
 import { SignInPage } from '../../src/examples/SignInPage';
 import { SetupWizard } from '../../src/examples/SetupWizard';
+import { ListPage } from '../../src/examples/ListPage';
 
 afterEach(cleanup);
 
@@ -109,5 +110,37 @@ describe('Setup wizard example', () => {
     expect(current()).toBe('Invite');
     expect(screen.getByText('Completed:', { exact: false }).closest('li')?.textContent).toContain('Workspace');
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Invite your team' }));
+  });
+});
+
+describe('List page example', () => {
+  it('shows active filters as chips; removing one moves focus to the next chip, then to Filters', async () => {
+    render(<ListPage initialStatuses={['active', 'pending']} />);
+    const chips = screen.getByRole('list', { name: 'Active filters' });
+    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
+    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Pending' })));
+    fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Pending' }));
+    expect(screen.queryByRole('list', { name: 'Active filters' })).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Filters' })));
+  });
+
+  it('pages the rows, marks the current page and keeps Previous focusable but inert on page 1', () => {
+    render(<ListPage />);
+    const pager = screen.getByRole('navigation', { name: 'Records pages' });
+    expect(within(pager).getByRole('status').textContent).toBe('1–5 of 7');
+    expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page');
+    const previous = within(pager).getByRole('button', { name: 'Previous' });
+    expect(previous.getAttribute('aria-disabled')).toBe('true');
+    fireEvent.click(within(pager).getByRole('button', { name: 'Next' }));
+    expect(within(pager).getByRole('status').textContent).toBe('6–7 of 7');
+    expect(within(pager).getByRole('button', { name: 'Page 2' }).getAttribute('aria-current')).toBe('page');
+  });
+
+  it('clears the search from its clear button and keeps focus in the field', () => {
+    render(<ListPage initialQuery="lease" />);
+    const search = screen.getByRole('searchbox', { name: 'Search records' });
+    fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect((search as HTMLInputElement).value).toBe('');
+    expect(document.activeElement).toBe(search);
   });
 });

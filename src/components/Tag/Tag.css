@@ -1,0 +1,43 @@
+@layer components {
+  /* 1. block */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    min-block-size: var(--size-target-min);
+    padding-inline: var(--space-inset-sm);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-surface);
+    color: var(--color-fg-default);
+    font: var(--text-caption);
+    font-weight: var(--font-weight-strong);
+    white-space: nowrap;
+  }
+
+  /* 2. parts */
+  .tag__remove {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .tag__remove:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
+  /* 3. variants: the remove button sits flush with the end of the pill */
+  .tag[data-removable="true"] {
+    padding-inline-end: 0;
+  }
+}
