@@ -217,7 +217,8 @@ const valueIn = (tokens: TokenMap, path: string, mode: string | undefined): stri
   return cssText(resolveValue(tokens, last, mode === 'dark' ? 'dark' : 'light'), tokens.get(path)?.type);
 };
 
-const tokenInfo = (tokens: TokenMap, path: string): TokenInfo => {
+/** One token's tier, value, alias chain and mode values. Also used by the agent manifest. */
+export const tokenInfo = (tokens: TokenMap, path: string): TokenInfo => {
   const token = tokens.get(path);
   if (!token) throw new Error(`Unknown token ${path}`);
   // Collect every mode defined anywhere along the base chain (a semantic token's dark value, a

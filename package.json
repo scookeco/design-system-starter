@@ -22,7 +22,8 @@
     "build-storybook": "storybook build --quiet",
     "test:visual": "npm run build-storybook && playwright test",
     "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=all",
-    "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22"
+    "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22",
+    "manifest": "node scripts/manifest.ts"
   },
   "dependencies": {
     "radix-ui": "^1.6.7",

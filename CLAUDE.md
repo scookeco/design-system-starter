@@ -43,6 +43,7 @@ Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting
 
 ## UI rules for coding agents
 
+<!-- agent-rules:start (extracted into llms.txt, llms-full.txt and design-system.manifest.json: run npm run manifest after editing) -->
 ```text
 UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
@@ -83,6 +84,7 @@ UI rules (design system v0)
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
 ```
+<!-- agent-rules:end -->
 
 ## Data rules (the app layer)
 
