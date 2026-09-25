@@ -143,7 +143,7 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
 
-**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 15% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
+**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 10% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
 
 ## Theming
 
