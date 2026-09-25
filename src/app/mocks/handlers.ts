@@ -9,6 +9,7 @@
 import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
 import type { AccountInput } from '../api/accounts';
 import {
+  MOVABLE_STATUSES,
   RECORD_STATUSES,
   RECORD_VIEWS,
   RecordStatusSchema,
@@ -22,7 +23,7 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canRename, matchesFilter, type SearchableRecord } from '../model/predicates';
+import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesSearch, type SearchableRecord } from '../model/predicates';
 import { mockConfig } from './config';
 import { bump, db, touch } from './db';
 import { emailFor, SEED_EPOCH } from './seed';
@@ -114,10 +115,12 @@ export const handlers = [
     handle(({ tenant, request }) => {
       const { q, status } = parseFilter(new URL(request.url));
       const join = searchable(tenant);
-      const counts = Object.fromEntries(
-        RECORD_VIEWS.map((view: RecordView) => [view, db(tenant).records.filter((r) => matchesFilter(join(r), { q, status, view })).length]),
-      );
-      return HttpResponse.json({ counts });
+      const records = db(tenant).records.map(join);
+      const counts = Object.fromEntries(RECORD_VIEWS.map((view: RecordView) => [view, records.filter((r) => matchesFilter(r, { q, status, view })).length]));
+      // A column's count is its whole status for this search, whatever the status filter narrows the rows to.
+      const searched = records.filter((r) => matchesSearch(r, q));
+      const statuses = Object.fromEntries(RECORD_STATUSES.map((s) => [s, searched.filter(hasStatus(s)).length]));
+      return HttpResponse.json({ counts, statuses });
     }),
   ),
 
@@ -215,6 +218,24 @@ export const handlers = [
       if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
       if (!canArchive(current)) return error(409, 'already_archived', 'This record is already archived.', current);
       const next = touch({ ...current, status: 'archived' });
+      partition.records[index] = next;
+      return HttpResponse.json(next);
+    }),
+  ),
+
+  http.post(
+    `${API}/records/:id/status`,
+    handle(async ({ tenant, request, params }) => {
+      const partition = db(tenant);
+      const index = partition.records.findIndex((r) => r.id === params.id);
+      const current = partition.records[index];
+      if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<{ status: string; version: number }>;
+      const status = MOVABLE_STATUSES.find((s) => s === body.status);
+      if (!status) return error(422, 'invalid', 'Choose draft, pending, active or overdue.');
+      if (!canMove(current)) return error(409, 'archived', 'Archived records can’t be moved. Restore it first.', current);
+      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this record.', current);
+      const next = touch({ ...current, status });
       partition.records[index] = next;
       return HttpResponse.json(next);
     }),

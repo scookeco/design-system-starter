@@ -12,9 +12,12 @@
  * Anatomy:
  *   header   PageHeader: title + description | page actions
  *   views    NavTabs (All · Open · Drafts · Archived) with server counts; each view is a predicate
- *   toolbar  SearchField · Filters Popover (status checkboxes)   (role="search")
+ *   toolbar  SearchField · Filters Popover (status checkboxes)   (role="search") | Display: Table · Board
  *   chips    one removable Tag per active filter; removing one moves focus to the next chip, or to Filters
- *   content  one of: skeleton rows (loading) · table · empty state (first use | no results | error)
+ *   content  one of: skeleton rows (loading) · table or board · empty state (first use | no results | error)
+ *            The table and the board are two surfaces over ONE query and ONE projection: the same
+ *            rows, the board grouped by the per-status predicates (toBoard), its column totals from
+ *            the same server counts as the tabs. Neither keeps its own copy.
  *   footer   Pagination: "1–10 of 219", from the server's total. Its summary is the page's one live
  *            region for the count; while loading or failed, a caption announces that instead.
  *   select   a checkbox per row, named after it; the header box selects the page, then offers
@@ -49,6 +52,7 @@ import {
   Pagination,
   Popover,
   SearchField,
+  SegmentedControl,
   Skeleton,
   Stack,
   Table,
@@ -64,9 +68,9 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { BulkDeleteResult, RecordStatus, SortKey } from '../app/api/schemas';
-import { useBulkDeleteRecords, useCreateRecord, type BulkSelection } from '../app/model/mutations';
-import { statusOptionsFor, toRow, VIEWS } from '../app/model/projections';
+import type { BulkDeleteResult, MovableStatus, RecordStatus, SortKey } from '../app/api/schemas';
+import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
+import { DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
   EMPTY_SELECTION,
@@ -86,6 +90,7 @@ import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { ExampleShell } from './ExampleShell';
+import { RecordBoard } from './RecordBoard';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
 const PAGE_SIZE = 10;
@@ -166,6 +171,7 @@ function ListPageContent({
   const format = useFormat();
   const createRecord = useCreateRecord();
   const retryDelete = useBulkDeleteRecords();
+  const move = useMoveRecord();
 
   const [url, nav] = useUrlState(listCodec);
   const query = { ...url, q: url.q.trim(), pageSize: PAGE_SIZE };
@@ -236,6 +242,15 @@ function ListPageContent({
     setFocusChip(index);
   };
 
+  const moveRecord = (row: RecordRow, status: MovableStatus) =>
+    move.mutate(
+      { record: row, status },
+      {
+        onSuccess: () => toast({ title: `Moved to ${STATUS[status].label}`, description: row.name, tone: 'success' }),
+        onError: () => toast({ title: 'Couldn’t move the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+      },
+    );
+
   const toggleSort = (column: SortColumn) => refine({ sort: (query.sort === column ? `-${column}` : column) as SortKey });
 
   const submitCreate = (event?: FormEvent) => {
@@ -297,7 +312,7 @@ function ListPageContent({
   );
 
   // First use: nothing in the workspace at all, whatever the view.
-  const firstUse = counts.data !== undefined && !filtered && counts.data.all + counts.data.archived === 0;
+  const firstUse = counts.data !== undefined && !filtered && counts.data.counts.all + counts.data.counts.archived === 0;
 
   return (
     <Center max="lg" gutters="lg">
@@ -320,7 +335,7 @@ function ListPageContent({
             <NavTabs
               label="Record views"
               items={VIEWS.map(({ view, label }) => ({
-                label: counts.data ? `${label} (${format.number(counts.data[view])})` : label,
+                label: counts.data ? `${label} (${format.number(counts.data.counts[view])})` : label,
                 // A tab keeps the search, drops filters the new view can't use, and starts at page 1.
                 href: nav.href({ view, status: [], page: 1 }),
               }))}
@@ -329,31 +344,41 @@ function ListPageContent({
             />
 
             <Stack gap="sm">
-              <Cluster as="form" role="search" gap="sm" align="end" onSubmit={(event) => event.preventDefault()}>
-                <SearchField
-                  label="Search records"
+              <Cluster align="end" gap="sm">
+                <Cluster as="form" role="search" gap="sm" align="end" onSubmit={(event) => event.preventDefault()}>
+                  <SearchField
+                    label="Search records"
+                    hideLabel
+                    placeholder="Search by name or owner"
+                    value={searchText}
+                    onValueChange={setSearchText}
+                  />
+                  <Popover
+                    label="Filter by status"
+                    open={filtersOpen}
+                    onOpenChange={setFiltersOpen}
+                    trigger={
+                      <Button ref={filtersRef} variant="secondary" icon="settings">
+                        {query.status.length > 0 ? `Filters (${format.number(query.status.length)})` : 'Filters'}
+                      </Button>
+                    }
+                  >
+                    <Text size="caption" tone="muted">
+                      Status
+                    </Text>
+                    {statusOptions.map(({ value, label }) => (
+                      <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
+                    ))}
+                  </Popover>
+                </Cluster>
+                {/* Two surfaces, one query: switching is navigation (push), so Back returns to the other one. */}
+                <SegmentedControl
+                  label="Display"
                   hideLabel
-                  placeholder="Search by name or owner"
-                  value={searchText}
-                  onValueChange={setSearchText}
+                  options={DISPLAYS}
+                  value={url.display}
+                  onValueChange={(display) => nav.push({ display: display as Display })}
                 />
-                <Popover
-                  label="Filter by status"
-                  open={filtersOpen}
-                  onOpenChange={setFiltersOpen}
-                  trigger={
-                    <Button ref={filtersRef} variant="secondary" icon="settings">
-                      {query.status.length > 0 ? `Filters (${format.number(query.status.length)})` : 'Filters'}
-                    </Button>
-                  }
-                >
-                  <Text size="caption" tone="muted">
-                    Status
-                  </Text>
-                  {statusOptions.map(({ value, label }) => (
-                    <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
-                  ))}
-                </Popover>
               </Cluster>
               {query.status.length > 0 ? (
                 <Cluster as="ul" role="list" aria-label="Active filters" gap="xs">
@@ -394,7 +419,7 @@ function ListPageContent({
               </Banner>
             ) : null}
 
-            {list.isSuccess && rows.length > 0 && pageSelection === true && total > rows.length ? (
+            {url.display === 'table' && list.isSuccess && rows.length > 0 && pageSelection === true && total > rows.length ? (
               <Cluster gap="xs" align="center">
                 {selection.scope === 'matching' ? (
                   <>
@@ -462,6 +487,14 @@ function ListPageContent({
                     </Button>
                   ) : undefined
                 }
+              />
+            ) : url.display === 'board' ? (
+              <RecordBoard
+                columns={toBoard(rows, query.view, query.status)}
+                statusCounts={counts.data?.statuses}
+                allowMove
+                movingId={move.isPending ? move.variables.record.id : undefined}
+                onMove={moveRecord}
               />
             ) : (
               <Table caption="Records" hideCaption maxHeight="md">

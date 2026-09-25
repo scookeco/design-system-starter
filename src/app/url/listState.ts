@@ -1,10 +1,10 @@
 /**
- * The list page's URL: /records?view=open&q=lease&status=pending,overdue&sort=-amount&page=2.
+ * The list page's URL: /records?view=open&q=lease&status=pending,overdue&sort=-amount&page=2&display=board.
  * Every value is validated here; anything unknown falls back to its default, so a hand-edited or
  * stale link still opens a sensible view.
  */
 import { RECORD_VIEWS, SORT_KEYS, type RecordStatus, type RecordView, type SortKey } from '../api/schemas';
-import { statusOptionsFor } from '../model/projections';
+import { DISPLAYS, statusOptionsFor, type Display } from '../model/projections';
 import type { UrlCodec } from './useUrlState';
 
 export interface ListUrlState {
@@ -13,9 +13,11 @@ export interface ListUrlState {
   status: readonly RecordStatus[];
   sort: SortKey;
   page: number;
+  /** Table or board: two surfaces over the same query. Not "view", which is the tab. */
+  display: Display;
 }
 
-export const LIST_DEFAULTS: ListUrlState = { view: 'all', q: '', status: [], sort: 'name', page: 1 };
+export const LIST_DEFAULTS: ListUrlState = { view: 'all', q: '', status: [], sort: 'name', page: 1, display: 'table' };
 
 const oneOf = <T extends string>(allowed: readonly T[], value: string | null, fallback: T): T =>
   value !== null && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
@@ -34,6 +36,11 @@ export const listCodec: UrlCodec<ListUrlState> = {
       status: allowed.filter((status) => asked.has(status)),
       sort: oneOf(SORT_KEYS, params.get('sort'), LIST_DEFAULTS.sort),
       page: Number.isInteger(page) && page >= 1 ? page : LIST_DEFAULTS.page,
+      display: oneOf(
+        DISPLAYS.map((d) => d.value),
+        params.get('display'),
+        LIST_DEFAULTS.display,
+      ),
     };
   },
   serialise: (state) => {
@@ -43,6 +50,7 @@ export const listCodec: UrlCodec<ListUrlState> = {
     if (state.status.length > 0) params.set('status', state.status.join(','));
     if (state.sort !== LIST_DEFAULTS.sort) params.set('sort', state.sort);
     if (state.page !== LIST_DEFAULTS.page) params.set('page', String(state.page));
+    if (state.display !== LIST_DEFAULTS.display) params.set('display', state.display);
     return params.toString().replaceAll('%2C', ',');
   },
 };

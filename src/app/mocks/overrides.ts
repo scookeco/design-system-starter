@@ -18,7 +18,9 @@ export const fail = (method: Method, path: string, status = 500, code = 'server_
 /** A workspace with no records yet. */
 export const emptyWorkspace = [
   http.get(`${API}/records`, () => HttpResponse.json({ items: [], total: 0, page: 1, pageSize: 10 })),
-  http.get(`${API}/records/counts`, () => HttpResponse.json({ counts: { all: 0, open: 0, drafts: 0, archived: 0 } })),
+  http.get(`${API}/records/counts`, () =>
+    HttpResponse.json({ counts: { all: 0, open: 0, drafts: 0, archived: 0 }, statuses: { draft: 0, pending: 0, active: 0, overdue: 0, archived: 0 } }),
+  ),
 ];
 
 /** A 200 whose body breaks the contract: the boundary rejects it and the page shows its error state. */

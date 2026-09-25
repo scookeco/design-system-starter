@@ -8,6 +8,7 @@ import { SetupWizard } from '../../src/examples/SetupWizard';
 import { ListPage } from '../../src/examples/ListPage';
 import { RecordPage } from '../../src/examples/RecordPage';
 import { http, HttpResponse } from 'msw';
+import { countRecords } from '../../src/app/api/records';
 import { renderWithApp, server, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
@@ -194,6 +195,28 @@ describe('List page example', () => {
     const views = screen.getByRole('navigation', { name: 'Record views' });
     await waitFor(() => expect(within(views).getByRole('link', { name: 'All (219)' }).getAttribute('aria-current')).toBe('page'));
     expect(within(views).getByRole('link', { name: 'Archived (21)' })).toBeTruthy();
+  });
+
+  it('shows the same rows as a board: one column per status, cards from the same query, totals from the server', async () => {
+    renderWithApp(<ListPage />, { url: '/records?display=board' });
+    const pending = await screen.findByRole('region', { name: 'Pending' });
+    const columns = ['Draft', 'Pending', 'Active', 'Overdue'].map((name) => screen.getByRole('region', { name }));
+    await waitFor(() => expect(columns.reduce((n, column) => n + within(column).queryAllByRole('listitem').length, 0)).toBe(10));
+    // The column total is the server's per-status count, the same one the tabs are counted with.
+    const { statuses } = await countRecords('acme', { q: '', status: [] });
+    expect(within(pending).getByText(`${String(statuses.pending)} total`)).toBeTruthy();
+  });
+
+  it('moves a card without dragging: its Move to… menu, from the keyboard', async () => {
+    renderWithApp(<ListPage />, { url: '/records?display=board&view=drafts' });
+    const drafts = await screen.findByRole('region', { name: 'Draft' });
+    const first = (await within(drafts).findAllByRole('listitem'))[0] as HTMLElement;
+    const name = within(first).getAllByRole('link')[0]?.textContent ?? '';
+    fireEvent.keyDown(within(first).getByRole('button', { name: `Move to…, ${name}` }), { key: 'Enter' });
+    expect(screen.queryByRole('menuitem', { name: 'Move to Draft' })).toBeNull();
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Move to Active' }));
+    // Drafts shows drafts only: once moved, the card leaves this board.
+    await waitFor(() => expect(within(drafts).queryByRole('link', { name })).toBeNull());
   });
 
   it('clears the search from its clear button and keeps focus in the field', () => {

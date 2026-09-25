@@ -25,7 +25,6 @@ export function useRecordCounts(filter: Omit<RecordFilter, 'view'>) {
   return useQuery({
     queryKey: recordKeys.count(tenant, filter),
     queryFn: ({ signal }) => countRecords(tenant, filter, signal),
-    select: (data) => data.counts,
     placeholderData: keepPreviousData,
   });
 }

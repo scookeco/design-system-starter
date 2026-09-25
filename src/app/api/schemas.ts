@@ -93,8 +93,20 @@ export const RECORD_VIEWS = ['all', 'open', 'drafts', 'archived'] as const;
 export const RecordViewSchema = z.enum(RECORD_VIEWS);
 export type RecordView = z.infer<typeof RecordViewSchema>;
 
-export const RecordCountsSchema = z.object({ counts: z.record(RecordViewSchema, z.number().int().nonnegative()) });
+/**
+ * Server counts for a search: one per view (the tabs) and one per status (the board's columns).
+ * Both are counted with the same named predicates the list filters by.
+ */
+export const RecordCountsSchema = z.object({
+  counts: z.record(RecordViewSchema, z.number().int().nonnegative()),
+  statuses: z.record(RecordStatusSchema, z.number().int().nonnegative()),
+});
 export type RecordCounts = z.infer<typeof RecordCountsSchema>['counts'];
+export type StatusCounts = z.infer<typeof RecordCountsSchema>['statuses'];
+
+/** The statuses a person can move a record between. Archiving is its own verb, with its own rules. */
+export const MOVABLE_STATUSES = ['draft', 'pending', 'active', 'overdue'] as const satisfies readonly RecordStatus[];
+export type MovableStatus = (typeof MOVABLE_STATUSES)[number];
 
 export const SORT_KEYS = ['name', '-name', 'amount', '-amount', 'updated', '-updated'] as const;
 export type SortKey = (typeof SORT_KEYS)[number];

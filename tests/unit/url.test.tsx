@@ -13,9 +13,9 @@ setupMockApi();
 describe('list URL codec', () => {
   const states: ListUrlState[] = [
     LIST_DEFAULTS,
-    { view: 'open', q: 'lease', status: ['pending', 'overdue'], sort: '-amount', page: 3 },
-    { view: 'archived', q: 'Café & co', status: ['archived'], sort: 'updated', page: 1 },
-    { view: 'all', q: '', status: ['draft'], sort: '-name', page: 12 },
+    { view: 'open', q: 'lease', status: ['pending', 'overdue'], sort: '-amount', page: 3, display: 'table' },
+    { view: 'archived', q: 'Café & co', status: ['archived'], sort: 'updated', page: 1, display: 'board' },
+    { view: 'all', q: '', status: ['draft'], sort: '-name', page: 12, display: 'table' },
   ];
 
   it.each(states)('round-trips %o', (state) => {
@@ -24,8 +24,8 @@ describe('list URL codec', () => {
 
   it('writes defaults as nothing and keeps a stable, readable order', () => {
     expect(listCodec.serialise(LIST_DEFAULTS)).toBe('');
-    expect(listCodec.serialise({ view: 'open', q: 'lease', status: ['pending', 'overdue'], sort: '-amount', page: 2 })).toBe(
-      'view=open&q=lease&status=pending,overdue&sort=-amount&page=2',
+    expect(listCodec.serialise({ view: 'open', q: 'lease', status: ['pending', 'overdue'], sort: '-amount', page: 2, display: 'board' })).toBe(
+      'view=open&q=lease&status=pending,overdue&sort=-amount&page=2&display=board',
     );
   });
 

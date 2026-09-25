@@ -28,6 +28,10 @@ export const SecondPage: Story = { parameters: mockApi({ url: '/records?page=2' 
 export const OpenedFromLink: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount' }) };
 /** Another tenant: its own records, currency and counts, under its own cache keys. */
 export const OtherTenant: Story = { parameters: mockApi({ tenant: 'globex' }) };
+/** The same query as a board: one column per status the view lets through, totals from the server's counts. */
+export const Board: Story = { parameters: mockApi({ url: '/records?display=board' }) };
+/** A filter narrows the board to its columns, as it narrows the table to its rows. */
+export const BoardFiltered: Story = { parameters: mockApi({ url: '/records?display=board&view=open&q=lease' }) };
 export const RowsSelected: Story = { args: { initialSelection: 'page' } };
 /** "Select all N matching": the selection is the filter, not the ids on this page. */
 export const AllMatchingSelected: Story = { args: { initialSelection: 'matching' } };

@@ -5,6 +5,7 @@
  *
  *   verb               presents     patches                    invalidates
  *   renameRecord       optimistic   detail (then rolls back)   detail, lists        (counts can't change)
+ *   moveRecord         pessimistic  detail (server's answer)   lists, counts        (board column)
  *   archiveRecord      pessimistic  detail (server's answer)   lists, counts
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts
@@ -16,8 +17,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
-import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, type NewRecord } from '../api/records';
-import type { Account, Person, RecordEntity, RecordFilter } from '../api/schemas';
+import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
+import type { Account, MovableStatus, Person, RecordEntity, RecordFilter } from '../api/schemas';
 import { useTenant } from '../tenant';
 import { accountKeys, recordKeys } from './keys';
 
@@ -60,6 +61,26 @@ export function useRenameRecord(id: string) {
         isConflict(error) ? undefined : client.invalidateQueries({ queryKey: key, exact: true }),
         client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
       ]),
+  });
+}
+
+/**
+ * moveRecord: pessimistic. A board's "Move to…" (or a drop): the new status, versioned. Takes the
+ * record per call, so one hook serves every card on a board.
+ */
+export function useMoveRecord() {
+  const tenant = useTenant();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [tenant, 'moveRecord'],
+    mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => postStatus(tenant, record.id, status, record.version),
+    onSuccess: (moved) => {
+      client.setQueryData(recordKeys.detail(tenant, moved.id), moved);
+      return Promise.all([
+        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
+      ]);
+    },
   });
 }
 

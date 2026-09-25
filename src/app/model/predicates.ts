@@ -3,7 +3,7 @@
  * action guards and the (mock) server all call these, so they can never disagree. A new tab is a
  * new entry in VIEW_PREDICATES; a new rule is a new named function here.
  */
-import type { RecordEntity, RecordFilter, RecordView } from '../api/schemas';
+import type { RecordEntity, RecordFilter, RecordStatus, RecordView } from '../api/schemas';
 
 /**
  * A record joined with its owner's name, for search. The name is looked up by id at the moment of
@@ -21,6 +21,11 @@ export const isOnLegalHold = (record: Pick<RecordEntity, 'tags'>) => record.tags
 export const canRename = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canArchive = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canDelete = (record: Pick<RecordEntity, 'tags'>) => !isOnLegalHold(record);
+/** Moving between board columns: anything not archived (archive and restore are their own verbs). */
+export const canMove = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
+
+/** One predicate per status: what a board column holds. */
+export const hasStatus = (status: RecordStatus) => (record: Pick<RecordEntity, 'status'>) => record.status === status;
 
 /** The list's tabs, as predicates over one set of records. */
 export const VIEW_PREDICATES: Record<RecordView, (record: Pick<RecordEntity, 'status'>) => boolean> = {
