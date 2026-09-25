@@ -19,6 +19,14 @@
       "description": "Rebuild tokens to a temp dir and fail if the committed files or the token usage map are stale."
     },
     {
+      "command": "npm run manifest",
+      "description": "Generate the files for coding agents from the code, stories, usage docs, guides and `CLAUDE.md`: `design-system.manifest.json`, `llms.txt` and `llms-full.txt`."
+    },
+    {
+      "command": "npm run manifest:check",
+      "description": "Regenerate them in memory and fail if any committed one is stale."
+    },
+    {
       "command": "npm run typecheck",
       "description": "`tsc --noEmit`, strict."
     },
@@ -60,7 +68,7 @@
     },
     {
       "command": "npm run check",
-      "description": "`tokens:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`."
+      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`."
     }
   ],
   "guides": [

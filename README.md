@@ -26,6 +26,8 @@ npm run check                     # everything CI runs except the visual job
 | `npm run dev` | Storybook dev server (the gallery). |
 | `npm run tokens` | Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`, then the token usage map `src/tokens/token-usage.json`. |
 | `npm run tokens:check` | Rebuild tokens to a temp dir and fail if the committed files or the token usage map are stale. |
+| `npm run manifest` | Generate the files for coding agents from the code, stories, usage docs, guides and `CLAUDE.md`: `design-system.manifest.json`, `llms.txt` and `llms-full.txt`. |
+| `npm run manifest:check` | Regenerate them in memory and fail if any committed one is stale. |
 | `npm run typecheck` | `tsc --noEmit`, strict. |
 | `npm run lint` | ESLint (`lint:js`) and Stylelint (`lint:css`), zero warnings allowed. |
 | `npm test` | Vitest: token, contrast, CSS-structure and component tests. |
@@ -36,7 +38,7 @@ npm run check                     # everything CI runs except the visual job
 | `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
-| `npm run check` | `tokens:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
+| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
 
 ## Repo map
 
