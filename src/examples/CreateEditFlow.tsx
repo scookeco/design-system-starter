@@ -9,6 +9,10 @@
  * and each summary link moves focus to its field. The submit button stays enabled and carries
  * the pending state; nothing the user typed is cleared on error.
  *
+ * Fields: Name, Owner and Amount render from CREATE_FIELDS through the field registry, the same
+ * registry the record page's properties use; renewal and the reminder stay hand-composed, since no
+ * other surface shares them.
+ *
  * Writes (src/app/model/mutations.ts): the record is created with createRecord, pessimistically,
  * with an idempotency key: a retry after a failure, or a double submit, sends the same key, so the
  * server makes one record. A changed draft gets a new key. A server failure keeps the draft and
@@ -31,15 +35,17 @@ import {
   Link,
   PageHeader,
   RadioGroup,
-  Select,
   Stack,
   Switch,
   TextField,
   Textarea,
   currencyDigits,
+  useFormat,
 } from '../index';
 import { useAddPerson, useCreateRecord } from '../app/model/mutations';
 import { usePeople } from '../app/model/queries';
+import { FieldInput } from '../app/registries/fields';
+import { CREATE_FIELDS } from '../app/registries/recordFields';
 import { useTenant } from '../app/tenant';
 import { WORKSPACES } from '../app/workspaces';
 import { ExampleShell } from './ExampleShell';
@@ -115,7 +121,8 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
   const errors = validate(draft);
   const shown = (field: FieldName) => (failedSubmits > 0 || touched[field] ? errors[field] : undefined);
   const summary = failedSubmits > 0 ? (Object.keys(FIELD_ID) as FieldName[]).filter((f) => errors[f]) : [];
-  const ownerOptions = (people.data ?? []).map((person) => ({ value: person.id, label: person.name }));
+  const format = useFormat();
+  const fieldContext = { format, currency, people: people.data ?? [] };
 
   // After each failed submit, focus moves to the summary; it is not also announced (announce={false}).
   useEffect(() => {
@@ -246,57 +253,47 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
             <Card>
               <CardHeader title="Details" description="What the record is and who owns it." />
               <CardBody>
-                <TextField
-                  id={FIELD_ID.name}
-                  label="Name"
-                  value={draft.name}
-                  onChange={(event) => set('name', event.target.value)}
-                  onBlur={() => touch('name')}
-                  error={shown('name')}
-                  autoComplete="off"
-                />
-                <Stack gap="xs">
-                  <Select
-                    id={FIELD_ID.owner}
-                    label="Owner"
-                    placeholder={people.isPending ? 'Loading people…' : 'Choose a person'}
-                    options={ownerOptions}
-                    value={draft.owner}
-                    onValueChange={(value) => {
-                      set('owner', value);
-                      touch('owner');
-                    }}
-                    error={shown('owner')}
+                {/* Registry-rendered: CREATE_FIELDS.details says which fields, the field registry how each one edits. */}
+                {CREATE_FIELDS.details.map((field) => (
+                  <FieldInput
+                    key={field.id}
+                    field={field}
+                    inputId={FIELD_ID[field.id]}
+                    value={draft[field.id]}
+                    onChange={(value) => set(field.id, value)}
+                    onBlur={() => touch(field.id)}
+                    error={shown(field.id)}
+                    context={fieldContext}
                   />
-                  <Cluster>
-                    <Dialog
-                      size="sm"
-                      title="Add a person"
-                      description="People own records. They’re invited when a record is sent."
-                      open={quickCreateOpen}
-                      onOpenChange={setQuickCreateOpen}
-                      trigger={
-                        <Button variant="ghost" size="sm" icon="plus">
-                          Add a person
+                ))}
+                <Cluster>
+                  <Dialog
+                    size="sm"
+                    title="Add a person"
+                    description="People own records. They’re invited when a record is sent."
+                    open={quickCreateOpen}
+                    onOpenChange={setQuickCreateOpen}
+                    trigger={
+                      <Button variant="ghost" size="sm" icon="plus">
+                        Add a person
+                      </Button>
+                    }
+                    footer={
+                      <>
+                        <Button variant="secondary" onClick={() => setQuickCreateOpen(false)}>
+                          Cancel
                         </Button>
-                      }
-                      footer={
-                        <>
-                          <Button variant="secondary" onClick={() => setQuickCreateOpen(false)}>
-                            Cancel
-                          </Button>
-                          <Button onClick={() => createPerson()} loading={addPerson.isPending}>
-                            Add person
-                          </Button>
-                        </>
-                      }
-                    >
-                      <Stack as="form" gap="md" onSubmit={createPerson}>
-                        <TextField label="Full name" value={personName} onChange={(event) => setPersonName(event.target.value)} error={personError} />
-                      </Stack>
-                    </Dialog>
-                  </Cluster>
-                </Stack>
+                        <Button onClick={() => createPerson()} loading={addPerson.isPending}>
+                          Add person
+                        </Button>
+                      </>
+                    }
+                  >
+                    <Stack as="form" gap="md" onSubmit={createPerson}>
+                      <TextField label="Full name" value={personName} onChange={(event) => setPersonName(event.target.value)} error={personError} />
+                    </Stack>
+                  </Dialog>
+                </Cluster>
                 <Textarea
                   label="Description (optional)"
                   description="Shown to everyone with access to the record."
@@ -309,19 +306,18 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
             <Card>
               <CardHeader title="Terms" description="Money and what happens when the term ends." />
               <CardBody>
-                <TextField
-                  id={FIELD_ID.amount}
-                  label={`Amount (${currency})`}
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  // Any number of decimals: otherwise the browser blocks "12500.50" as a step mismatch.
-                  step="any"
-                  value={draft.amount}
-                  onChange={(event) => set('amount', event.target.value)}
-                  onBlur={() => touch('amount')}
-                  error={shown('amount')}
-                />
+                {CREATE_FIELDS.terms.map((field) => (
+                  <FieldInput
+                    key={field.id}
+                    field={field}
+                    inputId={FIELD_ID[field.id]}
+                    value={draft[field.id]}
+                    onChange={(value) => set(field.id, value)}
+                    onBlur={() => touch(field.id)}
+                    error={shown(field.id)}
+                    context={fieldContext}
+                  />
+                ))}
                 <RadioGroup
                   id={FIELD_ID.renewal}
                   label="When the term ends"

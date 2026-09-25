@@ -9,7 +9,8 @@
  *   header   PageHeader: title + status badge · metadata line | secondary · primary · "More" menu (destructive last)
  *   sections NavTabs (Overview · Activity · Files): each section is its own URL, so links, not a tablist
  *   main     the section: summary card | activity feed with a comment box | files (previews in a Frame)
- *   aside    PageLayout's aside ("Properties"): a definition list; stacks below main when the container is narrow
+ *   aside    PageLayout's aside ("Properties"): a definition list rendered from RECORD_PROPERTIES through
+ *            the field registry; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays rename dialog, delete confirmation; toasts for results
  *
@@ -47,7 +48,6 @@ import {
   TextField,
   useFormat,
   useToast,
-  type Formatter,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
 import type { RecordEntity } from '../app/api/schemas';
@@ -55,6 +55,8 @@ import { isConflict, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } f
 import { canArchive, canDelete, canRename, isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { FieldDisplay, isNumericField } from '../app/registries/fields';
+import { RECORD_PROPERTIES } from '../app/registries/recordFields';
 
 interface Activity {
   id: string;
@@ -115,15 +117,6 @@ const SECTIONS: readonly { section: RecordSection; label: string }[] = [
 
 /** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
 const sectionHref = (record: RecordEntity, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
-
-/** The per-type part: which properties a record shows, in what order. Everything else is shared. */
-const properties = (record: RecordEntity, format: Formatter) => [
-  { label: 'Owner', value: record.owner.name },
-  { label: 'Status', value: STATUS[record.status].label },
-  { label: 'Amount', value: format.money(record.amount.minor, record.amount.currency), numeric: true },
-  { label: 'Last updated', value: format.date(record.updatedAt), numeric: true },
-  { label: 'ID', value: record.id, numeric: true },
-];
 
 /** A write to start on mount, so the gallery and tests can show each mutation state. */
 export type RecordPageAction = { kind: 'rename'; name: string } | { kind: 'archive' };
@@ -389,13 +382,14 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
               <CardHeader title="Properties" />
               <CardBody>
                 <Stack as="dl" gap="sm">
-                  {properties(record, format).map((property) => (
-                    <Stack gap="2xs" key={property.label}>
+                  {/* The per-type part is config: RECORD_PROPERTIES says which fields, the field registry how each renders. */}
+                  {RECORD_PROPERTIES.map((field) => (
+                    <Stack gap="2xs" key={field.id}>
                       <Text as="dt" size="caption" tone="muted">
-                        {property.label}
+                        {field.label}
                       </Text>
-                      <Text as="dd" numeric={property.numeric}>
-                        {property.value}
+                      <Text as="dd" numeric={isNumericField(field.type)}>
+                        <FieldDisplay field={field} entity={record} format={format} />
                       </Text>
                     </Stack>
                   ))}
