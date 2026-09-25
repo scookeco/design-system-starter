@@ -72,7 +72,8 @@
     cursor: not-allowed;
   }
 
+  /* The value stays readable when disabled (it is text, and axe checks its contrast); muted, not disabled grey. */
   .slider__root[data-disabled] ~ .slider__value {
-    color: var(--color-fg-disabled);
+    color: var(--color-fg-muted);
   }
 }

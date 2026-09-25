@@ -157,7 +157,6 @@ export function FileUpload({
         <div
           className="file-upload__dropzone"
           data-state={dragging ? 'dragging' : undefined}
-          data-disabled={disabled ? 'true' : undefined}
           data-drag-alternative="the Choose files button opens the system file picker"
           onDragOver={onDragOver}
           onDragLeave={() => setDragging(false)}
