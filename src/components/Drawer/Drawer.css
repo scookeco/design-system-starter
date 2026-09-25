@@ -25,6 +25,11 @@
     box-shadow: var(--shadow-modal);
   }
 
+  /* Focus scrolls clear of the sticky footer, never under it (WCAG 2.4.11). */
+  .drawer:has(> .drawer__footer) {
+    scroll-padding-block-end: var(--space-scroll-padding-end);
+  }
+
   /* 2. parts: each pads itself, so the sticky footer can run edge to edge */
   .drawer__header {
     display: flex;

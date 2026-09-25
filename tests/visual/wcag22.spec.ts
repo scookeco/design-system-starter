@@ -2,7 +2,7 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import { index, openStory, stories, type IndexEntry } from './storybook';
-import { CHECKS, targetSizeViolations, type CheckId } from './wcag22-checks';
+import { CHECKS, focusObscuredViolation, targetSizeViolations, type CheckId } from './wcag22-checks';
 
 /**
  * WCAG 2.2 checks beyond axe, over every story in one pass each (light theme: none of them depends
@@ -15,8 +15,33 @@ import { CHECKS, targetSizeViolations, type CheckId } from './wcag22-checks';
  * Set WCAG22_TIMINGS=<file> to append each story's per-check time (ms) as a JSON line.
  */
 
+/** Tab stops per direction before giving up on wrap-around. The longest example has about 30. */
+const MAX_TAB_STOPS = 200;
+
+/**
+ * Tab forward through every focus stop until focus wraps or leaves the page, then Shift+Tab back
+ * the same way: forward exposes bars stuck to the block end (action bars), backward bars stuck to
+ * the block start (a table's header row).
+ */
+const focusNotObscured = async (page: Page) => {
+  const violations = new Set<string>();
+  for (const key of ['Tab', 'Shift+Tab']) {
+    const seen = new Set<string>();
+    for (let stop = 0; stop < MAX_TAB_STOPS; stop += 1) {
+      await page.keyboard.press(key);
+      const focus = await page.evaluate(focusObscuredViolation);
+      if (focus.key === null ? stop > 0 : seen.has(focus.key)) break;
+      if (focus.key !== null) seen.add(focus.key);
+      for (const v of focus.violations) violations.add(`${v} [${key}]`);
+    }
+  }
+  return [...violations];
+};
+
 const RUNNERS: Record<CheckId, (page: Page, story: IndexEntry) => Promise<string[]>> = {
   'target-size': (page) => page.evaluate(targetSizeViolations),
+  // Last: tabbing opens tooltips and scrolls.
+  'focus-not-obscured': focusNotObscured,
 };
 
 const fixtures = Object.values(index.entries).filter((e) => e.type === 'story' && e.tags?.includes('check-fixture'));

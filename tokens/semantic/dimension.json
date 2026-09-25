@@ -45,6 +45,17 @@
       "xl": {
         "$value": "{space.8}"
       }
+    },
+    "scroll-padding": {
+      "$description": "Kept clear inside a scroll container with sticky content, so the element that gets keyboard focus scrolls clear of it (WCAG 2.2 SC 2.4.11, checked on every story by tests/visual/wcag22.spec.ts).",
+      "start": {
+        "$value": "{space.12}",
+        "$description": "Below a sticky header row (Table). At least the header's height."
+      },
+      "end": {
+        "$value": "{space.20}",
+        "$description": "Above a sticky action bar (AppShell, FocusedLayout and Drawer footers). At least the tallest bar."
+      }
     }
   },
   "size": {

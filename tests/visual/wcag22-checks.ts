@@ -7,7 +7,7 @@
  */
 
 /** The ids of the checks, as the fixture stories name them in an `expect:<id>` tag. */
-export const CHECKS = ['target-size'] as const;
+export const CHECKS = ['target-size', 'focus-not-obscured'] as const;
 export type CheckId = (typeof CHECKS)[number];
 
 /**
@@ -106,4 +106,65 @@ export function targetSizeViolations(): string[] {
     }
   }
   return violations;
+}
+
+/**
+ * SC 2.4.11 Focus Not Obscured (Minimum), AA, for the element that has focus now: fails when no
+ * part of it can be seen, because other content (a sticky action bar, a sticky table header, a fixed
+ * banner) paints over every sampled point of its visible box, or because it isn't on screen at all.
+ * Also returns a key naming the focused element (null when nothing, or <body>, has focus), so the
+ * caller can tell when Tab has wrapped around.
+ */
+export function focusObscuredViolation(): { key: string | null; violations: string[] } {
+  const el = document.activeElement;
+  if (!el || el === document.body || el === document.documentElement) return { key: null, violations: [] };
+  const w = window as unknown as { wcagFocusCount?: number };
+  if (!(el instanceof HTMLElement || el instanceof SVGElement)) return { key: null, violations: [] };
+  if (el.dataset.wcagFocusKey === undefined) {
+    w.wcagFocusCount = (w.wcagFocusCount ?? 0) + 1;
+    el.dataset.wcagFocusKey = String(w.wcagFocusCount);
+  }
+  const key = el.dataset.wcagFocusKey;
+  const result = (violations: string[]) => ({ key, violations });
+
+  const describe = (node: Element) => {
+    const role = node.getAttribute('role');
+    const name = (node.getAttribute('aria-label') ?? node.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    const cls = [...node.classList].slice(0, 2).map((c) => `.${c}`).join('');
+    const id = node.id && !/[:«]/.test(node.id) ? `#${node.id}` : '';
+    return `${node.tagName.toLowerCase()}${id}${cls}${role ? `[role="${role}"]` : ''}${name ? ` "${name}"` : ''}`;
+  };
+
+  const r = el.getBoundingClientRect();
+  // Visually hidden focus targets (1px) are a Focus Visible question, not an obscuring one.
+  if (r.width <= 1 || r.height <= 1) return result([]);
+
+  // Sample the part inside the viewport. Hit testing already accounts for clipping by scroll
+  // containers and for anything painted on top.
+  const top = Math.max(r.top, 0);
+  const left = Math.max(r.left, 0);
+  const bottom = Math.min(r.bottom, window.innerHeight);
+  const right = Math.min(r.right, window.innerWidth);
+  if (bottom - top < 1 || right - left < 1) return result([`${describe(el)} has focus but is out of view (SC 2.4.11)`]);
+
+  const STEPS = 4;
+  const coverers = new Set<Element>();
+  for (let i = 0; i <= STEPS; i += 1) {
+    for (let j = 0; j <= STEPS; j += 1) {
+      // Inset by 1px: the edge pixels of a box are shared with its neighbours.
+      const x = left + 1 + ((right - left - 2) * i) / STEPS;
+      const y = top + 1 + ((bottom - top - 2) * j) / STEPS;
+      const hit = document.elementFromPoint(x, y);
+      if (!hit) continue;
+      if (hit === el || el.contains(hit) || hit.contains(el)) return result([]);
+      coverers.add(hit);
+    }
+  }
+  if (coverers.size === 0) return result([`${describe(el)} has focus but is out of view (SC 2.4.11)`]);
+  const covering = [...coverers].map((c) => {
+    let n: Element | null = c;
+    while (n && !['sticky', 'fixed'].includes(getComputedStyle(n).position)) n = n.parentElement;
+    return describe(n ?? c);
+  });
+  return result([`${describe(el)} has focus but is entirely hidden by ${[...new Set(covering)].join(', ')} (SC 2.4.11)`]);
 }
