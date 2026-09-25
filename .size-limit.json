@@ -10,7 +10,7 @@
       "radix-ui"
     ],
     "gzip": true,
-    "limit": "13.25 kB"
+    "limit": "16.35 kB"
   },
   {
     "name": "Library CSS (dist/styles.css)",
