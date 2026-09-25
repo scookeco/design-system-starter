@@ -7885,6 +7885,15 @@
           ]
         },
         {
+          "token": "color.bg.selected",
+          "readBy": [
+            {
+              "unit": "Table",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.subtle",
           "readBy": [
             {
