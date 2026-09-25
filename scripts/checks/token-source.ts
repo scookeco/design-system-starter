@@ -4,9 +4,9 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { parseTokens, type Tier, type TokenMap } from './token-model';
+import { parseTokens, type Tier, type TokenMap } from './token-model.ts';
 
-export * from './token-model';
+export * from './token-model.ts';
 
 export const loadTokenSource = (dir: string): TokenMap => {
   const docs: { tier: Tier; file: string; json: Record<string, unknown> }[] = [];

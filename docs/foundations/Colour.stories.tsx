@@ -124,6 +124,8 @@ const GROUP_NAMES: Record<string, string> = {
 function ColourPage() {
   const groups = new Map<string, string[]>();
   for (const { path } of colorRoles) {
+    // Chart colours have their own page and rules (Foundations/Data visualisation).
+    if (path.startsWith('color.chart.')) continue;
     const key = path.startsWith('color.status.') ? `status.${path.split('.')[2] ?? ''}` : group(path);
     groups.set(key, [...(groups.get(key) ?? []), path]);
   }
@@ -139,7 +141,7 @@ function ColourPage() {
     >
       <DocSection
         title="Semantic roles"
-        intro="Use these, through var(--color-…) in system CSS. Each pair is checked in tests/unit/contrast.test.ts: 4.5:1 for text, 3:1 for control boundaries and focus."
+        intro="Use these, through var(--color-…) in system CSS. Each pair is checked in tests/unit/contrast.test.ts: 4.5:1 for text, 3:1 for control boundaries and focus. Chart colours have their own page: Foundations, Data visualisation."
       >
         {[...groups].map(([key, paths]) => (
           <RoleTable

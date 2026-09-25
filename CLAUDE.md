@@ -5,8 +5,9 @@ Reference design system in which drift fails the build. See `README.md` for the 
 ## Commands
 
 ```sh
-npm run check          # tokens:check + typecheck + lint + test + test:rules + build. Must pass.
-npm run tokens         # regenerate src/styles/tokens.css and src/tokens/tokens.ts after editing tokens/
+npm run check          # tokens:check + typecheck + lint + test + test:rules + build + size. Must pass.
+npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
+npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first
 npm run dev            # Storybook gallery
 npm run test:visual    # screenshots + axe for every story, light and dark (local baselines are gitignored)
 ```
@@ -16,6 +17,7 @@ Work on a branch. Never commit to `main` directly.
 ## Repo map
 
 - `tokens/`: DTCG source (primitive → semantic → component). The only place values live.
+- `src/tokens/token-usage.json`: **generated** map of the tokens each component, primitive and layout reads (directly, through props, or through what it composes). Shown in the gallery's Tokens panel. Changing any system CSS or a token means `npm run tokens`, or the unit test and `tokens:check` fail.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
 - `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
@@ -24,6 +26,12 @@ Work on a branch. Never commit to `main` directly.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `docs/`: gallery-only pages. `foundations/` (rendered from the token source), `guides/`, and `usage/<Name>.usage.tsx`, the usage section of each component's Docs tab.
+
+## Budgets and gallery tools
+
+- `npm run check` ends with bundle budgets: library JS, library CSS and a single `import { Button }` (`.size-limit.json`), and a check that importing any one export pulls in only the units it composes. A budget fails when the library grows: find why before raising the limit, and raise it only in the change that needs it (README, "Bundle size budgets").
+- Charts use `color.chart.*` only (categorical slots in order, sequential, diverging), never status colours, and never colour alone. The rules and numbers are on Foundations/Data visualisation.
+- The gallery's Width toolbar shows layouts at narrow, medium and wide container widths; the Tokens panel lists what a component reads.
 
 ## Read the Guides first
 

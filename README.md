@@ -24,27 +24,31 @@ npm run check                     # everything CI runs except the visual job
 | Script | What it does |
 |---|---|
 | `npm run dev` | Storybook dev server (the gallery). |
-| `npm run tokens` | Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`. |
-| `npm run tokens:check` | Rebuild tokens to a temp dir and fail if the committed files are stale. |
+| `npm run tokens` | Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`, then the token usage map `src/tokens/token-usage.json`. |
+| `npm run tokens:check` | Rebuild tokens to a temp dir and fail if the committed files or the token usage map are stale. |
 | `npm run typecheck` | `tsc --noEmit`, strict. |
 | `npm run lint` | ESLint (`lint:js`) and Stylelint (`lint:css`), zero warnings allowed. |
 | `npm test` | Vitest: token, contrast, CSS-structure and component tests. |
 | `npm run test:rules` | Lints every file in `fixtures/violations/` and asserts that the expected rule fires. |
 | `npm run build` | Library build (`dist/index.js`, `dist/styles.css`). |
+| `npm run size` | Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`. |
 | `npm run build-storybook` | Static gallery in `storybook-static/`. |
 | `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
-| `npm run check` | `tokens:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`. |
+| `npm run check` | `tokens:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
 
 ## Repo map
 
 ```text
 tokens/                 DTCG token source: primitive/ → semantic/ → component/
 scripts/build-tokens.ts Style Dictionary build and --check mode
-scripts/checks/         token, contrast and CSS checks (used by Vitest)
+scripts/token-usage.ts  token usage map (src/tokens/token-usage.json) and --check mode
+scripts/check-tree-shaking.ts  single-component imports pull in only what they compose
+scripts/checks/         token, contrast, chart palette, token usage and CSS checks (used by Vitest)
 scripts/test-rules.ts   proves every lint and type rule fires
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
+src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame
 src/components/         the components; the only place (with primitives) Radix is imported
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
@@ -55,7 +59,8 @@ docs/                   Storybook-only pages: foundations/ (generated from the t
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls
 tests/unit/             Vitest suites
 tests/visual/           Playwright suite; __screenshots__/linux/ is committed
-.storybook/             gallery config, theme toolbar
+.storybook/             gallery config, theme and width toolbars, the Tokens panel (manager.tsx)
+.size-limit.json        bundle size budgets
 .github/workflows/      ci.yml, update-visual-baselines.yml
 ```
 
@@ -68,8 +73,10 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Token source (DTCG JSON) is the only place values live | `color-no-hex`, `color-named`, colour-function ban, strict token values, raw length/duration ban (Stylelint) | `stylelint.config.mjs` |
 | Aliases resolve, tiers reference downward only, every semantic colour has a dark value | Vitest | `tests/unit/tokens.test.ts`, `scripts/checks/token-source.ts` |
 | Semantic fg/bg pairs meet WCAG 2.2 AA (4.5:1 text, 3:1 UI) in light **and** dark | Vitest | `tests/unit/contrast.test.ts` |
+| Chart colours: every mark 3:1 on every surface; adjacent categorical slots distinguishable with normal vision and colour-vision deficiency; ramps that stand out more at every step | Vitest, in light and dark | `tests/unit/contrast.test.ts`, `scripts/checks/chart-palette.ts` |
 | Source → CSS variables + TS map | Style Dictionary build; `tokens:check` fails on stale output | `scripts/build-tokens.ts` |
 | Every `var()` used is defined; system CSS never reads primitives; one layer order; every rule in a layer | Vitest | `tests/unit/css.test.ts`, `scripts/checks/css.ts` |
+| The token usage map (and the gallery's Tokens panel) matches the stylesheets, TSX and token source | `tokens:check` and Vitest fail when it is stale or breaks its schema | `scripts/token-usage.ts`, `tests/unit/token-usage.test.ts`, `src/tokens/token-usage.schema.json` |
 | Closed components: no `className`/`style` props | TypeScript props types (`Closed<>`), proved by a type fixture | `src/internal/closed-api.ts`, `fixtures/violations/typescript-closed-api.tsx` |
 | Vendor UI only inside the system; consumers use the public entry | `no-restricted-imports` (ESLint) | `eslint.config.js` |
 | Layers import downward only (see the layer table below) | `no-restricted-imports` per layer; `test:rules` needs a fixture for every direction | `eslint.config.js`, `scripts/test-rules.ts` |
@@ -82,6 +89,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
+| The library stays small, and one import doesn't pull in the rest | size-limit budgets; tree-shaking check per exported unit | `.size-limit.json`, `scripts/check-tree-shaking.ts` |
 | Agents know the rules | UI rules block | `CLAUDE.md` |
 
 ### Layers
@@ -107,6 +115,20 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
   {/* eslint-disable-next-line no-restricted-syntax -- <reason>; owner: <team>; remove when: <condition> */}
   ```
   Count these disables. A rising count means drift, and a repeated override means a variant is missing.
+
+## Bundle size budgets
+
+`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom` and `radix-ui` left out as the consumer's own dependencies:
+
+| Budget | Limit | Measures |
+|---|---|---|
+| Library JS | 12 kB | `dist/index.js`, everything exported |
+| Library CSS | 11.5 kB | `dist/styles.css` |
+| One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
+
+It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
+
+**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 15% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
 
 ## Theming
 
@@ -165,7 +187,14 @@ Then run `npm run check`, run the baseline workflow on the branch, and review th
 2. Edit `tokens/<tier>/*.json` (DTCG: `$type`, `$value`, aliases as `{path.to.token}`). Keys are lowercase kebab-case. A semantic colour needs `"$extensions": { "starter.modes": { "dark": "{…}" } }`.
 3. `npm run tokens`, and commit the JSON together with the regenerated `src/styles/tokens.css` and `src/tokens/tokens.ts`.
 4. If it is a new text/background pair, add it to `scripts/checks/contrast-pairs.ts` (tested in `tests/unit/contrast.test.ts`, shown on Foundations/Colour).
+   A chart colour goes in `tokens/semantic/chart.json`; if it adds a slot or step, extend the lists in `scripts/checks/chart-palette.ts`, which the contrast test and Foundations/Data visualisation read.
 5. Removing or renaming a semantic token is a breaking change. Keep an alias for a deprecation window.
+
+## Gallery tooling
+
+- **Theme toolbar**: light or dark, on `<html>`, so portalled overlays follow it.
+- **Width toolbar**: wraps any story in a container of narrow (half of `size.breakpoint.sm`), medium (`sm`), wide (`md`) or full width. Layouts respond to their container, so this shows each responsive state inside the fixed viewport. Full, the default, renders no wrapper, so screenshots are unaffected.
+- **Tokens panel**: for the current component, primitive or layout story, every token it reads, in its own CSS, through a prop (`gap="md"` → `space.gap.md`) or through the units it composes, with the token's tier, alias chain (semantic → primitive) and light and dark values. It renders `src/tokens/token-usage.json`, which `npm run tokens` generates and `tokens:check` keeps current. Content a caller passes in (an AppShell's nav, a Card's body) is the caller's, so it isn't listed. The JSON is documented by `src/tokens/token-usage.schema.json`, for tools that need a machine-readable map.
 
 ## Documentation
 
@@ -173,7 +202,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 
 | Section | Where | What |
 |---|---|---|
-| **Foundations** | `docs/foundations/` | Colour, typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
+| **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
 | **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, accessibility, content, escape hatches. |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
@@ -218,7 +247,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | **Codemods** for breaking changes (jscodeshift/ts-morph) | You ship a breaking change to more than one consumer. |
 | **Adoption scanning** (system vs local components, `UNSAFE_` uses, disable counts per app) | A second team builds on the system and you need system-coverage numbers. |
 | **Phone tab bar** | Phones become a primary surface. Until then the narrow-screen nav opens in a Drawer. |
-| **Charts** | A page needs a trend, not just a number. Until then dashboards use Stat, Meter and tables. |
+| **Chart components** | A page needs a trend, not just a number. Until then dashboards use Stat, Meter and tables. The chart colour tokens and their rules already exist (Foundations/Data visualisation), so a chart library or hand-drawn SVG reads `color.chart.*` from day one. |
 | **Multi-brand / tenant token axis** (`data-brand` remapping primitives beside `color-scheme`) | A second brand or tenant arrives. Brand becomes another mode on the semantic tier, and the contrast and visual matrix run per brand × scheme. |
 
 ## Versions and compromises

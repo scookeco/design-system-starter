@@ -1,0 +1,161 @@
+{
+  "color": {
+    "$type": "color",
+    "chart": {
+      "$description": "Data visualisation. Marks only: every value reaches 3:1 against every surface in both themes, and tests/unit/contrast.test.ts checks the palette rules on Foundations/Data visualisation. Pair colour with labels, direct labels or patterns; never encode by colour alone. Text in charts uses the fg roles, never these.",
+      "categorical": {
+        "$description": "Series identity, assigned in this order and never cycled: a ninth series folds into \"Other\". Adjacent slots are distinguishable with normal vision and with protanopia or deuteranopia.",
+        "1": {
+          "$value": "{color.blue.500}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.500}"
+            }
+          }
+        },
+        "2": {
+          "$value": "{color.orange.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.600}"
+            }
+          }
+        },
+        "3": {
+          "$value": "{color.teal.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.teal.500}"
+            }
+          }
+        },
+        "4": {
+          "$value": "{color.yellow.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.600}"
+            }
+          }
+        },
+        "5": {
+          "$value": "{color.fuchsia.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.fuchsia.500}"
+            }
+          }
+        },
+        "6": {
+          "$value": "{color.emerald.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.emerald.600}"
+            }
+          }
+        },
+        "7": {
+          "$value": "{color.violet.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.violet.500}"
+            }
+          }
+        },
+        "8": {
+          "$value": "{color.pink.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.pink.500}"
+            }
+          }
+        }
+      },
+      "sequential": {
+        "$description": "Magnitude, one hue: 1 is the lowest value, 5 the highest. Every step stands out more from the surface than the one before, in both themes (light steps darken, dark steps lighten).",
+        "1": {
+          "$value": "{color.blue.500}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.500}"
+            }
+          }
+        },
+        "2": {
+          "$value": "{color.blue.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.400}"
+            }
+          }
+        },
+        "3": {
+          "$value": "{color.blue.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.300}"
+            }
+          }
+        },
+        "4": {
+          "$value": "{color.blue.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.200}"
+            }
+          }
+        },
+        "5": {
+          "$value": "{color.blue.950}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.50}"
+            }
+          }
+        }
+      },
+      "diverging": {
+        "$description": "Polarity around a baseline: a neutral midpoint and two hues that stand out more with distance from it. below is under the baseline, above is over it; neither implies good or bad.",
+        "below-2": {
+          "$value": "{color.orange.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.300}"
+            }
+          }
+        },
+        "below-1": {
+          "$value": "{color.orange.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.500}"
+            }
+          }
+        },
+        "midpoint": {
+          "$value": "{color.gray.500}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.gray.400}"
+            }
+          }
+        },
+        "above-1": {
+          "$value": "{color.blue.500}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.500}"
+            }
+          }
+        },
+        "above-2": {
+          "$value": "{color.blue.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.200}"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -97,7 +97,9 @@ function Layout() {
             <>Pass semantic elements with <code>as</code> (<code>section</code>, <code>ul</code>, <code>form</code>) so the layout is also the outline.</>,
             <>
               Layouts respond to their container, not the viewport. AppShell opens its nav in a Drawer below <code>size.breakpoint.md</code>;
-              PageLayout stacks nav, main and aside below <code>size.breakpoint.sm</code>; Switcher stacks below its <code>threshold</code>.
+              PageLayout stacks nav, main and aside below <code>size.breakpoint.sm</code>; Switcher stacks below its <code>threshold</code>. To
+              see each state, set the gallery’s Width toolbar to Narrow, Medium or Wide: it wraps any story in a container sized from those
+              tokens.
             </>,
             <>
               Start every page with a <code>PageHeader</code> (the one h1, status, actions). Breadcrumbs belong to AppShell’s header, not the

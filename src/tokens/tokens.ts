@@ -25,6 +25,32 @@ export const vars = {
     }
   },
   "color": {
+    "chart": {
+      "categorical": {
+        "1": "var(--color-chart-categorical-1)",
+        "2": "var(--color-chart-categorical-2)",
+        "3": "var(--color-chart-categorical-3)",
+        "4": "var(--color-chart-categorical-4)",
+        "5": "var(--color-chart-categorical-5)",
+        "6": "var(--color-chart-categorical-6)",
+        "7": "var(--color-chart-categorical-7)",
+        "8": "var(--color-chart-categorical-8)"
+      },
+      "sequential": {
+        "1": "var(--color-chart-sequential-1)",
+        "2": "var(--color-chart-sequential-2)",
+        "3": "var(--color-chart-sequential-3)",
+        "4": "var(--color-chart-sequential-4)",
+        "5": "var(--color-chart-sequential-5)"
+      },
+      "diverging": {
+        "below-2": "var(--color-chart-diverging-below-2)",
+        "below-1": "var(--color-chart-diverging-below-1)",
+        "midpoint": "var(--color-chart-diverging-midpoint)",
+        "above-1": "var(--color-chart-diverging-above-1)",
+        "above-2": "var(--color-chart-diverging-above-2)"
+      }
+    },
     "bg": {
       "canvas": "var(--color-bg-canvas)",
       "surface": "var(--color-bg-surface)",

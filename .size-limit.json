@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Library JS (dist/index.js, everything)",
+    "path": "dist/index.js",
+    "import": "*",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "radix-ui"
+    ],
+    "gzip": true,
+    "limit": "12 kB"
+  },
+  {
+    "name": "Library CSS (dist/styles.css)",
+    "path": "dist/styles.css",
+    "gzip": true,
+    "limit": "11.5 kB"
+  },
+  {
+    "name": "One component (import { Button })",
+    "path": "dist/index.js",
+    "import": "{ Button }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "radix-ui"
+    ],
+    "gzip": true,
+    "limit": "1.5 kB"
+  }
+]

@@ -14,7 +14,7 @@ function GettingStarted() {
         <Code label="Install and check">{`
 npm ci
 npx playwright install chromium   # once, for the visual and axe suite
-npm run check                     # tokens, types, lint, tests, rules, build
+npm run check                     # tokens, types, lint, tests, rules, build, size budgets
 npm run dev                       # this gallery on http://localhost:6006
 `}</Code>
       </DocSection>
