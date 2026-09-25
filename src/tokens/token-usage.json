@@ -13672,7 +13672,7 @@
       "cssVar": "--z-dropdown",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Panels anchored to a trigger that close on their own: menus, selects, popovers, hover cards.",
       "value": "200",
       "chain": [
         "z.dropdown",
@@ -13684,7 +13684,7 @@
       "cssVar": "--z-modal",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Modal dialogs and drawers with their scrim. Everything below is inert while one is open.",
       "value": "400",
       "chain": [
         "z.modal",
@@ -13696,7 +13696,7 @@
       "cssVar": "--z-overlay",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Layers over part of the page that aren’t modal: the skip link as it appears, an Imposter’s overlay (inside the Imposter’s own stacking context).",
       "value": "300",
       "chain": [
         "z.overlay",
@@ -13708,7 +13708,7 @@
       "cssVar": "--z-sticky",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Sticky parts of a scroll container: table header rows, action bars. Above content, below anything that floats.",
       "value": "100",
       "chain": [
         "z.sticky",
@@ -13720,7 +13720,7 @@
       "cssVar": "--z-toast",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Toasts, above modals, so a confirmation sent from inside a dialog stays visible.",
       "value": "500",
       "chain": [
         "z.toast",
@@ -13732,7 +13732,7 @@
       "cssVar": "--z-tooltip",
       "tier": "semantic",
       "type": "number",
-      "description": "Stacking order. Never write a raw z-index.",
+      "description": "Tooltips, above everything: they label whatever has focus or the pointer, wherever it is.",
       "value": "600",
       "chain": [
         "z.tooltip",

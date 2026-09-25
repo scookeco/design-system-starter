@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text, vars } from '../../src/index';
+import { StoryLink } from '../ui/Code';
 import { DocPage, DocSection, Rules } from '../ui/DocPage';
 import { ScaleTable, docsVar } from './ScaleTable';
 import { formatValue, reducedMotionValue, resolveValue, token, tokens, varEntries } from './tokens';
@@ -29,7 +30,10 @@ function ElevationMotionPage() {
         <ScaleTable caption="Shadow tokens" entries={varEntries(vars.shadow, 'shadow')} preview={shadow} />
       </DocSection>
       <DocSection title="Stacking">
-        <ScaleTable caption="Stacking tokens" entries={varEntries(vars.z, 'z')} />
+        <Text>
+          Stacking order has its own page: every tier, what it is for and which components use it, on{' '}
+          <StoryLink id="foundations-layers--layers">Foundations/Layers</StoryLink>.
+        </Text>
       </DocSection>
       <DocSection title="Durations">
         <Table caption="Duration tokens">
