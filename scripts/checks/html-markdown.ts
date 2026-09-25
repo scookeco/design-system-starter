@@ -112,8 +112,12 @@ export const htmlToMarkdown = (html: string, options: MarkdownOptions = {}): str
     }
   };
 
-  /** A container's children: runs of inline content become paragraphs, blocks convert on their own. */
+  /**
+   * A container's children: runs of inline content become paragraphs, blocks convert on their own.
+   * A Stack (the system's vertical-flow primitive) lays every child out on its own line, even a span.
+   */
   const blocks = (el: Element): string => {
+    const vertical = el.classList.contains('stack');
     const out: string[] = [];
     let run: Node[] = [];
     const flush = () => {
@@ -122,7 +126,7 @@ export const htmlToMarkdown = (html: string, options: MarkdownOptions = {}): str
       run = [];
     };
     for (const child of el.childNodes) {
-      if (isBlock(child)) {
+      if (isBlock(child) || (vertical && isElement(child))) {
         flush();
         const b = block(child as Element);
         if (b) out.push(b);

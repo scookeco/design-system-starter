@@ -1,17 +1,18 @@
 /**
- * The agent manifest: design-system.manifest.json, generated from the code, stories, usage docs,
- * guides, token usage map, CLAUDE.md and README.md.
+ * The agent manifest (design-system.manifest.json) and llms.txt / llms-full.txt, generated from the
+ * code, stories, usage docs, guides, token usage map, CLAUDE.md and README.md.
  *
- *   node scripts/manifest.ts           write it
- *   node scripts/manifest.ts --check   fail if the committed file is stale
+ *   node scripts/manifest.ts           write all three
+ *   node scripts/manifest.ts --check   fail if any committed file is stale
  *
  * The collector (scripts/manifest-collect.ts) imports TSX (usage docs, guides), so it runs inside a
- * Vite server in SSR mode. The builder is scripts/checks/manifest.ts; the schema, which documents
+ * Vite server in SSR mode. The builders are scripts/checks/manifest.ts and scripts/checks/llms.ts; the schema, which documents
  * every field, is design-system.manifest.schema.json.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createServer } from 'vite';
+import { LLMS_FILE, LLMS_FULL_FILE, renderLlms, renderLlmsFull } from './checks/llms.ts';
 import { buildManifest, MANIFEST_FILE, serialize } from './checks/manifest.ts';
 import type { collect as Collect } from './manifest-collect.ts';
 
@@ -28,8 +29,9 @@ const server = await createServer({
 let files: Record<string, string>;
 try {
   const { collect } = (await server.ssrLoadModule('/scripts/manifest-collect.ts')) as { collect: typeof Collect };
-  const { inputs } = await collect(root);
-  files = { [MANIFEST_FILE]: serialize(buildManifest(inputs)) };
+  const { inputs, guideMarkdown } = await collect(root);
+  const manifest = buildManifest(inputs);
+  files = { [MANIFEST_FILE]: serialize(manifest), [LLMS_FILE]: renderLlms(manifest), [LLMS_FULL_FILE]: renderLlmsFull(manifest, guideMarkdown) };
 } finally {
   await server.close();
 }

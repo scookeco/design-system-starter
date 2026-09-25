@@ -442,11 +442,11 @@
         ],
         "do": {
           "caption": "The page fills main and uses the slots; the frame is untouched.",
-          "code": "      <AppShell brand=\"Acme\" nav={nav('Main (do example)')} breadcrumbs={<Breadcrumbs label=\"Breadcrumb (do example)\" items={[{ label: 'Home', href: '/home' }]} current=\"Records\" />} skipLinkLabel=\"Skip to content (do example)\">\n  <Center max=\"lg\" gutters=\"md\">\n    <Stack gap=\"sm\">\n      <Heading level={3}>Records</Heading>\n      <Text tone=\"muted\">Only this region scrolls.</Text>\n    </Stack>\n  </Center>\n</AppShell>"
+          "code": "<AppShell brand=\"Acme\" nav={nav('Main (do example)')} breadcrumbs={<Breadcrumbs label=\"Breadcrumb (do example)\" items={[{ label: 'Home', href: '/home' }]} current=\"Records\" />} skipLinkLabel=\"Skip to content (do example)\">\n  <Center max=\"lg\" gutters=\"md\">\n    <Stack gap=\"sm\">\n      <Heading level={3}>Records</Heading>\n      <Text tone=\"muted\">Only this region scrolls.</Text>\n    </Stack>\n  </Center>\n</AppShell>"
         },
         "dont": {
           "caption": "A page that rebuilds its own header and actions inside main: two headers, and page actions where global ones belong.",
-          "code": "      <AppShell brand=\"Acme\" nav={nav('Main (don’t example)')} actions={<Button>Save record</Button>} skipLinkLabel=\"Skip to content (don’t example)\">\n  <Center max=\"lg\" gutters=\"md\">\n    <Stack gap=\"sm\">\n      <Heading level={3}>Acme · Records</Heading>\n      <Text tone=\"muted\">A second title bar, typed again on every page.</Text>\n    </Stack>\n  </Center>\n</AppShell>"
+          "code": "<AppShell brand=\"Acme\" nav={nav('Main (don’t example)')} actions={<Button>Save record</Button>} skipLinkLabel=\"Skip to content (don’t example)\">\n  <Center max=\"lg\" gutters=\"md\">\n    <Stack gap=\"sm\">\n      <Heading level={3}>Acme · Records</Heading>\n      <Text tone=\"muted\">A second title bar, typed again on every page.</Text>\n    </Stack>\n  </Center>\n</AppShell>"
         },
         "accessibility": [
           "Provides the skip link, banner, navigation and main landmarks; `main` is the only scrolling region.",
@@ -656,11 +656,11 @@
         ],
         "do": {
           "caption": "Brand above, one card with the h1 and the way in, legal links below.",
-          "code": "      <AuthLayout brand=\"Acme\" footer={<Text size=\"caption\">Privacy · Terms</Text>}>\n  <Stack gap=\"2xs\">\n    <Heading level={1} size={3}>\n      Sign in to Acme\n    </Heading>\n    <Text tone=\"muted\">Use your work account.</Text>\n  </Stack>\n  <Button>Continue with SSO</Button>\n</AuthLayout>"
+          "code": "<AuthLayout brand=\"Acme\" footer={<Text size=\"caption\">Privacy · Terms</Text>}>\n  <Stack gap=\"2xs\">\n    <Heading level={1} size={3}>\n      Sign in to Acme\n    </Heading>\n    <Text tone=\"muted\">Use your work account.</Text>\n  </Stack>\n  <Button>Continue with SSO</Button>\n</AuthLayout>"
         },
         "dont": {
           "caption": "Sign-in inside the app shell: navigation to pages the person can’t open yet, and a frame that implies they’re signed in.",
-          "code": "      <AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Button>Continue with SSO</Button>\n</AppShell>"
+          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Button>Continue with SSO</Button>\n</AppShell>"
         },
         "accessibility": [
           "Provides banner (brand), main (the card) and contentinfo (footer) landmarks; the page supplies the one h1 inside the card.",
@@ -801,11 +801,11 @@
         ],
         "do": {
           "caption": "Beside the visible name, the avatar is `decorative`, so the name isn’t read twice.",
-          "code": "      <Cluster gap=\"xs\">\n  <Avatar name=\"Sam Rivera\" size=\"sm\" decorative />\n  <Text as=\"span\">Sam Rivera</Text>\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Avatar name=\"Sam Rivera\" size=\"sm\" decorative />\n  <Text as=\"span\">Sam Rivera</Text>\n</Cluster>"
         },
         "dont": {
           "caption": "A row of initials with no names: people have to hover to find out who is who.",
-          "code": "      <Cluster gap=\"2xs\">\n  <Avatar name=\"Sam Rivera\" size=\"sm\" />\n  <Avatar name=\"Alex Kim\" size=\"sm\" />\n  <Avatar name=\"Jo Park\" size=\"sm\" />\n</Cluster>"
+          "code": "<Cluster gap=\"2xs\">\n  <Avatar name=\"Sam Rivera\" size=\"sm\" />\n  <Avatar name=\"Alex Kim\" size=\"sm\" />\n  <Avatar name=\"Jo Park\" size=\"sm\" />\n</Cluster>"
         },
         "accessibility": [
           "`name` is required: it is the accessible name and the source of the initials fallback.",
@@ -965,11 +965,11 @@
         ],
         "do": {
           "caption": "One short word per status, the same word everywhere it appears.",
-          "code": "      <Cluster gap=\"xs\">\n  <Badge tone=\"success\">Approved</Badge>\n  <Badge tone=\"warning\">Pending</Badge>\n  <Badge tone=\"neutral\">Draft</Badge>\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Badge tone=\"success\">Approved</Badge>\n  <Badge tone=\"warning\">Pending</Badge>\n  <Badge tone=\"neutral\">Draft</Badge>\n</Cluster>"
         },
         "dont": {
           "caption": "Sentences in badges, and a danger tone for something that isn’t a problem.",
-          "code": "      <Cluster gap=\"xs\">\n  <Badge tone=\"danger\">New feature available now</Badge>\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Badge tone=\"danger\">New feature available now</Badge>\n</Cluster>"
         },
         "accessibility": [
           "Text is required: status is never colour alone, and tones add an icon or dot as a second cue.",
@@ -1178,11 +1178,11 @@
         ],
         "do": {
           "caption": "What happened, then how to fix it, with the fix one click away.",
-          "code": "      <Banner tone=\"warning\" title=\"Seat limit almost reached\" action={<Button variant=\"secondary\" size=\"sm\">Add seats</Button>}>\n  9 of 10 seats are in use. New invites will fail at the limit.\n</Banner>"
+          "code": "<Banner tone=\"warning\" title=\"Seat limit almost reached\" action={<Button variant=\"secondary\" size=\"sm\">Add seats</Button>}>\n  9 of 10 seats are in use. New invites will fail at the limit.\n</Banner>"
         },
         "dont": {
           "caption": "A warning tone with no explanation or next step.",
-          "code": "                  <Banner tone=\"danger\">Error.</Banner>"
+          "code": "<Banner tone=\"danger\">Error.</Banner>"
         },
         "accessibility": [
           "Tone sets the live region: danger and warning are `role=\"alert\"`, info and success `role=\"status\"`.",
@@ -1339,11 +1339,11 @@
         ],
         "do": {
           "caption": "Every ancestor is a link; the current page matches the page title.",
-          "code": "                  <Breadcrumbs items={[{ label: 'Records', href: '/records' }]} current=\"Hardware lease\" />"
+          "code": "<Breadcrumbs items={[{ label: 'Records', href: '/records' }]} current=\"Hardware lease\" />"
         },
         "dont": {
           "caption": "History instead of hierarchy: the trail repeats where you clicked, not where the page lives.",
-          "code": "      <Breadcrumbs\n  label=\"Visited pages\"\n  items={[\n    { label: 'Home', href: '/home' },\n    { label: 'Search', href: '/search' },\n    { label: 'Records', href: '/records' },\n    { label: 'Search', href: '/search?q=lease' },\n  ]}\n  current=\"Hardware lease\"\n/>"
+          "code": "<Breadcrumbs\n  label=\"Visited pages\"\n  items={[\n    { label: 'Home', href: '/home' },\n    { label: 'Search', href: '/search' },\n    { label: 'Records', href: '/records' },\n    { label: 'Search', href: '/search?q=lease' },\n  ]}\n  current=\"Hardware lease\"\n/>"
         },
         "accessibility": [
           "A labelled nav landmark with an ordered list; the current page is text with `aria-current=\"page\"`.",
@@ -1526,11 +1526,11 @@
         ],
         "do": {
           "caption": "One primary action, with the alternative as secondary. Labels are verb-first and say what happens.",
-          "code": "      <Cluster gap=\"sm\">\n  <Button variant=\"secondary\">Cancel</Button>\n  <Button>Create record</Button>\n</Cluster>"
+          "code": "<Cluster gap=\"sm\">\n  <Button variant=\"secondary\">Cancel</Button>\n  <Button>Create record</Button>\n</Cluster>"
         },
         "dont": {
           "caption": "Two primaries compete for the same attention, and \"OK\" doesn’t say what it does.",
-          "code": "      <Cluster gap=\"sm\">\n  <Button>Save draft</Button>\n  <Button>OK</Button>\n</Cluster>"
+          "code": "<Cluster gap=\"sm\">\n  <Button>Save draft</Button>\n  <Button>OK</Button>\n</Cluster>"
         },
         "accessibility": [
           "A visible label is required; it is the accessible name. An icon-only button needs `aria-label` and a `Tooltip`.",
@@ -1712,11 +1712,11 @@
         ],
         "do": {
           "caption": "A titled section that saves on its own.",
-          "code": "      <Card>\n  <CardHeader title=\"Notifications\" level={4} description=\"How we contact you about your records.\" />\n  <CardBody>\n    <Switch label=\"Email me a weekly digest\" defaultChecked />\n  </CardBody>\n  <CardFooter>\n    <Button>Save</Button>\n  </CardFooter>\n</Card>"
+          "code": "<Card>\n  <CardHeader title=\"Notifications\" level={4} description=\"How we contact you about your records.\" />\n  <CardBody>\n    <Switch label=\"Email me a weekly digest\" defaultChecked />\n  </CardBody>\n  <CardFooter>\n    <Button>Save</Button>\n  </CardFooter>\n</Card>"
         },
         "dont": {
           "caption": "Cards nested in cards: the borders stack up and the hierarchy is lost.",
-          "code": "      <Card>\n  <CardHeader title=\"Profile\" level={4} />\n  <CardBody>\n    <Stack>\n      <Card>\n        <CardHeader title=\"Name\" level={4} />\n      </Card>\n    </Stack>\n  </CardBody>\n</Card>"
+          "code": "<Card>\n  <CardHeader title=\"Profile\" level={4} />\n  <CardBody>\n    <Stack>\n      <Card>\n        <CardHeader title=\"Name\" level={4} />\n      </Card>\n    </Stack>\n  </CardBody>\n</Card>"
         },
         "accessibility": [
           "`CardHeader` requires a `title`, rendered as a heading at `level` (default 2) so the card is a section in the outline.",
@@ -2050,11 +2050,11 @@
         ],
         "do": {
           "caption": "A readable measure for running text.",
-          "code": "      <Center max=\"sm\" gutters=\"sm\">\n  <Text>Records track agreements from draft to renewal, with their owner, amount and every change along the way.</Text>\n</Center>"
+          "code": "<Center max=\"sm\" gutters=\"sm\">\n  <Text>Records track agreements from draft to renewal, with their owner, amount and every change along the way.</Text>\n</Center>"
         },
         "dont": {
           "caption": "An intrinsic centre around a long paragraph: centred text is hard to read.",
-          "code": "      <Center intrinsic>\n  <EmptyState\n    reason=\"first-use\"\n    headingLevel={4}\n    title=\"About records\"\n    description=\"Records track agreements from draft to renewal, with their owner, amount and every change along the way, and can be exported.\"\n  />\n</Center>"
+          "code": "<Center intrinsic>\n  <EmptyState\n    reason=\"first-use\"\n    headingLevel={4}\n    title=\"About records\"\n    description=\"Records track agreements from draft to renewal, with their owner, amount and every change along the way, and can be exported.\"\n  />\n</Center>"
         },
         "accessibility": [
           "Layout only. Pass `as=\"main\"` or `as=\"article\"` only when that landmark isn’t already provided (AppShell provides main)."
@@ -2210,11 +2210,11 @@
         ],
         "do": {
           "caption": "Part of a form: nothing happens until Save.",
-          "code": "      <Stack gap=\"md\" align=\"start\">\n  <Checkbox label=\"Send a copy to the record owner\" defaultChecked />\n  <Button variant=\"secondary\">Save</Button>\n</Stack>"
+          "code": "<Stack gap=\"md\" align=\"start\">\n  <Checkbox label=\"Send a copy to the record owner\" defaultChecked />\n  <Button variant=\"secondary\">Save</Button>\n</Stack>"
         },
         "dont": {
           "caption": "A negative label makes checked mean “no”. Phrase the option positively.",
-          "code": "                  <Checkbox label=\"Don’t send me updates\" />"
+          "code": "<Checkbox label=\"Don’t send me updates\" />"
         },
         "accessibility": [
           "`label` is required and clicking it toggles the box; `description` is linked to the control.",
@@ -2439,11 +2439,11 @@
         ],
         "do": {
           "caption": "A header bar: the title and its status on one side, the action on the other, wrapping on narrow screens.",
-          "code": "      <Cluster justify=\"between\">\n  <Cluster gap=\"xs\">\n    <Heading level={4}>Hardware lease</Heading>\n    <Badge tone=\"success\">Approved</Badge>\n  </Cluster>\n  <Button variant=\"secondary\">Edit</Button>\n</Cluster>"
+          "code": "<Cluster justify=\"between\">\n  <Cluster gap=\"xs\">\n    <Heading level={4}>Hardware lease</Heading>\n    <Badge tone=\"success\">Approved</Badge>\n  </Cluster>\n  <Button variant=\"secondary\">Edit</Button>\n</Cluster>"
         },
         "dont": {
           "caption": "Wrapping turned off for a long row: it overflows instead of reflowing.",
-          "code": "      <Cluster wrap={false} gap=\"xs\">\n  <Button variant=\"secondary\" size=\"sm\">Status</Button>\n  <Button variant=\"secondary\" size=\"sm\">Owner</Button>\n  <Button variant=\"secondary\" size=\"sm\">Created</Button>\n  <Button variant=\"secondary\" size=\"sm\">Amount</Button>\n</Cluster>"
+          "code": "<Cluster wrap={false} gap=\"xs\">\n  <Button variant=\"secondary\" size=\"sm\">Status</Button>\n  <Button variant=\"secondary\" size=\"sm\">Owner</Button>\n  <Button variant=\"secondary\" size=\"sm\">Created</Button>\n  <Button variant=\"secondary\" size=\"sm\">Amount</Button>\n</Cluster>"
         },
         "accessibility": [
           "Layout only. DOM order is visual order, including after wrapping.",
@@ -2634,11 +2634,11 @@
         ],
         "do": {
           "caption": "One message centred in the space, with a header pinned above it.",
-          "code": "      <Cover header={<Text tone=\"muted\">Acme</Text>}>\n  <Stack gap=\"xs\" align=\"center\">\n    <Heading level={4}>You’re all set</Heading>\n    <Button>Go to Home</Button>\n  </Stack>\n</Cover>"
+          "code": "<Cover header={<Text tone=\"muted\">Acme</Text>}>\n  <Stack gap=\"xs\" align=\"center\">\n    <Heading level={4}>You’re all set</Heading>\n    <Button>Go to Home</Button>\n  </Stack>\n</Cover>"
         },
         "dont": {
           "caption": "Several unrelated blocks in one Cover: only one thing can be the centre of attention.",
-          "code": "      <Cover>\n  <Stack gap=\"xs\">\n    <Heading level={4}>Recent records</Heading>\n    <Heading level={4}>Usage this month</Heading>\n    <Heading level={4}>Team</Heading>\n  </Stack>\n</Cover>"
+          "code": "<Cover>\n  <Stack gap=\"xs\">\n    <Heading level={4}>Recent records</Heading>\n    <Heading level={4}>Usage this month</Heading>\n    <Heading level={4}>Team</Heading>\n  </Stack>\n</Cover>"
         },
         "accessibility": [
           "Layout only: it adds no landmark. Pass landmark elements (`header`, `main`, `footer`) into its slots when it frames a whole page, as AuthLayout does.",
@@ -2827,11 +2827,11 @@
         ],
         "do": {
           "caption": "A focused quick-create: a short title, the fields, and the primary action last.",
-          "code": "      <Dialog\n  title=\"New record\"\n  description=\"Records start as drafts.\"\n  trigger={<Button icon=\"plus\">New record</Button>}\n  footer={\n    <>\n      <Button variant=\"secondary\">Cancel</Button>\n      <Button>Create record</Button>\n    </>\n  }\n>\n  <TextField label=\"Name\" />\n</Dialog>"
+          "code": "<Dialog\n  title=\"New record\"\n  description=\"Records start as drafts.\"\n  trigger={<Button icon=\"plus\">New record</Button>}\n  footer={\n    <>\n      <Button variant=\"secondary\">Cancel</Button>\n      <Button>Create record</Button>\n    </>\n  }\n>\n  <TextField label=\"Name\" />\n</Dialog>"
         },
         "dont": {
           "caption": "A vague confirm: “Are you sure?” with “OK” forces people to reread what they clicked.",
-          "code": "      <Cluster>\n  <Dialog\n    size=\"sm\"\n    title=\"Are you sure?\"\n    trigger={<Button variant=\"danger\">Delete record</Button>}\n    footer={\n      <>\n        <Button variant=\"secondary\">Cancel</Button>\n        <Button>OK</Button>\n      </>\n    }\n  />\n</Cluster>"
+          "code": "<Cluster>\n  <Dialog\n    size=\"sm\"\n    title=\"Are you sure?\"\n    trigger={<Button variant=\"danger\">Delete record</Button>}\n    footer={\n      <>\n        <Button variant=\"secondary\">Cancel</Button>\n        <Button>OK</Button>\n      </>\n    }\n  />\n</Cluster>"
         },
         "accessibility": [
           "`title` is required and names the dialog; `description` is announced with it.",
@@ -3048,11 +3048,11 @@
         ],
         "do": {
           "caption": "Filters in a drawer from the end, opened by a labelled button, applied from the footer.",
-          "code": "      <Drawer\n  title=\"Filters\"\n  description=\"Narrow the list. Applies when you choose Show.\"\n  trigger={<Button variant=\"secondary\">Filters</Button>}\n  footer={<Button>Show 12 records</Button>}\n>\n  <Checkbox label=\"Active\" defaultChecked />\n</Drawer>"
+          "code": "<Drawer\n  title=\"Filters\"\n  description=\"Narrow the list. Applies when you choose Show.\"\n  trigger={<Button variant=\"secondary\">Filters</Button>}\n  footer={<Button>Show 12 records</Button>}\n>\n  <Checkbox label=\"Active\" defaultChecked />\n</Drawer>"
         },
         "dont": {
           "caption": "A confirmation in a drawer: a full-height sheet for one sentence and two buttons; a Dialog is the right size.",
-          "code": "      <Stack gap=\"xs\" align=\"start\">\n  <Drawer title=\"Delete record?\" description=\"This cannot be undone.\" trigger={<Button variant=\"danger\">Delete record</Button>} />\n  <Dialog title=\"Delete record?\" description=\"This cannot be undone.\" trigger={<Button variant=\"secondary\">Dialog instead</Button>} />\n</Stack>"
+          "code": "<Stack gap=\"xs\" align=\"start\">\n  <Drawer title=\"Delete record?\" description=\"This cannot be undone.\" trigger={<Button variant=\"danger\">Delete record</Button>} />\n  <Dialog title=\"Delete record?\" description=\"This cannot be undone.\" trigger={<Button variant=\"secondary\">Dialog instead</Button>} />\n</Stack>"
         },
         "accessibility": [
           "A modal dialog named by its required `title` (kept as the name when `hideTitle` hides it). Focus moves in, stays trapped, and returns to the trigger on close.",
@@ -3213,11 +3213,11 @@
         ],
         "do": {
           "caption": "Say what goes here and offer the one action that fills it.",
-          "code": "      <EmptyState\n  reason=\"first-use\"\n  headingLevel={4}\n  title=\"Create your first record\"\n  description=\"Records track agreements from draft to renewal.\"\n  action={<Button icon=\"plus\">New record</Button>}\n/>"
+          "code": "<EmptyState\n  reason=\"first-use\"\n  headingLevel={4}\n  title=\"Create your first record\"\n  description=\"Records track agreements from draft to renewal.\"\n  action={<Button icon=\"plus\">New record</Button>}\n/>"
         },
         "dont": {
           "caption": "A dead end: no explanation and no way forward.",
-          "code": "                  <EmptyState reason=\"no-results\" headingLevel={4} title=\"Nothing here\" />"
+          "code": "<EmptyState reason=\"no-results\" headingLevel={4} title=\"Nothing here\" />"
         },
         "accessibility": [
           "The title is a real heading (`headingLevel`, default 2) so the state is findable in the outline.",
@@ -3390,11 +3390,11 @@
         ],
         "do": {
           "caption": "The task and a way out in the header; one column; the step actions in a sticky bar.",
-          "code": "      <FocusedLayout\n  brand=\"Acme\"\n  task=\"Set up your workspace\"\n  exit={<Button variant=\"ghost\">Exit setup</Button>}\n  footer={\n    <Cluster justify=\"end\">\n      <Button>Next</Button>\n    </Cluster>\n  }\n>\n  <Stepper label=\"Setup steps (do example)\" steps={steps} current={0} />\n  <PageHeader title=\"Name your workspace\" />\n</FocusedLayout>"
+          "code": "<FocusedLayout\n  brand=\"Acme\"\n  task=\"Set up your workspace\"\n  exit={<Button variant=\"ghost\">Exit setup</Button>}\n  footer={\n    <Cluster justify=\"end\">\n      <Button>Next</Button>\n    </Cluster>\n  }\n>\n  <Stepper label=\"Setup steps (do example)\" steps={steps} current={0} />\n  <PageHeader title=\"Name your workspace\" />\n</FocusedLayout>"
         },
         "dont": {
           "caption": "A wizard inside the app shell: the full navigation invites people to leave half-way, and nothing says how to exit safely.",
-          "code": "      <AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Text>Step 1 of 3: Name your workspace</Text>\n</AppShell>"
+          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Text>Step 1 of 3: Name your workspace</Text>\n</AppShell>"
         },
         "accessibility": [
           "Provides banner (the header) and main landmarks; the step’s `PageHeader` is the page’s h1, and the task name in the header is not a heading.",
@@ -3548,11 +3548,11 @@
         ],
         "do": {
           "caption": "Previews held to one ratio, so the grid lines up; the name beside each is its text.",
-          "code": "      <Grid min=\"sm\" gap=\"sm\">\n  {['Site plan.png', 'Floor two.png'].map((name) => (\n    <Stack gap=\"2xs\" key={name}>\n      <Frame ratio=\"landscape\">\n        <img src={preview} alt=\"\" />\n      </Frame>\n      <Text size=\"caption\">{name}</Text>\n    </Stack>\n  ))}\n</Grid>"
+          "code": "<Grid min=\"sm\" gap=\"sm\">\n  {['Site plan.png', 'Floor two.png'].map((name) => (\n    <Stack gap=\"2xs\" key={name}>\n      <Frame ratio=\"landscape\">\n        <img src={preview} alt=\"\" />\n      </Frame>\n      <Text size=\"caption\">{name}</Text>\n    </Stack>\n  ))}\n</Grid>"
         },
         "dont": {
           "caption": "A bare image: a tall source makes a tall tile, and the grid breaks.",
-          "code": "      <Grid min=\"sm\" gap=\"sm\">\n  <img src={preview} alt=\"\" />\n  <Text size=\"caption\">Site plan.png</Text>\n</Grid>"
+          "code": "<Grid min=\"sm\" gap=\"sm\">\n  <img src={preview} alt=\"\" />\n  <Text size=\"caption\">Site plan.png</Text>\n</Grid>"
         },
         "accessibility": [
           "Layout only. The media keeps its own alternative: `alt=\"\"` when a visible name sits beside it, a real description when it carries information."
@@ -3723,11 +3723,11 @@
         ],
         "do": {
           "caption": "Tiles of equal importance, each at least the `min` width.",
-          "code": "      <Grid min=\"sm\" gap=\"sm\">\n  {STATS.map((s) => (\n    <Card key={s}>\n      <CardHeader title={s} level={4} />\n    </Card>\n  ))}\n</Grid>"
+          "code": "<Grid min=\"sm\" gap=\"sm\">\n  {STATS.map((s) => (\n    <Card key={s}>\n      <CardHeader title={s} level={4} />\n    </Card>\n  ))}\n</Grid>"
         },
         "dont": {
           "caption": "A grid of one: an item that isn’t part of a set is just content.",
-          "code": "      <Grid min=\"lg\">\n  <Card>\n    <CardHeader title=\"Notes\" level={4} />\n  </Card>\n</Grid>"
+          "code": "<Grid min=\"lg\">\n  <Card>\n    <CardHeader title=\"Notes\" level={4} />\n  </Card>\n</Grid>"
         },
         "accessibility": [
           "Layout only. Items read in DOM order, row by row.",
@@ -3874,11 +3874,11 @@
         ],
         "do": {
           "caption": "Levels follow the outline; the section title is visually smaller with `size`, not a skipped level.",
-          "code": "      <Stack gap=\"xs\">\n  <Heading level={3}>Billing</Heading>\n  <Heading level={4} size={4}>\n    Payment method\n  </Heading>\n  <Text tone=\"muted\">Visa ending 4242</Text>\n</Stack>"
+          "code": "<Stack gap=\"xs\">\n  <Heading level={3}>Billing</Heading>\n  <Heading level={4} size={4}>\n    Payment method\n  </Heading>\n  <Text tone=\"muted\">Visa ending 4242</Text>\n</Stack>"
         },
         "dont": {
           "caption": "A heading used as a label for a value: it adds noise to the outline screen-reader users navigate by.",
-          "code": "      <Stack gap=\"xs\">\n  <Heading level={4}>Owner</Heading>\n  <Text>Sam Rivera</Text>\n</Stack>"
+          "code": "<Stack gap=\"xs\">\n  <Heading level={4}>Owner</Heading>\n  <Text>Sam Rivera</Text>\n</Stack>"
         },
         "accessibility": [
           "`level` is required, so the outline is always a deliberate choice. Never skip a level to get a size.",
@@ -4081,11 +4081,11 @@
         ],
         "do": {
           "caption": "Link text that says where it goes, inside the sentence it belongs to.",
-          "code": "      <Text>\n  The lease renews in January. <Link href=\"/records/r-1002/files\">Read the signed agreement</Link> for the full terms.\n</Text>"
+          "code": "<Text>\n  The lease renews in January. <Link href=\"/records/r-1002/files\">Read the signed agreement</Link> for the full terms.\n</Text>"
         },
         "dont": {
           "caption": "“Click here”: out of context (a screen reader’s list of links) it says nothing about where it goes.",
-          "code": "      <Text>\n  The lease renews in January. For the full terms, <Link href=\"/records/r-1002/files\">click here</Link>.\n</Text>"
+          "code": "<Text>\n  The lease renews in January. For the full terms, <Link href=\"/records/r-1002/files\">click here</Link>.\n</Text>"
         },
         "accessibility": [
           "A real anchor with an `href`, so it works with the keyboard, opens in a new tab and is listed as a link.",
@@ -4382,11 +4382,11 @@
         ],
         "do": {
           "caption": "The primary action stays visible; the rest live behind “More”, with the destructive one last.",
-          "code": "      <Cluster gap=\"xs\">\n  <Button>Edit</Button>\n  <Menu\n    trigger={<Button variant=\"secondary\">More</Button>}\n    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: 'download' }, 'separator', { label: 'Delete record' }]}\n  />\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Button>Edit</Button>\n  <Menu\n    trigger={<Button variant=\"secondary\">More</Button>}\n    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: 'download' }, 'separator', { label: 'Delete record' }]}\n  />\n</Cluster>"
         },
         "dont": {
           "caption": "The main action hidden in a menu with a single item: one extra click for nothing.",
-          "code": "                  <Menu trigger={<Button variant=\"secondary\">Actions</Button>} items={[{ label: 'Save' }]} />"
+          "code": "<Menu trigger={<Button variant=\"secondary\">Actions</Button>} items={[{ label: 'Save' }]} />"
         },
         "accessibility": [
           "The trigger keeps its own accessible name and gets `aria-expanded`; arrow keys and typeahead move through items.",
@@ -4551,11 +4551,11 @@
         ],
         "do": {
           "caption": "Near the limit: the fill changes colour, and an icon and words say so.",
-          "code": "                  <Meter label=\"Seats\" value={42} max={50} valueText=\"42 of 50 seats\" />"
+          "code": "<Meter label=\"Seats\" value={42} max={50} valueText=\"42 of 50 seats\" />"
         },
         "dont": {
           "caption": "A progress bar for usage: it reads as a task heading for done, and never warns as the limit nears.",
-          "code": "                  <Progress label=\"Seats\" value={42} max={50} valueText=\"42 of 50 seats\" />"
+          "code": "<Progress label=\"Seats\" value={42} max={50} valueText=\"42 of 50 seats\" />"
         },
         "accessibility": [
           "A `meter` named by the visible label, with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and `aria-valuetext` (the usage, plus the status past a threshold).",
@@ -4699,11 +4699,11 @@
         ],
         "do": {
           "caption": "A few top-level destinations, grouped, with the current page marked.",
-          "code": "      <Nav\n  label=\"Settings\"\n  current=\"/settings/profile\"\n  sections={[\n    { label: 'Personal', items: [{ label: 'Profile', href: '/settings/profile' }, { label: 'Notifications', href: '/settings/notifications' }] },\n    { label: 'Workspace', items: [{ label: 'General', href: '/settings/general' }] },\n  ]}\n/>"
+          "code": "<Nav\n  label=\"Settings\"\n  current=\"/settings/profile\"\n  sections={[\n    { label: 'Personal', items: [{ label: 'Profile', href: '/settings/profile' }, { label: 'Notifications', href: '/settings/notifications' }] },\n    { label: 'Workspace', items: [{ label: 'General', href: '/settings/general' }] },\n  ]}\n/>"
         },
         "dont": {
           "caption": "Actions dressed as destinations: “Export” and “Sign out” don’t lead to a page.",
-          "code": "      <Nav\n  label=\"Records menu\"\n  current=\"/records\"\n  sections={[{ items: [{ label: 'Records', href: '/records' }, { label: 'Export', href: '/export' }, { label: 'Sign out', href: '/sign-out' }] }]}\n/>"
+          "code": "<Nav\n  label=\"Records menu\"\n  current=\"/records\"\n  sections={[{ items: [{ label: 'Records', href: '/records' }, { label: 'Export', href: '/export' }, { label: 'Sign out', href: '/sign-out' }] }]}\n/>"
         },
         "accessibility": [
           "`label` is required: pages carry several nav landmarks, and each needs a distinct name.",
@@ -4870,11 +4870,11 @@
         ],
         "do": {
           "caption": "Each section is a route: links in a named nav, the current one marked with aria-current.",
-          "code": "                  <NavTabs label=\"Record sections (do example)\" items={sections} current=\"/records/r-1001/activity\" />"
+          "code": "<NavTabs label=\"Record sections (do example)\" items={sections} current=\"/records/r-1001/activity\" />"
         },
         "dont": {
           "caption": "An ARIA tablist for routes: screen readers announce tabs and panels, but each “tab” is really a page change.",
-          "code": "      <Tabs defaultValue=\"activity\">\n  <TabList label=\"Record sections (don’t example)\">\n    <Tab value=\"overview\">Overview</Tab>\n    <Tab value=\"activity\">Activity</Tab>\n  </TabList>\n  <TabPanel value=\"overview\">\n    <Text>Loads /records/r-1001</Text>\n  </TabPanel>\n  <TabPanel value=\"activity\">\n    <Text>Loads /records/r-1001/activity</Text>\n  </TabPanel>\n</Tabs>"
+          "code": "<Tabs defaultValue=\"activity\">\n  <TabList label=\"Record sections (don’t example)\">\n    <Tab value=\"overview\">Overview</Tab>\n    <Tab value=\"activity\">Activity</Tab>\n  </TabList>\n  <TabPanel value=\"overview\">\n    <Text>Loads /records/r-1001</Text>\n  </TabPanel>\n  <TabPanel value=\"activity\">\n    <Text>Loads /records/r-1001/activity</Text>\n  </TabPanel>\n</Tabs>"
         },
         "accessibility": [
           "A `nav` landmark named by the required `label`, with `aria-current=\"page\"` on the current link. It is not a tablist: Tab moves link to link, Enter follows.",
@@ -5002,11 +5002,11 @@
         ],
         "do": {
           "caption": "Title, status and metadata on the start side; page actions on the end, primary last.",
-          "code": "      <PageHeader\n  title=\"Hardware lease\"\n  status={<Badge tone=\"info\">Pending</Badge>}\n  description=\"Owned by Facilities · updated 2026-09-10\"\n  actions={\n    <>\n      <Button variant=\"secondary\">Share</Button>\n      <Button>Request approval</Button>\n    </>\n  }\n/>"
+          "code": "<PageHeader\n  title=\"Hardware lease\"\n  status={<Badge tone=\"info\">Pending</Badge>}\n  description=\"Owned by Facilities · updated 2026-09-10\"\n  actions={\n    <>\n      <Button variant=\"secondary\">Share</Button>\n      <Button>Request approval</Button>\n    </>\n  }\n/>"
         },
         "dont": {
           "caption": "A hand-built title row: the gaps, alignment and wrapping drift from page to page, and the status sits under the title.",
-          "code": "      <Stack gap=\"xs\">\n  <Heading level={1} size={3}>\n    Hardware lease\n  </Heading>\n  <Badge tone=\"info\">Pending</Badge>\n  <Text tone=\"muted\">Owned by Facilities</Text>\n  <Button>Request approval</Button>\n</Stack>"
+          "code": "<Stack gap=\"xs\">\n  <Heading level={1} size={3}>\n    Hardware lease\n  </Heading>\n  <Badge tone=\"info\">Pending</Badge>\n  <Text tone=\"muted\">Owned by Facilities</Text>\n  <Button>Request approval</Button>\n</Stack>"
         },
         "accessibility": [
           "Renders the page’s h1, so every page has exactly one, in the same place. Keep it the same words as the nav item or breadcrumb that leads here.",
@@ -5141,11 +5141,11 @@
         ],
         "do": {
           "caption": "Main content first; the properties rail is a named aside at the inline end.",
-          "code": "      <PageLayout\n  aside={\n    <Card>\n      <CardHeader title=\"Properties\" level={4} />\n    </Card>\n  }\n  asideLabel=\"Properties (do example)\"\n>\n  <Card>\n    <CardBody>\n      <Text>Summary, activity and files.</Text>\n    </CardBody>\n  </Card>\n</PageLayout>"
+          "code": "<PageLayout\n  aside={\n    <Card>\n      <CardHeader title=\"Properties\" level={4} />\n    </Card>\n  }\n  asideLabel=\"Properties (do example)\"\n>\n  <Card>\n    <CardBody>\n      <Text>Summary, activity and files.</Text>\n    </CardBody>\n  </Card>\n</PageLayout>"
         },
         "dont": {
           "caption": "A sub-nav hand-placed with Sidebar and wrapped in an aside: navigation announced as complementary content, and a gap and width of its own.",
-          "code": "      <Sidebar\n  as=\"aside\"\n  sideWidth=\"sm\"\n  side={<Nav label=\"Settings (don’t example)\" sections={[{ items: [{ label: 'Profile', href: '/settings/profile' }] }]} />}\n>\n  <Card>\n    <CardBody>\n      <Text>Profile fields.</Text>\n    </CardBody>\n  </Card>\n</Sidebar>"
+          "code": "<Sidebar\n  as=\"aside\"\n  sideWidth=\"sm\"\n  side={<Nav label=\"Settings (don’t example)\" sections={[{ items: [{ label: 'Profile', href: '/settings/profile' }] }]} />}\n>\n  <Card>\n    <CardBody>\n      <Text>Profile fields.</Text>\n    </CardBody>\n  </Card>\n</Sidebar>"
         },
         "accessibility": [
           "The aside is a complementary landmark, and `asideLabel` is required whenever `aside` is set (a type error otherwise).",
@@ -5306,11 +5306,11 @@
         ],
         "do": {
           "caption": "What is shown, then Previous, the pages around the current one, and Next.",
-          "code": "                  <Pagination page={12} pageSize={25} total={1284} onPageChange={() => undefined} />"
+          "code": "<Pagination page={12} pageSize={25} total={1284} onPageChange={() => undefined} />"
         },
         "dont": {
           "caption": "Bare arrows: no page, no total, and no name for either button.",
-          "code": "      <Cluster gap=\"xs\">\n  <Button variant=\"secondary\" size=\"sm\">\n    ‹\n  </Button>\n  <Button variant=\"secondary\" size=\"sm\">\n    ›\n  </Button>\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Button variant=\"secondary\" size=\"sm\">\n    ‹\n  </Button>\n  <Button variant=\"secondary\" size=\"sm\">\n    ›\n  </Button>\n</Cluster>"
         },
         "accessibility": [
           "A `nav` landmark (`label`, default “Pagination”); the current page has `aria-current=\"page\"`, and each page button is named “Page n”.",
@@ -5479,11 +5479,11 @@
         ],
         "do": {
           "caption": "A Filters button that opens a named popover of status checkboxes.",
-          "code": "      <Popover label=\"Filter by status (do example)\" trigger={<Button variant=\"secondary\">Filters</Button>}>\n  <Checkbox label=\"Active\" />\n</Popover>"
+          "code": "<Popover label=\"Filter by status (do example)\" trigger={<Button variant=\"secondary\">Filters</Button>}>\n  <Checkbox label=\"Active\" />\n</Popover>"
         },
         "dont": {
           "caption": "Controls in a tooltip: it vanishes when the pointer leaves, and keyboard users can’t reach what is inside.",
-          "code": "      <Tooltip content=\"Active · Pending · Overdue\">\n  <Button variant=\"secondary\">Filters</Button>\n</Tooltip>"
+          "code": "<Tooltip content=\"Active · Pending · Overdue\">\n  <Button variant=\"secondary\">Filters</Button>\n</Tooltip>"
         },
         "accessibility": [
           "A dialog named by the required `label`; the trigger gets `aria-expanded` and `aria-controls`.",
@@ -5597,11 +5597,11 @@
         ],
         "do": {
           "caption": "A label and the value in words, over the bar.",
-          "code": "                  <Progress label=\"Importing records\" value={340} max={1284} valueText=\"340 of 1,284 records\" />"
+          "code": "<Progress label=\"Importing records\" value={340} max={1284} valueText=\"340 of 1,284 records\" />"
         },
         "dont": {
           "caption": "A spinner for a job whose size is known: people can’t tell whether to wait or come back later.",
-          "code": "                  <Spinner label=\"Importing 1,284 records\" />"
+          "code": "<Spinner label=\"Importing 1,284 records\" />"
         },
         "accessibility": [
           "A `progressbar` named by the visible `label`, with `aria-valuenow`, `aria-valuemax` and `aria-valuetext` from `valueText`.",
@@ -5782,11 +5782,11 @@
         ],
         "do": {
           "caption": "The group label asks the question; each option says what it means.",
-          "code": "      <RadioGroup\n  label=\"Billing period\"\n  defaultValue=\"yearly\"\n  options={[\n    { value: 'monthly', label: 'Monthly', description: 'Cancel any time.' },\n    { value: 'yearly', label: 'Yearly', description: 'Two months free.' },\n  ]}\n/>"
+          "code": "<RadioGroup\n  label=\"Billing period\"\n  defaultValue=\"yearly\"\n  options={[\n    { value: 'monthly', label: 'Monthly', description: 'Cancel any time.' },\n    { value: 'yearly', label: 'Yearly', description: 'Two months free.' },\n  ]}\n/>"
         },
         "dont": {
           "caption": "Radio buttons for a long list: the form becomes a wall of options. Use a Select.",
-          "code": "      <RadioGroup\n  label=\"Country\"\n  orientation=\"horizontal\"\n  options={['Austria', 'Belgium', 'Denmark', 'Finland', 'France', 'Germany', 'Ireland', 'Italy'].map((c) => ({ value: c, label: c }))}\n/>"
+          "code": "<RadioGroup\n  label=\"Country\"\n  orientation=\"horizontal\"\n  options={['Austria', 'Belgium', 'Denmark', 'Finland', 'France', 'Germany', 'Ireland', 'Italy'].map((c) => ({ value: c, label: c }))}\n/>"
         },
         "accessibility": [
           "Renders a labelled `radiogroup`; arrow keys move between options.",
@@ -5997,11 +5997,11 @@
         ],
         "do": {
           "caption": "A labelled search with a clear button once there is a query.",
-          "code": "                  <SearchField label=\"Search records\" value=\"lease\" onValueChange={() => undefined} />"
+          "code": "<SearchField label=\"Search records\" value=\"lease\" onValueChange={() => undefined} />"
         },
         "dont": {
           "caption": "A plain text field for search: not announced as a search, no search icon, and no quick way to clear.",
-          "code": "                  <TextField label=\"Search records (don’t example)\" defaultValue=\"lease\" />"
+          "code": "<TextField label=\"Search records (don’t example)\" defaultValue=\"lease\" />"
         },
         "accessibility": [
           "`label` is required; `hideLabel` hides it visually only. The input is `type=\"search\"`.",
@@ -6162,11 +6162,11 @@
         ],
         "do": {
           "caption": "A named group of short, parallel options with one always selected.",
-          "code": "                  <SegmentedControl label=\"Date range (do example)\" options={ranges} defaultValue=\"30d\" />"
+          "code": "<SegmentedControl label=\"Date range (do example)\" options={ranges} defaultValue=\"30d\" />"
         },
         "dont": {
           "caption": "A row of buttons faking a selection: nothing tells assistive tech which one is chosen, or that they belong together.",
-          "code": "      <Cluster gap=\"2xs\">\n  <Button variant=\"secondary\" size=\"sm\">\n    7 days\n  </Button>\n  <Button size=\"sm\">30 days</Button>\n  <Button variant=\"secondary\" size=\"sm\">\n    90 days\n  </Button>\n</Cluster>"
+          "code": "<Cluster gap=\"2xs\">\n  <Button variant=\"secondary\" size=\"sm\">\n    7 days\n  </Button>\n  <Button size=\"sm\">30 days</Button>\n  <Button variant=\"secondary\" size=\"sm\">\n    90 days\n  </Button>\n</Cluster>"
         },
         "accessibility": [
           "`label` is required and names the group; `hideLabel` hides it visually only.",
@@ -6390,11 +6390,11 @@
         ],
         "do": {
           "caption": "Many options, a clear label, and a sensible default.",
-          "code": "                  <Select label=\"Status\" options={STATUSES} defaultValue=\"draft\" />"
+          "code": "<Select label=\"Status\" options={STATUSES} defaultValue=\"draft\" />"
         },
         "dont": {
           "caption": "Two options hidden behind a click. Radio buttons show both at once.",
-          "code": "      <Select\n  label=\"Billing\"\n  options={[\n    { value: 'monthly', label: 'Monthly' },\n    { value: 'yearly', label: 'Yearly' },\n  ]}\n  placeholder=\"Choose\"\n/>"
+          "code": "<Select\n  label=\"Billing\"\n  options={[\n    { value: 'monthly', label: 'Monthly' },\n    { value: 'yearly', label: 'Yearly' },\n  ]}\n  placeholder=\"Choose\"\n/>"
         },
         "accessibility": [
           "Keyboard, typeahead and focus return come from Radix; the trigger’s accessible name is the `label`.",
@@ -6632,11 +6632,11 @@
         ],
         "do": {
           "caption": "Main content first, a narrow region at the end that stacks below it when space runs out.",
-          "code": "      <Sidebar\n  placement=\"end\"\n  sideWidth=\"sm\"\n  gap=\"md\"\n  side={\n    <Card>\n      <CardHeader title=\"Properties\" level={4} />\n    </Card>\n  }\n>\n  <Card>\n    <CardBody>\n      <Text>Activity, newest first.</Text>\n    </CardBody>\n  </Card>\n</Sidebar>"
+          "code": "<Sidebar\n  placement=\"end\"\n  sideWidth=\"sm\"\n  gap=\"md\"\n  side={\n    <Card>\n      <CardHeader title=\"Properties\" level={4} />\n    </Card>\n  }\n>\n  <Card>\n    <CardBody>\n      <Text>Activity, newest first.</Text>\n    </CardBody>\n  </Card>\n</Sidebar>"
         },
         "dont": {
           "caption": "The important content squeezed into the narrow side.",
-          "code": "      <Sidebar\n  sideWidth=\"sm\"\n  side={\n    <Card>\n      <CardBody>\n        <Text>Activity, newest first, with every change to the record.</Text>\n      </CardBody>\n    </Card>\n  }\n>\n  <Card>\n    <CardHeader title=\"Owner\" level={4} />\n  </Card>\n</Sidebar>"
+          "code": "<Sidebar\n  sideWidth=\"sm\"\n  side={\n    <Card>\n      <CardBody>\n        <Text>Activity, newest first, with every change to the record.</Text>\n      </CardBody>\n    </Card>\n  }\n>\n  <Card>\n    <CardHeader title=\"Owner\" level={4} />\n  </Card>\n</Sidebar>"
         },
         "accessibility": [
           "Layout only: it adds no landmark. For a page’s nav or aside regions use `PageLayout`, which does.",
@@ -6763,11 +6763,11 @@
         ],
         "do": {
           "caption": "Keep the real card and heading; only the content that is loading is a skeleton.",
-          "code": "      <Card>\n  <CardBody>\n    <Skeleton lines={3} />\n  </CardBody>\n</Card>"
+          "code": "<Card>\n  <CardBody>\n    <Skeleton lines={3} />\n  </CardBody>\n</Card>"
         },
         "dont": {
           "caption": "One big block for a page of mixed content: it says nothing about what is coming.",
-          "code": "      <Stack>\n  <Skeleton shape=\"block\" />\n</Stack>"
+          "code": "<Stack>\n  <Skeleton shape=\"block\" />\n</Stack>"
         },
         "accessibility": [
           "Skeletons are hidden from assistive tech; the region that is loading should say so (for example `aria-busy` on it).",
@@ -6904,11 +6904,11 @@
         ],
         "do": {
           "caption": "The pending state belongs to the button that started it.",
-          "code": "                  <Button loading>Save changes</Button>"
+          "code": "<Button loading>Save changes</Button>"
         },
         "dont": {
           "caption": "A spinner standing in for a whole list: the page jumps when the rows arrive.",
-          "code": "      <Cluster justify=\"center\">\n  <Spinner size=\"md\" label=\"Loading records\" />\n</Cluster>"
+          "code": "<Cluster justify=\"center\">\n  <Spinner size=\"md\" label=\"Loading records\" />\n</Cluster>"
         },
         "accessibility": [
           "A standalone spinner takes a `label` and is announced as a status; inside a button it is decorative and the label stays.",
@@ -7079,11 +7079,11 @@
         ],
         "do": {
           "caption": "One Stack owns the rhythm of the form; the fields bring no margins of their own.",
-          "code": "      <Stack as=\"form\" gap=\"md\" align=\"start\" aria-label=\"Invite\">\n  <TextField label=\"Name\" />\n  <TextField label=\"Email\" type=\"email\" />\n  <Button type=\"submit\">Send invite</Button>\n</Stack>"
+          "code": "<Stack as=\"form\" gap=\"md\" align=\"start\" aria-label=\"Invite\">\n  <TextField label=\"Name\" />\n  <TextField label=\"Email\" type=\"email\" />\n  <Button type=\"submit\">Send invite</Button>\n</Stack>"
         },
         "dont": {
           "caption": "Nested Stacks with mixed gaps for the same rhythm: spacing drifts field by field.",
-          "code": "      <Stack gap=\"2xs\" aria-label=\"Invite\">\n  <Stack gap=\"xl\">\n    <TextField label=\"Name\" />\n  </Stack>\n  <TextField label=\"Email\" type=\"email\" />\n</Stack>"
+          "code": "<Stack gap=\"2xs\" aria-label=\"Invite\">\n  <Stack gap=\"xl\">\n    <TextField label=\"Name\" />\n  </Stack>\n  <TextField label=\"Email\" type=\"email\" />\n</Stack>"
         },
         "accessibility": [
           "Layout only: it adds no roles. Use `as` so the element matches the content (a list is a `ul`).",
@@ -7206,11 +7206,11 @@
         ],
         "do": {
           "caption": "Direction from the numbers, tone from the meaning, and what the change compares against.",
-          "code": "      <Switcher threshold=\"xs\">\n  <Stat label=\"Overdue records\" value=\"14\" delta={{ value: '3', direction: 'up', tone: 'negative' }} comparison=\"vs previous 30 days\" />\n  <Stat label=\"Pending approvals\" value=\"9\" delta={{ value: '25%', direction: 'down', tone: 'positive' }} comparison=\"vs previous 30 days\" />\n</Switcher>"
+          "code": "<Switcher threshold=\"xs\">\n  <Stat label=\"Overdue records\" value=\"14\" delta={{ value: '3', direction: 'up', tone: 'negative' }} comparison=\"vs previous 30 days\" />\n  <Stat label=\"Pending approvals\" value=\"9\" delta={{ value: '25%', direction: 'down', tone: 'positive' }} comparison=\"vs previous 30 days\" />\n</Switcher>"
         },
         "dont": {
           "caption": "A bare number in coloured text: no label, no comparison, and the colour is the only hint of whether it is good.",
-          "code": "                  <Text size=\"body-lg\">14 (+3)</Text>"
+          "code": "<Text size=\"body-lg\">14 (+3)</Text>"
         },
         "accessibility": [
           "The direction is an icon plus a visually hidden word (“Up”, “Down”, “No change”; set with `directionLabels`); tone colour only adds good or bad, never carries it alone.",
@@ -7384,11 +7384,11 @@
         ],
         "do": {
           "caption": "An ordered list: done steps show a check, the current one is marked, the rest show their number.",
-          "code": "                  <Stepper label=\"Setup steps (do example)\" steps={steps} current={2} />"
+          "code": "<Stepper label=\"Setup steps (do example)\" steps={steps} current={2} />"
         },
         "dont": {
           "caption": "Ordered steps as navigation tabs: it suggests people can jump to Plan before naming the workspace.",
-          "code": "      <NavTabs\n  label=\"Setup steps (don’t example)\"\n  current=\"/setup/workspace\"\n  items={steps.map((s) => ({ label: s.label, href: `/setup/${s.label.toLowerCase()}` }))}\n/>"
+          "code": "<NavTabs\n  label=\"Setup steps (don’t example)\"\n  current=\"/setup/workspace\"\n  items={steps.map((s) => ({ label: s.label, href: `/setup/${s.label.toLowerCase()}` }))}\n/>"
         },
         "accessibility": [
           "An ordered list named by the required `label`; the current step has `aria-current=\"step\"`.",
@@ -7564,11 +7564,11 @@
         ],
         "do": {
           "caption": "The label names the setting; the switch shows its state.",
-          "code": "      <Stack gap=\"md\">\n  <Switch label=\"Email me a weekly digest\" description=\"Every Monday morning.\" defaultChecked />\n</Stack>"
+          "code": "<Stack gap=\"md\">\n  <Switch label=\"Email me a weekly digest\" description=\"Every Monday morning.\" defaultChecked />\n</Stack>"
         },
         "dont": {
           "caption": "A label that describes the state (“On”) reads wrong as soon as the switch changes.",
-          "code": "                  <Switch label=\"On\" defaultChecked />"
+          "code": "<Switch label=\"On\" defaultChecked />"
         },
         "accessibility": [
           "Exposed as `role=\"switch\"` with `aria-checked`; Space toggles it.",
@@ -7749,11 +7749,11 @@
         ],
         "do": {
           "caption": "Stats in one row, which becomes one column all at once when narrow.",
-          "code": "      <Switcher threshold=\"xs\">\n  <Stat label=\"Records created\" value=\"86\" />\n  <Stat label=\"Pending approvals\" value=\"9\" />\n  <Stat label=\"Overdue records\" value=\"14\" />\n</Switcher>"
+          "code": "<Switcher threshold=\"xs\">\n  <Stat label=\"Records created\" value=\"86\" />\n  <Stat label=\"Pending approvals\" value=\"9\" />\n  <Stat label=\"Overdue records\" value=\"14\" />\n</Switcher>"
         },
         "dont": {
           "caption": "Stats in a wrapping Cluster: at in-between widths two sit on one row and the third alone below, at a different width.",
-          "code": "      <Cluster gap=\"md\">\n  <Stat label=\"Records created\" value=\"86\" />\n  <Stat label=\"Pending approvals\" value=\"9\" />\n  <Stat label=\"Overdue records\" value=\"14\" />\n</Cluster>"
+          "code": "<Cluster gap=\"md\">\n  <Stat label=\"Records created\" value=\"86\" />\n  <Stat label=\"Pending approvals\" value=\"9\" />\n  <Stat label=\"Overdue records\" value=\"14\" />\n</Cluster>"
         },
         "accessibility": [
           "Layout only: it adds no landmark, and children stay in DOM order in both arrangements, so reading and focus order never change.",
@@ -8020,11 +8020,11 @@
         ],
         "do": {
           "caption": "A caption names the table, the first cell heads the row, amounts line up on the right.",
-          "code": "      <Table caption=\"Records\" hideCaption>\n  <TableHead>\n    <TableRow>\n      <TableHeaderCell>Name</TableHeaderCell>\n      <TableHeaderCell>Status</TableHeaderCell>\n      <TableHeaderCell numeric>Amount</TableHeaderCell>\n    </TableRow>\n  </TableHead>\n  <TableBody>\n    {ROWS.map((r) => (\n      <TableRow key={r.name}>\n        <TableCell rowHeader>{r.name}</TableCell>\n        <TableCell>\n          <Badge tone={r.status === 'Approved' ? 'success' : 'warning'}>{r.status}</Badge>\n        </TableCell>\n        <TableCell numeric>{r.amount}</TableCell>\n      </TableRow>\n    ))}\n  </TableBody>\n</Table>"
+          "code": "<Table caption=\"Records\" hideCaption>\n  <TableHead>\n    <TableRow>\n      <TableHeaderCell>Name</TableHeaderCell>\n      <TableHeaderCell>Status</TableHeaderCell>\n      <TableHeaderCell numeric>Amount</TableHeaderCell>\n    </TableRow>\n  </TableHead>\n  <TableBody>\n    {ROWS.map((r) => (\n      <TableRow key={r.name}>\n        <TableCell rowHeader>{r.name}</TableCell>\n        <TableCell>\n          <Badge tone={r.status === 'Approved' ? 'success' : 'warning'}>{r.status}</Badge>\n        </TableCell>\n        <TableCell numeric>{r.amount}</TableCell>\n      </TableRow>\n    ))}\n  </TableBody>\n</Table>"
         },
         "dont": {
           "caption": "A table used to lay out a form: the grid means nothing, and screen readers announce rows and columns that aren’t there.",
-          "code": "      <Table caption=\"Profile\" hideCaption>\n  <TableBody>\n    <TableRow>\n      <TableCell rowHeader>Name</TableCell>\n      <TableCell>Sam Rivera</TableCell>\n      <TableCell rowHeader>Role</TableCell>\n      <TableCell>Owner</TableCell>\n    </TableRow>\n  </TableBody>\n</Table>"
+          "code": "<Table caption=\"Profile\" hideCaption>\n  <TableBody>\n    <TableRow>\n      <TableCell rowHeader>Name</TableCell>\n      <TableCell>Sam Rivera</TableCell>\n      <TableCell rowHeader>Role</TableCell>\n      <TableCell>Owner</TableCell>\n    </TableRow>\n  </TableBody>\n</Table>"
         },
         "accessibility": [
           "`caption` is required and names the scroll region; `hideCaption` keeps it for screen readers only.",
@@ -8371,11 +8371,11 @@
         ],
         "do": {
           "caption": "Short, parallel labels for views of one record.",
-          "code": "      <Tabs defaultValue=\"overview\">\n  <TabList label=\"Record sections\">\n    <Tab value=\"overview\">Overview</Tab>\n    <Tab value=\"activity\">Activity</Tab>\n  </TabList>\n  <TabPanel value=\"overview\">\n    <Text>Summary of the record and its owner.</Text>\n  </TabPanel>\n  <TabPanel value=\"activity\">\n    <Text>Recent changes, newest first.</Text>\n  </TabPanel>\n</Tabs>"
+          "code": "<Tabs defaultValue=\"overview\">\n  <TabList label=\"Record sections\">\n    <Tab value=\"overview\">Overview</Tab>\n    <Tab value=\"activity\">Activity</Tab>\n  </TabList>\n  <TabPanel value=\"overview\">\n    <Text>Summary of the record and its owner.</Text>\n  </TabPanel>\n  <TabPanel value=\"activity\">\n    <Text>Recent changes, newest first.</Text>\n  </TabPanel>\n</Tabs>"
         },
         "dont": {
           "caption": "Tabs as a wizard: “Step 2” hides what step 1 required and lets people skip it.",
-          "code": "      <Tabs defaultValue=\"1\">\n  <TabList label=\"Setup\">\n    <Tab value=\"1\">Step 1</Tab>\n    <Tab value=\"2\">Step 2</Tab>\n    <Tab value=\"3\">Step 3</Tab>\n  </TabList>\n  <TabPanel value=\"1\">\n    <Text>Company details</Text>\n  </TabPanel>\n  <TabPanel value=\"2\">\n    <Text>Invite people</Text>\n  </TabPanel>\n  <TabPanel value=\"3\">\n    <Text>Choose a plan</Text>\n  </TabPanel>\n</Tabs>"
+          "code": "<Tabs defaultValue=\"1\">\n  <TabList label=\"Setup\">\n    <Tab value=\"1\">Step 1</Tab>\n    <Tab value=\"2\">Step 2</Tab>\n    <Tab value=\"3\">Step 3</Tab>\n  </TabList>\n  <TabPanel value=\"1\">\n    <Text>Company details</Text>\n  </TabPanel>\n  <TabPanel value=\"2\">\n    <Text>Invite people</Text>\n  </TabPanel>\n  <TabPanel value=\"3\">\n    <Text>Choose a plan</Text>\n  </TabPanel>\n</Tabs>"
         },
         "accessibility": [
           "`TabList` requires a `label`; tabs, panels and their relationships use the ARIA tabs pattern.",
@@ -8487,11 +8487,11 @@
         ],
         "do": {
           "caption": "Filter chips that say what they filter, each with a named remove button.",
-          "code": "      <Cluster gap=\"xs\">\n  <Tag onRemove={() => undefined}>Status: Active</Tag>\n  <Tag onRemove={() => undefined}>Status: Pending</Tag>\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Tag onRemove={() => undefined}>Status: Active</Tag>\n  <Tag onRemove={() => undefined}>Status: Pending</Tag>\n</Cluster>"
         },
         "dont": {
           "caption": "A status badge used as a filter chip: it looks like data about a record, and it can’t be removed.",
-          "code": "                  <Badge tone=\"success\">Active</Badge>"
+          "code": "<Badge tone=\"success\">Active</Badge>"
         },
         "accessibility": [
           "The remove button is named “Remove <label>” by default (override with `removeLabel`) and is at least the minimum target size.",
@@ -8660,11 +8660,11 @@
         ],
         "do": {
           "caption": "Muted tone for secondary information, default tone for the content itself.",
-          "code": "      <Stack gap=\"2xs\">\n  <Text>Hardware lease renews on 1 March.</Text>\n  <Text size=\"caption\" tone=\"muted\">\n    Updated 2 hours ago\n  </Text>\n</Stack>"
+          "code": "<Stack gap=\"2xs\">\n  <Text>Hardware lease renews on 1 March.</Text>\n  <Text size=\"caption\" tone=\"muted\">\n    Updated 2 hours ago\n  </Text>\n</Stack>"
         },
         "dont": {
           "caption": "Everything muted: the content the reader came for is as quiet as the metadata.",
-          "code": "      <Stack gap=\"2xs\">\n  <Text tone=\"muted\">Hardware lease renews on 1 March.</Text>\n  <Text size=\"caption\" tone=\"muted\">\n    Updated 2 hours ago\n  </Text>\n</Stack>"
+          "code": "<Stack gap=\"2xs\">\n  <Text tone=\"muted\">Hardware lease renews on 1 March.</Text>\n  <Text size=\"caption\" tone=\"muted\">\n    Updated 2 hours ago\n  </Text>\n</Stack>"
         },
         "accessibility": [
           "Both tones meet 4.5:1 on every surface, in light and dark.",
@@ -8846,11 +8846,11 @@
         ],
         "do": {
           "caption": "A visible label, helper text that explains format, and an error that says how to fix it.",
-          "code": "      <Stack gap=\"md\">\n  <TextField label=\"Work email\" type=\"email\" description=\"We send invoices here.\" />\n  <TextField label=\"Amount\" type=\"number\" defaultValue=\"0\" error=\"Enter an amount greater than 0.\" />\n</Stack>"
+          "code": "<Stack gap=\"md\">\n  <TextField label=\"Work email\" type=\"email\" description=\"We send invoices here.\" />\n  <TextField label=\"Amount\" type=\"number\" defaultValue=\"0\" error=\"Enter an amount greater than 0.\" />\n</Stack>"
         },
         "dont": {
           "caption": "Hidden labels on a form: the placeholder vanishes as soon as someone types, and so does the question.",
-          "code": "      <Stack gap=\"md\">\n  <TextField label=\"Work email\" hideLabel placeholder=\"Work email\" />\n  <TextField label=\"Amount\" hideLabel placeholder=\"Amount\" />\n</Stack>"
+          "code": "<Stack gap=\"md\">\n  <TextField label=\"Work email\" hideLabel placeholder=\"Work email\" />\n  <TextField label=\"Amount\" hideLabel placeholder=\"Amount\" />\n</Stack>"
         },
         "accessibility": [
           "`label` is required and is the accessible name; `hideLabel` is for fields whose context makes the question obvious, such as a search box.",
@@ -9037,11 +9037,11 @@
         ],
         "do": {
           "caption": "Say what the text is for, and what happens to it.",
-          "code": "                  <Textarea label=\"Notes\" description=\"Visible to everyone in this workspace.\" />"
+          "code": "<Textarea label=\"Notes\" description=\"Visible to everyone in this workspace.\" />"
         },
         "dont": {
           "caption": "A multi-line box for a one-line answer invites the wrong input.",
-          "code": "                  <Textarea label=\"Postcode\" />"
+          "code": "<Textarea label=\"Postcode\" />"
         },
         "accessibility": [
           "Same anatomy as every field: required `label`, `description` and `error` linked to the control.",
@@ -9226,11 +9226,11 @@
         ],
         "do": {
           "caption": "A short confirmation that disappears by itself. Press the button to see it.",
-          "code": "      <ToastProvider label=\"Notifications (do example)\">\n  <SaveButton />\n</ToastProvider>"
+          "code": "<ToastProvider label=\"Notifications (do example)\">\n  <SaveButton />\n</ToastProvider>"
         },
         "dont": {
           "caption": "A failure that needs action, in a toast that auto-dismisses. Put it in a Banner where the problem is.",
-          "code": "      <ToastProvider label=\"Notifications (don’t example)\">\n  <FailingButton />\n</ToastProvider>"
+          "code": "<ToastProvider label=\"Notifications (don’t example)\">\n  <FailingButton />\n</ToastProvider>"
         },
         "accessibility": [
           "Toasts live in a labelled region; success, info and neutral are announced politely, danger and warning assertively.",
@@ -9458,11 +9458,11 @@
         ],
         "do": {
           "caption": "The visible label stays; the tooltip adds a hint about when the action applies.",
-          "code": "      <Cluster>\n  <Tooltip content=\"Downloads every row that matches the filters\">\n    <Button variant=\"secondary\" icon=\"download\">\n      Export CSV\n    </Button>\n  </Tooltip>\n</Cluster>"
+          "code": "<Cluster>\n  <Tooltip content=\"Downloads every row that matches the filters\">\n    <Button variant=\"secondary\" icon=\"download\">\n      Export CSV\n    </Button>\n  </Tooltip>\n</Cluster>"
         },
         "dont": {
           "caption": "The only explanation of a required format hidden in a tooltip: touch users never see it.",
-          "code": "      <Cluster>\n  <Tooltip content=\"Use the format AB-1234\">\n    <Button variant=\"ghost\">Reference</Button>\n  </Tooltip>\n</Cluster>"
+          "code": "<Cluster>\n  <Tooltip content=\"Use the format AB-1234\">\n    <Button variant=\"ghost\">Reference</Button>\n  </Tooltip>\n</Cluster>"
         },
         "accessibility": [
           "Opens on hover and keyboard focus, closes on Escape; the trigger keeps its own accessible name.",

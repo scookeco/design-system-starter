@@ -193,8 +193,8 @@ export const collectStories = (root: string): StoryFileFacts[] =>
 
 const dedent = (text: string) => {
   const lines = text.replace(/^\n+|\s+$/g, '').split('\n');
-  const indent = Math.min(...lines.slice(1).filter((l) => l.trim()).map((l) => /^ */.exec(l)?.[0].length ?? 0));
-  return lines.map((l, i) => (i === 0 || !Number.isFinite(indent) ? l : l.slice(indent))).join('\n');
+  const indent = Math.min(...lines.filter((l) => l.trim()).map((l) => /^ */.exec(l)?.[0].length ?? 0));
+  return lines.map((l) => l.slice(indent)).join('\n');
 };
 
 /** The source of `do.render` and `dont.render` in a usage doc. */
@@ -279,7 +279,8 @@ export const collectPages = async (
   const fileOfStory = new Map(stories.flatMap((f) => f.stories.map((s) => [s.id, f.file] as const)));
   const href = (h: string) => {
     const story = /^\.\/\?path=\/(?:story|docs)\/([\w-]+)/.exec(h)?.[1];
-    if (story) return fileOfStory.get(story);
+    // A golden example links to its source, not its stories.
+    if (story) return fileOfStory.get(story)?.replace(/^(src\/examples\/.+)\.stories\.tsx$/, "$1.tsx");
     return /^https?:/.test(h) ? h : undefined;
   };
   const files = stories.filter((f) => f.title.startsWith(`${section}/`));

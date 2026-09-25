@@ -1,0 +1,139 @@
+# Design system starter
+
+> Design system starter where design-system drift fails the build.
+
+Import only from `src/index.ts`. Every export's props, variants, stories, tokens and usage rules: [design-system.manifest.json](design-system.manifest.json) ([schema](design-system.manifest.schema.json)). Every usage doc and guide in full: [llms-full.txt](llms-full.txt). Rules for all UI work:
+
+```text
+UI rules (design system v0)
+- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
+  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
+- Compose system components and layout primitives, imported from src/index.ts.
+  Never import radix-ui outside src/components or src/primitives.
+- Never restyle a system component with className or style. Need a new look?
+  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
+  a lint disable with a reason, an owner and a removal condition.
+- Before creating a component, walk the decision ladder: template → variant →
+  component → primitive. Stop at the first yes.
+- Missing token? Add a semantic token in tokens/ (with a dark value for colours),
+  run npm run tokens. Never write a literal instead.
+- New pages start from PageHeader (the one h1, status, actions) inside the right
+  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),
+  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout
+  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
+  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
+  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
+  error/404 → ErrorPages. Not other screens.
+- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
+  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
+- CSS: inside a declared @layer, BEM-lite classes, logical properties only,
+  variants as closed data-* attributes, state via aria/native attributes,
+  specificity ≤ 0,3,0, no !important, no ids.
+- Every new variant, size or state gets a story. Every new exported component,
+  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
+  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
+  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
+- A story that renders an open modal is tagged ['modal-open', '!autodocs'].
+- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
+  focus never hidden behind sticky content (scroll containers use
+  space.scroll-padding.*), password fields as TextField type="password" with
+  autoComplete (username, current-password or new-password, one-time-code),
+  never block paste, pass AppShell's help from the shell composition, never
+  ask twice in a multi-step flow, and any drag declares data-drag-alternative.
+- Never add an eslint-disable or stylelint-disable without a reason after "--".
+```
+
+## Guides
+
+- [Getting started](docs/guides/GettingStarted.stories.tsx): Four steps: bring the system in, load its styles once, render every…
+- [Principles](docs/guides/Principles.stories.tsx): Three rules the whole system is built around.
+- [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Before building anything new, walk the ladder from the top and stop…
+- [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eight layout primitives arrange everything…
+- [Page archetypes](docs/guides/PageArchetypes.stories.tsx): Most pages are one of a few archetypes.
+- [Accessibility](docs/guides/Accessibility.stories.tsx): The target is WCAG 2.2 AA.
+- [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx): What the build checks against WCAG 2.2 AA, what it can’t, and how to…
+- [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
+- [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
+- [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
+
+## Foundations
+
+- [Colour](docs/foundations/Colour.stories.tsx): Every semantic colour role, in light and dark, with the contrast it…
+- [Data visualisation](docs/foundations/DataVisualisation.stories.tsx): Colours for chart marks: a categorical palette for series, a…
+- [Typography](docs/foundations/Typography.stories.tsx): Named text styles, each a complete font shorthand.
+- [Spacing, sizing and radius](docs/foundations/SpacingSizingRadius.stories.tsx): Every length in the system comes from these scales.
+- [Elevation and motion](docs/foundations/ElevationMotion.stories.tsx): Shadows say how far a surface floats; stacking tokens say what sits…
+- [Icons](docs/foundations/Icons.stories.tsx): A small, closed set drawn on one 20-unit grid with one stroke token.
+
+## Components
+
+- [Avatar](docs/usage/Avatar.usage.tsx)
+- [Badge](docs/usage/Badge.usage.tsx)
+- [Banner](docs/usage/Banner.usage.tsx)
+- [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx)
+- [Button](docs/usage/Button.usage.tsx)
+- [Card](docs/usage/Card.usage.tsx)
+- [Checkbox](docs/usage/Checkbox.usage.tsx)
+- [Dialog](docs/usage/Dialog.usage.tsx)
+- [Drawer](docs/usage/Drawer.usage.tsx)
+- [EmptyState](docs/usage/EmptyState.usage.tsx)
+- [Heading](docs/usage/Heading.usage.tsx)
+- [Link](docs/usage/Link.usage.tsx)
+- [Menu](docs/usage/Menu.usage.tsx)
+- [Meter](docs/usage/Meter.usage.tsx)
+- [Nav](docs/usage/Nav.usage.tsx)
+- [NavTabs](docs/usage/NavTabs.usage.tsx)
+- [PageHeader](docs/usage/PageHeader.usage.tsx)
+- [Pagination](docs/usage/Pagination.usage.tsx)
+- [Popover](docs/usage/Popover.usage.tsx)
+- [Progress](docs/usage/Progress.usage.tsx)
+- [RadioGroup](docs/usage/RadioGroup.usage.tsx)
+- [SearchField](docs/usage/SearchField.usage.tsx)
+- [SegmentedControl](docs/usage/SegmentedControl.usage.tsx)
+- [Select](docs/usage/Select.usage.tsx)
+- [Skeleton](docs/usage/Skeleton.usage.tsx)
+- [Spinner](docs/usage/Spinner.usage.tsx)
+- [Stat](docs/usage/Stat.usage.tsx)
+- [Stepper](docs/usage/Stepper.usage.tsx)
+- [Switch](docs/usage/Switch.usage.tsx)
+- [Table](docs/usage/Table.usage.tsx)
+- [Tabs](docs/usage/Tabs.usage.tsx)
+- [Tag](docs/usage/Tag.usage.tsx)
+- [Text](docs/usage/Text.usage.tsx)
+- [TextField](docs/usage/TextField.usage.tsx)
+- [Textarea](docs/usage/Textarea.usage.tsx)
+- [Toast](docs/usage/Toast.usage.tsx)
+- [Tooltip](docs/usage/Tooltip.usage.tsx)
+
+## Primitives
+
+- [Center](docs/usage/Center.usage.tsx)
+- [Cluster](docs/usage/Cluster.usage.tsx)
+- [Cover](docs/usage/Cover.usage.tsx)
+- [Frame](docs/usage/Frame.usage.tsx)
+- [Grid](docs/usage/Grid.usage.tsx)
+- [Sidebar](docs/usage/Sidebar.usage.tsx)
+- [Stack](docs/usage/Stack.usage.tsx)
+- [Switcher](docs/usage/Switcher.usage.tsx)
+
+## Layouts
+
+- [AppShell](docs/usage/AppShell.usage.tsx)
+- [AuthLayout](docs/usage/AuthLayout.usage.tsx)
+- [FocusedLayout](docs/usage/FocusedLayout.usage.tsx)
+- [PageLayout](docs/usage/PageLayout.usage.tsx)
+
+## Utilities
+
+- [vars](src/tokens/tokens.ts): Semantic and component tokens as var() references, for inline custom…
+
+## Examples
+
+- [Create and edit](src/examples/CreateEditFlow.tsx)
+- [Dashboard](src/examples/DashboardPage.tsx)
+- [Error pages](src/examples/ErrorPages.tsx)
+- [List page](src/examples/ListPage.tsx)
+- [Record page](src/examples/RecordPage.tsx)
+- [Settings page](src/examples/SettingsPage.tsx)
+- [Setup wizard](src/examples/SetupWizard.tsx)
+- [Sign in](src/examples/SignInPage.tsx)
