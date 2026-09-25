@@ -18,6 +18,7 @@ export const usage: UsageDoc = {
     { situation: 'Switching panels in place without changing the URL', instead: '`Tabs`' },
     { situation: 'The app’s areas', instead: 'AppShell’s `Nav`' },
     { situation: 'A long list of categories (settings)', instead: '`Nav` in `PageLayout`’s nav slot' },
+    { situation: 'Steps that must be done in order', instead: '`Stepper` in a `FocusedLayout`' },
   ],
   do: {
     caption: 'Each section is a route: links in a named nav, the current one marked with aria-current.',

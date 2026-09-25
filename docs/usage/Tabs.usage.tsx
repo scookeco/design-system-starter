@@ -10,7 +10,7 @@ export const usage: UsageDoc = {
   whenNotToUse: [
     { situation: 'Sections that are each their own route', instead: '`NavTabs`' },
     { situation: 'Moving between pages or areas of the app', instead: '`Nav`, or a settings sub-nav with `Nav`' },
-    { situation: 'Steps that must be done in order', instead: 'a full-page form with sections' },
+    { situation: 'Steps that must be done in order', instead: '`Stepper` in a `FocusedLayout`' },
     { situation: 'Content people need to compare side by side', instead: 'one page with sections' },
   ],
   do: {

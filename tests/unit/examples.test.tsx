@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { CreateEditFlow } from '../../src/examples/CreateEditFlow';
 import { SettingsPage } from '../../src/examples/SettingsPage';
 import { SignInPage } from '../../src/examples/SignInPage';
+import { SetupWizard } from '../../src/examples/SetupWizard';
 
 afterEach(cleanup);
 
@@ -87,5 +88,26 @@ describe('Sign-in example', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Work email' }), { target: { value: 'sam@example.com' } });
     fireEvent.click(screen.getByRole('button', { name: 'Email me a sign-in link' }));
     expect(screen.getByRole('heading', { level: 1, name: 'Check your email' })).toBeTruthy();
+  });
+});
+
+describe('Setup wizard example', () => {
+  it('validates only the current step, focuses the first invalid field, then moves focus to the next step’s h1', async () => {
+    render(<SetupWizard />);
+    const current = () => document.querySelector('[aria-current="step"] .stepper__label')?.textContent;
+    expect(current()).toBe('Workspace');
+    expect(screen.getByRole('progressbar', { name: 'Setup progress' }).getAttribute('aria-valuetext')).toBe('Step 1 of 4');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    const name = screen.getByRole('textbox', { name: 'Workspace name' });
+    expect(name.getAttribute('aria-invalid')).toBe('true');
+    await waitFor(() => expect(document.activeElement).toBe(name));
+
+    fireEvent.change(name, { target: { value: 'Acme Legal' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Workspace address' }), { target: { value: 'acme-legal' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(current()).toBe('Invite');
+    expect(screen.getByText('Completed:', { exact: false }).closest('li')?.textContent).toContain('Workspace');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Invite your team' }));
   });
 });

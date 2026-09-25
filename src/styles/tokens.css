@@ -214,6 +214,7 @@
     --size-sidebar-md: var(--container-2xs);
     --size-sidebar-lg: var(--container-xs);
     --size-rail: var(--size-12);
+    --size-bar: var(--space-2);
     --size-grid-item-sm: var(--container-3xs);
     --size-grid-item-md: var(--container-2xs);
     --size-grid-item-lg: var(--container-xs);

@@ -38,3 +38,5 @@ export { PageHeader, type PageHeaderProps } from './PageHeader/PageHeader';
 export { NavTabs, type NavTabsProps, type NavTab } from './NavTabs/NavTabs';
 export { Link, LinkProvider, type LinkProps, type LinkProviderProps, type LinkComponent, type LinkComponentProps } from './Link/Link';
 export { Drawer, type DrawerProps } from './Drawer/Drawer';
+export { Stepper, type StepperProps, type StepperStep } from './Stepper/Stepper';
+export { Progress, type ProgressProps } from './Progress/Progress';

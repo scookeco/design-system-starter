@@ -126,6 +126,7 @@ export const vars = {
       "lg": "var(--size-sidebar-lg)"
     },
     "rail": "var(--size-rail)",
+    "bar": "var(--size-bar)",
     "grid-item": {
       "sm": "var(--size-grid-item-sm)",
       "md": "var(--size-grid-item-md)",

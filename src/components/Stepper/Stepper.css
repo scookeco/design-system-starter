@@ -1,0 +1,53 @@
+@layer components {
+  /* 1. block: a row of steps that wraps on narrow screens */
+  .stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap-sm) var(--space-gap-lg);
+  }
+
+  /* 2. parts */
+  .stepper__step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+  }
+
+  .stepper__marker {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-surface);
+    font: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 3. states: shape and weight as well as colour */
+  .stepper__step[data-state="completed"] {
+    color: var(--color-fg-default);
+  }
+
+  .stepper__step[data-state="completed"] .stepper__marker {
+    border-color: var(--color-action-primary);
+    background: var(--color-action-primary);
+    color: var(--color-fg-on-action);
+  }
+
+  .stepper__step[data-state="current"] {
+    color: var(--color-fg-default);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .stepper__step[data-state="current"] .stepper__marker {
+    border: var(--focus-ring-width) solid var(--color-action-primary);
+    color: var(--color-fg-default);
+    font-weight: var(--font-weight-strong);
+  }
+}
