@@ -12,7 +12,7 @@
  *   tokens      the token source, through the same model the token checks use
  *   rules       the marked block in CLAUDE.md; commands from README.md's Scripts table
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -244,11 +244,11 @@ export const collectUsage = (root: string, docs: ReadonlyMap<string, UsageDoc>, 
 type StoryModule = Record<string, unknown>;
 type Loader = () => Promise<StoryModule>;
 
-const renderPage = (mod: StoryModule): string => {
+const renderPage = (file: string, mod: StoryModule): string => {
   const story = Object.entries(mod).find(([key, value]) => key !== 'default' && typeof (value as { render?: unknown } | undefined)?.render === 'function')?.[1] as
     | { render: (args: object, context: object) => ReturnType<typeof createElement> }
     | undefined;
-  if (!story) throw new Error('A docs page needs a story with a render function');
+  if (!story) throw new Error(`${file}: a Guides or Foundations page needs a story with a render function`);
   return renderToStaticMarkup(createElement(() => story.render({}, {})));
 };
 
@@ -289,7 +289,7 @@ export const collectPages = async (
   for (const f of files) {
     const loader = loaders[`../${f.file}`];
     if (!loader) throw new Error(`${f.file}: not found by the collector's import.meta.glob`);
-    const html = renderPage(await loader());
+    const html = renderPage(f.file, await loader());
     const { title, lead } = pageHeading(html);
     const name = f.title.split('/').at(-1) ?? f.title;
     const rank = order.indexOf(name);
@@ -315,7 +315,9 @@ export const collectExamples = (root: string, stories: StoryFileFacts[]): Exampl
   stories
     .filter((f) => f.title.startsWith('Examples/'))
     .map((f) => {
-      const path = f.file.replace(/\.stories\.tsx?$/, '.tsx');
+      // The example beside its stories file (ListPage.stories.tsx → ListPage.tsx), else the stories file itself.
+      const beside = f.file.replace(/\.stories\.tsx?$/, '.tsx');
+      const path = existsSync(join(root, beside)) ? beside : f.file;
       return { title: f.title.split('/').at(-1) ?? f.title, summary: headerSummary(readFileSync(join(root, path), 'utf8')), path, stories: f.stories.map((s) => s.id) };
     })
     .sort((a, b) => byName(a.path, b.path));

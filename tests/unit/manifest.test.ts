@@ -93,7 +93,7 @@ describe('agent manifest and llms files', () => {
   it.skipIf(!existsSync(join(root, 'storybook-static/index.json')))('story ids match the built Storybook index', () => {
     const index = JSON.parse(read('storybook-static/index.json')) as { entries: Record<string, unknown> };
     const missing = manifest.exports.flatMap((e) => (e.unit?.stories ?? []).map((s) => s.id)).filter((id) => !(id in index.entries));
-    expect(missing).toEqual([]);
+    expect(missing, 'Story ids missing from storybook-static/index.json. If the local build is old, rebuild it: npm run build-storybook').toEqual([]);
   });
 
   it('carries the agent rules from CLAUDE.md and commands that exist', () => {
