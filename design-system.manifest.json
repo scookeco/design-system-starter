@@ -4278,7 +4278,25 @@
           "Show relative times (“3 days ago”) with the absolute date nearby or on hover when precision matters.",
           "Numbers in tables still need `numeric` cells, so digits line up in every locale."
         ]
-      }
+      },
+      "stories": [
+        {
+          "id": "utilities-localeprovider--english-us",
+          "name": "English US"
+        },
+        {
+          "id": "utilities-localeprovider--german",
+          "name": "German"
+        },
+        {
+          "id": "utilities-localeprovider--japanese",
+          "name": "Japanese"
+        },
+        {
+          "id": "utilities-localeprovider--arabic-egypt",
+          "name": "Arabic Egypt"
+        }
+      ]
     },
     {
       "name": "LocaleProviderProps",

@@ -166,6 +166,8 @@ export interface ExportEntry {
   variants?: Record<string, Literal[]>;
   states?: string[];
   usage?: Usage;
+  /** Stories of an export that documents itself but is not a UI unit (LocaleProvider). */
+  stories?: { id: string; name: string }[];
   unit?: UnitEntry;
 }
 
@@ -265,6 +267,10 @@ export const buildManifest = (inputs: ManifestInputs): Manifest => {
           composes: unit.composesAll,
           tokens: unit.tokens.map(({ token }) => token),
         };
+      }
+      if (usage && !entry.unit) {
+        const stories = storiesFor(f.name);
+        if (stories.length) entry.stories = stories;
       }
       return entry;
     });

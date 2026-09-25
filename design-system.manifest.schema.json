@@ -449,6 +449,29 @@
               }
             }
           },
+          "stories": {
+            "type": "array",
+            "description": "Stories of an export that has its own usage doc but is not a UI unit (LocaleProvider): titles ending in /<Name>.",
+            "items": {
+              "type": "object",
+              "description": "One story.",
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Storybook story id, from Storybook's own CSF parser."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Story name."
+                }
+              }
+            }
+          },
           "unit": {
             "type": "object",
             "description": "Unit-level facts, on the export a component, primitive or layout folder is named after.",

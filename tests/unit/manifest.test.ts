@@ -66,6 +66,12 @@ describe('agent manifest and llms files', () => {
     expect(entry('useToast')).toMatchObject({ kind: 'utility', partOf: 'Toast' });
     expect(entry('ButtonProps')).toMatchObject({ kind: 'type-only', propsOf: 'Button' });
     expect(entry('TableRow')).toMatchObject({ kind: 'component', partOf: 'Table', docs: 'docs/usage/Table.usage.tsx' });
+    // Utilities outside the UI layers (the locale formatting) carry their usage doc and stories too.
+    expect(entry('LocaleProvider')).toMatchObject({ kind: 'utility', docs: 'docs/usage/LocaleProvider.usage.tsx' });
+    expect(entry('LocaleProvider').usage?.whenToUse.length).toBeGreaterThan(0);
+    expect(entry('LocaleProvider').stories?.length).toBeGreaterThan(0);
+    expect(entry('useFormat')).toMatchObject({ kind: 'utility', docs: 'docs/usage/LocaleProvider.usage.tsx' });
+    expect(entry('useFormat').signature).toMatch(/=>/);
   });
 
   it('reads props from the TypeScript types: own props, defaults, literal values, closed-API facts', () => {

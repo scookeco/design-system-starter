@@ -3216,6 +3216,8 @@ Closed styling API: no `className`/`style`.
 - Show relative times (“3 days ago”) with the absolute date nearby or on hover when precision matters.
 - Numbers in tables still need `numeric` cells, so digits line up in every locale.
 
+Stories: `utilities-localeprovider--english-us`, `utilities-localeprovider--german`, `utilities-localeprovider--japanese`, `utilities-localeprovider--arabic-egypt`.
+
 ### createFormatter
 
 utility · `src/format/format.ts` · usage: `docs/usage/LocaleProvider.usage.tsx`

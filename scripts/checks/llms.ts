@@ -155,6 +155,7 @@ const unitBlock = (m: Manifest, e: ExportEntry): string[] => {
     lines.push('', `#### ${part.name}`, '', `${part.kind}, part of ${e.name}${part.description ? `. ${part.description}` : '.'}`, ...propsBlock(part));
   }
   if (e.usage) lines.push(...usageBlock(e.usage));
+  if (e.stories) lines.push('', `Stories: ${e.stories.map((st) => code(st.id)).join(', ')}.`);
   if (e.unit) {
     lines.push('', `Stories: ${e.unit.stories.map((s) => code(s.id)).join(', ') || 'none'}.`);
     if (e.unit.composes.length) lines.push(`Composes: ${e.unit.composes.join(', ')}.`);
