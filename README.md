@@ -108,6 +108,20 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
   ```
   Count these disables. A rising count means drift, and a repeated override means a variant is missing.
 
+## Bundle size budgets
+
+`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom` and `radix-ui` left out as the consumer's own dependencies:
+
+| Budget | Limit | Measures |
+|---|---|---|
+| Library JS | 12 kB | `dist/index.js`, everything exported |
+| Library CSS | 11.5 kB | `dist/styles.css` |
+| One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
+
+It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
+
+**Changing a budget deliberately.** A failing budget means the library grew. First find out why: `dist/index.js` is not minified and marks each source module with a `//#region` comment, so diffing it against a build of `main` shows what grew. If the growth is intended (a new component, new tokens), raise the `limit` of that entry in `.size-limit.json` to the new size plus about 15% headroom, in the same pull request as the change, and say why in its description. Never raise a limit to make an unexplained increase pass, and lower it again when something is removed.
+
 ## Theming
 
 Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` sets `color-scheme: light`, and `data-theme="dark"` on `<html>` switches to dark. Components contain no theme rules at all. The product ships light, and turning dark on is a one-line change. Contrast is tested in both themes, and the gallery captures both.
