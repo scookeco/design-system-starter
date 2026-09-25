@@ -2,7 +2,7 @@
 
 A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, page layouts (app shell, page regions, signed-out and focused-task frames), a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
-Stack: npm (Node 24), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
+Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
 
 ## Quick start
 
@@ -247,7 +247,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Job | Runs | What it does |
 |---|---|---|
 | Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
-| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json` or the workflow itself |
+| Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.nvmrc` or the workflow itself |
 | Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
 | Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact, running every spec: screenshots, axe and the WCAG 2.2 checks; each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
