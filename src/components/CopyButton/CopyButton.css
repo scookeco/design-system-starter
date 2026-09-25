@@ -1,0 +1,5 @@
+@layer components {
+  .copy-button {
+    display: inline-flex;
+  }
+}

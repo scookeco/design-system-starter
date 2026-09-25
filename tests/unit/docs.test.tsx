@@ -9,6 +9,13 @@ import { usageDocs } from '../../docs/usage/registry';
 
 afterEach(cleanup);
 
+// jsdom has no ResizeObserver; Radix Slider measures its thumbs with one.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 const root = resolve(import.meta.dirname, '../..');
 const docs = [...usageDocs];
 

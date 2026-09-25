@@ -1,0 +1,17 @@
+@layer components {
+  .hover-card {
+    z-index: var(--z-dropdown);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+    inline-size: max-content;
+    max-inline-size: var(--size-overlay-max);
+    padding: var(--space-inset-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-elevated);
+    color: var(--color-fg-default);
+    font: var(--text-body);
+    box-shadow: var(--shadow-popover);
+  }
+}
