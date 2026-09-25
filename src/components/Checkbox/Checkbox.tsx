@@ -9,6 +9,11 @@ export type CheckedState = boolean | 'indeterminate';
 export interface CheckboxProps extends EscapeHatch {
   /** Visible label and accessible name. Required. */
   label: string;
+  /**
+   * Keep the label for assistive tech only, when the context makes it obvious visually: a row's
+   * checkbox in a table ("Select Hardware lease"). The name must still say what is selected.
+   */
+  hideLabel?: boolean;
   description?: string;
   checked?: CheckedState;
   defaultChecked?: CheckedState;
@@ -19,7 +24,7 @@ export interface CheckboxProps extends EscapeHatch {
   value?: string;
 }
 
-export function Checkbox({ label, description, UNSAFE_className, UNSAFE_style, ...rootProps }: CheckboxProps) {
+export function Checkbox({ label, hideLabel = false, description, UNSAFE_className, UNSAFE_style, ...rootProps }: CheckboxProps) {
   const id = useId();
   const descriptionId = description ? `${id}-description` : undefined;
   return (
@@ -30,7 +35,7 @@ export function Checkbox({ label, description, UNSAFE_className, UNSAFE_style, .
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       <div className="checkbox__text">
-        <label className="checkbox__label" htmlFor={id}>
+        <label className={hideLabel ? 'checkbox__label visually-hidden' : 'checkbox__label'} htmlFor={id}>
           {label}
         </label>
         {description ? (

@@ -11,6 +11,7 @@ export const usage: UsageDoc = {
   whenToUse: [
     'Records people compare across the same attributes: the default for a list page.',
     'Numbers right-aligned with `numeric`; the first cell of each row is its `rowHeader`.',
+    'Selectable rows: a first column of `Checkbox` with `hideLabel`, named after each row, and `selected` on the `TableRow` so a selected row is filled, not just ticked. Bulk actions go in a bar that shows the count (see the List page example).',
   ],
   whenNotToUse: [
     { situation: 'Items that are mostly visual or have fewer than four attributes worth comparing', instead: 'cards in a `Grid`' },

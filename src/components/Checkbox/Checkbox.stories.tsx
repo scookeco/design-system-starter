@@ -16,3 +16,5 @@ export const Indeterminate: Story = { args: { checked: 'indeterminate', label: '
 export const WithDescription: Story = { args: { description: 'Drafts are only visible to their owner.' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const DisabledChecked: Story = { args: { disabled: true, defaultChecked: true } };
+/** In a table row: the name ("Select Hardware lease") is for assistive tech; the row shows what it is. */
+export const HiddenLabel: Story = { args: { label: 'Select Hardware lease', hideLabel: true, defaultChecked: true } };

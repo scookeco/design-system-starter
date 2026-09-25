@@ -28,3 +28,18 @@ export const SecondPage: Story = { parameters: mockApi({ url: '/records?page=2' 
 export const OpenedFromLink: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount' }) };
 /** Another tenant: its own records, currency and counts, under its own cache keys. */
 export const OtherTenant: Story = { parameters: mockApi({ tenant: 'globex' }) };
+export const RowsSelected: Story = { args: { initialSelection: 'page' } };
+/** "Select all N matching": the selection is the filter, not the ids on this page. */
+export const AllMatchingSelected: Story = { args: { initialSelection: 'matching' } };
+export const BulkDeleteConfirm: Story = { tags: ['modal-open'], args: { initialSelection: 'page', initialBulkDelete: 'confirm' } };
+/** Pessimistic: the dialog stays, Delete shows its pending state, Cancel is disabled. */
+export const BulkDeletePending: Story = {
+  tags: ['modal-open', 'busy'],
+  args: { initialSelection: 'page', initialBulkDelete: 'submit' },
+  parameters: mswOverrides(hold('post', '/records/bulk-delete')),
+};
+/** Every draft, deleted by filter; the ones on legal hold fail and stay listed, with Retry. */
+export const BulkDeletePartialFailure: Story = {
+  args: { initialSelection: 'matching', initialBulkDelete: 'submit' },
+  parameters: mockApi({ url: '/records?view=drafts' }),
+};

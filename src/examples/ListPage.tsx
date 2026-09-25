@@ -17,7 +17,12 @@
  *   content  one of: skeleton rows (loading) · table · empty state (first use | no results | error)
  *   footer   Pagination: "1–10 of 219", from the server's total. Its summary is the page's one live
  *            region for the count; while loading or failed, a caption announces that instead.
- *   overlays create dialog, toast on success
+ *   select   a checkbox per row, named after it; the header box selects the page, then offers
+ *            "Select all N matching" (the selection is then the filter, not a list of ids)
+ *   bar      the shell's sticky footer while anything is selected: the count (live), Clear
+ *            selection, and Delete last, guarded by the canDelete predicate
+ *   overlays create dialog; bulk delete confirmation naming the count; toast on success; a
+ *            banner that stays for a partial failure ("98 deleted, 2 failed") with Retry
  *
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
@@ -25,10 +30,13 @@
  * URL: the view, search, filters, sort and page live in the query string (useUrlState), so any
  * view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
  * debounced search is a refinement (replace). The half-typed search stays out of the URL.
+ *
+ * Selection belongs to one filter: change the search, a filter or the view and it clears.
  */
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import {
   Badge,
+  Banner,
   Button,
   Center,
   Checkbox,
@@ -56,9 +64,22 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { RecordStatus, SortKey } from '../app/api/schemas';
-import { useCreateRecord } from '../app/model/mutations';
+import type { BulkDeleteResult, RecordStatus, SortKey } from '../app/api/schemas';
+import { useBulkDeleteRecords, useCreateRecord, type BulkSelection } from '../app/model/mutations';
 import { statusOptionsFor, toRow, VIEWS } from '../app/model/projections';
+import {
+  deletableCount,
+  EMPTY_SELECTION,
+  filterKey,
+  isSelected,
+  pageState,
+  selectedCount,
+  selectMatching,
+  toBulkSelection,
+  toggleRow,
+  togglePage,
+  type Selection,
+} from '../app/model/selection';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
 import { listCodec, type ListUrlState } from '../app/url/listState';
@@ -68,7 +89,7 @@ import { ExampleShell } from './ExampleShell';
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
 const PAGE_SIZE = 10;
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
-const COLUMNS = 5;
+const COLUMNS = 6;
 
 type SortColumn = 'name' | 'amount' | 'updated';
 const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | 'descending' } => ({
@@ -76,25 +97,74 @@ const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | '
   direction: sort.startsWith('-') ? 'descending' : 'ascending',
 });
 
+const plural = (n: string, count: number, one: string, many: string) => `${n} ${count === 1 ? one : many}`;
+
 /** The page's search, filters, sort, page and view come from the URL (/records?view=open&q=…). */
 export interface ListPageProps {
   initialDialogOpen?: boolean;
   /** Open the Filters popover on first render (gallery and tests). */
   initialFiltersOpen?: boolean;
+  /** Select this page, or everything matching, once rows load (gallery and tests). */
+  initialSelection?: 'page' | 'matching';
+  /** With a selection: open the delete confirmation, or confirm it straight away (gallery and tests). */
+  initialBulkDelete?: 'confirm' | 'submit';
 }
 
+/**
+ * The page owns the selection (it's shared by the table and the shell's footer bar) and the last
+ * bulk result. Both are UI state, so they live here, not in the URL or the cache.
+ */
 export function ListPage(props: ListPageProps) {
+  const [url] = useUrlState(listCodec);
+  const key = filterKey(url);
+  const [held, setHeld] = useState<{ key: string; selection: Selection }>({ key, selection: EMPTY_SELECTION });
+  // A selection made under another filter no longer applies.
+  const selection = held.key === key ? held.selection : EMPTY_SELECTION;
+  const setSelection = useCallback((next: Selection) => setHeld({ key, selection: next }), [key]);
+  const [result, setResult] = useState<BulkDeleteResult | undefined>();
+
   return (
-    <ExampleShell current="/records">
-      <ListPageContent {...props} />
+    <ExampleShell
+      current="/records"
+      footer={
+        selectedCount(selection) > 0 ? (
+          <BulkActionBar
+            selection={selection}
+            initialBulkDelete={props.initialBulkDelete}
+            onClear={() => setSelection(EMPTY_SELECTION)}
+            onDone={(outcome) => {
+              setSelection(EMPTY_SELECTION);
+              setResult(outcome.failed.length > 0 ? outcome : undefined);
+            }}
+          />
+        ) : undefined
+      }
+    >
+      <ListPageContent {...props} selection={selection} onSelectionChange={setSelection} result={result} onResultChange={setResult} />
     </ExampleShell>
   );
 }
 
-function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false }: ListPageProps) {
+interface ContentProps extends ListPageProps {
+  selection: Selection;
+  onSelectionChange: (selection: Selection) => void;
+  result: BulkDeleteResult | undefined;
+  onResultChange: (result: BulkDeleteResult | undefined) => void;
+}
+
+function ListPageContent({
+  initialDialogOpen = false,
+  initialFiltersOpen = false,
+  initialSelection,
+  selection,
+  onSelectionChange,
+  result,
+  onResultChange,
+}: ContentProps) {
   const toast = useToast();
   const format = useFormat();
   const createRecord = useCreateRecord();
+  const retryDelete = useBulkDeleteRecords();
 
   const [url, nav] = useUrlState(listCodec);
   const query = { ...url, q: url.q.trim(), pageSize: PAGE_SIZE };
@@ -116,6 +186,33 @@ function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false
   const total = list.data?.total ?? 0;
   const filtered = query.q.trim() !== '' || query.status.length > 0;
   const sort = sortOf(query.sort);
+
+  const pageSelection = pageState(selection, rows);
+  const filter = { q: query.q, status: query.status, view: query.view };
+
+  // Gallery and tests: make the initial selection once the rows are here.
+  const selectedInitially = useRef(false);
+  const selectOnLoad = useEffectEvent(() => {
+    if (!initialSelection || selectedInitially.current) return;
+    selectedInitially.current = true;
+    onSelectionChange(initialSelection === 'page' ? togglePage(EMPTY_SELECTION, rows) : selectMatching(filter, total));
+  });
+  const loaded = list.isSuccess;
+  useEffect(() => {
+    if (loaded) selectOnLoad();
+  }, [loaded]);
+
+  const retry = (failedIds: readonly string[]) =>
+    retryDelete.mutate(
+      { ids: failedIds },
+      {
+        onSuccess: (outcome) => {
+          onResultChange(outcome.failed.length > 0 ? outcome : undefined);
+          if (outcome.failed.length === 0) toast({ title: plural(format.number(outcome.deleted.length), outcome.deleted.length, 'record deleted', 'records deleted'), tone: 'success' });
+        },
+        onError: () => toast({ title: 'The retry failed', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+      },
+    );
 
   /** A refinement of this view: rewrite the URL entry, back to page 1. */
   const refine = (next: Partial<ListUrlState>) => nav.replace({ ...next, page: 1 });
@@ -276,11 +373,56 @@ function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false
               ) : null}
             </Stack>
 
+            {result ? (
+              <Banner
+                tone="warning"
+                title={`${format.number(result.deleted.length)} deleted, ${format.number(result.failed.length)} failed`}
+                onDismiss={() => onResultChange(undefined)}
+                action={
+                  <Button variant="secondary" loading={retryDelete.isPending} onClick={() => retry(result.failed.map((f) => f.id))}>
+                    {retryDelete.isPending ? 'Retrying…' : 'Retry'}
+                  </Button>
+                }
+              >
+                <Stack as="ul" gap="2xs">
+                  {result.failed.slice(0, 5).map((failure) => (
+                    <li key={failure.id}>{`${failure.name}: ${failure.reason}`}</li>
+                  ))}
+                  {result.failed.length > 5 ? <li>{`and ${format.number(result.failed.length - 5)} more`}</li> : null}
+                </Stack>
+              </Banner>
+            ) : null}
+
+            {list.isSuccess && rows.length > 0 && pageSelection === true && total > rows.length ? (
+              <Cluster gap="xs" align="center">
+                {selection.scope === 'matching' ? (
+                  <>
+                    <Text>{`All ${format.number(total)} matching records are selected.`}</Text>
+                    <Button variant="ghost" size="sm" onClick={() => onSelectionChange(EMPTY_SELECTION)}>
+                      Clear selection
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Text>{`All ${format.number(rows.length)} on this page are selected.`}</Text>
+                    <Button variant="ghost" size="sm" onClick={() => onSelectionChange(selectMatching(filter, total))}>
+                      {`Select all ${format.number(total)} matching`}
+                    </Button>
+                  </>
+                )}
+              </Cluster>
+            ) : null}
+
             {list.isPending ? (
               <Stack aria-busy="true">
                 <Table caption="Records" hideCaption maxHeight="md">
                   <TableHead>
                     <TableRow>
+                      <TableHeaderCell>
+                        <Text as="span" size="caption" tone="muted">
+                          Select
+                        </Text>
+                      </TableHeaderCell>
                       <TableHeaderCell>Name</TableHeaderCell>
                       <TableHeaderCell>Owner</TableHeaderCell>
                       <TableHeaderCell>Status</TableHeaderCell>
@@ -323,6 +465,9 @@ function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false
               <Table caption="Records" hideCaption maxHeight="md">
                 <TableHead>
                   <TableRow>
+                    <TableHeaderCell>
+                      <Checkbox label="Select all on this page" hideLabel checked={pageSelection} onCheckedChange={() => onSelectionChange(togglePage(selection, rows))} />
+                    </TableHeaderCell>
                     <TableHeaderCell sort={sort.column === 'name' ? sort.direction : undefined} onSort={() => toggleSort('name')}>
                       Name
                     </TableHeaderCell>
@@ -338,7 +483,15 @@ function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false
                 </TableHead>
                 <TableBody>
                   {rows.map((row) => (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} selected={isSelected(selection, row.id)}>
+                      <TableCell>
+                        <Checkbox
+                          label={`Select ${row.name}`}
+                          hideLabel
+                          checked={isSelected(selection, row.id)}
+                          onCheckedChange={(checked) => onSelectionChange(toggleRow(selection, rows, row, checked === true))}
+                        />
+                      </TableCell>
                       <TableCell rowHeader>
                         <Link href={`/records/${row.id}`}>{row.name}</Link>
                       </TableCell>
@@ -374,6 +527,94 @@ function ListPageContent({ initialDialogOpen = false, initialFiltersOpen = false
           </>
         )}
       </Stack>
+    </Center>
+  );
+}
+
+interface BulkActionBarProps {
+  selection: Selection;
+  initialBulkDelete: ListPageProps['initialBulkDelete'];
+  onClear: () => void;
+  onDone: (result: BulkDeleteResult) => void;
+}
+
+/**
+ * The bulk bar, in the shell's sticky footer while anything is selected: the count, then the
+ * actions, destructive last. Delete is pessimistic and confirmed with the count in the question.
+ */
+function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkActionBarProps) {
+  const toast = useToast();
+  const format = useFormat();
+  const bulkDelete = useBulkDeleteRecords();
+  const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined);
+  const count = selectedCount(selection);
+  const deletable = deletableCount(selection);
+  const skipped = count - deletable;
+  const records = plural(format.number(count), count, 'record', 'records');
+
+  const confirm = (target: BulkSelection = toBulkSelection(selection)) =>
+    bulkDelete.mutate(target, {
+      onSuccess: (outcome) => {
+        setConfirmOpen(false);
+        onDone(outcome);
+        if (outcome.failed.length === 0) toast({ title: plural(format.number(outcome.deleted.length), outcome.deleted.length, 'record deleted', 'records deleted'), tone: 'success' });
+      },
+      onError: () => {
+        setConfirmOpen(false);
+        toast({ title: 'Nothing was deleted', description: 'The server didn’t answer. Your selection is kept: try again.', tone: 'danger', duration: Infinity });
+      },
+    });
+
+  // Gallery and tests: confirm straight away, once.
+  const submitted = useRef(false);
+  const submitOnMount = useEffectEvent(() => {
+    if (initialBulkDelete !== 'submit' || submitted.current) return;
+    submitted.current = true;
+    confirm();
+  });
+  useEffect(() => submitOnMount(), []);
+
+  return (
+    <Center max="lg" gutters="lg">
+      <Cluster justify="between" align="center">
+        <Cluster gap="sm" align="center">
+          <Text aria-live="polite">{`${format.number(count)} selected`}</Text>
+          {skipped > 0 ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
+        </Cluster>
+        <Cluster gap="sm">
+          <Button variant="ghost" onClick={onClear} disabled={bulkDelete.isPending}>
+            Clear selection
+          </Button>
+          <Dialog
+            size="sm"
+            title={`Delete ${records}?`}
+            description={
+              skipped > 0
+                ? `${plural(format.number(deletable), deletable, 'record', 'records')} will be deleted. ${format.number(skipped)} on legal hold will be skipped. This can’t be undone.`
+                : `${count === 1 ? 'It' : 'They'}’ll be removed from every list. This can’t be undone.`
+            }
+            open={confirmOpen}
+            onOpenChange={(open) => {
+              if (!bulkDelete.isPending) setConfirmOpen(open);
+            }}
+            trigger={
+              <Button variant="danger" disabled={deletable === 0}>
+                Delete
+              </Button>
+            }
+            footer={
+              <>
+                <Button variant="secondary" disabled={bulkDelete.isPending} onClick={() => setConfirmOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="danger" loading={bulkDelete.isPending} onClick={() => confirm()}>
+                  {bulkDelete.isPending ? 'Deleting…' : `Delete ${records}`}
+                </Button>
+              </>
+            }
+          />
+        </Cluster>
+      </Cluster>
     </Center>
   );
 }
