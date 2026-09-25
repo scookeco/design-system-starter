@@ -25,7 +25,7 @@ describe('predicates', () => {
   });
 
   it('match search on name or owner, ignoring case and accents', () => {
-    const record = { ...first(records), name: 'Café lease', owner: { id: 'p', name: 'Zoë Ng' } };
+    const record = { ...first(records), name: 'Café lease', ownerName: 'Zoë Ng' };
     expect(matchesFilter(record, { q: 'cafe', status: [], view: 'all' })).toBe(true);
     expect(matchesFilter(record, { q: 'ZOE', status: [], view: 'all' })).toBe(true);
     expect(matchesFilter(record, { q: 'cafe', status: ['draft'], view: 'all' })).toBe(record.status === 'draft');
@@ -36,7 +36,7 @@ describe('projections', () => {
   it('derive a row from an entity without copying what it doesn’t need', () => {
     const record = first(records.filter((r) => r.tags.includes('legal-hold')));
     const row = toRow(record);
-    expect(row).toMatchObject({ id: record.id, ownerName: record.owner.name, legalHold: true, deletable: false, status: STATUS[record.status] });
+    expect(row).toMatchObject({ id: record.id, ownerId: record.ownerId, accountId: record.accountId, legalHold: true, deletable: false, status: STATUS[record.status] });
     expect(row.deletable).toBe(canDelete(record));
   });
 

@@ -7,12 +7,14 @@
  * The same handlers serve Storybook (msw/browser via msw-storybook-addon) and Vitest (msw/node).
  */
 import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
+import type { AccountInput } from '../api/accounts';
 import {
   RECORD_STATUSES,
   RECORD_VIEWS,
   RecordStatusSchema,
   RecordViewSchema,
   TenantSchema,
+  type Account,
   type RecordEntity,
   type RecordFilter,
   type RecordStatus,
@@ -20,15 +22,15 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canRename, matchesFilter } from '../model/predicates';
+import { canArchive, canDelete, canRename, matchesFilter, type SearchableRecord } from '../model/predicates';
 import { mockConfig } from './config';
-import { db, touch } from './db';
-import { SEED_EPOCH } from './seed';
+import { bump, db, touch } from './db';
+import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 
 const API = '*/api/t/:tenant';
 
-const error = (status: number, code: string, message: string, current?: RecordEntity) =>
+const error = (status: number, code: string, message: string, current?: RecordEntity | Account) =>
   HttpResponse.json({ error: { code, message, ...(current ? { current } : {}) } }, { status });
 
 /** Latency, then the failure roll, then the handler. Every handler goes through this. */
@@ -53,6 +55,23 @@ const parseFilter = (url: URL): RecordFilter => {
       return parsed.success ? [parsed.data] : [];
     });
   return { q: url.searchParams.get('q') ?? '', status, view: view.success ? view.data : 'all' };
+};
+
+/** The server joins a record with its owner's name (by id) before searching, as a database would. */
+const searchable = (tenant: Tenant) => {
+  const names = new Map(db(tenant).people.map((p) => [p.id, p.name]));
+  return (record: RecordEntity): SearchableRecord => ({ ...record, ownerName: names.get(record.ownerId) ?? '' });
+};
+
+const validAccount = (tenant: Tenant, body: Partial<AccountInput>): AccountInput | undefined => {
+  const name = body.name?.trim();
+  const domain = body.domain?.trim();
+  const industry = body.industry?.trim();
+  if (!name || !domain || !industry) return undefined;
+  if (!db(tenant).people.some((p) => p.id === body.ownerId)) return undefined;
+  if (typeof body.arrMinor !== 'number' || !Number.isInteger(body.arrMinor) || body.arrMinor < 0) return undefined;
+  if (!body.customerSince || !/^\d{4}-\d{2}-\d{2}$/.test(body.customerSince)) return undefined;
+  return { name, domain, industry, ownerId: body.ownerId as string, arrMinor: body.arrMinor, customerSince: body.customerSince };
 };
 
 const collator = new Intl.Collator('en', { sensitivity: 'base', numeric: true });
@@ -80,8 +99,9 @@ export const handlers = [
       const filter = parseFilter(url);
       const sort = url.searchParams.get('sort');
       const pageSize = clampInt(url.searchParams.get('pageSize'), 25, 1, 100);
+      const join = searchable(tenant);
       const matches = db(tenant)
-        .records.filter((r) => matchesFilter(r, filter))
+        .records.filter((r) => matchesFilter(join(r), filter))
         .sort((a, b) => COMPARE[isSortKey(sort) ? sort : 'name'](a, b) || a.id.localeCompare(b.id));
       const pages = Math.max(1, Math.ceil(matches.length / pageSize));
       const page = clampInt(url.searchParams.get('page'), 1, 1, pages);
@@ -93,8 +113,9 @@ export const handlers = [
     `${API}/records/counts`,
     handle(({ tenant, request }) => {
       const { q, status } = parseFilter(new URL(request.url));
+      const join = searchable(tenant);
       const counts = Object.fromEntries(
-        RECORD_VIEWS.map((view: RecordView) => [view, db(tenant).records.filter((r) => matchesFilter(r, { q, status, view })).length]),
+        RECORD_VIEWS.map((view: RecordView) => [view, db(tenant).records.filter((r) => matchesFilter(join(r), { q, status, view })).length]),
       );
       return HttpResponse.json({ counts });
     }),
@@ -112,7 +133,7 @@ export const handlers = [
       const body = (await request.json()) as Partial<{ name: string }>;
       const name = body.name?.trim();
       if (!name) return error(422, 'invalid', 'Enter a name.');
-      const person = { id: `${tenant}-p${String(partition.people.length + 1).padStart(2, '0')}`, name };
+      const person = { id: `${tenant}-p${String(partition.people.length + 1).padStart(2, '0')}`, name, email: emailFor(name) };
       partition.people.push(person);
       return HttpResponse.json(person, { status: 201 });
     }),
@@ -133,20 +154,27 @@ export const handlers = [
       if (!key) return error(400, 'idempotency_key_required', 'Creates need an Idempotency-Key header.');
       const partition = db(tenant);
       const replay = partition.created.get(key);
-      if (replay) return HttpResponse.json(replay, { status: 201 });
+      if (replay && 'status' in replay) return HttpResponse.json(replay, { status: 201 });
 
-      const body = (await request.json()) as Partial<{ name: string; ownerId: string; amountMinor: number; renewsOn: string; tags: string[] }>;
-      // Defaults for a quick create: the signed-in person owns it, no amount yet, renews in a year.
+      const body = (await request.json()) as Partial<{ name: string; ownerId: string; accountId: string | null; amountMinor: number; renewsOn: string; tags: string[] }>;
+      // Defaults for a quick create: the signed-in person owns it, no account or amount yet, renews in a year.
       const owner = body.ownerId === undefined ? partition.people[0] : partition.people.find((p) => p.id === body.ownerId);
+      const accountId = body.accountId ?? null;
       const renewsOn = body.renewsOn ?? new Date(SEED_EPOCH + 365 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-      if (!body.name?.trim() || !owner || (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')) {
+      if (
+        !body.name?.trim() ||
+        !owner ||
+        (accountId !== null && !partition.accounts.some((a) => a.id === accountId)) ||
+        (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')
+      ) {
         return error(422, 'invalid', 'Some fields are missing or invalid.');
       }
       const currency = WORKSPACES[tenant].currency;
       const record = touch({
         id: `${tenant === 'acme' ? 'r' : 'g'}-${String(partition.nextId)}`,
         name: body.name.trim(),
-        owner,
+        ownerId: owner.id,
+        accountId,
         status: 'draft',
         amount: { minor: Math.round(body.amountMinor ?? 0), currency },
         updatedAt: new Date(SEED_EPOCH).toISOString(),
@@ -204,7 +232,8 @@ export const handlers = [
             view: RecordViewSchema.catch('all').parse(body.filter.view),
           }
         : undefined;
-      const targets = filter ? partition.records.filter((r) => matchesFilter(r, filter)) : partition.records.filter((r) => body.ids?.includes(r.id));
+      const join = searchable(tenant);
+      const targets = filter ? partition.records.filter((r) => matchesFilter(join(r), filter)) : partition.records.filter((r) => body.ids?.includes(r.id));
       const deleted: string[] = [];
       const failed: { id: string; name: string; reason: string }[] = [];
       for (const record of targets) {
@@ -213,6 +242,61 @@ export const handlers = [
       }
       partition.records = partition.records.filter((r) => !deleted.includes(r.id));
       return HttpResponse.json({ deleted, failed });
+    }),
+  ),
+
+  http.get(
+    `${API}/accounts`,
+    handle(({ tenant }) => HttpResponse.json({ items: db(tenant).accounts })),
+  ),
+
+  http.get(
+    `${API}/accounts/:id`,
+    handle(({ tenant, params }) => {
+      const account = db(tenant).accounts.find((a) => a.id === params.id);
+      return account ? HttpResponse.json(account) : error(404, 'not_found', 'This account doesn’t exist, or was deleted.');
+    }),
+  ),
+
+  http.post(
+    `${API}/accounts`,
+    handle(async ({ tenant, request }) => {
+      const key = request.headers.get('Idempotency-Key');
+      if (!key) return error(400, 'idempotency_key_required', 'Creates need an Idempotency-Key header.');
+      const partition = db(tenant);
+      const replay = partition.created.get(key);
+      if (replay && 'domain' in replay) return HttpResponse.json(replay, { status: 201 });
+      const body = (await request.json()) as Partial<AccountInput>;
+      const input = validAccount(tenant, body);
+      if (!input) return error(422, 'invalid', 'Some fields are missing or invalid.');
+      const { arrMinor, ...fields } = input;
+      const account: Account = {
+        id: `${tenant}-a${String(partition.accounts.length + 1).padStart(2, '0')}`,
+        ...fields,
+        arr: { minor: arrMinor, currency: WORKSPACES[tenant].currency },
+        version: 1,
+      };
+      partition.accounts.push(account);
+      partition.created.set(key, account);
+      return HttpResponse.json(account, { status: 201 });
+    }),
+  ),
+
+  http.patch(
+    `${API}/accounts/:id`,
+    handle(async ({ tenant, request, params }) => {
+      const partition = db(tenant);
+      const index = partition.accounts.findIndex((a) => a.id === params.id);
+      const current = partition.accounts[index];
+      if (!current) return error(404, 'not_found', 'This account doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<AccountInput> & { version?: number };
+      const input = validAccount(tenant, { name: current.name, domain: current.domain, industry: current.industry, ownerId: current.ownerId, arrMinor: current.arr.minor, customerSince: current.customerSince, ...body });
+      if (!input) return error(422, 'invalid', 'Some fields are missing or invalid.');
+      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this account.', current);
+      const { arrMinor, ...rest } = input;
+      const next = bump({ ...current, ...rest, arr: { minor: arrMinor, currency: current.arr.currency } });
+      partition.accounts[index] = next;
+      return HttpResponse.json(next);
     }),
   ),
 ];

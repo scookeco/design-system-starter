@@ -11,11 +11,12 @@
  *    schema from elsewhere) renders a placeholder and is reported. It never throws.
  */
 import type { ReactNode } from 'react';
-import { Avatar, Badge, Cluster, Select, Tag, Text, TextField, type Formatter } from '../../index';
-import { RECORD_STATUSES, type Money, type Person, type RecordStatus } from '../api/schemas';
+import { Badge, Cluster, Select, Tag, Text, TextField, type Formatter } from '../../index';
+import { RECORD_STATUSES, type Account, type Money, type Person, type RecordStatus } from '../api/schemas';
 import { STATUS } from '../model/status';
+import { AccountRef, PersonRef } from './refs';
 
-export const FIELD_TYPES = ['text', 'money', 'date', 'status', 'person', 'tags'] as const;
+export const FIELD_TYPES = ['text', 'money', 'date', 'status', 'person', 'account', 'tags'] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 
 /** What a field of each type holds, confirmed, from the cache. */
@@ -25,7 +26,10 @@ export interface FieldValues {
   /** A calendar date (2026-09-30) or an instant (ISO 8601 with zone). */
   date: string;
   status: RecordStatus;
-  person: Person;
+  /** A person's id: displays join through the people cache. */
+  person: string;
+  /** An account's id, or null for none: displays join through the account cache. */
+  account: string | null;
   tags: readonly string[];
 }
 
@@ -38,6 +42,8 @@ export interface DraftValues {
   status: RecordStatus | '';
   /** A person's id. */
   person: string;
+  /** An account's id, or '' for none. */
+  account: string;
   /** Comma-separated. */
   tags: string;
 }
@@ -49,6 +55,8 @@ export interface FieldContext {
   currency: string;
   /** Choices for person inputs. */
   people: readonly Person[];
+  /** Choices for account inputs. */
+  accounts: readonly Account[];
 }
 
 export interface FieldInputProps<K extends FieldType> {
@@ -122,18 +130,31 @@ export const FIELD_REGISTRY: FieldRegistry = {
   },
   person: {
     numeric: false,
-    display: (value) => (
-      <Cluster gap="xs" align="center" wrap={false}>
-        <Avatar name={value.name} size="sm" decorative />
-        {value.name}
-      </Cluster>
-    ),
+    display: (value) => <PersonRef id={value} />,
     input: ({ id, label, value, onChange, onBlur, error, context }) => (
       <Select
         id={id}
         label={label}
         placeholder={context.people.length === 0 ? 'Loading people…' : 'Choose a person'}
         options={context.people.map((person) => ({ value: person.id, label: person.name }))}
+        value={value}
+        onValueChange={(next) => {
+          onChange(next);
+          onBlur?.();
+        }}
+        error={error}
+      />
+    ),
+  },
+  account: {
+    numeric: false,
+    display: (value) => <AccountRef id={value} />,
+    input: ({ id, label, value, onChange, onBlur, error, context }) => (
+      <Select
+        id={id}
+        label={label}
+        placeholder={context.accounts.length === 0 ? 'Loading accounts…' : 'Choose an account'}
+        options={context.accounts.map((account) => ({ value: account.id, label: account.name }))}
         value={value}
         onValueChange={(next) => {
           onChange(next);

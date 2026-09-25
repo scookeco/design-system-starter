@@ -14,3 +14,9 @@ export const recordKeys = {
   detail: (tenant: Tenant, id: string) => [tenant, 'record', { id }] as const,
   people: (tenant: Tenant) => [tenant, 'people', {}] as const,
 };
+
+export const accountKeys = {
+  /** The whole directory of accounts (reference data, loaded whole). */
+  list: (tenant: Tenant) => [tenant, 'accounts', {}] as const,
+  detail: (tenant: Tenant, id: string) => [tenant, 'account', { id }] as const,
+};

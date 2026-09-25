@@ -9,13 +9,17 @@
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts
  *   addPerson          pessimistic  people (appends)           people
+ *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key)
+ *   updateAccount      pessimistic  directory entry, detail      nothing else: records hold the id, so
+ *                                                               every join re-renders from the directory
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
+import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, type NewRecord } from '../api/records';
-import type { Person, RecordEntity, RecordFilter } from '../api/schemas';
+import type { Account, Person, RecordEntity, RecordFilter } from '../api/schemas';
 import { useTenant } from '../tenant';
-import { recordKeys } from './keys';
+import { accountKeys, recordKeys } from './keys';
 
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;
@@ -130,6 +134,43 @@ export function useAddPerson() {
     onSuccess: (person) => {
       client.setQueryData<{ items: Person[] }>(recordKeys.people(tenant), (current) => (current ? { items: [...current.items, person] } : current));
       return client.invalidateQueries({ queryKey: recordKeys.people(tenant) });
+    },
+  });
+}
+
+/** Put one account into the directory (replacing it by id, or appending it). */
+const upsertAccount = (current: { items: Account[] } | undefined, account: Account) =>
+  current ? { items: current.items.some((a) => a.id === account.id) ? current.items.map((a) => (a.id === account.id ? account : a)) : [...current.items, account] } : current;
+
+/** createAccount: pessimistic, with an idempotency key. Seeds the detail and appends to the directory. */
+export function useCreateAccount() {
+  const tenant = useTenant();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [tenant, 'createAccount'],
+    mutationFn: ({ account, idempotencyKey }: { account: AccountInput; idempotencyKey: string }) => postAccount(tenant, account, idempotencyKey),
+    onSuccess: (created) => {
+      client.setQueryData(accountKeys.detail(tenant, created.id), created);
+      client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, created));
+      return client.invalidateQueries({ queryKey: accountKeys.list(tenant) });
+    },
+  });
+}
+
+/**
+ * updateAccount: pessimistic, versioned (a stale edit gets a 409). Writes the server's answer to the
+ * detail and to its entry in the directory. Nothing else needs to change: records reference the
+ * account by id, so every row, card and property that shows its name re-renders from the directory.
+ */
+export function useUpdateAccount(id: string) {
+  const tenant = useTenant();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [tenant, 'updateAccount', { id }],
+    mutationFn: ({ changes, version }: { changes: Partial<AccountInput>; version: number }) => patchAccount(tenant, id, changes, version),
+    onSuccess: (updated) => {
+      client.setQueryData(accountKeys.detail(tenant, id), updated);
+      client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, updated));
     },
   });
 }

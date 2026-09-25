@@ -5,7 +5,11 @@
  */
 import type { RecordEntity, RecordFilter, RecordView } from '../api/schemas';
 
-type Entity = Pick<RecordEntity, 'status' | 'tags' | 'name' | 'owner'>;
+/**
+ * A record joined with its owner's name, for search. The name is looked up by id at the moment of
+ * matching (the server joins it from people), never stored on the record.
+ */
+export type SearchableRecord = Pick<RecordEntity, 'status' | 'name'> & { ownerName: string };
 
 export const isArchived = (record: Pick<RecordEntity, 'status'>) => record.status === 'archived';
 export const isDraft = (record: Pick<RecordEntity, 'status'>) => record.status === 'draft';
@@ -26,15 +30,15 @@ export const VIEW_PREDICATES: Record<RecordView, (record: Pick<RecordEntity, 'st
   archived: isArchived,
 };
 
-/** Search matches the name or the owner, ignoring case and accents. */
-export const matchesSearch = (record: Pick<Entity, 'name' | 'owner'>, q: string) => {
+/** Search matches the name or the owner's name, ignoring case and accents. */
+export const matchesSearch = (record: Pick<SearchableRecord, 'name' | 'ownerName'>, q: string) => {
   const fold = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
   const needle = fold(q.trim());
-  return needle === '' || fold(record.name).includes(needle) || fold(record.owner.name).includes(needle);
+  return needle === '' || fold(record.name).includes(needle) || fold(record.ownerName).includes(needle);
 };
 
 /** One filter, used for the rows, the counts and "Select all N matching". */
-export const matchesFilter = (record: Entity, filter: RecordFilter) =>
+export const matchesFilter = (record: SearchableRecord, filter: RecordFilter) =>
   VIEW_PREDICATES[filter.view](record) &&
   (filter.status.length === 0 || filter.status.includes(record.status)) &&
   matchesSearch(record, filter.q);

@@ -10,7 +10,9 @@ import { STATUS } from './status';
 export interface RecordRow {
   id: RecordEntity['id'];
   name: RecordEntity['name'];
-  ownerName: RecordEntity['owner']['name'];
+  /** References, resolved at render through the people and account caches: a row never copies a name. */
+  ownerId: RecordEntity['ownerId'];
+  accountId: RecordEntity['accountId'];
   status: (typeof STATUS)[keyof typeof STATUS];
   legalHold: boolean;
   amount: RecordEntity['amount'];
@@ -22,7 +24,8 @@ export interface RecordRow {
 export const toRow = (record: RecordEntity): RecordRow => ({
   id: record.id,
   name: record.name,
-  ownerName: record.owner.name,
+  ownerId: record.ownerId,
+  accountId: record.accountId,
   status: STATUS[record.status],
   legalHold: isOnLegalHold(record),
   amount: record.amount,

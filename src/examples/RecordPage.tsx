@@ -57,6 +57,7 @@ import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
 import { FieldDisplay, isNumericField } from '../app/registries/fields';
 import { RECORD_PROPERTIES } from '../app/registries/recordFields';
+import { usePersonName } from '../app/registries/refs';
 
 interface Activity {
   id: string;
@@ -145,6 +146,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const toast = useToast();
   const format = useFormat();
   const query = useRecord(recordId);
+  // The owner's name is joined by id through the people cache, never copied onto the record.
+  const ownerName = usePersonName(query.data?.ownerId ?? '');
   const rename = useRenameRecord(recordId);
   const archive = useArchiveRecord(recordId);
   const remove = useBulkDeleteRecords();
@@ -331,7 +334,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
               {isOnLegalHold(record) ? <Badge tone="warning">Legal hold</Badge> : null}
             </Cluster>
           }
-          description={rename.isPending ? 'Saving the new name…' : `Owned by ${record.owner.name} · updated ${format.relative(record.updatedAt)}`}
+          description={rename.isPending ? 'Saving the new name…' : `Owned by ${ownerName ?? '…'} · updated ${format.relative(record.updatedAt)}`}
           actions={
             <>
               <Button variant="secondary" disabled={archive.isPending}>

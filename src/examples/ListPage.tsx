@@ -82,6 +82,7 @@ import {
 } from '../app/model/selection';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { ExampleShell } from './ExampleShell';
@@ -89,7 +90,7 @@ import { ExampleShell } from './ExampleShell';
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
 const PAGE_SIZE = 10;
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
-const COLUMNS = 6;
+const COLUMNS = 7;
 
 type SortColumn = 'name' | 'amount' | 'updated';
 const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | 'descending' } => ({
@@ -425,6 +426,7 @@ function ListPageContent({
                       </TableHeaderCell>
                       <TableHeaderCell>Name</TableHeaderCell>
                       <TableHeaderCell>Owner</TableHeaderCell>
+                      <TableHeaderCell>Account</TableHeaderCell>
                       <TableHeaderCell>Status</TableHeaderCell>
                       <TableHeaderCell>Updated</TableHeaderCell>
                       <TableHeaderCell numeric>Amount</TableHeaderCell>
@@ -472,6 +474,7 @@ function ListPageContent({
                       Name
                     </TableHeaderCell>
                     <TableHeaderCell>Owner</TableHeaderCell>
+                    <TableHeaderCell>Account</TableHeaderCell>
                     <TableHeaderCell>Status</TableHeaderCell>
                     <TableHeaderCell sort={sort.column === 'updated' ? sort.direction : undefined} onSort={() => toggleSort('updated')}>
                       Updated
@@ -495,7 +498,13 @@ function ListPageContent({
                       <TableCell rowHeader>
                         <Link href={`/records/${row.id}`}>{row.name}</Link>
                       </TableCell>
-                      <TableCell>{row.ownerName}</TableCell>
+                      {/* Joined by id at render: the row holds ids, the people and account caches hold the names. */}
+                      <TableCell>
+                        <PersonRef id={row.ownerId} plain />
+                      </TableCell>
+                      <TableCell>
+                        <AccountRef id={row.accountId} />
+                      </TableCell>
                       <TableCell>
                         <Cluster gap="2xs">
                           <Badge tone={row.status.tone}>{row.status.label}</Badge>

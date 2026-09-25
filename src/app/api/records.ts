@@ -50,6 +50,8 @@ export const postPerson = (tenant: Tenant, name: string) => request(PersonSchema
 export interface NewRecord {
   name: string;
   ownerId?: string;
+  /** The account it belongs to, by id; null (or left out) for none yet. */
+  accountId?: string | null;
   amountMinor?: number;
   renewsOn?: string;
   tags?: readonly string[];

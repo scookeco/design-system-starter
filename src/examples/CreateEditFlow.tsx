@@ -43,7 +43,7 @@ import {
   useFormat,
 } from '../index';
 import { useAddPerson, useCreateRecord } from '../app/model/mutations';
-import { usePeople } from '../app/model/queries';
+import { useAccounts, usePeople } from '../app/model/queries';
 import { FieldInput } from '../app/registries/fields';
 import { CREATE_FIELDS } from '../app/registries/recordFields';
 import { useTenant } from '../app/tenant';
@@ -54,6 +54,8 @@ export interface RecordDraft {
   name: string;
   /** A person's id. */
   owner: string;
+  /** An account's id, or '' for none. */
+  account: string;
   description: string;
   /** As typed, in major units ("12500.50"). Sent as integer minor units. */
   amount: string;
@@ -61,17 +63,18 @@ export interface RecordDraft {
   remind: boolean;
 }
 
-type FieldName = 'name' | 'owner' | 'amount' | 'renewal';
+type FieldName = 'name' | 'owner' | 'account' | 'amount' | 'renewal';
 
 /** Field ids double as error-summary link targets. */
 const FIELD_ID: Record<FieldName, string> = {
   name: 'record-name',
   owner: 'record-owner',
+  account: 'record-account',
   amount: 'record-amount',
   renewal: 'record-renewal',
 };
 
-const EMPTY: RecordDraft = { name: '', owner: '', description: '', amount: '', renewal: '', remind: true };
+const EMPTY: RecordDraft = { name: '', owner: '', account: '', description: '', amount: '', renewal: '', remind: true };
 
 const RENEWAL = [
   { value: 'renew', label: 'Renews automatically', description: 'The term restarts unless someone cancels it.' },
@@ -105,6 +108,7 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
   const tenant = useTenant();
   const currency = WORKSPACES[tenant].currency;
   const people = usePeople();
+  const accounts = useAccounts();
   const createRecord = useCreateRecord();
   const addPerson = useAddPerson();
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -122,7 +126,7 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
   const shown = (field: FieldName) => (failedSubmits > 0 || touched[field] ? errors[field] : undefined);
   const summary = failedSubmits > 0 ? (Object.keys(FIELD_ID) as FieldName[]).filter((f) => errors[f]) : [];
   const format = useFormat();
-  const fieldContext = { format, currency, people: people.data ?? [] };
+  const fieldContext = { format, currency, people: people.data ?? [], accounts: accounts.data ?? [] };
 
   // After each failed submit, focus moves to the summary; it is not also announced (announce={false}).
   useEffect(() => {
@@ -141,6 +145,7 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
     const body = {
       name: draft.name.trim(),
       ownerId: draft.owner,
+      accountId: draft.account === '' ? null : draft.account,
       amountMinor: Math.round(Number(draft.amount) * 10 ** currencyDigits(currency)),
     };
     const fingerprint = JSON.stringify(body);

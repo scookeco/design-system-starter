@@ -21,13 +21,34 @@ export const MoneySchema = z.object({
 });
 export type Money = z.infer<typeof MoneySchema>;
 
-export const PersonSchema = z.object({ id: z.string().min(1), name: z.string().min(1) });
+/** Someone in the workspace. Records and accounts point at people by id; a name is never copied onto them. */
+export const PersonSchema = z.object({ id: z.string().min(1), name: z.string().min(1), email: z.email() });
 export type Person = z.infer<typeof PersonSchema>;
+
+/** A customer organisation. Records belong to an account by id. */
+export const AccountSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  domain: z.string().min(1),
+  industry: z.string().min(1),
+  /** The person who owns the relationship, by id. */
+  ownerId: z.string().min(1),
+  /** Annual recurring revenue. */
+  arr: MoneySchema,
+  /** A calendar date with no zone. */
+  customerSince: z.iso.date(),
+  version: z.number().int().nonnegative(),
+});
+export type Account = z.infer<typeof AccountSchema>;
+
+export const AccountsSchema = z.object({ items: z.array(AccountSchema) });
 
 export const RecordSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  owner: PersonSchema,
+  /** References, never copies: the owner and account are joined by id wherever they're shown. */
+  ownerId: z.string().min(1),
+  accountId: z.string().min(1).nullable(),
   status: RecordStatusSchema,
   amount: MoneySchema,
   /** An instant (ISO 8601 with zone). */
@@ -61,8 +82,8 @@ export const ErrorBodySchema = z.object({
   error: z.object({
     code: z.string(),
     message: z.string(),
-    /** On a 409: the record as the server has it now. */
-    current: RecordSchema.optional(),
+    /** On a 409: the entity as the server has it now. */
+    current: z.union([RecordSchema, AccountSchema]).optional(),
   }),
 });
 export type ErrorBody = z.infer<typeof ErrorBodySchema>;
