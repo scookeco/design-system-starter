@@ -1,0 +1,45 @@
+name: Update visual baselines
+
+# Linux is the source of truth for screenshots. Run this on a branch to regenerate
+# every Linux baseline and commit them back to that branch.
+# Note: a push made with GITHUB_TOKEN does not trigger CI. Re-run CI on the branch
+# (or push any commit) afterwards to see the visual job compare against the new baselines.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visual-baselines-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Regenerate Linux baselines
+        run: |
+          # Start clean so baselines of deleted stories do not linger.
+          rm -rf tests/visual/__screenshots__/linux
+          npm run test:visual:update
+      - name: Commit baselines to ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tests/visual/__screenshots__/linux
+          if git diff --cached --quiet; then
+            echo "Baselines are unchanged."
+            exit 0
+          fi
+          git commit -m "Update Linux visual baselines"
+          git push

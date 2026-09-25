@@ -1,0 +1,9 @@
+/*
+ * @expect scale-unlimited/declaration-strict-value
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    z-index: 10;
+  }
+}

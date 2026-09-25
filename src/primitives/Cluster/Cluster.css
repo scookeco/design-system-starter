@@ -1,0 +1,43 @@
+@layer primitives {
+  .cluster {
+    --cluster-gap: var(--space-gap-sm);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-gap);
+    align-items: center;
+    min-inline-size: 0;
+  }
+
+  .cluster[data-wrap="nowrap"] {
+    flex-wrap: nowrap;
+  }
+
+  .cluster[data-justify="center"] {
+    justify-content: center;
+  }
+
+  .cluster[data-justify="end"] {
+    justify-content: flex-end;
+  }
+
+  .cluster[data-justify="between"] {
+    justify-content: space-between;
+  }
+
+  .cluster[data-align="start"] {
+    align-items: flex-start;
+  }
+
+  .cluster[data-align="end"] {
+    align-items: flex-end;
+  }
+
+  .cluster[data-align="baseline"] {
+    align-items: baseline;
+  }
+
+  .cluster[data-align="stretch"] {
+    align-items: stretch;
+  }
+}

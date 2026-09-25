@@ -1,0 +1,22 @@
+@layer components {
+  .text {
+    color: var(--color-fg-default);
+    font: var(--text-body);
+  }
+
+  .text[data-size="body-lg"] {
+    font: var(--text-body-lg);
+  }
+
+  .text[data-size="caption"] {
+    font: var(--text-caption);
+  }
+
+  .text[data-tone="muted"] {
+    color: var(--color-fg-muted);
+  }
+
+  .text[data-numeric="true"] {
+    font-variant-numeric: tabular-nums;
+  }
+}

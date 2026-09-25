@@ -1,0 +1,10 @@
+/*
+ * The only place the cascade layer order is declared. Everything else joins a named layer.
+ * Later layers win for normal declarations, so utilities beat components beat primitives.
+ */
+@layer reset, tokens, base, primitives, components, utilities;
+
+@import url("./reset.css");
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./utilities.css");

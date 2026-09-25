@@ -1,0 +1,9 @@
+/*
+ * @expect selector-max-specificity
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .page .card .card__header .card__title {
+    color: var(--color-fg-default);
+  }
+}

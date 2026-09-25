@@ -1,0 +1,9 @@
+/*
+ * @expect color-named
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    color: rebeccapurple;
+  }
+}

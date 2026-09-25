@@ -1,0 +1,14 @@
+@layer primitives {
+  .grid {
+    --grid-gap: var(--space-gap-md);
+    --grid-min: var(--size-grid-item-md);
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min)), 1fr));
+    gap: var(--grid-gap);
+  }
+
+  .grid > * {
+    min-inline-size: 0;
+  }
+}

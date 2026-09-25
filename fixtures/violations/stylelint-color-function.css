@@ -1,0 +1,9 @@
+/*
+ * @expect function-disallowed-list
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    color: color-mix(in srgb, var(--color-fg-default) 60%, transparent);
+  }
+}

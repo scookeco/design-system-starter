@@ -1,0 +1,10 @@
+/*
+ * @expect --report-descriptionless-disables
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--color-fg-default) !important;
+  }
+}

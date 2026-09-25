@@ -1,0 +1,9 @@
+/*
+ * @expect color-no-hex
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    color: #3b82f6;
+  }
+}

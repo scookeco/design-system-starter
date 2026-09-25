@@ -1,0 +1,10 @@
+/*
+ * @expect --report-needless-disables
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    /* stylelint-disable-next-line color-no-hex -- stale exception: the hex was replaced by a token */
+    color: var(--color-fg-default);
+  }
+}

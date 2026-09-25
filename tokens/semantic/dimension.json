@@ -1,0 +1,178 @@
+{
+  "space": {
+    "$type": "dimension",
+    "gap": {
+      "$description": "Space between siblings. Layout primitives take these as gap.",
+      "2xs": {
+        "$value": "{space.1}"
+      },
+      "xs": {
+        "$value": "{space.2}"
+      },
+      "sm": {
+        "$value": "{space.3}"
+      },
+      "md": {
+        "$value": "{space.4}"
+      },
+      "lg": {
+        "$value": "{space.6}"
+      },
+      "xl": {
+        "$value": "{space.8}"
+      },
+      "2xl": {
+        "$value": "{space.12}"
+      }
+    },
+    "inset": {
+      "$description": "Padding inside a box.",
+      "2xs": {
+        "$value": "{space.half}"
+      },
+      "xs": {
+        "$value": "{space.1}"
+      },
+      "sm": {
+        "$value": "{space.2}"
+      },
+      "md": {
+        "$value": "{space.4}"
+      },
+      "lg": {
+        "$value": "{space.6}"
+      },
+      "xl": {
+        "$value": "{space.8}"
+      }
+    }
+  },
+  "size": {
+    "$type": "dimension",
+    "control": {
+      "$description": "Heights shared by buttons, inputs and selects.",
+      "sm": {
+        "$value": "{size.8}"
+      },
+      "md": {
+        "$value": "{size.10}"
+      },
+      "lg": {
+        "$value": "{size.12}"
+      }
+    },
+    "icon": {
+      "sm": {
+        "$value": "{size.4}"
+      },
+      "md": {
+        "$value": "{size.5}"
+      }
+    },
+    "target-min": {
+      "$value": "{size.6}",
+      "$description": "WCAG 2.2 minimum target size (24px)."
+    },
+    "content": {
+      "$description": "Max measure for Center.",
+      "sm": {
+        "$value": "{container.xl}"
+      },
+      "md": {
+        "$value": "{container.3xl}"
+      },
+      "lg": {
+        "$value": "{container.4xl}"
+      }
+    },
+    "sidebar": {
+      "$description": "Sidebar widths.",
+      "sm": {
+        "$value": "{container.3xs}"
+      },
+      "md": {
+        "$value": "{container.2xs}"
+      },
+      "lg": {
+        "$value": "{container.xs}"
+      }
+    },
+    "grid-item": {
+      "$description": "Minimum item width for auto-fit Grid.",
+      "sm": {
+        "$value": "{container.3xs}"
+      },
+      "md": {
+        "$value": "{container.2xs}"
+      },
+      "lg": {
+        "$value": "{container.xs}"
+      }
+    },
+    "dialog": {
+      "sm": {
+        "$value": "{container.md}"
+      },
+      "md": {
+        "$value": "{container.lg}"
+      },
+      "lg": {
+        "$value": "{container.2xl}"
+      }
+    },
+    "overlay-max": {
+      "$value": "{container.sm}",
+      "$description": "Max width for tooltips and toasts."
+    },
+    "scroll-region": {
+      "$description": "Max block size for scrollable regions such as tables.",
+      "sm": {
+        "$value": "{container.xs}"
+      },
+      "md": {
+        "$value": "{container.lg}"
+      },
+      "lg": {
+        "$value": "{container.2xl}"
+      }
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "indicator": {
+      "$value": "{radius.xs}",
+      "$description": "Checkbox boxes and other small marks."
+    },
+    "control": {
+      "$value": "{radius.md}",
+      "$description": "Buttons, inputs, selects."
+    },
+    "surface": {
+      "$value": "{radius.lg}",
+      "$description": "Cards, tables, dialogs, popovers."
+    },
+    "pill": {
+      "$value": "{radius.full}",
+      "$description": "Badges and pills."
+    }
+  },
+  "border": {
+    "$type": "dimension",
+    "width": {
+      "default": {
+        "$value": "{border-width.1}"
+      }
+    }
+  },
+  "focus": {
+    "$type": "dimension",
+    "ring": {
+      "width": {
+        "$value": "{border-width.2}"
+      },
+      "offset": {
+        "$value": "{space.half}"
+      }
+    }
+  }
+}

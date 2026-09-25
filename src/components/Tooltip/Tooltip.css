@@ -1,0 +1,13 @@
+@layer components {
+  .tooltip {
+    z-index: var(--z-tooltip);
+    max-inline-size: var(--size-overlay-max);
+    padding-block: var(--space-inset-xs);
+    padding-inline: var(--space-inset-sm);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-inverse);
+    color: var(--color-fg-inverse);
+    font: var(--text-caption);
+    box-shadow: var(--shadow-popover);
+  }
+}

@@ -1,0 +1,25 @@
+/*
+ * @expect clean
+ * @as src/components/Fixture.css
+ * Negative control: a well-formed component stylesheet lints clean.
+ */
+@layer components {
+  .fixture {
+    --fixture-bg: var(--color-bg-surface);
+
+    display: flex;
+    gap: var(--space-gap-sm);
+    padding: var(--space-inset-sm) var(--space-inset-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--fixture-bg);
+    color: currentcolor;
+    transition-property: background-color;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  .fixture__part[data-tone="danger"]:where(:hover) {
+    color: var(--color-status-danger-fg);
+  }
+}

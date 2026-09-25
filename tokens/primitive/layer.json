@@ -1,0 +1,27 @@
+{
+  "layer": {
+    "0": {
+      "$value": 0
+    },
+    "1": {
+      "$value": 100
+    },
+    "2": {
+      "$value": 200
+    },
+    "3": {
+      "$value": 300
+    },
+    "4": {
+      "$value": 400
+    },
+    "5": {
+      "$value": 500
+    },
+    "6": {
+      "$value": 600
+    },
+    "$type": "number",
+    "$description": "Ordered stacking tiers. Semantic z tokens pick from these."
+  }
+}

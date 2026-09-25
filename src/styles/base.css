@@ -1,0 +1,40 @@
+@layer base {
+  /*
+   * Theming: semantic colour tokens hold both values as light-dark().
+   * The product ships light; data-theme="dark" on <html> opts in. Components carry no theme rules.
+   */
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-bg-canvas);
+    color: var(--color-fg-default);
+    font: var(--text-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code,
+  kbd,
+  samp {
+    font: var(--text-code);
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /*
+   * Primitives set display: flex/grid, which would beat the hidden attribute.
+   * Important declarations reverse layer order, so this base-layer rule wins over later layers.
+   */
+  [hidden]:not([hidden="until-found"]) {
+    /* stylelint-disable-next-line declaration-no-important -- hidden must beat primitive display values; owner: design system; permanent, documented in CSS architecture */
+    display: none !important;
+  }
+}

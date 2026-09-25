@@ -1,0 +1,11 @@
+/*
+ * @expect declaration-property-value-allowed-list
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    --fixture-gap: 12px;
+
+    gap: var(--fixture-gap);
+  }
+}

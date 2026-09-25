@@ -1,0 +1,12 @@
+node_modules/
+dist/
+storybook-static/
+playwright-report/
+test-results/
+blob-report/
+.cache/
+*.log
+.DS_Store
+# Visual baselines: CI (Linux) is the source of truth. Local platform snapshots stay local.
+tests/visual/__screenshots__/*
+!tests/visual/__screenshots__/linux/

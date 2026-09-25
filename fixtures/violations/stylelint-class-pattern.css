@@ -1,0 +1,9 @@
+/*
+ * @expect selector-class-pattern
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixtureCard {
+    color: var(--color-fg-default);
+  }
+}

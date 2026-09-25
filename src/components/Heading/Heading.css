@@ -1,0 +1,18 @@
+@layer components {
+  .heading {
+    color: var(--color-fg-default);
+    font: var(--text-heading-1);
+  }
+
+  .heading[data-size="2"] {
+    font: var(--text-heading-2);
+  }
+
+  .heading[data-size="3"] {
+    font: var(--text-heading-3);
+  }
+
+  .heading[data-size="4"] {
+    font: var(--text-heading-4);
+  }
+}

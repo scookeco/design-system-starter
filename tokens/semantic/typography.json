@@ -1,0 +1,98 @@
+{
+  "font": {
+    "family": {
+      "$type": "fontFamily",
+      "body": {
+        "$value": "{font.family.sans}"
+      },
+      "code": {
+        "$value": "{font.family.mono}"
+      }
+    },
+    "weight": {
+      "$type": "fontWeight",
+      "body": {
+        "$value": "{font.weight.regular}"
+      },
+      "strong": {
+        "$value": "{font.weight.semibold}"
+      }
+    }
+  },
+  "text": {
+    "$type": "typography",
+    "$description": "Named text styles. Use as font: var(--text-*).",
+    "body": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.200}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{font.line-height.normal}"
+      }
+    },
+    "body-lg": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.300}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{font.line-height.normal}"
+      }
+    },
+    "label": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.200}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{font.line-height.tight}"
+      }
+    },
+    "caption": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.100}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{font.line-height.snug}"
+      }
+    },
+    "code": {
+      "$value": {
+        "fontFamily": "{font.family.mono}",
+        "fontSize": "{font.size.200}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{font.line-height.normal}"
+      }
+    },
+    "heading-1": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.700}",
+        "fontWeight": "{font.weight.bold}",
+        "lineHeight": "{font.line-height.tight}"
+      }
+    },
+    "heading-2": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.600}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{font.line-height.tight}"
+      }
+    },
+    "heading-3": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.500}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{font.line-height.snug}"
+      }
+    },
+    "heading-4": {
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.400}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{font.line-height.snug}"
+      }
+    }
+  }
+}

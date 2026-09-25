@@ -1,0 +1,342 @@
+{
+  "color": {
+    "$type": "color",
+    "bg": {
+      "canvas": {
+        "$value": "{color.gray.50}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.950}"
+          }
+        },
+        "$description": "Page background behind surfaces."
+      },
+      "surface": {
+        "$value": "{color.white}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.900}"
+          }
+        },
+        "$description": "Cards, tables, inputs."
+      },
+      "subtle": {
+        "$value": "{color.gray.100}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.800}"
+          }
+        },
+        "$description": "Recessed areas: table headers, toolbars."
+      },
+      "elevated": {
+        "$value": "{color.white}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.800}"
+          }
+        },
+        "$description": "Popovers, dialogs, toasts. Lighter than surface in dark mode."
+      },
+      "hover": {
+        "$value": "{color.gray.100}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.800}"
+          }
+        },
+        "$description": "Hover wash on neutral interactive rows and ghost controls."
+      },
+      "selected": {
+        "$value": "{color.indigo.50}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.indigo.950}"
+          }
+        },
+        "$description": "Selected rows and items."
+      },
+      "inverse": {
+        "$value": "{color.gray.900}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.100}"
+          }
+        },
+        "$description": "Tooltips and other inverse surfaces."
+      },
+      "scrim": {
+        "$value": "{color.black-alpha.40}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.black-alpha.60}"
+          }
+        },
+        "$description": "Backdrop behind modal overlays."
+      }
+    },
+    "fg": {
+      "default": {
+        "$value": "{color.gray.900}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.50}"
+          }
+        },
+        "$description": "Body text and headings."
+      },
+      "muted": {
+        "$value": "{color.gray.600}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.400}"
+          }
+        },
+        "$description": "Secondary text: descriptions, captions, placeholders."
+      },
+      "disabled": {
+        "$value": "{color.gray.400}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.600}"
+          }
+        },
+        "$description": "Disabled text. Exempt from contrast minimums."
+      },
+      "inverse": {
+        "$value": "{color.gray.50}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.900}"
+          }
+        },
+        "$description": "Text on bg.inverse."
+      },
+      "link": {
+        "$value": "{color.indigo.700}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.indigo.300}"
+          }
+        },
+        "$description": "Inline links and text-only actions."
+      },
+      "on-action": {
+        "$value": "{color.white}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.950}"
+          }
+        },
+        "$description": "Text on action.primary."
+      },
+      "on-danger": {
+        "$value": "{color.white}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.950}"
+          }
+        },
+        "$description": "Text on action.danger."
+      }
+    },
+    "border": {
+      "default": {
+        "$value": "{color.gray.200}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.700}"
+          }
+        },
+        "$description": "Decorative dividers and surface outlines."
+      },
+      "strong": {
+        "$value": "{color.gray.500}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.gray.400}"
+          }
+        },
+        "$description": "Control boundaries that must meet 3:1 against their background."
+      }
+    },
+    "action": {
+      "primary": {
+        "$value": "{color.indigo.600}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.indigo.400}"
+          }
+        },
+        "$description": "Primary action fill."
+      },
+      "primary-hover": {
+        "$value": "{color.indigo.700}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.indigo.300}"
+          }
+        }
+      },
+      "danger": {
+        "$value": "{color.red.600}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.red.400}"
+          }
+        },
+        "$description": "Destructive action fill."
+      },
+      "danger-hover": {
+        "$value": "{color.red.700}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.red.300}"
+          }
+        }
+      }
+    },
+    "status": {
+      "$description": "Status tones. fg and bg are a contrast-checked pair; border is decorative.",
+      "success": {
+        "fg": {
+          "$value": "{color.green.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.green.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.green.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.green.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.green.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.green.800}"
+            }
+          }
+        }
+      },
+      "warning": {
+        "fg": {
+          "$value": "{color.amber.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.amber.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.amber.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.amber.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.amber.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.amber.800}"
+            }
+          }
+        }
+      },
+      "danger": {
+        "fg": {
+          "$value": "{color.red.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.red.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.red.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.red.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.red.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.red.800}"
+            }
+          }
+        }
+      },
+      "info": {
+        "fg": {
+          "$value": "{color.sky.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.sky.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.sky.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.sky.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.sky.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.sky.800}"
+            }
+          }
+        }
+      },
+      "neutral": {
+        "fg": {
+          "$value": "{color.gray.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.gray.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.gray.100}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.gray.800}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.gray.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.gray.600}"
+            }
+          }
+        }
+      }
+    },
+    "focus": {
+      "$value": "{color.indigo.600}",
+      "$extensions": {
+        "starter.modes": {
+          "dark": "{color.indigo.300}"
+        }
+      },
+      "$description": "Focus ring. Must meet 3:1 against every surface."
+    }
+  }
+}

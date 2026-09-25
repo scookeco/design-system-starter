@@ -1,0 +1,9 @@
+/*
+ * @expect declaration-no-important
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    color: var(--color-fg-default) !important;
+  }
+}

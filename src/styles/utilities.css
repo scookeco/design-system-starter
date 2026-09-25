@@ -1,0 +1,11 @@
+@layer utilities {
+  /* Visually hidden but announced. Used by components for accessible names; not for consumers. */
+  .visually-hidden {
+    position: absolute;
+    overflow: hidden;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    block-size: 1px;
+    white-space: nowrap;
+  }
+}

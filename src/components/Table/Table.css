@@ -1,0 +1,88 @@
+@layer components {
+  .table {
+    --table-max-height: none;
+
+    overflow: auto;
+    max-block-size: var(--table-max-height);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-surface);
+  }
+
+  .table__table {
+    inline-size: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--color-fg-default);
+    font: var(--text-body);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .table__caption {
+    padding: var(--space-inset-md);
+    font: var(--text-label);
+    text-align: start;
+  }
+
+  .table__header-cell {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-sticky);
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-md);
+    border-block-end: 1px solid var(--color-border-default);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+    text-align: start;
+    white-space: nowrap;
+  }
+
+  .table__cell {
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-md);
+    border-block-end: 1px solid var(--color-border-default);
+    font: var(--text-body);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  .table__cell[scope="row"] {
+    font: var(--text-label);
+  }
+
+  .table__row:last-child .table__cell {
+    border-block-end: 0;
+  }
+
+  .table__row:hover .table__cell {
+    background: var(--color-bg-hover);
+  }
+
+  .table__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .table__sort:hover {
+    color: var(--color-fg-default);
+  }
+
+  .table__header-cell[aria-sort] {
+    color: var(--color-fg-default);
+  }
+
+  .table__header-cell[data-numeric="true"],
+  .table__cell[data-numeric="true"] {
+    text-align: end;
+  }
+}

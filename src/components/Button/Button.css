@@ -1,0 +1,100 @@
+@layer components {
+  /* 1. block: layout + token wiring */
+  .button {
+    --button-bg: var(--button-primary-bg);
+    --button-bg-hover: var(--button-primary-bg-hover);
+    --button-fg: var(--button-primary-fg);
+    --button-border: var(--button-primary-bg);
+    --button-height: var(--size-control-md);
+    --button-padding: var(--space-inset-md);
+
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-gap-xs);
+    min-block-size: var(--button-height);
+    min-inline-size: var(--size-target-min);
+    padding-block: 0;
+    padding-inline: var(--button-padding);
+    border: 1px solid var(--button-border);
+    border-radius: var(--radius-control);
+    background: var(--button-bg);
+    color: var(--button-fg);
+    font: var(--text-label);
+    white-space: nowrap;
+    cursor: pointer;
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  /* 2. parts */
+  .button__spinner {
+    inline-size: var(--size-icon-sm);
+    block-size: var(--size-icon-sm);
+    border: var(--focus-ring-width) solid currentcolor;
+    border-inline-end-color: transparent;
+    border-radius: var(--radius-pill);
+    animation-name: button-spin;
+    animation-duration: var(--motion-spin);
+    animation-timing-function: var(--ease-linear);
+    animation-iteration-count: infinite;
+  }
+
+  /* 3. variants */
+  .button[data-variant="secondary"] {
+    --button-bg: var(--button-secondary-bg);
+    --button-bg-hover: var(--button-secondary-bg-hover);
+    --button-fg: var(--button-secondary-fg);
+    --button-border: var(--button-secondary-border);
+  }
+
+  .button[data-variant="ghost"] {
+    --button-bg: transparent;
+    --button-bg-hover: var(--button-ghost-bg-hover);
+    --button-fg: var(--button-ghost-fg);
+    --button-border: transparent;
+  }
+
+  .button[data-variant="danger"] {
+    --button-bg: var(--button-danger-bg);
+    --button-bg-hover: var(--button-danger-bg-hover);
+    --button-fg: var(--button-danger-fg);
+    --button-border: var(--button-danger-bg);
+  }
+
+  .button[data-size="sm"] {
+    --button-height: var(--size-control-sm);
+    --button-padding: var(--space-inset-sm);
+  }
+
+  .button[data-size="lg"] {
+    --button-height: var(--size-control-lg);
+    --button-padding: var(--space-inset-lg);
+
+    font: var(--text-body-lg);
+  }
+
+  /* 4. states */
+  .button:where(:hover):not(:disabled, [aria-disabled="true"]) {
+    background: var(--button-bg-hover);
+  }
+
+  .button:disabled {
+    border-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  .button[data-state="loading"] {
+    cursor: progress;
+  }
+
+  @keyframes button-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+}

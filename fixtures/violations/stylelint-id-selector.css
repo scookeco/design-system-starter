@@ -1,0 +1,9 @@
+/*
+ * @expect selector-max-id
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  #app {
+    color: var(--color-fg-default);
+  }
+}

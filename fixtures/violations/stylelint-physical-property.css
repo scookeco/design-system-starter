@@ -1,0 +1,9 @@
+/*
+ * @expect csstools/use-logical
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    margin-left: var(--space-gap-md);
+  }
+}

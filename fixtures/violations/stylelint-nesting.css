@@ -1,0 +1,15 @@
+/*
+ * @expect max-nesting-depth
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    & .one {
+      & .two {
+        & .three {
+          color: var(--color-fg-default);
+        }
+      }
+    }
+  }
+}

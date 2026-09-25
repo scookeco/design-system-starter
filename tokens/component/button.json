@@ -1,0 +1,53 @@
+{
+  "button": {
+    "$description": "Component tier: override hooks for Button only. References semantic tokens, never primitives.",
+    "primary": {
+      "$type": "color",
+      "bg": {
+        "$value": "{color.action.primary}"
+      },
+      "bg-hover": {
+        "$value": "{color.action.primary-hover}"
+      },
+      "fg": {
+        "$value": "{color.fg.on-action}"
+      }
+    },
+    "secondary": {
+      "$type": "color",
+      "bg": {
+        "$value": "{color.bg.surface}"
+      },
+      "bg-hover": {
+        "$value": "{color.bg.hover}"
+      },
+      "fg": {
+        "$value": "{color.fg.default}"
+      },
+      "border": {
+        "$value": "{color.border.strong}"
+      }
+    },
+    "ghost": {
+      "$type": "color",
+      "bg-hover": {
+        "$value": "{color.bg.hover}"
+      },
+      "fg": {
+        "$value": "{color.fg.default}"
+      }
+    },
+    "danger": {
+      "$type": "color",
+      "bg": {
+        "$value": "{color.action.danger}"
+      },
+      "bg-hover": {
+        "$value": "{color.action.danger-hover}"
+      },
+      "fg": {
+        "$value": "{color.fg.on-danger}"
+      }
+    }
+  }
+}

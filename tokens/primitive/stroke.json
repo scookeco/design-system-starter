@@ -1,0 +1,12 @@
+{
+  "stroke": {
+    "$type": "number",
+    "$description": "SVG stroke widths in icon user units (20-unit viewBox).",
+    "regular": {
+      "$value": 1.75
+    },
+    "bold": {
+      "$value": 2.25
+    }
+  }
+}

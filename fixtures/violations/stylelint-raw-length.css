@@ -1,0 +1,9 @@
+/*
+ * @expect declaration-property-value-disallowed-list
+ * @as src/components/Fixture.css
+ */
+@layer components {
+  .fixture {
+    inline-size: 240px;
+  }
+}

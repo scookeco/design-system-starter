@@ -1,0 +1,189 @@
+{
+  "shadow": {
+    "$type": "shadow",
+    "card": {
+      "$value": {
+        "color": "{color.black-alpha.10}",
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 1,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 2,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      }
+    },
+    "popover": {
+      "$value": [
+        {
+          "color": "{color.black-alpha.10}",
+          "offsetX": {
+            "value": 0,
+            "unit": "px"
+          },
+          "offsetY": {
+            "value": 4,
+            "unit": "px"
+          },
+          "blur": {
+            "value": 6,
+            "unit": "px"
+          },
+          "spread": {
+            "value": -1,
+            "unit": "px"
+          }
+        },
+        {
+          "color": "{color.black-alpha.10}",
+          "offsetX": {
+            "value": 0,
+            "unit": "px"
+          },
+          "offsetY": {
+            "value": 2,
+            "unit": "px"
+          },
+          "blur": {
+            "value": 4,
+            "unit": "px"
+          },
+          "spread": {
+            "value": -2,
+            "unit": "px"
+          }
+        }
+      ]
+    },
+    "modal": {
+      "$value": [
+        {
+          "color": "{color.black-alpha.20}",
+          "offsetX": {
+            "value": 0,
+            "unit": "px"
+          },
+          "offsetY": {
+            "value": 20,
+            "unit": "px"
+          },
+          "blur": {
+            "value": 25,
+            "unit": "px"
+          },
+          "spread": {
+            "value": -5,
+            "unit": "px"
+          }
+        },
+        {
+          "color": "{color.black-alpha.10}",
+          "offsetX": {
+            "value": 0,
+            "unit": "px"
+          },
+          "offsetY": {
+            "value": 8,
+            "unit": "px"
+          },
+          "blur": {
+            "value": 10,
+            "unit": "px"
+          },
+          "spread": {
+            "value": -6,
+            "unit": "px"
+          }
+        }
+      ]
+    }
+  },
+  "motion": {
+    "$type": "duration",
+    "$description": "Durations. Collapse to 0ms under prefers-reduced-motion.",
+    "fast": {
+      "$value": "{duration.100}",
+      "$extensions": {
+        "starter.modes": {
+          "reduced-motion": "{duration.0}"
+        }
+      }
+    },
+    "base": {
+      "$value": "{duration.200}",
+      "$extensions": {
+        "starter.modes": {
+          "reduced-motion": "{duration.0}"
+        }
+      }
+    },
+    "slow": {
+      "$value": "{duration.300}",
+      "$extensions": {
+        "starter.modes": {
+          "reduced-motion": "{duration.0}"
+        }
+      }
+    },
+    "spin": {
+      "$value": "{duration.1000}",
+      "$description": "One revolution of a loading spinner. Not reduced: the spinner is the only progress cue."
+    }
+  },
+  "ease": {
+    "$type": "cubicBezier",
+    "standard": {
+      "$value": "{easing.standard}"
+    },
+    "enter": {
+      "$value": "{easing.decelerate}"
+    },
+    "exit": {
+      "$value": "{easing.accelerate}"
+    },
+    "linear": {
+      "$value": "{easing.linear}"
+    }
+  },
+  "z": {
+    "$type": "number",
+    "$description": "Stacking order. Never write a raw z-index.",
+    "base": {
+      "$value": "{layer.0}"
+    },
+    "sticky": {
+      "$value": "{layer.1}"
+    },
+    "dropdown": {
+      "$value": "{layer.2}"
+    },
+    "overlay": {
+      "$value": "{layer.3}"
+    },
+    "modal": {
+      "$value": "{layer.4}"
+    },
+    "toast": {
+      "$value": "{layer.5}"
+    },
+    "tooltip": {
+      "$value": "{layer.6}"
+    }
+  },
+  "icon": {
+    "stroke": {
+      "$type": "number",
+      "$value": "{stroke.regular}",
+      "$description": "Stroke width for the system icon set."
+    }
+  }
+}

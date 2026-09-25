@@ -1,0 +1,22 @@
+@layer primitives {
+  .stack {
+    --stack-gap: var(--space-gap-md);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap);
+    min-inline-size: 0;
+  }
+
+  .stack[data-align="start"] {
+    align-items: flex-start;
+  }
+
+  .stack[data-align="center"] {
+    align-items: center;
+  }
+
+  .stack[data-align="end"] {
+    align-items: flex-end;
+  }
+}

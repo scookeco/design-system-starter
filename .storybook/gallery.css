@@ -1,0 +1,11 @@
+/* Gallery-only helpers. Not part of the library build. */
+@layer components {
+  .demo-box {
+    padding: var(--space-inset-sm) var(--space-inset-md);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-default);
+    font: var(--text-label);
+  }
+}
