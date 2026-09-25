@@ -1,6 +1,7 @@
 import { createContext, useContext, useId, type MouseEvent } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon, type IconName } from '../Icon/Icon';
+import { RouterLink } from '../Link/Link';
 import { Tooltip } from '../Tooltip/Tooltip';
 import './Nav.css';
 
@@ -33,7 +34,8 @@ export interface NavProps extends EscapeHatch {
   current?: string;
   /**
    * Client-side routing hook. When set, a plain click calls it instead of following the link;
-   * modified clicks (new tab, new window) still use the browser.
+   * modified clicks (new tab, new window) still use the browser. Apps with a router usually
+   * inject its link once with LinkProvider instead.
    */
   onNavigate?: (href: string) => void;
 }
@@ -58,7 +60,7 @@ export function Nav({ label, sections, current, onNavigate, UNSAFE_className, UN
             <ul role="list" className="nav__list" aria-labelledby={section.label ? headingId : undefined}>
               {section.items.map((item) => {
                 const link = (
-                  <a
+                  <RouterLink
                     className="nav__link"
                     href={item.href}
                     aria-current={item.href === current ? 'page' : undefined}
@@ -77,7 +79,7 @@ export function Nav({ label, sections, current, onNavigate, UNSAFE_className, UN
                     ) : null}
                     {/* In the rail the label is visually hidden, so it stays the link's accessible name. */}
                     <span className={rail ? 'nav__label visually-hidden' : 'nav__label'}>{item.label}</span>
-                  </a>
+                  </RouterLink>
                 );
                 return (
                   <li key={item.href}>

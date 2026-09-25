@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { LinkComponentProps } from '../../src/index';
 import {
   AppShell,
   Avatar,
@@ -10,6 +11,8 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  Link,
+  LinkProvider,
   Nav,
   NavTabs,
   PageLayout,
@@ -404,5 +407,35 @@ describe('NavTabs', () => {
     expect(screen.getByRole('link', { name: 'Overview' }).hasAttribute('aria-current')).toBe(false);
     fireEvent.click(screen.getByRole('link', { name: 'Overview' }));
     expect(onNavigate).toHaveBeenCalledWith('/r/1');
+  });
+});
+
+describe('LinkProvider', () => {
+  const RouterAnchor = ({ href, ...rest }: LinkComponentProps) => <a {...rest} href={`/app${href}`} data-routed="true" />;
+
+  it('routes Link, Nav, NavTabs and Breadcrumbs through the injected link component', () => {
+    render(
+      <LinkProvider component={RouterAnchor}>
+        <Link href="/a">Plain link</Link>
+        <Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} current="/home" />
+        <NavTabs label="Sections" items={[{ label: 'Files', href: '/r/1/files' }]} current="/r/1/files" />
+        <Breadcrumbs items={[{ label: 'Records', href: '/records' }]} current="Lease" />
+      </LinkProvider>,
+    );
+    for (const name of ['Plain link', 'Home', 'Files', 'Records']) {
+      const link = screen.getByRole('link', { name });
+      expect(link.dataset.routed).toBe('true');
+      expect(link.getAttribute('href')?.startsWith('/app/')).toBe(true);
+    }
+    // The system's own attributes still reach the anchor.
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBe('page');
+    expect(screen.getByRole('link', { name: 'Plain link' }).className).toBe('link');
+  });
+
+  it('renders plain anchors without a provider', () => {
+    render(<Link href="/a">Plain link</Link>);
+    const link = screen.getByRole('link', { name: 'Plain link' });
+    expect(link.getAttribute('href')).toBe('/a');
+    expect(link.dataset.routed).toBeUndefined();
   });
 });

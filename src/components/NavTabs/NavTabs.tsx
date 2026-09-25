@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
+import { RouterLink } from '../Link/Link';
 import './NavTabs.css';
 
 export interface NavTab {
@@ -17,7 +18,8 @@ export interface NavTabsProps extends EscapeHatch {
   current: string;
   /**
    * Client-side routing hook. When set, a plain click calls it instead of following the link;
-   * modified clicks (new tab, new window) still use the browser.
+   * modified clicks (new tab, new window) still use the browser. Apps with a router usually
+   * inject its link once with LinkProvider instead.
    */
   onNavigate?: (href: string) => void;
 }
@@ -34,7 +36,7 @@ export function NavTabs({ label, items, current, onNavigate, UNSAFE_className, U
       <ul role="list" className="nav-tabs__list">
         {items.map((item) => (
           <li key={item.href}>
-            <a
+            <RouterLink
               className="nav-tabs__link"
               href={item.href}
               aria-current={item.href === current ? 'page' : undefined}
@@ -45,7 +47,7 @@ export function NavTabs({ label, items, current, onNavigate, UNSAFE_className, U
               }}
             >
               {item.label}
-            </a>
+            </RouterLink>
           </li>
         ))}
       </ul>

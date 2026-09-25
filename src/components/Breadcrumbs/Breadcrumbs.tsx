@@ -1,5 +1,6 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { RouterLink } from '../Link/Link';
 import './Breadcrumbs.css';
 
 export interface BreadcrumbLink {
@@ -23,9 +24,9 @@ export function Breadcrumbs({ items, current, label = 'Breadcrumb', UNSAFE_class
       <ol role="list" className="breadcrumbs__list">
         {items.map((item) => (
           <li className="breadcrumbs__item" key={item.href}>
-            <a className="breadcrumbs__link" href={item.href}>
+            <RouterLink className="breadcrumbs__link" href={item.href}>
               {item.label}
-            </a>
+            </RouterLink>
             <span className="breadcrumbs__separator">
               <Icon name="chevron-right" />
             </span>

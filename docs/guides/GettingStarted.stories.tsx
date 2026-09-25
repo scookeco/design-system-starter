@@ -5,7 +5,7 @@ import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
 function GettingStarted() {
   return (
-    <DocPage title="Getting started" lead="Three steps: bring the system in, load its styles once, and render every signed-in page inside AppShell.">
+    <DocPage title="Getting started" lead="Four steps: bring the system in, load its styles once, render every signed-in page inside AppShell, and route its links through your router.">
       <DocSection title="1. Install">
         <Text>
           The system is one folder in this repo until a second app needs it as a versioned package. Install its dependencies and check
@@ -54,6 +54,40 @@ export function RecordsPage() {
         <Text>
           The golden examples do exactly this through one shared shell: start from{' '}
           <StoryLink id="examples-list-page--default">the list page example</StoryLink>.
+        </Text>
+      </DocSection>
+      <DocSection title="4. Route links through your router">
+        <Text>
+          System links render a plain <code>&lt;a&gt;</code> by default. Give the app’s router link to <code>LinkProvider</code> once, at
+          the root, and <code>Link</code>, <code>Nav</code>, <code>NavTabs</code> and <code>Breadcrumbs</code> all navigate client-side.
+          The adapter takes <code>href</code>, spreads every other prop onto the anchor and forwards <code>ref</code>.
+        </Text>
+        <Code label="React Router">{`
+import { Link as RouterLinkBase } from 'react-router';
+import { LinkProvider, type LinkComponentProps } from '../index';
+
+// Defined once, outside any component, so its identity never changes.
+function AppLink({ href, ref, ...rest }: LinkComponentProps) {
+  return <RouterLinkBase to={href} ref={ref} {...rest} />;
+}
+
+export function App() {
+  return (
+    <LinkProvider component={AppLink}>
+      <Routes>{/* every page, each inside AppShell */}</Routes>
+    </LinkProvider>
+  );
+}
+`}</Code>
+        <Code label="Next.js (App Router)">{`
+import NextLink from 'next/link';
+
+function AppLink(props: LinkComponentProps) {
+  return <NextLink {...props} />;   // already takes href and forwards ref
+}
+`}</Code>
+        <Text>
+          Modified clicks (new tab, new window) keep working, because the router link is still an anchor with a real <code>href</code>.
         </Text>
       </DocSection>
       <DocSection title="Then">
