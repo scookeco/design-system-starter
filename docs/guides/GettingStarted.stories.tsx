@@ -5,7 +5,10 @@ import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
 function GettingStarted() {
   return (
-    <DocPage title="Getting started" lead="Four steps: bring the system in, load its styles once, render every signed-in page inside AppShell, and route its links through your router.">
+    <DocPage
+      title="Getting started"
+      lead="Five steps: bring the system in, load its styles once, render every signed-in page inside AppShell, route its links through your router, and set the reader’s locale."
+    >
       <DocSection title="1. Install">
         <Text>
           The system is one folder in this repo until a second app needs it as a versioned package. Install its dependencies and check
@@ -90,10 +93,32 @@ function AppLink(props: LinkComponentProps) {
           Modified clicks (new tab, new window) keep working, because the router link is still an anchor with a real <code>href</code>.
         </Text>
       </DocSection>
+      <DocSection title="5. Set the locale and time zone">
+        <Text>
+          Wrap the app once in <code>LocaleProvider</code> with the signed-in person’s locale and time zone (a profile setting that
+          defaults from the browser). Then format every value a person reads with <code>useFormat()</code>. System components that show
+          numbers, such as Pagination, follow it too.
+        </Text>
+        <Code label="Locale and formats">{`
+<LocaleProvider locale={user.locale} timeZone={user.timeZone}>
+  <LinkProvider component={AppLink}>{/* the app */}</LinkProvider>
+</LocaleProvider>
+
+const format = useFormat();
+format.money(1_250_050, 'EUR');   // "€12,500.50" in en-US, "12.500,50 €" in de-DE
+format.date('2026-09-12');        // a calendar date: never shifts by time zone
+format.relative(record.updatedAt);  // "3 days ago"
+`}</Code>
+        <Text>
+          Data is the app’s job, not the system’s: the examples read and write through <code>src/app</code> (a query cache, named
+          mutations, URL state). The Data guide explains that layer.
+        </Text>
+      </DocSection>
       <DocSection title="Then">
         <Rules
           items={[
             <>Pick the page archetype and copy its example: see Page archetypes.</>,
+            <>Wire its data the way the examples do: see Data.</>,
             <>Style nothing. If a component doesn’t look right for the job, walk the Decision ladder.</>,
             <>
               Before a pull request: <code>npm run check</code>, then the visual and axe suite (<code>npm run test:visual</code>).

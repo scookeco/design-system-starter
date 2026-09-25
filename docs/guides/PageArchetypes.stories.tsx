@@ -10,7 +10,7 @@ const ARCHETYPES = [
     id: 'examples-list-page--default',
     example: 'List page',
     choose: 'Users come to find, compare or act on many records: records, people, invoices, an audit log.',
-    shows: 'PageHeader with one primary action, SearchField and a Filters popover with removable chips, a sortable table, Pagination; loading, first use, no results and load error states.',
+    shows: 'PageHeader with one primary action, view tabs with server counts, SearchField and a Filters popover with removable chips, a sortable table, Pagination; view, search, filters, sort and page in the URL; row selection with “Select all N matching” and a bulk bar; loading, first use, no results and load error states.',
   },
   {
     archetype: 'Record / detail',
@@ -18,7 +18,7 @@ const ARCHETYPES = [
     id: 'examples-record-page--default',
     example: 'Record page',
     choose: 'One record is the subject: its status, properties, activity and the actions on it.',
-    shows: 'Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside in PageLayout.',
+    shows: 'Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside rendered from the field registry; an optimistic rename with rollback and a conflict banner, a pessimistic archive.',
   },
   {
     archetype: 'Create and edit',
@@ -26,7 +26,7 @@ const ARCHETYPES = [
     id: 'examples-create-and-edit--empty',
     example: 'Create and edit',
     choose: 'Someone fills in a record: a full page for heavy records, a quick-create dialog for light ones.',
-    shows: 'Errors on blur and submit, a focused error summary linking to fields, a pending submit in the sticky action bar.',
+    shows: 'Errors on blur and submit, a focused error summary linking to fields, registry-rendered fields, a pending submit in the sticky action bar, a create that is safe to retry (idempotency key).',
   },
   {
     archetype: 'Settings',
@@ -111,7 +111,15 @@ function PageArchetypes() {
               in AuthLayout; a focused multi-step task in FocusedLayout. Every page starts with a <code>PageHeader</code>.
             </>,
             <>Keep every state the example has: loading, empty, error. A page without them isn’t finished.</>,
-            <>Map domain statuses to badge tones in one place, as the examples’ status-to-tone map does.</>,
+            <>
+              Read and write through the app layer, as the list, record and create examples do: queries and named mutations from{' '}
+              <code>src/app/model</code>, never a fetch in a page. See the Data guide.
+            </>,
+            <>
+              Map domain statuses to badge tones in one place (<code>src/app/model/status.ts</code>), and define each “what counts as X” as
+              one named predicate.
+            </>,
+            <>Format every number, date and amount with <code>useFormat()</code>; never by hand.</>,
             <>A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.</>,
           ]}
         />
