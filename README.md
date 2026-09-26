@@ -59,16 +59,19 @@ src/components/         the components; the only place (with primitives) Radix i
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
 src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
-                        predicates, projections, mutations, selection), url/ (useUrlState), registries/ (field registry), mocks/ (MSW)
+                        predicates, projections, mutations, selection, permissions), session.tsx (memberships, workspace
+                        switch, sign-out), routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState),
+                        registries/ (field registry, entityType → fields), mocks/ (MSW)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
-src/examples/           golden example pages, one per archetype (also a consumer lint target)
+src/examples/           golden example pages, one per archetype, the schema-driven entity pages, and the app's route table
+                        (routes.tsx) and assembly (App.tsx); also a consumer lint target
 src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls; fixtures/manifest/ = the manifest extractor's test entry
 tests/unit/             Vitest suites
 tests/visual/           Playwright suite: screenshots + axe, WCAG 2.2 checks (shared story opening in storybook.ts); __screenshots__/linux/ is committed
 tests/visual/fixtures/  check-fixture stories that each WCAG 2.2 check must fail (hidden from the gallery)
-.storybook/             gallery config, theme, width, locale, latency and failure toolbars, the Tokens panel (manager.tsx); public/ holds MSW's service worker
+.storybook/             gallery config, theme, width, locale, latency, failure and role toolbars, the Tokens panel (manager.tsx); public/ holds MSW's service worker
 .size-limit.json        bundle size budgets
 llms.txt, llms-full.txt, design-system.manifest.json   generated: the system for coding agents (schema: design-system.manifest.schema.json)
 .github/workflows/      ci.yml, update-visual-baselines.yml
@@ -176,14 +179,16 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 
 | Archetype | Copy | It shows |
 |---|---|---|
-| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, view tabs with server counts, SearchField and a Filters popover with removable chips, sortable table, pagination, all server-side and in the URL; row selection, "Select all N matching", a bulk bar and bulk delete with partial failure; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
+| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, saved views (save, rename, default, delete, "Modified"), view tabs with server counts, SearchField, a Filters popover with removable chips and a Columns popover, a sortable table or a keyboard-operable board over the same query (`RecordBoard.tsx`, Move to… with drag as the alternative), pagination, all server-side and in the URL; row selection, "Select all N matching", a bulk bar and bulk delete with partial failure; actions disabled with a reason per role; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
 | Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside rendered from the field registry; optimistic rename with rollback and a 409 conflict banner, pessimistic archive and delete; loading and error with the shell up |
 | Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record (fields from the field registry), quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar, a create that is safe to retry (idempotency key) |
 | Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav (PageLayout's nav slot), one card per category with its own Save, a success banner |
 | Sign-in | `src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed sign-in link, a password as the secondary route; a failed-sign-in banner; a verification-code step |
 | Wizard | `src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step, focus to each step's h1; a review step with Edit |
 | Dashboard | `src/examples/DashboardPage.tsx` | a date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table |
-| Error / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
+| Entity list, record and form | `src/examples/EntityPages.tsx` | schema-driven pages for any entity in `src/app/registries/entities.ts` (accounts, people): columns and properties through the field registry, related records joined by id with rollups, create and edit with a focused error summary, Edit disabled with a reason |
+| The app and its routes | `src/examples/App.tsx`, `routes.tsx` | the route table (path → layout + page + guard), lazy pages, LinkProvider with the app's router link, a 403 page from the guard, the 404 fallback |
+| Error / 403 / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 and 403 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
 
 `src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
 
@@ -191,13 +196,20 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 
 The design system draws; `src/app` knows. It is consumer code, like the examples, and the system never imports it. The **Guides → Data** page in the gallery explains it in full.
 
-- **One server cache** (TanStack Query) with keys `[tenant, resource, params]`. The tenant is in every key and every request.
+- **One server cache** (TanStack Query) with keys `[tenant, scope, resource, params]`. The workspace is in every key and every request; the permission scope partitions what each role cached.
+- **Entities joined by id**: records point at their account and owner by id, and every name on screen is read from the account and people directories at render. Renaming an account is one cache write.
+- **The query-cache trap, handled**: a record write patches its detail and every cached list page holding it (`patchListedRecord`), then invalidates what the patch can't know. A test proves a detail edit shows in an already-cached list with every list request held open.
+- **Permissions**: capabilities (`record:rename`, `account:edit`, …), roles mapped to them in one place (`ROLE_CAPABILITIES`), and one predicate, `can`, used by the controls, the route guard, every mutation and the mock server (403). Viewers get a narrower projection (no drafts), filtered in the query.
+- **Workspace and session boundaries**: switching workspace cancels the old one's reads and remounts the page; a permission change drops the old scope's partition; sign-out cancels everything and clears the cache.
+- **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`.
+- **Schema-driven pages**: `entityType → fields` config (`src/app/registries/entities.ts`) gives accounts and people their list, record and form pages.
+- **Saved views**: named filter, sort, columns and display, persisted per person per workspace; the URL stays the truth.
 - **Validate at the boundary.** Every response is parsed with a zod schema in `src/app/api/client.ts`; a bad payload becomes an error state and never reaches the cache.
 - **Named predicates** (`isOpen`, `canDelete`, the view predicates) drive the filters, tab counts, badges, bulk guards and the mock server. Views are pure projections (`toRow`).
 - **URL state** (`useUrlState`) for view, search, filters, sort and page: push for navigation, replace for refinements, debounced search.
 - **One named mutation per verb** (`renameRecord` optimistic with rollback and 409 handling; `archiveRecord`, `createRecord` with an idempotency key, and `bulkDeleteRecords` pessimistic), each documenting what it patches and invalidates.
 - **A typed field registry** renders record properties and form fields; exhaustive at compile time, with a runtime fallback that reports and never throws.
-- **A mock API** (MSW) over a seeded database: 240 and 120 records for two tenants. The gallery's Latency and Failures toolbars change its behaviour, and failures are real 500 responses. The same handlers serve Vitest (`msw/node`).
+- **A mock API** (MSW) over a seeded database: 240 and 120 records, 12 and 8 accounts for two tenants. The gallery's Latency, Failures and Role toolbars change its behaviour, and failures are real 500 (or 403) responses. The same handlers serve Vitest (`msw/node`).
 
 ## Adding a component: walk the decision ladder
 
@@ -228,6 +240,7 @@ Then run `npm run check`, run the baseline workflow on the branch, and review th
 
 - **Theme toolbar**: light or dark, on `<html>`, so portalled overlays follow it.
 - **Width toolbar**: wraps any story in a container of narrow (half of `size.breakpoint.sm`), medium (`sm`), wide (`md`) or full width. Layouts respond to their container, so this shows each responsive state inside the fixed viewport. Full, the default, renders no wrapper, so screenshots are unaffected.
+- **Latency, Failures and Role toolbars**: how the mock API behaves (delay, failure rate) and who you are in the mock workspace (viewer, editor or admin; admin by default). A story about a role sets it with `mockApi({ role })`, which wins over the toolbar.
 - **Tokens panel**: for the current component, primitive or layout story, every token it reads, in its own CSS, through a prop (`gap="md"` → `space.gap.md`) or through the units it composes, with the token's tier, alias chain (semantic → primitive) and light and dark values. It renders `src/tokens/token-usage.json`, which `npm run tokens` generates and `tokens:check` keeps current. Content a caller passes in (an AppShell's nav, a Card's body) is the caller's, so it isn't listed. The JSON is documented by `src/tokens/token-usage.schema.json`, for tools that need a machine-readable map.
 
 ## Documentation
@@ -291,7 +304,7 @@ Where the facts come from:
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
 - Stories tagged `no-visual` get no screenshot and no axe run. Only the WCAG 2.2 check fixtures use it: they are deliberate violations.
-- **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0` in its globals, freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
+- **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0;role:admin` in its globals (a story that sets its own role with `mockApi({ role })` keeps it), freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
 - **Screenshots are byte-stable.** Chromium launches with `--disable-partial-raster` (in `playwright.config.ts`). Without it, a region that repaints after a story settles (a list arriving, a button leaving its pending state, a dialog opening) is re-rasterised on its own, and rounded edges come out a colour level or two different from a full raster. That stays under the comparison threshold, but it churned baseline files on every run.
 - Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 

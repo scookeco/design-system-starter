@@ -11,11 +11,21 @@ const HOMES = [
 ] as const;
 
 const MUTATIONS = [
-  { verb: 'renameRecord', presents: 'Optimistic', patches: 'The record, at once; rolled back on failure unless a newer write landed', invalidates: 'The record, every list (counts can’t change)', failure: 'Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload' },
-  { verb: 'archiveRecord', presents: 'Pessimistic', patches: 'The record, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays' },
+  { verb: 'renameRecord', presents: 'Optimistic', patches: 'The record and every cached list page holding it, at once; both rolled back on failure unless a newer write landed', invalidates: 'The record, every list (counts can’t change)', failure: 'Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload; a 403 refreshes the session' },
+  { verb: 'moveRecord', presents: 'Pessimistic', patches: 'The record and every listed copy, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays' },
+  { verb: 'archiveRecord', presents: 'Pessimistic', patches: 'The record and every listed copy, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays' },
   { verb: 'createRecord', presents: 'Pessimistic, with an idempotency key', patches: 'The new record’s detail entry', invalidates: 'Every list and count', failure: 'The draft stays; a retry sends the same key, so no duplicate' },
   { verb: 'bulkDeleteRecords', presents: 'Pessimistic, confirmed', patches: 'Removes deleted records', invalidates: 'Every list and count', failure: 'Partial: a banner that stays (“50 deleted, 9 failed”) with Retry' },
   { verb: 'addPerson', presents: 'Pessimistic', patches: 'Appends to people', invalidates: 'People', failure: 'The dialog stays open with an error' },
+  { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory', failure: 'The form stays, with a banner' },
+  { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'Nothing else: records hold its id, so every row re-renders from the directory', failure: 'A banner; a 409 says someone else changed it' },
+  { verb: 'saveView · updateView · deleteView', presents: 'Pessimistic', patches: 'The person’s views (the default moves on update)', invalidates: 'Views', failure: 'The dialog stays open with the server’s reason' },
+] as const;
+
+const ROLES = [
+  { role: 'Viewer', holds: 'workspace:read, record:read, account:read', sees: 'Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive' },
+  { role: 'Editor', holds: 'Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create', sees: 'Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled' },
+  { role: 'Admin', holds: 'Editor’s, plus workspace:manage, record:delete, account:edit', sees: 'Everything' },
 ] as const;
 
 function DataPage() {
@@ -50,9 +60,12 @@ function DataPage() {
 tokens → primitives → components → layouts        the design system (src/index.ts)
                                          ↑
 src/app   api/        the client and zod schemas: every response is parsed at the boundary
-          model/      cache keys, queries, named predicates, projections, mutations, selection
+          model/      cache keys, queries, named predicates, projections, mutations, selection,
+                      permissions (the role → capability mapping and the one predicate, can)
+          session.tsx the session: memberships, the active workspace, switch, sign out
+          routing/    the route entry type, the matcher, RouteView and AppLink
           url/        useUrlState and the list page's URL codec
-          registries/ the field registry and which fields a record has
+          registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
                                          ↑
 src/examples          golden pages: compose the system, read and write through src/app
@@ -67,13 +80,16 @@ src/examples          golden pages: compose the system, read and write through s
               paging. A normalized store would earn its cost only if many views edited the same entities at once.
             </>,
             <>
-              Keys are <code>[tenant, resource, params]</code>: <code>['acme', 'records', {'{ view, q, status, sort, page }'}]</code>,{' '}
-              <code>['acme', 'record', {'{ id }'}]</code>. The tenant leads every key and every request path, so one workspace’s data can
-              never answer for another’s, and invalidation can be as narrow as one resource in one tenant.
+              Keys are <code>[tenant, scope, resource, params]</code>: <code>['acme', 'admin', 'records', {'{ view, q, status, sort, page }'}]</code>,{' '}
+              <code>['acme', 'admin', 'record', {'{ id }'}]</code>. The partition (the workspace, then the permission scope the server
+              answered for) leads every key, so one workspace’s data can never answer for another’s, a viewer never reads what an admin
+              cached, and invalidation can be as narrow as one resource in one partition.
             </>,
             <>
-              A query cache doesn’t normalize: patching a record doesn’t update a list that contains it. That’s why each mutation says which
-              lists and counts it invalidates (below).
+              A query cache doesn’t normalize: a record also lives inside every cached list page that holds it. So a record write patches
+              the detail <em>and</em> every listed copy (<code>patchListedRecord</code>, one <code>setQueriesData</code> over the lists
+              prefix), then invalidates what the patch can’t know (membership, order, totals). A test holds every list request open and still
+              sees the edit in the mounted list and in an unmounted page of another tab.
             </>,
             <>
               Only trusted data enters the cache. Every response is parsed with a zod schema in <code>src/app/api/client.ts</code>. A payload
@@ -84,6 +100,144 @@ src/examples          golden pages: compose the system, read and write through s
               Views are projections, never copies: rows are <code>toRow(record)</code>. “What counts as open” is one predicate,{' '}
               <code>isOpen</code>. The Open tab, its count, the filter options, the badges, the bulk-delete guard (<code>canDelete</code>)
               and the mock server all call the same functions, so they can’t disagree.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Entities and joins">
+        <Rules
+          items={[
+            <>
+              Three entities: records, accounts and people. A record holds <code>ownerId</code> and <code>accountId</code>, never a copy of a
+              name. Accounts and people are reference data, loaded whole into one directory query each.
+            </>,
+            <>
+              Every name on screen is joined by id at render: <code>PersonRef</code> and <code>AccountRef</code> (and the registry’s{' '}
+              <code>person</code> and <code>account</code> field types) read the directory. Rename an account once and every row, card and
+              property that shows it changes, with no list touched.
+            </>,
+            <>
+              The server joins too: search matches the owner’s name, looked up by id before the one <code>matchesSearch</code> predicate
+              runs, so client and server still agree about what matches.
+            </>,
+            <>
+              A related-entity section is a join projection: an account’s page lists <code>useRecordList({'{ account: id }'})</code>, through
+              the same <code>toRow</code>, with rollups from the same counts as the tabs. Navigation goes both ways by id.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="One projection, many surfaces">
+        <Rules
+          items={[
+            <>
+              The list’s table and board are two surfaces over one query and one projection. The board groups the same rows by per-status
+              predicates (<code>toBoard</code>, <code>hasStatus</code>); its columns are the statuses the tab’s predicate lets through,
+              narrowed by the status filter; its column totals are per-status counts the server returns beside the tab counts.
+            </>,
+            <>
+              The display is URL state (<code>display=board</code>), pushed so Back returns to the table. A new surface (a calendar, a
+              timeline) is a new entry in <code>DISPLAYS</code> and a component, never a page with its own store.
+            </>,
+            <>
+              Every card has a Move to… menu, so the board works from the keyboard. Dragging a card onto a column does the same, and
+              declares the menu as its alternative (<code>data-drag-alternative</code>, enforced by ESLint).
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Permissions">
+        <Code label="One mapping, one predicate, four call sites">{`
+role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabilities ──▶ can(grant, capability, subject?)
+                                                                              ├─ control: shown / disabled with the reason
+                                                                              ├─ route guard: page / 403 page
+                                                                              ├─ mutation: sends / refuses (403) without a request
+                                                                              └─ mock server: 200 / 403, whatever the client did
+`}</Code>
+        <Table caption="Roles">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Role</TableHeaderCell>
+              <TableHeaderCell>Holds</TableHeaderCell>
+              <TableHeaderCell>In the examples</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {ROLES.map((r) => (
+              <TableRow key={r.role}>
+                <TableCell rowHeader>{r.role}</TableCell>
+                <TableCell>{r.holds}</TableCell>
+                <TableCell>{r.sees}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Rules
+          items={[
+            <>
+              Capabilities are <code>resource:action</code> strings. Roles map to them in exactly one place, and the session carries each
+              membership’s capabilities as the server derived them. The client never decides anything from a role name.
+            </>,
+            <>
+              <code>can</code> checks the capability, then the object rule for the thing acted on (an archived record can’t be renamed; one
+              on legal hold can’t be deleted), from the same named predicates as everything else.
+            </>,
+            <>
+              One rule per context: page and bar actions are disabled, with the reason as visible text they point at (
+              <code>aria-describedby</code>); overflow-menu items and card actions are hidden; a route the role can’t open renders the 403
+              page. Never a silent redirect.
+            </>,
+            <>
+              Roles shape projections too: a viewer’s lists have no drafts, filtered by the server in the query, so pages and totals stay
+              honest. The Drafts tab needs <code>record:read-drafts</code>.
+            </>,
+            <>
+              The gallery’s <strong>Role</strong> toolbar switches between viewer, editor and admin (default admin). A story that sets{' '}
+              <code>mockApi({'{ role }'})</code> wins, and the visual suite pins <code>role:admin</code>. See{' '}
+              <StoryLink id="examples-list-page--as-viewer">the viewer’s list</StoryLink> and{' '}
+              <StoryLink id="examples-record-page--rename-forbidden">a forced 403</StoryLink>.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Workspace and session boundaries">
+        <Rules
+          items={[
+            <>
+              <strong>Switch workspace</strong> (the account menu): in-flight reads of the old workspace are cancelled, its confirmed data
+              stays under its own keys, and the page remounts, so selections and drafts stay behind. A late answer never reaches the new
+              screen.
+            </>,
+            <>
+              <strong>Permission change</strong> (a new session, or <code>refreshSession</code> after a 403): the old scope’s partition is
+              dropped, and a list never keeps the previous page on screen across partitions (<code>keepPreviousData</code> would otherwise
+              show an admin’s rows to a viewer until the viewer’s arrived).
+            </>,
+            <>
+              <strong>Sign out</strong>: every query and mutation is cancelled and the whole cache cleared before the signed-out screen
+              renders. The server ends the session; every later request is a 401.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Routes">
+        <Rules
+          items={[
+            <>
+              The route table is the master registry: <code>path → layout + page + guard</code> (<code>src/examples/routes.tsx</code>). A
+              route without a capability doesn’t compile, and a test checks every route has one.
+            </>,
+            <>
+              Pages are lazy, one chunk per route. The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
+            </>,
+            <>
+              An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (
+              <code>LinkProvider</code> with <code>AppLink</code>), so every Link, Nav, NavTabs and Breadcrumbs routes in place.
             </>,
           ]}
         />
@@ -200,6 +354,11 @@ src/examples          golden pages: compose the system, read and write through s
         <Rules
           items={[
             <>
+              <code>src/app/registries/entities.ts</code> maps each entity type to its fields: list columns, record properties, related
+              records, and its create and edit form. Generic list, record and form pages (<code>src/examples/EntityPages.tsx</code>) render
+              any entry, so accounts and people have no hand-built pages.
+            </>,
+            <>
               <code>src/app/registries/fields.tsx</code> maps each field type (<code>text</code>, <code>money</code>, <code>date</code>,{' '}
               <code>status</code>, <code>person</code>, <code>tags</code>) to how it displays and how it edits. <code>RECORD_PROPERTIES</code>{' '}
               drives the record page’s properties; <code>CREATE_FIELDS</code> drives the create form. One registry, two surfaces.
@@ -211,6 +370,25 @@ src/examples          golden pages: compose the system, read and write through s
             <>
               Data can still be newer than the code. A field whose type has no entry renders “Not available” and is reported once. It never
               throws.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Saved views">
+        <Rules
+          items={[
+            <>
+              A saved view is config: the tab, search, status filter, sort, visible columns and display, the same state the URL already
+              holds. The mock API stores views per person per workspace, with one default each.
+            </>,
+            <>
+              The URL stays the truth. Choosing a view pushes its config and <code>saved=&lt;id&gt;</code>; changing anything after that
+              shows “Modified” until it’s saved into the view or saved as a new one.
+            </>,
+            <>
+              The default view applies only when the list opens with nothing in its URL, with replace: a shared link always wins, and Back
+              never returns to the bare URL.
             </>,
           ]}
         />
@@ -255,11 +433,13 @@ export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=
       <DocSection title="Adding an entity">
         <Rules
           items={[
-            <>Its schema in <code>src/app/api/schemas.ts</code>, and its endpoints (the tenant first) beside the record ones.</>,
-            <>Its predicates and status map in <code>src/app/model</code>; its projections for lists.</>,
-            <>Its keys, queries and named mutations, each mutation with its row in the matrix above.</>,
-            <>Its field definitions for the record page and the form; registry entries only for genuinely new field types.</>,
-            <>Its URL codec if it has a list; mock handlers and seed data so its stories and tests run.</>,
+            <>Its schema in <code>src/app/api/schemas.ts</code>, and its endpoints (the tenant first) in their own file in <code>api/</code>.</>,
+            <>References to other entities as ids, displayed through a ref component or a ref field type: never a copied name.</>,
+            <>Its predicates in <code>src/app/model</code>; its projections for lists.</>,
+            <>Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its capability.</>,
+            <>Its capabilities in <code>CAPABILITIES</code>, their roles in <code>ROLE_CAPABILITIES</code>, and the same capability on its mock routes.</>,
+            <>Its entry in <code>entities.ts</code> (fields, related records, form) and its rows in the route table, each with a guard.</>,
+            <>Mock handlers and seed data (from its own PRNG stream) so its stories and tests run.</>,
           ]}
         />
       </DocSection>
