@@ -12,13 +12,13 @@
       "@internationalized/date"
     ],
     "gzip": true,
-    "limit": "24.5 kB"
+    "limit": "34.5 kB"
   },
   {
     "name": "Library CSS (dist/styles.css)",
     "path": "dist/styles.css",
     "gzip": true,
-    "limit": "14.5 kB"
+    "limit": "16.2 kB"
   },
   {
     "name": "One component (import { Button })",

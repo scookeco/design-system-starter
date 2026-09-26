@@ -147,8 +147,8 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 24.5 kB | `dist/index.js`, everything exported |
-| Library CSS | 14.5 kB | `dist/styles.css` |
+| Library JS | 34.5 kB | `dist/index.js`, everything exported |
+| Library CSS | 16.2 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
