@@ -47,3 +47,8 @@ export const RenameForbidden: Story = {
   parameters: mswOverrides(fail('patch', '/records/:id', 403, 'forbidden', 'Your role in this workspace changed: you can no longer rename records.')),
 };
 
+
+/** Another person renamed this record while it was open: the page shows their version in place. */
+export const EditedElsewhere: Story = { parameters: mockApi({ anotherUser: [{ kind: 'edit', id: 'r-1001', changes: { name: 'Annual hosting agreement (renegotiated)' } }] }) };
+/** Another person deleted this record while it was open: the page says so instead of offering actions on it. */
+export const DeletedElsewhere: Story = { parameters: mockApi({ anotherUser: [{ kind: 'delete', id: 'r-1001' }] }) };

@@ -28,6 +28,9 @@
  *            selection, and Delete last, guarded by the canDelete predicate
  *   overlays create dialog; bulk delete confirmation naming the count; toast on success; a
  *            banner that stays for a partial failure ("98 deleted, 2 failed") with Retry
+ *   live     changes made elsewhere (src/app/model/live.ts): an edited row updates in place, a
+ *            deleted one leaves, new ones wait behind "3 new records · Show 3 new", so rows never
+ *            reorder under the cursor
  *
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
@@ -93,6 +96,7 @@ import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { LiveListNotice } from './Freshness';
 import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
 import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
@@ -439,6 +443,9 @@ function ListPageContent({
                 </Cluster>
               ) : null}
             </Stack>
+
+            {/* Changes made elsewhere: new rows wait for "Show N new", so nothing moves under the cursor. */}
+            <LiveListNotice />
 
             {result ? (
               <Banner

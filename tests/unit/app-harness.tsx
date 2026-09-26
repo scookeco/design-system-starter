@@ -7,6 +7,7 @@ import { render, type RenderResult } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 import type { ReactElement, ReactNode } from 'react';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
+import type { LiveSource } from '../../src/app/api/live';
 import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
@@ -32,22 +33,22 @@ export const testClient = () => new QueryClient({ defaultOptions: { queries: { r
 
 /** The app's providers for a hook or a component, with the mock server's current session (admin unless setRoles says otherwise). */
 export const wrapperFor =
-  (client: QueryClient, tenant: Tenant = 'acme') =>
+  (client: QueryClient, tenant: Tenant = 'acme', live?: LiveSource) =>
   ({ children }: { children: ReactNode }) => (
-    <AppProviders session={currentSession()} tenant={tenant} queryClient={client}>
+    <AppProviders session={currentSession()} tenant={tenant} queryClient={client} {...(live ? { live } : {})}>
       {children}
     </AppProviders>
   );
 
 export const renderWithApp = (
   ui: ReactElement,
-  { tenant = 'acme', client = testClient(), url = '/', role }: { tenant?: Tenant; client?: QueryClient; url?: string; role?: Role } = {},
+  { tenant = 'acme', client = testClient(), url = '/', role, live }: { tenant?: Tenant; client?: QueryClient; url?: string; role?: Role; live?: LiveSource } = {},
 ): RenderResult & { client: QueryClient; history: MemoryHistory } => {
   const history = createMemoryHistory(url);
   if (role) setRoles(role);
   return {
     ...render(
-      <AppProviders session={currentSession()} tenant={tenant} queryClient={client} history={history}>
+      <AppProviders session={currentSession()} tenant={tenant} queryClient={client} history={history} {...(live ? { live } : {})}>
         {ui}
       </AppProviders>,
     ),

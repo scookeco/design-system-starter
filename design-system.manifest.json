@@ -435,7 +435,10 @@
         "examples-list-page--saved-view-chosen",
         "examples-list-page--saved-view-modified",
         "examples-list-page--save-view-dialog",
-        "examples-list-page--columns-chosen"
+        "examples-list-page--columns-chosen",
+        "examples-list-page--live-new-records",
+        "examples-list-page--live-row-updated",
+        "examples-list-page--live-row-deleted"
       ]
     },
     {
@@ -473,7 +476,9 @@
         "examples-record-page--archive-pending",
         "examples-record-page--as-viewer-more-actions",
         "examples-record-page--as-editor-more-actions",
-        "examples-record-page--rename-forbidden"
+        "examples-record-page--rename-forbidden",
+        "examples-record-page--edited-elsewhere",
+        "examples-record-page--deleted-elsewhere"
       ]
     },
     {

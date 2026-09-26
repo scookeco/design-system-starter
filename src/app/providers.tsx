@@ -4,20 +4,24 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
+import type { LiveSource } from './api/live';
 import type { Session, Tenant } from './api/schemas';
+import { useLiveSubscription } from './model/live';
 import { SessionProvider } from './session';
 import type { UrlHistory } from './url/history';
 import { HistoryProvider } from './url/useUrlState';
 
 /**
  * The cache policy, chosen once: a query cache (not a normalized store), because this is
- * server-driven CRUD with server-side paging and filtering. Data is fresh for 30s, refetched on
- * window focus, and a failed read retries once.
+ * server-driven CRUD with server-side paging and filtering. Keeping it fresh (src/app/model/live.ts):
+ * data is fresh for 30 s, so moving between pages doesn't refetch what was just read; after that,
+ * returning to the window or coming back online refetches what's on screen. A failed read retries
+ * once. Live events, when a source is passed, patch in between.
  */
 export const createQueryClient = () =>
   new QueryClient({
     defaultOptions: {
-      queries: { staleTime: 30_000, refetchOnWindowFocus: true, retry: 1 },
+      queries: { staleTime: 30_000, refetchOnWindowFocus: true, refetchOnReconnect: true, retry: 1 },
       mutations: { retry: false },
     },
   });
@@ -33,12 +37,29 @@ export interface AppProvidersProps {
   queryClient?: QueryClient;
   /** Where URL state lives. The browser's history by default; stories and tests pass a memory history. */
   history?: UrlHistory;
+  /**
+   * Where live events come from (src/app/api/live.ts): `eventSourceLive()` in a product, the mock
+   * channel in the gallery and tests. Without one, the cache relies on focus and reconnect refetches.
+   */
+  live?: LiveSource;
   children: ReactNode;
 }
 
-export function AppProviders({ session, tenant, signedOut, queryClient, history, children }: AppProvidersProps) {
+/** Subscribes for the active workspace. Rendered inside the tenant boundary, so a switch or sign-out unsubscribes. */
+function LiveSubscription({ source }: { source: LiveSource | undefined }) {
+  useLiveSubscription(source);
+  return null;
+}
+
+export function AppProviders({ session, tenant, signedOut, queryClient, history, live, children }: AppProvidersProps) {
   const [ownClient] = useState(createQueryClient);
-  const content = history ? <HistoryProvider history={history}>{children}</HistoryProvider> : children;
+  const routed = history ? <HistoryProvider history={history}>{children}</HistoryProvider> : children;
+  const content = (
+    <>
+      <LiveSubscription source={live} />
+      {routed}
+    </>
+  );
   return (
     <QueryClientProvider client={queryClient ?? ownClient}>
       <SessionProvider session={session} tenant={tenant} signedOut={history ? <HistoryProvider history={history}>{signedOut}</HistoryProvider> : signedOut}>

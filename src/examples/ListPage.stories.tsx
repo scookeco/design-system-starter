@@ -63,3 +63,12 @@ export const SaveViewDialog: Story = { tags: ['modal-open'], args: { initialView
 /** Fewer columns, from the Columns popover: part of the URL, so part of a saved view. */
 export const ColumnsChosen: Story = { parameters: mockApi({ url: '/records?columns=owner,status,amount' }) };
 
+
+// Keeping the list fresh: another person's changes arrive through the live channel once the page
+// has loaded (mockApi({ anotherUser })). The gallery's "Another user…" toolbar pushes one on demand.
+/** Three records added elsewhere: counted, not inserted, so the rows stay put until "Show 3 new". */
+export const LiveNewRecords: Story = { parameters: mockApi({ anotherUser: [{ kind: 'add' }, { kind: 'add' }, { kind: 'add' }] }) };
+/** The first row, edited elsewhere: patched in place (no reorder), with "Updated just now by …". */
+export const LiveRowUpdated: Story = { parameters: mockApi({ anotherUser: [{ kind: 'edit' }] }) };
+/** The first row, deleted elsewhere: it leaves every cached page, and the total drops. */
+export const LiveRowDeleted: Story = { parameters: mockApi({ anotherUser: [{ kind: 'delete' }] }) };

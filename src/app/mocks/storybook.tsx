@@ -4,15 +4,20 @@
  * when the data has settled.
  */
 import { QueryClient, type QueryClient as QueryClientType } from '@tanstack/react-query';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 import type { Decorator } from '@storybook/react-vite';
+import { addons } from 'storybook/preview-api';
 import type { HttpHandler } from 'msw';
 import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
 import { AppProviders } from '../providers';
-import { createMemoryHistory } from '../url/history';
+import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
 import { aiHandlers } from './ai';
 import { handlers } from './handlers';
+import { anotherUser, mockLive, type AnotherUserChange } from './live';
+
+/** Storybook's own event for changing a global (core-events' UPDATE_GLOBALS; its module path is internal). */
+const UPDATE_GLOBALS = 'updateGlobals';
 
 /**
  * Settled: at least one query exists, nothing is fetching or mutating, and some query has an
@@ -29,10 +34,21 @@ const isSettled = (client: QueryClientType) => {
   );
 };
 
-function SettledSignal({ client }: { client: QueryClientType }) {
+/**
+ * Also plays the story's scripted changes by another user (`mockApi({ anotherUser })`), once, the
+ * first time the page's own queries settle: the page has loaded, then the colleague's change
+ * arrives. The signal stays false until they've been delivered and whatever they invalidated has
+ * refetched, so a screenshot always shows the reconciled page.
+ */
+function SettledSignal({ client, tenant, script }: { client: QueryClientType; tenant: Tenant; script: readonly AnotherUserChange[] }) {
   useEffect(() => {
+    let pending = script.length > 0;
     const update = () => {
-      document.documentElement.dataset.queriesSettled = String(isSettled(client));
+      if (pending && isSettled(client)) {
+        pending = false;
+        for (const change of script) anotherUser(tenant, change);
+      }
+      document.documentElement.dataset.queriesSettled = String(!pending && isSettled(client));
     };
     update();
     const unsubscribeQueries = client.getQueryCache().subscribe(update);
@@ -42,19 +58,49 @@ function SettledSignal({ client }: { client: QueryClientType }) {
       unsubscribeMutations();
       delete document.documentElement.dataset.queriesSettled;
     };
-  }, [client]);
+  }, [client, tenant, script]);
+  return null;
+}
+
+/** The gallery's "Another user…" toolbar: one change per pick, on the record the page shows (or the list's first row). */
+const TOOLBAR_CHANGES = ['edit', 'add', 'delete'] as const;
+type ToolbarChange = (typeof TOOLBAR_CHANGES)[number];
+const isToolbarChange = (value: unknown): value is ToolbarChange => (TOOLBAR_CHANGES as readonly unknown[]).includes(value);
+
+function ToolbarChanges({ tenant, history, pushed, onPushed }: { tenant: Tenant; history: MemoryHistory; pushed: unknown; onPushed: () => void }) {
+  const push = useEffectEvent((change: ToolbarChange) => {
+    const onRecord = /^\/records\/([^/]+)/.exec(history.location().pathname)?.[1];
+    const id = onRecord && onRecord !== 'new' ? onRecord : undefined;
+    anotherUser(tenant, change === 'add' ? { kind: 'add' } : { kind: change, ...(id ? { id } : {}) });
+    onPushed();
+  });
+  // Once per pick: the toolbar then goes back to "none", ready for the next one.
+  useEffect(() => {
+    if (isToolbarChange(pushed)) push(pushed);
+  }, [pushed]);
   return null;
 }
 
 /** Stories never retry and never go stale: a failure shows at once, and nothing refetches mid-capture. */
 const storyClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 
-function StoryProviders({ session, tenant, url, children }: { session: Session; tenant: Tenant; url: string; children: ReactNode }) {
+interface StoryProvidersProps {
+  session: Session;
+  tenant: Tenant;
+  url: string;
+  script: readonly AnotherUserChange[];
+  pushed: unknown;
+  onPushed: () => void;
+  children: ReactNode;
+}
+
+function StoryProviders({ session, tenant, url, script, pushed, onPushed, children }: StoryProvidersProps) {
   const [client] = useState(storyClient);
   const [history] = useState(() => createMemoryHistory(url));
   return (
-    <AppProviders session={session} tenant={tenant} queryClient={client} history={history}>
-      <SettledSignal client={client} />
+    <AppProviders session={session} tenant={tenant} queryClient={client} history={history} live={mockLive}>
+      <SettledSignal client={client} tenant={tenant} script={script} />
+      <ToolbarChanges tenant={tenant} history={history} pushed={pushed} onPushed={onPushed} />
       {children}
     </AppProviders>
   );
@@ -70,7 +116,14 @@ export interface MockApiParameters {
   role?: Role | Partial<Record<Tenant, Role>>;
   /** The URL the page opens at, kept in an in-memory history so the gallery's own URL is never rewritten. */
   url?: string;
+  /**
+   * Changes another person makes once the page has loaded, delivered through the live channel
+   * (in order, before the settled signal). Deterministic: the same changes at the same moment.
+   */
+  anotherUser?: readonly AnotherUserChange[];
 }
+
+const NO_SCRIPT: readonly AnotherUserChange[] = [];
 
 const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).includes(value) ? (value as Role) : 'admin';
 
@@ -80,10 +133,18 @@ const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).incl
  * server would return for it.
  */
 const withMockApi: Decorator = (Story, context) => {
-  const { tenant = 'acme', url = '/', role } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT } = (context.parameters.mockApi ?? {}) as MockApiParameters;
   setRoles(role ?? toolbarRole(context.globals.role));
   return (
-    <StoryProviders session={currentSession()} tenant={tenant} url={url}>
+    <StoryProviders
+      session={currentSession()}
+      tenant={tenant}
+      url={url}
+      script={script}
+      pushed={context.globals.anotherUser}
+      // Back to "none" (as the toolbar would), ready for the next pick.
+      onPushed={() => addons.getChannel().emit(UPDATE_GLOBALS, { globals: { anotherUser: 'none' } })}
+    >
       <Story />
     </StoryProviders>
   );

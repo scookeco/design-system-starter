@@ -13,6 +13,8 @@
  *            the field registry; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays rename dialog, delete confirmation; toasts for results
+ *   live     another person's edit patches the page in place (the version moves on); their delete
+ *            replaces the page with "This record was deleted"
  *
  * Data: the record is read from the server cache with useRecord(id); the page holds no copy of it.
  * Writes go through named mutations (src/app/model/mutations.ts), each presented its own way:
@@ -55,7 +57,9 @@ import {
   useToast,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
+import { DeletedElsewhere } from './Freshness';
 import type { RecordEntity } from '../app/api/schemas';
+import { useDeletedElsewhere } from '../app/model/live';
 import { isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
 import { isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
@@ -168,6 +172,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const [nameError, setNameError] = useState<string | undefined>();
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
+  const deletedElsewhere = useDeletedElsewhere(recordId);
 
   const addComment = (event: FormEvent) => {
     event.preventDefault();
@@ -263,6 +268,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
       </Center>
     );
   }
+
+  if (deletedElsewhere) return <DeletedElsewhere />;
 
   if (query.isError) {
     return (
