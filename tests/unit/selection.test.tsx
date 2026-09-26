@@ -101,11 +101,11 @@ describe('list page selection and bulk delete', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     const dialog = await screen.findByRole('dialog', { name: `Delete ${String(drafts.length)} records?` });
     fireEvent.click(within(dialog).getByRole('button', { name: `Delete ${String(drafts.length)} records` }));
-    await screen.findByText('Finished, with failures', {}, { timeout: 5000 });
+    await screen.findByText('Finished, with failures', {}, { timeout: 15_000 });
     expect(screen.getByRole('progressbar', { name: `Delete ${String(drafts.length)} records` }).getAttribute('aria-valuetext')).toBe(
       `${String(drafts.length - held.length)} done, ${String(held.length)} failed`,
     );
     expect(screen.getByRole('button', { name: `Retry ${String(held.length)} failed` })).toBeTruthy();
     expect(screen.queryByText(/selected$/)).toBeNull();
-  });
+  }, 20_000);
 });

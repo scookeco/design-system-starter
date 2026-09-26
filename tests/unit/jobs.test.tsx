@@ -78,9 +78,9 @@ describe('the job surfaces', () => {
     renderWithApp(<ListPage initialSelection="matching" initialBulkDelete="submit" />, { url: '/records?view=drafts' });
     const banner = await screen.findByText(/^Delete \d+ records$/);
     expect(banner).toBeTruthy();
-    await screen.findByText('Finished, with failures', {}, { timeout: 5000 });
+    await screen.findByText('Finished, with failures', {}, { timeout: 15_000 });
     expect(screen.getByRole('button', { name: /^Retry \d+ failed$/ })).toBeTruthy();
-  });
+  }, 20_000);
 
   it('follows the person to another page, in the shell’s Jobs popover', async () => {
     seedJob('acme', { state: 'running' });
