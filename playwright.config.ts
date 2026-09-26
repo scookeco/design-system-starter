@@ -30,7 +30,23 @@ export default defineConfig({
     deviceScaleFactor: 1,
     reducedMotion: 'reduce',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1024, height: 768 }, deviceScaleFactor: 1 } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1024, height: 768 },
+        deviceScaleFactor: 1,
+        // Byte-stable screenshots. By default Chromium re-rasterizes only the invalidated part of a
+        // tile when something repaints (a button leaving its pending state, a dialog opening over
+        // the page), and the antialiasing of a rounded border or a glyph edge that straddles that
+        // rect can then differ by a level or two from a full raster of the same frame. Which one a
+        // capture gets depends on paint timing, so a settled story could produce two different
+        // PNGs. Full rasters only: every capture of the same frame is the same bytes.
+        launchOptions: { args: ['--disable-partial-raster'] },
+      },
+    },
+  ],
   webServer: {
     command: `npx vite preview --outDir storybook-static --port ${String(PORT)} --strictPort`,
     url: `http://localhost:${String(PORT)}/index.json`,
