@@ -301,6 +301,14 @@ const UNIT_KINDS = new Set<ExportKind>(['component', 'primitive', 'layout']);
  * not public), components with no stories or no tokens, UI exports with no usage doc, and any
  * component whose props accept className or style.
  */
+/**
+ * Units that legitimately read no design tokens, each with the reason. Anything not listed here and
+ * reading no tokens is reported: it usually means a stylesheet is missing or bypasses the tokens.
+ */
+export const TOKENLESS_UNITS: Readonly<Record<string, string>> = {
+  VisuallyHidden: 'hides content visually with the standard clip pattern; it makes no design decisions',
+};
+
 export const manifestProblems = (manifest: Pick<Manifest, 'exports'>, publicExports: readonly string[]): string[] => {
   const problems: string[] = [];
   const listed = new Set(manifest.exports.map((e) => e.name));
@@ -310,7 +318,7 @@ export const manifestProblems = (manifest: Pick<Manifest, 'exports'>, publicExpo
   for (const e of manifest.exports) {
     if (UNIT_KINDS.has(e.kind) && !e.docs) problems.push(`${e.name}: no usage doc covers it`);
     if (e.unit && e.unit.stories.length === 0) problems.push(`${e.name}: no stories (titles ending in /${e.name})`);
-    if (e.unit && e.unit.tokens.length === 0) problems.push(`${e.name}: reads no tokens`);
+    if (e.unit && e.unit.tokens.length === 0 && !(e.name in TOKENLESS_UNITS)) problems.push(`${e.name}: reads no tokens`);
     if (UNIT_KINDS.has(e.kind) && !e.partOf && !e.unit) problems.push(`${e.name}: no entry in src/tokens/token-usage.json`);
     if (e.closedApi?.className || e.closedApi?.style) problems.push(`${e.name}: props accept className or style (use Closed<…>)`);
   }
