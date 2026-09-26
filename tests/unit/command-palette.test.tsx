@@ -106,3 +106,11 @@ describe('the app’s palette: permission filtering', () => {
     expect(rows.every((row) => /lease/i.test(row) && !row.includes('Draft'))).toBe(true);
   });
 });
+
+describe('the app’s "g then …" jumps', () => {
+  it('each names a page the palette lists, so its shortcut is registered and shown', async () => {
+    const { GO_KEYS, JUMP_ROUTES } = await import('../../src/examples/CommandMenu');
+    const listed = new Set(JUMP_ROUTES.map((r) => r.path));
+    expect(Object.keys(GO_KEYS).filter((path) => !listed.has(path))).toEqual([]);
+  });
+});

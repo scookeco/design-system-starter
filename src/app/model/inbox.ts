@@ -11,8 +11,10 @@
  * Each takes one id or many: bulk triage is the same verb.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ApiError } from '../api/client';
 import { listInbox, postTriage, type InboxItem, type InboxList, type InboxView, type TriageAction } from '../api/inbox';
-import { usePartition } from '../session';
+import { useGrant, usePartition } from '../session';
+import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { useTenant } from '../tenant';
 import type { Partition } from './keys';
 
@@ -57,14 +59,24 @@ const recount = (list: InboxList, view: InboxView, before: readonly InboxItem[],
   return counts;
 };
 
+/** Refused here, before any request (and before the optimistic patch, so a denied triage never flashes). */
+const refuseUnless = (grant: Grant) => {
+  if (!can(grant, 'workspace:read')) throw new ApiError(403, 'forbidden', DENIAL_REASONS['workspace:read']);
+};
+
 function useTriage(action: TriageAction) {
   const tenant = useTenant();
   const partition = usePartition();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [...partition, 'triageInbox', { action }],
-    mutationFn: (ids: readonly string[]) => postTriage(tenant, ids, action),
+    mutationFn: (ids: readonly string[]) => {
+      refuseUnless(grant);
+      return postTriage(tenant, ids, action);
+    },
     onMutate: async (ids) => {
+      refuseUnless(grant);
       await client.cancelQueries({ queryKey: inboxKeys.all(partition) });
       const snapshots = client.getQueriesData<InboxList>({ queryKey: inboxKeys.all(partition) });
       for (const [key, list] of snapshots) {

@@ -79,7 +79,7 @@ const jumpRoutes = (routes: readonly Route[]) => {
     return true;
   });
 };
-const JUMP_ROUTES = jumpRoutes(ROUTES);
+export const JUMP_ROUTES = jumpRoutes(ROUTES);
 
 /** One registered "g then …" shortcut. A component per jump, so each is a hook call of its own. */
 function GoShortcut({ route, keys }: { route: Route; keys: string }) {

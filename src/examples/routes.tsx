@@ -94,8 +94,8 @@ export const ROUTES: readonly Route[] = [
   // --- end AI patterns ---
   // ── B2B power features: the inbox and the admin console (titles name them in the command palette) ──
   { path: '/inbox', layout: 'shell', page: Inbox, guard: 'workspace:read', nav: '/inbox', title: 'Inbox' },
-  { path: '/admin', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
   { path: '/admin/members', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
+  { path: '/admin', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
   { path: '/admin/audit', layout: 'shell', page: Audit, guard: 'audit:read', nav: '/admin/members', title: 'Audit log' },
   // ── end B2B power features ──
 ];
