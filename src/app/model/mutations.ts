@@ -2,10 +2,12 @@
  * Writes. One named mutation per domain verb; components call these and never touch the cache.
  * The list of hooks here *is* the domain's verb list. Each one documents its presentation
  * (optimistic or pessimistic) and exactly which cache entries it patches and invalidates:
+ * Every write to one record goes through that record's write queue (src/app/model/writeQueue.ts):
+ * serialised, each sent on the latest confirmed version, the preview rebased when one fails.
  *
  *   verb               presents     patches                           invalidates
  *   renameRecord       optimistic   detail + every cached list page   detail, lists   (counts can't change)
- *                                   holding it (then rolls back)
+ *                                   holding it (rebased on failure)
  *   updateRecord       pessimistic  detail + listed copies (answer)   lists           (versioned, If-Match; a 409
  *                                   on a 409: detail := theirs                        with no field changed on
  *                                                                                     both sides is re-based once)
@@ -32,7 +34,7 @@ import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { applyChanges, compareVersions, realConflicts } from './conflicts';
 import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
-import { confirmRecord } from './writeQueue';
+import { confirmRecord, writeQueues } from './writeQueue';
 
 /**
  * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
@@ -100,21 +102,24 @@ export function useUpdateRecord(id: string) {
   const key = recordKeys.detail(partition, id);
   return useMutation({
     mutationKey: [...partition, 'updateRecord', { id }],
-    mutationFn: async ({ base, changes }: RecordEdit) => {
+    mutationFn: ({ base, changes }: RecordEdit) => {
       refuseUnless(grant, 'record:edit', client.getQueryData<RecordEntity>(key) ?? base);
-      try {
-        return await patchRecord(tenant, id, changes, base.version);
-      } catch (error) {
-        const theirs = conflictingRecord(error);
-        if (!theirs || realConflicts(compareVersions(base, applyChanges(base, changes), theirs)).length > 0) throw error;
-        return patchRecord(tenant, id, changes, theirs.version);
-      }
+      // Through the record's write queue, so it never overlaps a rename or a move; but based on the
+      // draft's version, not the latest, because catching a change made meanwhile is the point.
+      return writeQueues(client).enqueue(partition, id, {
+        label: 'Saving your changes…',
+        send: async () => {
+          try {
+            return await patchRecord(tenant, id, changes, base.version);
+          } catch (error) {
+            const theirs = conflictingRecord(error);
+            if (!theirs || realConflicts(compareVersions(base, applyChanges(base, changes), theirs)).length > 0) throw error;
+            return patchRecord(tenant, id, changes, theirs.version);
+          }
+        },
+      });
     },
-    onSuccess: (updated) => {
-      client.setQueryData(key, updated);
-      patchListedRecord(client, partition, id, () => updated);
-      return client.invalidateQueries({ queryKey: recordKeys.lists(partition) });
-    },
+    onSuccess: () => client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
     onError: (error) => {
       const theirs = conflictingRecord(error);
       if (theirs) confirmRecord(client, partition, theirs);
@@ -123,9 +128,11 @@ export function useUpdateRecord(id: string) {
 }
 
 /**
- * renameRecord: optimistic. The new name shows at once; a failure puts the previous one back,
- * unless a newer write already replaced it. Sends the version it was based on, so a stale edit
- * gets a 409 instead of silently overwriting someone else's change.
+ * renameRecord: optimistic, through the record's write queue (src/app/model/writeQueue.ts). The new
+ * name shows at once, in the detail and every listed copy; rapid renames are sent one at a time,
+ * each on the version the previous one produced, so none is lost and none 409s against another. A
+ * failure drops only this rename and replays anything queued after it on the confirmed record.
+ * A 409 means someone else changed it: the page shows their version (see conflicts.ts).
  */
 export function useRenameRecord(id: string) {
   const tenant = useTenant();
@@ -136,41 +143,21 @@ export function useRenameRecord(id: string) {
   return useMutation({
     mutationKey: [...partition, 'renameRecord', { id }],
     mutationFn: ({ name, version }: { name: string; version: number }) => {
+      // Refused before the optimistic preview, so a denied rename never flashes the new name.
       refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
-      return patchRecordName(tenant, id, name, version);
-    },
-    onMutate: async ({ name, version }) => {
-      // Refused before the optimistic patch, so a denied rename never flashes the new name.
-      refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
-      // A read in flight must not land on top of the optimistic name: not the detail, not a list.
-      await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(partition) })]);
-      const previous = client.getQueryData<RecordEntity>(key);
-      if (previous) client.setQueryData<RecordEntity>(key, { ...previous, name });
-      // Every cached list page holding this record shows the new name too (see patchListedRecord).
-      let listedName: string | undefined;
-      patchListedRecord(client, partition, id, (listed) => {
-        listedName ??= listed.name;
-        return listed.version === version ? { ...listed, name } : undefined;
+      return writeQueues(client).enqueue(partition, id, {
+        label: 'Saving the new name…',
+        apply: (record) => ({ ...record, name }),
+        send: (latest) => patchRecordName(tenant, id, name, latest),
+        fallbackVersion: version,
       });
-      return { previous, previousName: previous?.name ?? listedName };
     },
-    onError: (_error, { name, version }, context) => {
-      const current = client.getQueryData<RecordEntity>(key);
-      // Roll back only our own optimistic patch: if something newer landed, leave it.
-      if (context?.previous && current?.name === name && current.version === context.previous.version) {
-        client.setQueryData(key, context.previous);
-      }
-      const previousName = context?.previousName;
-      if (previousName !== undefined) {
-        patchListedRecord(client, partition, id, (listed) => (listed.name === name && listed.version === version ? { ...listed, name: previousName } : undefined));
-      }
-    },
-    onSuccess: (renamed) => {
-      client.setQueryData(key, renamed);
-      patchListedRecord(client, partition, id, () => renamed);
+    onMutate: async () => {
+      // A read in flight must not land on top of the preview: not the detail, not a list.
+      await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(partition) })]);
     },
     // Returning the promise keeps the mutation pending until the refetch lands. After a conflict the
-    // detail is left alone: the page says so and the person chooses when to reload.
+    // detail is left alone: the page says so and the person chooses.
     onSettled: (_data, error) =>
       Promise.all([
         isConflict(error) ? undefined : client.invalidateQueries({ queryKey: key, exact: true }),
@@ -180,8 +167,8 @@ export function useRenameRecord(id: string) {
 }
 
 /**
- * moveRecord: pessimistic. A board's "Move to…" (or a drop): the new status, versioned. Takes the
- * record per call, so one hook serves every card on a board.
+ * moveRecord: pessimistic, through the record's write queue. A board's "Move to…" (or a drop): the
+ * new status, versioned. Takes the record per call, so one hook serves every card on a board.
  */
 export function useMoveRecord() {
   const tenant = useTenant();
@@ -192,20 +179,21 @@ export function useMoveRecord() {
     mutationKey: [...partition, 'moveRecord'],
     mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => {
       refuseUnless(grant, 'record:move', client.getQueryData<RecordEntity>(recordKeys.detail(partition, record.id)));
-      return postStatus(tenant, record.id, status, record.version);
+      return writeQueues(client).enqueue(partition, record.id, {
+        label: 'Moving…',
+        send: (latest) => postStatus(tenant, record.id, status, latest),
+        fallbackVersion: record.version,
+      });
     },
-    onSuccess: (moved) => {
-      client.setQueryData(recordKeys.detail(partition, moved.id), moved);
-      patchListedRecord(client, partition, moved.id, () => moved);
-      return Promise.all([
+    onSuccess: () =>
+      Promise.all([
         client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
         client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]);
-    },
+      ]),
   });
 }
 
-/** archiveRecord: pessimistic. Nothing changes until the server says so; then lists and counts refetch. */
+/** archiveRecord: pessimistic, through the record's write queue. Nothing changes until the server says so; then lists and counts refetch. */
 export function useArchiveRecord(id: string) {
   const tenant = useTenant();
   const partition = usePartition();
@@ -215,16 +203,13 @@ export function useArchiveRecord(id: string) {
     mutationKey: [...partition, 'archiveRecord', { id }],
     mutationFn: () => {
       refuseUnless(grant, 'record:archive', client.getQueryData<RecordEntity>(recordKeys.detail(partition, id)));
-      return postArchive(tenant, id);
+      return writeQueues(client).enqueue(partition, id, { label: 'Archiving…', send: () => postArchive(tenant, id) });
     },
-    onSuccess: (archived) => {
-      client.setQueryData(recordKeys.detail(partition, id), archived);
-      patchListedRecord(client, partition, id, () => archived);
-      return Promise.all([
+    onSuccess: () =>
+      Promise.all([
         client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
         client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]);
-    },
+      ]),
   });
 }
 

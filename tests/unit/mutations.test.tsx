@@ -9,6 +9,7 @@ import { isConflict, useArchiveRecord, useBulkDeleteRecords, useCreateRecord, us
 import { useAccount, useRecord, useRecordCounts, useRecordList } from '../../src/app/model/queries';
 import { AccountRef } from '../../src/app/registries/refs';
 import { db } from '../../src/app/mocks/db';
+import { anotherUser } from '../../src/app/mocks/live';
 import { seedRecords } from '../../src/app/mocks/seed';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -85,7 +86,9 @@ describe('renameRecord (optimistic)', () => {
 
   it('reports a stale write as a conflict, leaving the detail for the person to reload', async () => {
     const { result, cached } = await setup(() => useRenameRecord(ID));
-    result.current.hook.mutate({ name: 'Stale', version: original.version - 1 });
+    // Someone else saves first, and this client never hears about it: its latest version is stale.
+    anotherUser('acme', { kind: 'edit', id: ID, changes: { name: 'Theirs' }, silent: true });
+    result.current.hook.mutate({ name: 'Stale', version: original.version });
     await waitFor(() => expect(result.current.hook.isError).toBe(true));
     expect(isConflict(result.current.hook.error)).toBe(true);
     expect(cached()?.name).toBe(original.name);

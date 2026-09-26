@@ -476,6 +476,7 @@
         "examples-record-page--files-section",
         "examples-record-page--rename-pending",
         "examples-record-page--rename-succeeded",
+        "examples-record-page--renames-queued",
         "examples-record-page--rename-failed-rolled-back",
         "examples-record-page--rename-conflict",
         "examples-record-page--rename-conflict-with-theirs",

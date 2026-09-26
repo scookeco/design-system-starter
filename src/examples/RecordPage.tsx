@@ -18,7 +18,8 @@
  *
  * Data: the record is read from the server cache with useRecord(id); the page holds no copy of it.
  * Writes go through named mutations (src/app/model/mutations.ts), each presented its own way:
- *   Rename   optimistic: the title changes at once ("Saving…"); a failure restores the old name
+ *   Rename   optimistic, through the record's write queue: the title changes at once ("Saving…",
+ *            or "Saving 2 changes…" when several are queued); a failure restores the old name
  *            and says so in a toast that stays; the typed name is kept for another try.
  *            A 409 (someone else changed it) shows the ConflictPanel when the server sent its
  *            version (yours and theirs; Keep mine or Take theirs), or a Banner with Reload.
@@ -62,6 +63,7 @@ import { ExampleShell } from './ExampleShell';
 import { DeletedElsewhere } from './Freshness';
 import type { RecordEntity } from '../app/api/schemas';
 import { useDeletedElsewhere } from '../app/model/live';
+import { usePendingWrites } from '../app/model/writeQueue';
 import { conflictingRecord, isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
 import { isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
@@ -133,8 +135,8 @@ const SECTIONS: readonly { section: RecordSection; label: string }[] = [
 /** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
 const sectionHref = (record: RecordEntity, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
 
-/** A write to start on mount, so the gallery and tests can show each mutation state. */
-export type RecordPageAction = { kind: 'rename'; name: string } | { kind: 'archive' };
+/** A write to start on mount, so the gallery and tests can show each mutation state. Several names: renamed in quick succession. */
+export type RecordPageAction = { kind: 'rename'; name: string | readonly string[] } | { kind: 'archive' };
 
 export interface RecordPageProps {
   /** The record's id, from the route (/records/:id). */
@@ -177,6 +179,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
   const deletedElsewhere = useDeletedElsewhere(recordId);
+  // Every write queued or in flight for this record, from any surface: the header says so.
+  const pending = usePendingWrites(recordId);
   const navigate = useNavigate();
   /** The record as it was when the rename was sent: the base a conflict is compared against. */
   const [renameBase, setRenameBase] = useState<RecordEntity | undefined>();
@@ -254,8 +258,11 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
     if (!initialAction || started.current) return;
     started.current = true;
     if (initialAction.kind === 'rename') {
-      setNameDraft(initialAction.name);
-      submitRename(initialAction.name);
+      const names = typeof initialAction.name === 'string' ? [initialAction.name] : initialAction.name;
+      for (const name of names) {
+        setNameDraft(name);
+        submitRename(name);
+      }
     } else archiveRecord();
   });
   const loaded = query.isSuccess;
@@ -385,7 +392,11 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
               {isOnLegalHold(record) ? <Badge tone="warning">Legal hold</Badge> : null}
             </Cluster>
           }
-          description={rename.isPending ? 'Saving the new name…' : `Owned by ${ownerName ?? '…'} · updated ${format.relative(record.updatedAt)}`}
+          description={
+            pending.length > 1
+              ? `Saving ${format.number(pending.length)} changes…`
+              : (pending[0]?.label ?? (rename.isPending ? 'Saving the new name…' : `Owned by ${ownerName ?? '…'} · updated ${format.relative(record.updatedAt)}`))
+          }
           actions={
             <>
               <Button variant="secondary" disabled={archive.isPending}>

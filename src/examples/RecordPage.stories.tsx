@@ -24,6 +24,15 @@ export const FilesSection: Story = { args: { initialSection: 'files' } };
 /** Optimistic rename, in flight: the new name shows at once, with "Saving the new name…". */
 export const RenamePending: Story = { tags: ['busy'], args: rename, parameters: mswOverrides(hold('patch', '/records/:id')) };
 export const RenameSucceeded: Story = { args: rename };
+/**
+ * Two renames in quick succession, the first held on the wire: the write queue sends one at a time,
+ * the title shows the latest, and the header says how many changes are pending.
+ */
+export const RenamesQueued: Story = {
+  tags: ['busy'],
+  args: { initialAction: { kind: 'rename', name: ['Master cleaning agreement 2027', 'Master cleaning agreement 2028'] } },
+  parameters: mswOverrides(hold('patch', '/records/:id')),
+};
 /** The server refused: the old name is back, and a toast that stays says so. */
 export const RenameFailedRolledBack: Story = { args: rename, parameters: mswOverrides(fail('patch', '/records/:id')) };
 /** Someone else changed the record first: a 409, shown as a Banner with Reload. */
