@@ -5,6 +5,15 @@
  * History is a product decision, made per write:
  *   push     deliberate navigation (a tab, a page): Back returns to where you were
  *   replace  a refinement of where you are (a filter, a sort, debounced search): Back skips it
+ *
+ * The policy, as the example app applies it:
+ *   push      open a record, a section of it, the edit form (links); a list tab, page or display;
+ *             choosing a saved view
+ *   replace   search (once typing pauses), filters, sort, columns; a default applied to a bare URL
+ *   neither   saving a form (the page stays; its draft is cleared), a live update, an undo
+ * Back (a pop) restores what the person left: a list's scroll and focus on the row they opened
+ * (src/app/url/restoration.ts). A dirty form holds in-app navigation until the person decides
+ * (useNavigationGuard, below).
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { browserHistory, type UrlHistory } from './history';
@@ -23,7 +32,8 @@ export function HistoryProvider({ history, children }: { history: UrlHistory; ch
 }
 
 let defaultHistory: UrlHistory | undefined;
-const useHistory = () => {
+/** The history URL state reads and writes: the provided one, or the browser's. */
+export const useHistory = () => {
   const history = useContext(HistoryContext);
   return history ?? (defaultHistory ??= browserHistory());
 };

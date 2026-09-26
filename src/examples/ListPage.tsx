@@ -40,7 +40,8 @@
  *
  * URL: the view, search, filters, sort, page, display, columns and saved view live in the query
  * string (useUrlState), so any view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
- * debounced search is a refinement (replace). The half-typed search stays out of the URL.
+ * debounced search is a refinement (replace). The half-typed search stays out of the URL. Opening a
+ * row is a push; Back to the list restores its scroll and puts focus on that row (useListRestoration).
  *
  * Selection belongs to one filter: change the search, a filter or the view and it clears.
  */
@@ -97,6 +98,7 @@ import { STATUS } from '../app/model/status';
 import { undoSettings } from '../app/model/undo';
 import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
+import { useListRestoration } from '../app/url/restoration';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
@@ -200,6 +202,8 @@ function ListPageContent({
   const list = useRecordList(query);
   const counts = useRecordCounts({ q: query.q, status: query.status });
   const commitSearch = useCallback((q: string) => nav.replace({ q, page: 1 }), [nav]);
+  // Back from a record: the list scrolls to where it was and focus returns to the row that was opened.
+  const restoration = useListRestoration(list.isSuccess);
   const [searchText, setSearchText] = useDebouncedUrlText(url.q, commitSearch);
 
   const [filtersOpen, setFiltersOpen] = useState(initialFiltersOpen);
@@ -579,6 +583,7 @@ function ListPageContent({
                 allowMove={can('record:move')}
                 movingId={move.isPending ? move.variables.record.id : undefined}
                 onMove={moveRecord}
+                onOpen={restoration.remember}
               />
             ) : (
               <Table caption="Records" hideCaption maxHeight="md">
@@ -618,7 +623,9 @@ function ListPageContent({
                         />
                       </TableCell>
                       <TableCell rowHeader>
-                        <Link href={`/records/${row.id}`}>{row.name}</Link>
+                        <Link href={`/records/${row.id}`} onClick={(event) => restoration.remember(event.currentTarget)}>
+                          {row.name}
+                        </Link>
                       </TableCell>
                       {/* Joined by id at render: the row holds ids, the people and account caches hold the names. */}
                       {shown.has('owner') ? (
