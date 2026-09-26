@@ -12,8 +12,8 @@
  *                      the screen below remounts, so selections and drafts stay behind
  *   permission change  the old scope's partition is dropped: a narrower role never reads what a
  *                      broader one cached, and nothing stale is kept for when access comes back
- *   sign out           every query and mutation is cancelled, unsent writes are dropped, and the whole
- *                      cache cleared, before the signed-out screen renders; nothing of one person's is
+ *   sign out           every query and mutation is cancelled, unsent writes and stored drafts are
+ *                      dropped, and the whole cache cleared, before the signed-out screen renders; nothing of one person's is
  *                      left for the next
  */
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,6 +22,7 @@ import { deleteSession, getSession } from './api/session';
 import type { Capability, Membership, Session, Tenant } from './api/schemas';
 import type { Partition } from './model/keys';
 import { can, DENIAL_REASONS, type Grant } from './model/permissions';
+import { draftStorage } from './model/drafts';
 import { writeQueues } from './model/writeQueue';
 import { TenantProvider, useTenant } from './tenant';
 
@@ -89,6 +90,8 @@ export function SessionProvider({ session: given, tenant: givenTenant, signedOut
     // Clear first, so nothing private survives even if the server call fails. Writes not yet sent
     // (queued behind another, or held in an undo window) are dropped: never sent under the next session.
     writeQueues(client).cancelUnsent();
+    // Drafts are private too: none is left on the device for the next person.
+    draftStorage.clearAll();
     await client.cancelQueries();
     client.getMutationCache().clear();
     client.clear();

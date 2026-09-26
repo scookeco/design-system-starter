@@ -9,6 +9,7 @@ import type { Decorator } from '@storybook/react-vite';
 import { addons } from 'storybook/preview-api';
 import type { HttpHandler } from 'msw';
 import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
+import { draftStorage } from '../model/drafts';
 import { AppProviders } from '../providers';
 import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
@@ -40,20 +41,31 @@ const isSettled = (client: QueryClientType) => {
  * arrives. The signal stays false until they've been delivered and whatever they invalidated has
  * refetched, so a screenshot always shows the reconciled page.
  */
+/** How long the page must stay settled before a scripted change lands. */
+const SCRIPT_QUIET_MS = 150;
+
 function SettledSignal({ client, tenant, script }: { client: QueryClientType; tenant: Tenant; script: readonly AnotherUserChange[] }) {
   useEffect(() => {
     let pending = script.length > 0;
+    let quiet: ReturnType<typeof setTimeout> | undefined;
+    const play = () => {
+      quiet = undefined;
+      if (!pending || !isSettled(client)) return;
+      pending = false;
+      for (const change of script) anotherUser(tenant, change);
+      update();
+    };
     const update = () => {
-      if (pending && isSettled(client)) {
-        pending = false;
-        for (const change of script) anotherUser(tenant, change);
-      }
+      // The script waits for a quiet moment, not the first settle: a page that loads in stages (the
+      // record, then the form's owners and accounts) must be fully on screen before the change lands.
+      if (pending && isSettled(client) && !quiet) quiet = setTimeout(play, SCRIPT_QUIET_MS);
       document.documentElement.dataset.queriesSettled = String(!pending && isSettled(client));
     };
     update();
     const unsubscribeQueries = client.getQueryCache().subscribe(update);
     const unsubscribeMutations = client.getMutationCache().subscribe(update);
     return () => {
+      clearTimeout(quiet);
       unsubscribeQueries();
       unsubscribeMutations();
       delete document.documentElement.dataset.queriesSettled;
@@ -165,6 +177,8 @@ export const mockApiMeta = {
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
   beforeEach: () => {
     resetDb();
+    // Drafts autosave to this browser's storage: every story starts with none.
+    draftStorage.clearAll();
   },
 };
 

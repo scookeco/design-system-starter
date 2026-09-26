@@ -28,10 +28,89 @@ const useHistory = () => {
   return history ?? (defaultHistory ??= browserHistory());
 };
 
-/** Navigate to a path: push (a new entry) by default, replace to rewrite this one. */
+/**
+ * Navigation guards, per history: while a guard is armed (a form with unsaved changes), in-app
+ * navigation (links through AppLink, useNavigate) is held and handed to the guard, which asks the
+ * person, then proceeds or stays. Back and Forward aren't intercepted: the browser has already
+ * moved, so the draft's autosave (src/app/model/drafts.ts) is what keeps the work.
+ */
+interface Guard {
+  armed: number;
+  pending: { href: string; replace: boolean } | undefined;
+  listeners: Set<() => void>;
+}
+const guards = new WeakMap<UrlHistory, Guard>();
+const guardFor = (history: UrlHistory): Guard => {
+  let guard = guards.get(history);
+  if (!guard) {
+    guard = { armed: 0, pending: undefined, listeners: new Set() };
+    guards.set(history, guard);
+  }
+  return guard;
+};
+const notifyGuard = (guard: Guard) => guard.listeners.forEach((listener) => listener());
+
+/** Navigate to a path: push (a new entry) by default, replace to rewrite this one. Held while a guard is armed. */
 export function useNavigate() {
   const history = useHistory();
-  return useCallback((href: string, { replace = false }: { replace?: boolean } = {}) => (replace ? history.replace(href) : history.push(href)), [history]);
+  return useCallback(
+    (href: string, { replace = false }: { replace?: boolean } = {}) => {
+      const guard = guardFor(history);
+      if (guard.armed > 0) {
+        guard.pending = { href, replace };
+        notifyGuard(guard);
+        return;
+      }
+      if (replace) history.replace(href);
+      else history.push(href);
+    },
+    [history],
+  );
+}
+
+export interface NavigationGuard {
+  /** Where the person tried to go, while the guard asks. */
+  pending: string | undefined;
+  /** Go there after all (the guard stands down first). */
+  proceed: () => void;
+  /** Stay here. */
+  stay: () => void;
+}
+
+/** Hold in-app navigation while `when` (unsaved changes), and say where the person tried to go. */
+export function useNavigationGuard(when: boolean): NavigationGuard {
+  const history = useHistory();
+  const guard = guardFor(history);
+  useEffect(() => {
+    if (!when) return;
+    guard.armed += 1;
+    return () => {
+      guard.armed -= 1;
+    };
+  }, [guard, when]);
+  const pending = useSyncExternalStore(
+    useCallback(
+      (listener: () => void) => {
+        guard.listeners.add(listener);
+        return () => guard.listeners.delete(listener);
+      },
+      [guard],
+    ),
+    () => guard.pending?.href,
+  );
+  const stay = useCallback(() => {
+    guard.pending = undefined;
+    notifyGuard(guard);
+  }, [guard]);
+  const proceed = useCallback(() => {
+    const target = guard.pending;
+    guard.pending = undefined;
+    notifyGuard(guard);
+    if (!target) return;
+    if (target.replace) history.replace(target.href);
+    else history.push(target.href);
+  }, [guard, history]);
+  return { pending, proceed, stay };
 }
 
 /** The current path, following Back, Forward and every push. */

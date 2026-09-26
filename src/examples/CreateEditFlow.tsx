@@ -27,6 +27,12 @@
  * changed the record meanwhile, a change to different fields is merged on its own; a change to the
  * same field shows the ConflictPanel: yours and theirs side by side, Keep mine (overwrite), Take
  * theirs, or a choice per field.
+ *
+ * Drafts (src/app/model/drafts.ts): the form owns its draft, never the cache, with the version it
+ * started from. It's autosaved on this device and restored on return ("Your unsaved changes are
+ * back"); while it's dirty, leaving through a link asks first and closing the tab gets the
+ * browser's prompt. If the record moves on underneath an edit (a refetch, a live event), a clean
+ * form follows it quietly; a dirty one keeps every keystroke and warns, with Review changes.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import {
@@ -54,7 +60,11 @@ import type { Person, RecordEntity } from '../app/api/schemas';
 import type { RecordChanges } from '../app/api/records';
 import { changesBetween } from '../app/model/conflicts';
 import { conflictingRecord, useAddPerson, useCreateRecord, useUpdateRecord } from '../app/model/mutations';
+import { useBeforeUnload, useDraft } from '../app/model/drafts';
+import { useLiveActivity } from '../app/model/live';
 import { useAccounts, usePeople, useRecord } from '../app/model/queries';
+import { usePersonName } from '../app/registries/refs';
+import { useNavigate, useNavigationGuard } from '../app/url/useUrlState';
 import { FieldInput } from '../app/registries/fields';
 import { CREATE_FIELDS } from '../app/registries/recordFields';
 import { useTenant } from '../app/tenant';
@@ -62,6 +72,7 @@ import { WORKSPACES } from '../app/workspaces';
 import { usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
 import { ConflictPanel } from './ConflictPanel';
+import { ChangedWhileEditingBanner, RestoredDraftBanner, UnsavedChangesDialog } from './Drafts';
 import { gated, PermissionNote } from './Permission';
 
 export interface RecordDraft {
@@ -117,6 +128,8 @@ export interface CreateEditFlowProps {
   /** Submit once the form's data has loaded (gallery and tests). */
   initialSubmitting?: boolean;
   initialQuickCreateOpen?: boolean;
+  /** Try to leave for this path once loaded, as a link would (gallery and tests: the unsaved-changes guard). */
+  initialLeave?: string;
 }
 
 const FORM_ID = 'new-record-form';
@@ -255,13 +268,19 @@ function AddPersonControl({ initialOpen, onAdded }: { initialOpen: boolean; onAd
   );
 }
 
-function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmitting = false, initialQuickCreateOpen = false }: CreateEditFlowProps) {
+function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmitting = false, initialQuickCreateOpen = false, initialLeave }: CreateEditFlowProps) {
   const tenant = useTenant();
   const currency = WORKSPACES[tenant].currency;
   const people = usePeople();
   const accounts = useAccounts();
   const createRecord = useCreateRecord();
-  const [draft, setDraft] = useState<RecordDraft>({ ...EMPTY, ...initialDraft });
+  // The form owns its draft (never the cache): autosaved on this device, restored on return.
+  const pristine = () => ({ ...EMPTY, ...initialDraft });
+  const owned = useDraft<RecordDraft>('record:new', { base: undefined, values: pristine() }, pristine);
+  const draft = owned.values;
+  const guard = useNavigationGuard(owned.dirty);
+  useBeforeUnload(owned.dirty);
+  useLeaveOnLoad(initialLeave, people.isSuccess);
   const validation = useFormValidation(draft, 'create', initialSubmitted);
   const { shown, touch } = validation;
   const [created, setCreated] = useState<{ id: string; name: string } | undefined>();
@@ -270,7 +289,7 @@ function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmi
   const format = useFormat();
   const fieldContext = { format, currency, people: people.data ?? [], accounts: accounts.data ?? [] };
 
-  const set = <K extends keyof RecordDraft>(key: K, value: RecordDraft[K]) => setDraft((current) => ({ ...current, [key]: value }));
+  const set = <K extends keyof RecordDraft>(key: K, value: RecordDraft[K]) => owned.set((current) => ({ ...current, [key]: value }));
 
   const submitDraft = () => {
     if (createRecord.isPending) return;
@@ -288,6 +307,8 @@ function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmi
       {
         onSuccess: (record) => {
           idempotency.current = undefined;
+          // Saved: the draft is done, so the guard stands down and storage is cleared.
+          owned.reset(undefined, pristine());
           setCreated({ id: record.id, name: record.name });
         },
       },
@@ -328,6 +349,8 @@ function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmi
       <Center max="sm" gutters="lg">
         <Stack gap="lg">
           <PageHeader title="New record" description="Records start as drafts. Nothing is sent until you choose to." />
+
+          {owned.restoredAt !== undefined ? <RestoredDraftBanner savedAt={owned.restoredAt} onDiscard={owned.discard} /> : null}
 
           {created ? (
             <Banner tone="success" action={<Link href={`/records/${created.id}`}>Open the record</Link>}>
@@ -413,8 +436,20 @@ function CreateRecordFlow({ initialDraft, initialSubmitted = false, initialSubmi
           </Stack>
         </Stack>
       </Center>
+      <UnsavedChangesDialog guard={guard} onDiscard={owned.discard} />
     </ExampleShell>
   );
+}
+
+/** Gallery and tests: try to navigate away once the form has loaded, as a link would. */
+function useLeaveOnLoad(href: string | undefined, loaded: boolean) {
+  const navigate = useNavigate();
+  const leave = useEffectEvent(() => {
+    if (href) navigate(href);
+  });
+  useEffect(() => {
+    if (loaded) leave();
+  }, [loaded]);
 }
 
 /** A record's editable fields as form values (money in major units, as a person would type it). */
@@ -432,13 +467,7 @@ export const recordFromDraft = (base: RecordEntity, draft: RecordDraft): RecordE
   amount: { ...base.amount, minor: Math.round(Number(draft.amount) * 10 ** currencyDigits(base.amount.currency)) },
 });
 
-/** The edit in progress: the version it started from, and the values as typed. */
-interface EditDraft {
-  base: RecordEntity;
-  values: RecordDraft;
-}
-
-function EditRecordFlow({ recordId, initialDraft, initialSubmitting = false, initialSubmitted = false, initialQuickCreateOpen = false }: CreateEditFlowProps & { recordId: string }) {
+function EditRecordFlow({ recordId, initialDraft, initialSubmitting = false, initialSubmitted = false, initialQuickCreateOpen = false, initialLeave }: CreateEditFlowProps & { recordId: string }) {
   const record = useRecord(recordId);
   const title = record.data?.name ?? 'Record';
   return (
@@ -471,6 +500,7 @@ function EditRecordFlow({ recordId, initialDraft, initialSubmitting = false, ini
           initialSubmitting={initialSubmitting}
           initialSubmitted={initialSubmitted}
           initialQuickCreateOpen={initialQuickCreateOpen}
+          initialLeave={initialLeave}
         />
       )}
     </EditShell>
@@ -493,26 +523,47 @@ function EditShell({ recordId, title, children }: { recordId: string; title: str
 }
 
 interface EditRecordFormProps extends Omit<CreateEditFlowProps, 'recordId'> {
+  /** The record as the cache holds it now: it moves on when someone else's change arrives. */
   record: RecordEntity;
 }
 
-function EditRecordForm({ record, initialDraft, initialSubmitting = false, initialSubmitted = false, initialQuickCreateOpen = false }: EditRecordFormProps) {
+/** A draft's untouched values: the fields of the record it started from. */
+const pristineFor = (base: RecordEntity | undefined) => (base ? draftFromRecord(base) : EMPTY);
+
+function EditRecordForm({ record, initialDraft, initialSubmitting = false, initialSubmitted = false, initialQuickCreateOpen = false, initialLeave }: EditRecordFormProps) {
   const tenant = useTenant();
   const currency = WORKSPACES[tenant].currency;
   const people = usePeople();
   const accounts = useAccounts();
   const update = useUpdateRecord(record.id);
   const format = useFormat();
-  const [draft, setDraft] = useState<EditDraft>(() => ({ base: record, values: { ...draftFromRecord(record), ...initialDraft } }));
+  // The form owns the draft and the version it started from; the cache keeps only confirmed data.
+  const owned = useDraft<RecordDraft>(`record:${record.id}`, { base: record, values: { ...draftFromRecord(record), ...initialDraft } }, pristineFor);
+  const base = owned.base ?? record;
+  const draft = { base, values: owned.values };
+  const guard = useNavigationGuard(owned.dirty);
+  useBeforeUnload(owned.dirty);
+  useLeaveOnLoad(initialLeave, people.isSuccess);
   const validation = useFormValidation(draft.values, 'edit', initialSubmitted);
   const { shown, touch } = validation;
   const [saved, setSaved] = useState(false);
-  const theirs = conflictingRecord(update.error);
+  const [reviewing, setReviewing] = useState(false);
+  const live = useLiveActivity();
+  const changedBy = usePersonName(live.lastBy ?? '');
   const fieldContext = { format, currency, people: people.data ?? [], accounts: accounts.data ?? [] };
+
+  // A background refetch or a live event moved the record on while the form was open.
+  const movedOn = record.version > base.version;
+  // Nothing typed yet: follow the record quietly. Something typed: never overwrite it; warn instead.
+  const { reset } = owned;
+  useEffect(() => {
+    if (movedOn && !owned.dirty) reset(record, draftFromRecord(record));
+  }, [movedOn, owned.dirty, record, reset]);
+  const theirs = conflictingRecord(update.error) ?? (reviewing && movedOn ? record : undefined);
 
   const set = <K extends keyof RecordDraft>(key: K, value: RecordDraft[K]) => {
     setSaved(false);
-    setDraft((current) => ({ ...current, values: { ...current.values, [key]: value } }));
+    owned.set((current) => ({ ...current, [key]: value }));
   };
 
   /** Send changes based on a version: the draft's base, or theirs after a conflict. */
@@ -521,8 +572,9 @@ function EditRecordForm({ record, initialDraft, initialSubmitting = false, initi
       { base, changes },
       {
         onSuccess: (updated) => {
-          // The edit is saved: the draft starts again from the server's answer.
-          setDraft({ base: updated, values: draftFromRecord(updated) });
+          // The edit is saved: the draft starts again from the server's answer (and leaves storage).
+          owned.reset(updated, draftFromRecord(updated));
+          setReviewing(false);
           setSaved(true);
         },
       },
@@ -547,6 +599,10 @@ function EditRecordForm({ record, initialDraft, initialSubmitting = false, initi
     <Stack gap="lg">
       <PageHeader title="Edit record" description={`Changes to ${draft.base.name} are saved when you choose Save changes.`} />
 
+      {owned.restoredAt !== undefined ? <RestoredDraftBanner savedAt={owned.restoredAt} onDiscard={owned.discard} /> : null}
+
+      {movedOn && owned.dirty && !theirs ? <ChangedWhileEditingBanner by={changedBy} onReview={() => setReviewing(true)} /> : null}
+
       {saved ? (
         <Banner tone="success" action={<Link href={`/records/${draft.base.id}`}>Open the record</Link>}>
           Your changes were saved.
@@ -558,11 +614,13 @@ function EditRecordForm({ record, initialDraft, initialSubmitting = false, initi
           base={draft.base}
           mine={recordFromDraft(draft.base, draft.values)}
           theirs={theirs}
+          by={conflictingRecord(update.error) ? undefined : changedBy}
           pending={update.isPending}
           onResolve={(changes) => send(theirs, changes)}
           onTakeTheirs={() => {
             update.reset();
-            setDraft({ base: theirs, values: draftFromRecord(theirs) });
+            setReviewing(false);
+            owned.reset(theirs, draftFromRecord(theirs));
           }}
         />
       ) : update.isError ? (
@@ -622,6 +680,7 @@ function EditRecordForm({ record, initialDraft, initialSubmitting = false, initi
           </Button>
         </Cluster>
       </Stack>
+      <UnsavedChangesDialog guard={guard} onDiscard={owned.discard} />
     </Stack>
   );
 }

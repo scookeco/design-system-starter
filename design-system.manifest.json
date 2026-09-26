@@ -340,7 +340,10 @@
         "examples-create-and-edit--edit-saved",
         "examples-create-and-edit--edit-merged-with-theirs",
         "examples-create-and-edit--edit-conflict",
-        "examples-create-and-edit--edit-conflict-per-field"
+        "examples-create-and-edit--edit-conflict-per-field",
+        "examples-create-and-edit--draft-restored",
+        "examples-create-and-edit--unsaved-changes-guard",
+        "examples-create-and-edit--edit-changed-while-editing"
       ]
     },
     {

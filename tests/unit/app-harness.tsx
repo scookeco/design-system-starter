@@ -10,6 +10,7 @@ import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 import type { LiveSource } from '../../src/app/api/live';
 import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
+import { draftStorage } from '../../src/app/model/drafts';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
 import { aiHandlers } from '../../src/app/mocks/ai';
 import { handlers } from '../../src/app/mocks/handlers';
@@ -23,6 +24,7 @@ export const setupMockApi = () => {
   beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
   beforeEach(() => {
     resetDb();
+    draftStorage.clearAll();
     configureMocks({ latencyMs: 0, failureRate: 0, random: Math.random });
   });
   afterEach(() => server.resetHandlers());
