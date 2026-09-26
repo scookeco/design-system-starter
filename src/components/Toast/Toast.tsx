@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { Toast as ToastPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
+import { Button } from '../Button/Button';
 import { Icon, type IconName } from '../Icon/Icon';
 import './Toast.css';
 
@@ -13,6 +14,19 @@ const TONE_ICON: Record<ToastTone, IconName> = {
   info: 'info',
   neutral: 'info',
 };
+
+/** The one action a toast can offer, such as Undo. Choosing it closes the toast. */
+export interface ToastAction {
+  /** The button's text: a short verb ("Undo"). */
+  label: string;
+  /**
+   * How to do the same without the toast, for people who can't reach it before it goes ("Find it
+   * under Archived to restore it"). Announced with the toast; required, because a toast can close
+   * before a keyboard or screen reader user gets to its button.
+   */
+  altText: string;
+  onAction: () => void;
+}
 
 export interface ToastProps extends EscapeHatch {
   /** Short message, always visible. Required. */
@@ -27,10 +41,16 @@ export interface ToastProps extends EscapeHatch {
   duration?: number;
   /** Label of the dismiss button. */
   closeLabel?: string;
+  /**
+   * One action, such as Undo for a reversible change ("Record archived · Undo"). Give the toast a
+   * duration long enough to reach it (the undo window), and keep the same way out elsewhere on the
+   * page (altText says where).
+   */
+  action?: ToastAction;
 }
 
 /** Declarative toast. Render inside a ToastProvider, or use the useToast() hook. */
-export function Toast({ title, description, tone = 'neutral', closeLabel = 'Dismiss', UNSAFE_className, UNSAFE_style, ...rootProps }: ToastProps) {
+export function Toast({ title, description, tone = 'neutral', closeLabel = 'Dismiss', action, UNSAFE_className, UNSAFE_style, ...rootProps }: ToastProps) {
   const urgent = tone === 'danger' || tone === 'warning';
   return (
     <ToastPrimitive.Root
@@ -47,6 +67,13 @@ export function Toast({ title, description, tone = 'neutral', closeLabel = 'Dism
         <ToastPrimitive.Title className="toast__title">{title}</ToastPrimitive.Title>
         {description ? <ToastPrimitive.Description className="toast__description">{description}</ToastPrimitive.Description> : null}
       </div>
+      {action ? (
+        <ToastPrimitive.Action asChild altText={action.altText}>
+          <Button variant="secondary" size="sm" onClick={action.onAction}>
+            {action.label}
+          </Button>
+        </ToastPrimitive.Action>
+      ) : null}
       <ToastPrimitive.Close className="toast__close" aria-label={closeLabel}>
         <Icon name="close" />
       </ToastPrimitive.Close>

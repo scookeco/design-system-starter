@@ -28,13 +28,20 @@
  *            selection, and Delete last, guarded by the canDelete predicate
  *   overlays create dialog; bulk delete confirmation naming the count; toast on success; a
  *            banner that stays for a partial failure ("98 deleted, 2 failed") with Retry
+ *   jobs     "Delete all N matching" runs as a job (src/app/model/jobs.ts): JobBanner shows its
+ *            truthful progress (queued, 20 of 59, done with 2 failed, stopped, cancelled) with
+ *            Cancel, Retry failed and Dismiss; the shell's Jobs popover follows it on every page
+ *   live     changes made elsewhere (src/app/model/live.ts): an edited row updates in place, a
+ *            deleted one leaves, new ones wait behind "3 new records · Show 3 new", so rows never
+ *            reorder under the cursor
  *
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
  *
  * URL: the view, search, filters, sort, page, display, columns and saved view live in the query
  * string (useUrlState), so any view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
- * debounced search is a refinement (replace). The half-typed search stays out of the URL.
+ * debounced search is a refinement (replace). The half-typed search stays out of the URL. Opening a
+ * row is a push; Back to the list restores its scroll and puts focus on that row (useListRestoration).
  *
  * Selection belongs to one filter: change the search, a filter or the view and it clears.
  */
@@ -70,8 +77,8 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { BulkDeleteResult, MovableStatus, RecordStatus, SortKey } from '../app/api/schemas';
-import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
+import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
+import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, useStartBulkDelete, type BulkSelection } from '../app/model/mutations';
 import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
@@ -88,11 +95,15 @@ import {
 } from '../app/model/selection';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { undoSettings } from '../app/model/undo';
 import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
+import { useListRestoration } from '../app/url/restoration';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { LiveListNotice } from './Freshness';
+import { JobBanner } from './Jobs';
 import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
 import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
@@ -120,6 +131,8 @@ export interface ListPageProps {
   initialBulkDelete?: 'confirm' | 'submit';
   /** Open a saved-view dialog on first render (gallery and tests). */
   initialViewDialog?: SavedViewDialog;
+  /** Move this record to this status once rows load, as the board's Move to… would (gallery and tests). */
+  initialMove?: { id: string; status: MovableStatus };
 }
 
 /**
@@ -148,6 +161,7 @@ export function ListPage(props: ListPageProps) {
               setSelection(EMPTY_SELECTION);
               setResult(outcome.failed.length > 0 ? outcome : undefined);
             }}
+            onJobStarted={() => setSelection(EMPTY_SELECTION)}
           />
         ) : undefined
       }
@@ -169,6 +183,7 @@ function ListPageContent({
   initialFiltersOpen = false,
   initialSelection,
   initialViewDialog,
+  initialMove,
   selection,
   onSelectionChange,
   result,
@@ -187,6 +202,8 @@ function ListPageContent({
   const list = useRecordList(query);
   const counts = useRecordCounts({ q: query.q, status: query.status });
   const commitSearch = useCallback((q: string) => nav.replace({ q, page: 1 }), [nav]);
+  // Back from a record: the list scrolls to where it was and focus returns to the row that was opened.
+  const restoration = useListRestoration(list.isSuccess);
   const [searchText, setSearchText] = useDebouncedUrlText(url.q, commitSearch);
 
   const [filtersOpen, setFiltersOpen] = useState(initialFiltersOpen);
@@ -212,9 +229,11 @@ function ListPageContent({
   // Gallery and tests: make the initial selection once the rows are here.
   const selectedInitially = useRef(false);
   const selectOnLoad = useEffectEvent(() => {
-    if (!initialSelection || selectedInitially.current) return;
+    if (selectedInitially.current) return;
     selectedInitially.current = true;
-    onSelectionChange(initialSelection === 'page' ? togglePage(EMPTY_SELECTION, rows) : selectMatching(filter, total));
+    const moving = initialMove ? rows.find((r) => r.id === initialMove.id) : undefined;
+    if (moving && initialMove) moveRecord(moving, initialMove.status);
+    if (initialSelection) onSelectionChange(initialSelection === 'page' ? togglePage(EMPTY_SELECTION, rows) : selectMatching(filter, total));
   });
   const loaded = list.isSuccess;
   useEffect(() => {
@@ -254,14 +273,36 @@ function ListPageContent({
     setFocusChip(index);
   };
 
-  const moveRecord = (row: RecordRow, status: MovableStatus) =>
+  /**
+   * A move is reversible, so it isn't confirmed: it's sent at once and the toast offers Undo, which
+   * moves it back (a compensating write through the same queue, so it follows the move).
+   */
+  const moveRecord = (row: RecordRow, status: MovableStatus) => {
+    const previous = MOVABLE_STATUSES.find((s) => s === row.statusKey);
+    const failed = (title: string) => () => toast({ title, description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity });
     move.mutate(
       { record: row, status },
       {
-        onSuccess: () => toast({ title: `Moved to ${STATUS[status].label}`, description: row.name, tone: 'success' }),
-        onError: () => toast({ title: 'Couldn’t move the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+        onSuccess: () =>
+          toast({
+            title: `Moved to ${STATUS[status].label}`,
+            description: row.name,
+            tone: 'success',
+            duration: undoSettings.windowMs,
+            ...(previous
+              ? {
+                  action: {
+                    label: 'Undo',
+                    altText: `Move it back to ${STATUS[previous].label} with the card’s Move to… menu.`,
+                    onAction: () => move.mutate({ record: row, status: previous }, { onError: failed('Couldn’t undo the move') }),
+                  },
+                }
+              : {}),
+          }),
+        onError: failed('Couldn’t move the record'),
       },
     );
+  };
 
   const toggleSort = (column: SortColumn) => refine({ sort: (query.sort === column ? `-${column}` : column) as SortKey });
 
@@ -440,6 +481,12 @@ function ListPageContent({
               ) : null}
             </Stack>
 
+            {/* Changes made elsewhere: new rows wait for "Show N new", so nothing moves under the cursor. */}
+            <LiveListNotice />
+
+            {/* A bulk job over "all matching": its truthful progress, then Retry failed or Dismiss. */}
+            <JobBanner />
+
             {result ? (
               <Banner
                 tone="warning"
@@ -536,6 +583,7 @@ function ListPageContent({
                 allowMove={can('record:move')}
                 movingId={move.isPending ? move.variables.record.id : undefined}
                 onMove={moveRecord}
+                onOpen={restoration.remember}
               />
             ) : (
               <Table caption="Records" hideCaption maxHeight="md">
@@ -575,7 +623,9 @@ function ListPageContent({
                         />
                       </TableCell>
                       <TableCell rowHeader>
-                        <Link href={`/records/${row.id}`}>{row.name}</Link>
+                        <Link href={`/records/${row.id}`} onClick={(event) => restoration.remember(event.currentTarget)}>
+                          {row.name}
+                        </Link>
                       </TableCell>
                       {/* Joined by id at render: the row holds ids, the people and account caches hold the names. */}
                       {shown.has('owner') ? (
@@ -630,24 +680,50 @@ interface BulkActionBarProps {
   initialBulkDelete: ListPageProps['initialBulkDelete'];
   onClear: () => void;
   onDone: (result: BulkDeleteResult) => void;
+  /** "All matching" went to a job: the selection is done with. */
+  onJobStarted: () => void;
 }
 
 /**
  * The bulk bar, in the shell's sticky footer while anything is selected: the count, then the
  * actions, destructive last. Delete is pessimistic and confirmed with the count in the question.
  */
-function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkActionBarProps) {
+function BulkActionBar({ selection, initialBulkDelete, onClear, onDone, onJobStarted }: BulkActionBarProps) {
   const toast = useToast();
   const format = useFormat();
   const bulkDelete = useBulkDeleteRecords();
+  const startJob = useStartBulkDelete();
   const deletePermission = usePermission('record:delete');
+  const pending = bulkDelete.isPending || startJob.isPending;
   const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined && deletePermission.allowed);
   const count = selectedCount(selection);
   const deletable = deletableCount(selection);
   const skipped = count - deletable;
   const records = plural(format.number(count), count, 'record', 'records');
 
-  const confirm = (target: BulkSelection = toBulkSelection(selection)) =>
+  /**
+   * "All N matching" can be thousands of records: it runs as a job on the server, with truthful
+   * progress in the shell and on the list (JobBanner), never a request held open. Listed ids are
+   * few: one request, answered in full.
+   */
+  const confirm = (target: BulkSelection = toBulkSelection(selection)) => {
+    if ('filter' in target) {
+      startJob.mutate(
+        { filter: target.filter, label: `Delete ${records}` },
+        {
+          onSuccess: () => {
+            setConfirmOpen(false);
+            // No toast: the job's banner above the list announces it at once and stays with its progress.
+            onJobStarted();
+          },
+          onError: () => {
+            setConfirmOpen(false);
+            toast({ title: 'Nothing was deleted', description: 'The job couldn’t be started. Your selection is kept: try again.', tone: 'danger', duration: Infinity });
+          },
+        },
+      );
+      return;
+    }
     bulkDelete.mutate(target, {
       onSuccess: (outcome) => {
         setConfirmOpen(false);
@@ -659,6 +735,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
         toast({ title: 'Nothing was deleted', description: 'The server didn’t answer. Your selection is kept: try again.', tone: 'danger', duration: Infinity });
       },
     });
+  };
 
   // Gallery and tests: confirm straight away, once.
   const submitted = useRef(false);
@@ -679,7 +756,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
           <PermissionNote permission={deletePermission} />
         </Cluster>
         <Cluster gap="sm">
-          <Button variant="ghost" onClick={onClear} disabled={bulkDelete.isPending}>
+          <Button variant="ghost" onClick={onClear} disabled={pending}>
             Clear selection
           </Button>
           <Dialog
@@ -692,7 +769,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
             }
             open={confirmOpen}
             onOpenChange={(open) => {
-              if (!bulkDelete.isPending) setConfirmOpen(open);
+              if (!pending) setConfirmOpen(open);
             }}
             trigger={
               <Button variant="danger" disabled={deletable === 0} {...gated(deletePermission)}>
@@ -701,11 +778,11 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
             }
             footer={
               <>
-                <Button variant="secondary" disabled={bulkDelete.isPending} onClick={() => setConfirmOpen(false)}>
+                <Button variant="secondary" disabled={pending} onClick={() => setConfirmOpen(false)}>
                   Cancel
                 </Button>
-                <Button variant="danger" loading={bulkDelete.isPending} onClick={() => confirm()}>
-                  {bulkDelete.isPending ? 'Deleting…' : `Delete ${records}`}
+                <Button variant="danger" loading={pending} onClick={() => confirm()}>
+                  {pending ? 'Deleting…' : `Delete ${records}`}
                 </Button>
               </>
             }

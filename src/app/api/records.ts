@@ -64,13 +64,33 @@ export interface NewRecord {
 export const postRecord = (tenant: Tenant, record: NewRecord, idempotencyKey: string) =>
   request(RecordSchema, `${base(tenant)}/records`, { method: 'POST', body: record, headers: { 'Idempotency-Key': idempotencyKey } });
 
-/** Sends the version it was based on; the server answers 409 if someone changed the record since. */
-export const patchRecordName = (tenant: Tenant, id: string, name: string, version: number) =>
-  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}`, { method: 'PATCH', body: { name, version } });
+/** What an edit can change. Only the fields sent change; money goes as integer minor units. */
+export interface RecordChanges {
+  name?: string;
+  ownerId?: string;
+  accountId?: string | null;
+  amountMinor?: number;
+  renewsOn?: string;
+  tags?: readonly string[];
+}
+
+/**
+ * A versioned edit: `If-Match` carries the version it was based on, and the server answers 409, with
+ * the record as it is now, if someone changed it since. A name-only edit is a rename (record:rename);
+ * anything else needs record:edit.
+ */
+export const patchRecord = (tenant: Tenant, id: string, changes: RecordChanges, version: number) =>
+  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}`, { method: 'PATCH', body: changes, ifMatch: version });
+
+export const patchRecordName = (tenant: Tenant, id: string, name: string, version: number) => patchRecord(tenant, id, { name }, version);
 
 /** Move between statuses (a board column). Versioned: a stale move gets a 409. */
 export const postStatus = (tenant: Tenant, id: string, status: MovableStatus, version: number) =>
-  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/status`, { method: 'POST', body: { status, version } });
+  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/status`, { method: 'POST', body: { status }, ifMatch: version });
+
+/** Undo an archive: back to the status it had. Versioned, and allowed only for an archived record. */
+export const postRestore = (tenant: Tenant, id: string, status: MovableStatus, version: number) =>
+  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/restore`, { method: 'POST', body: { status }, ifMatch: version });
 
 export const postArchive = (tenant: Tenant, id: string) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/archive`, { method: 'POST' });

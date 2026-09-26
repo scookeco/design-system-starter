@@ -9,6 +9,8 @@ import { ListPage } from '../../src/examples/ListPage';
 import { RecordPage } from '../../src/examples/RecordPage';
 import { http, HttpResponse } from 'msw';
 import { countRecords } from '../../src/app/api/records';
+import { db } from '../../src/app/mocks/db';
+import { undoSettings } from '../../src/app/model/undo';
 import { renderWithApp, server, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
@@ -86,7 +88,8 @@ describe('Record page example', () => {
     await waitFor(() => expect(screen.queryByText('Someone else changed this record')).toBeNull());
   });
 
-  it('archives pessimistically: pending on More, other actions disabled, then the new status', async () => {
+  it('archives once the undo window closes: pending on More, other actions disabled, then the new status', async () => {
+    undoSettings.windowMs = 0;
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
@@ -95,9 +98,26 @@ describe('Record page example', () => {
     renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
     expect(await screen.findByRole('button', { name: 'Archiving…' })).toBeTruthy();
     expect((screen.getByRole('button', { name: 'Request approval' }) as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.queryAllByText('Archived')).toHaveLength(0);
     release();
+    await waitFor(() => expect(db('acme').records.find((r) => r.id === 'r-1001')?.status).toBe('archived'));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'More' })).toBeTruthy());
+  });
+
+  it('archives with Undo instead of a confirmation: Undo inside the window sends nothing', async () => {
+    undoSettings.windowMs = Infinity;
+    const sent: string[] = [];
+    server.events.on('request:start', ({ request }) => {
+      if (request.method !== 'GET') sent.push(`${request.method} ${new URL(request.url).pathname}`);
+    });
+    renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
+    // Shown at once, before anything is sent.
     await waitFor(() => expect(screen.getAllByText('Archived').length).toBeGreaterThan(0));
+    const toast = await screen.findByText('Record archived');
+    fireEvent.click(within(toast.closest('li') as HTMLElement).getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(screen.queryAllByText('Archived')).toHaveLength(0));
+    expect(sent).toEqual([]);
+    expect(db('acme').records.find((r) => r.id === 'r-1001')?.status).not.toBe('archived');
+    server.events.removeAllListeners();
   });
 });
 

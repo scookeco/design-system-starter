@@ -9,6 +9,7 @@ import { isConflict, useArchiveRecord, useBulkDeleteRecords, useCreateRecord, us
 import { useAccount, useRecord, useRecordCounts, useRecordList } from '../../src/app/model/queries';
 import { AccountRef } from '../../src/app/registries/refs';
 import { db } from '../../src/app/mocks/db';
+import { anotherUser } from '../../src/app/mocks/live';
 import { seedRecords } from '../../src/app/mocks/seed';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -85,7 +86,9 @@ describe('renameRecord (optimistic)', () => {
 
   it('reports a stale write as a conflict, leaving the detail for the person to reload', async () => {
     const { result, cached } = await setup(() => useRenameRecord(ID));
-    result.current.hook.mutate({ name: 'Stale', version: original.version - 1 });
+    // Someone else saves first, and this client never hears about it: its latest version is stale.
+    anotherUser('acme', { kind: 'edit', id: ID, changes: { name: 'Theirs' }, silent: true });
+    result.current.hook.mutate({ name: 'Stale', version: original.version });
     await waitFor(() => expect(result.current.hook.isError).toBe(true));
     expect(isConflict(result.current.hook.error)).toBe(true);
     expect(cached()?.name).toBe(original.name);
@@ -93,7 +96,7 @@ describe('renameRecord (optimistic)', () => {
 });
 
 describe('pessimistic mutations', () => {
-  it('archiveRecord changes nothing until the server answers, then patches the detail and refetches lists and counts', async () => {
+  it('archiveRecord shows at once, is sent when its hold is released, then refetches lists and counts', async () => {
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
@@ -111,9 +114,15 @@ describe('pessimistic mutations', () => {
     }));
     await waitFor(() => expect(result.current.hook.counts.isSuccess).toBe(true));
     const countsBefore = client.getQueryState(recordKeys.count(ACME, { q: '', status: [] }))?.dataUpdateCount ?? 0;
-    result.current.hook.archive.mutate();
+    let closeWindow: () => void = () => undefined;
+    const hold = new Promise<void>((resolve) => {
+      closeWindow = resolve;
+    });
+    result.current.hook.archive.mutate({ hold });
     await waitFor(() => expect(result.current.hook.archive.isPending).toBe(true));
-    expect(cached()?.status).toBe(original.status);
+    // Optimistic: archived in the cache at once, while the write waits out its undo window.
+    expect(cached()?.status).toBe('archived');
+    closeWindow();
     release();
     await waitFor(() => expect(result.current.hook.archive.isSuccess).toBe(true));
     expect(cached()?.status).toBe('archived');

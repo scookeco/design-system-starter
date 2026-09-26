@@ -335,7 +335,15 @@
         "examples-create-and-edit--created",
         "examples-create-and-edit--create-failed",
         "examples-create-and-edit--quick-create-open",
-        "examples-create-and-edit--as-viewer-denied"
+        "examples-create-and-edit--as-viewer-denied",
+        "examples-create-and-edit--edit-record",
+        "examples-create-and-edit--edit-saved",
+        "examples-create-and-edit--edit-merged-with-theirs",
+        "examples-create-and-edit--edit-conflict",
+        "examples-create-and-edit--edit-conflict-per-field",
+        "examples-create-and-edit--draft-restored",
+        "examples-create-and-edit--unsaved-changes-guard",
+        "examples-create-and-edit--edit-changed-while-editing"
       ]
     },
     {
@@ -435,7 +443,15 @@
         "examples-list-page--saved-view-chosen",
         "examples-list-page--saved-view-modified",
         "examples-list-page--save-view-dialog",
-        "examples-list-page--columns-chosen"
+        "examples-list-page--columns-chosen",
+        "examples-list-page--live-new-records",
+        "examples-list-page--live-row-updated",
+        "examples-list-page--live-row-deleted",
+        "examples-list-page--board-move-undo-offered",
+        "examples-list-page--job-queued",
+        "examples-list-page--job-running",
+        "examples-list-page--job-failed",
+        "examples-list-page--job-cancelled"
       ]
     },
     {
@@ -468,12 +484,19 @@
         "examples-record-page--files-section",
         "examples-record-page--rename-pending",
         "examples-record-page--rename-succeeded",
+        "examples-record-page--renames-queued",
         "examples-record-page--rename-failed-rolled-back",
         "examples-record-page--rename-conflict",
+        "examples-record-page--rename-conflict-with-theirs",
         "examples-record-page--archive-pending",
+        "examples-record-page--archive-undo-offered",
+        "examples-record-page--tag-removed-undo-offered",
         "examples-record-page--as-viewer-more-actions",
         "examples-record-page--as-editor-more-actions",
-        "examples-record-page--rename-forbidden"
+        "examples-record-page--rename-forbidden",
+        "examples-record-page--edited-elsewhere",
+        "examples-record-page--deleted-elsewhere",
+        "examples-record-page--jobs-follow-you"
       ]
     },
     {
@@ -1132,6 +1155,7 @@
           "space.inset.sm",
           "space.inset.xs",
           "space.scroll-padding.end",
+          "space.scroll-padding.toast",
           "text.body",
           "text.body-lg",
           "text.caption",
@@ -5928,6 +5952,10 @@
           {
             "situation": "Telling people something happened",
             "instead": "`Toast` or `Banner`"
+          },
+          {
+            "situation": "Confirming something that can be undone (archive, move, remove a tag)",
+            "instead": "do it at once and offer Undo in a `Toast` (its `action`); keep the dialog for what can’t be undone, and for bulk actions"
           },
           {
             "situation": "Choosing an action",
@@ -16358,6 +16386,13 @@
           "required": false,
           "default": "'Dismiss'",
           "description": "Label of the dismiss button."
+        },
+        {
+          "name": "action",
+          "type": "ToastAction",
+          "required": false,
+          "default": null,
+          "description": "One action, such as Undo for a reversible change (\"Record archived · Undo\"). Give the toast a duration long enough to reach it (the undo window), and keep the same way out elsewhere on the page (altText says where)."
         }
       ],
       "inherits": [],
@@ -16383,7 +16418,8 @@
       "usage": {
         "whenToUse": [
           "Confirming the outcome of an action that doesn’t change the page visibly: saved, copied, export started.",
-          "Call `useToast()` from inside the app; AppShell mounts the one `ToastProvider`."
+          "Call `useToast()` from inside the app; AppShell mounts the one `ToastProvider`.",
+          "Offering Undo after a reversible change (archive, move, remove a tag): `action={{ label: 'Undo', altText, onAction }}` with a `duration` as long as the undo window. Prefer this to asking “Are you sure?” first."
         ],
         "whenNotToUse": [
           {
@@ -16393,6 +16429,10 @@
           {
             "situation": "A form’s validation errors",
             "instead": "field errors plus an error summary `Banner`"
+          },
+          {
+            "situation": "Undo for something that can’t really be undone (a permanent delete)",
+            "instead": "a confirming `Dialog` that names what will go"
           }
         ],
         "do": {
@@ -16405,7 +16445,8 @@
         },
         "accessibility": [
           "Toasts live in a labelled region; success, info and neutral are announced politely, danger and warning assertively.",
-          "The tone has an icon, never colour alone. Anything the user must act on needs `duration={Infinity}`, and usually isn’t a toast."
+          "The tone has an icon, never colour alone. Anything the user must act on needs `duration={Infinity}`, and usually isn’t a toast.",
+          "An action’s `altText` is required and announced with the toast: it tells people who can’t reach the button in time where else to do the same (“Find it under Archived to restore it”). Hovering or focusing the toast pauses its timer."
         ]
       },
       "unit": {
@@ -16432,28 +16473,56 @@
             "name": "Neutral"
           },
           {
+            "id": "components-toast--with-action",
+            "name": "With Action"
+          },
+          {
             "id": "components-toast--imperative",
             "name": "Imperative"
           }
         ],
         "composes": [
-          "Icon"
+          "Button",
+          "Icon",
+          "Spinner"
         ],
         "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
           "color.bg.elevated",
+          "color.bg.subtle",
           "color.border.default",
           "color.fg.default",
+          "color.fg.disabled",
           "color.fg.muted",
           "color.status.danger.fg",
           "color.status.info.fg",
           "color.status.neutral.fg",
           "color.status.success.fg",
           "color.status.warning.fg",
+          "ease.linear",
+          "ease.standard",
           "focus.ring.width",
           "icon.stroke",
+          "motion.fast",
+          "motion.spin",
           "radius.control",
+          "radius.pill",
           "radius.surface",
           "shadow.popover",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
@@ -16461,12 +16530,24 @@
           "space.gap.2xs",
           "space.gap.sm",
           "space.gap.xs",
+          "space.inset.lg",
           "space.inset.md",
+          "space.inset.sm",
           "text.body",
+          "text.body-lg",
           "text.label",
           "z.toast"
         ]
       }
+    },
+    {
+      "name": "ToastAction",
+      "kind": "type-only",
+      "source": "src/components/Toast/Toast.tsx",
+      "status": null,
+      "description": "The one action a toast can offer, such as Undo. Choosing it closes the toast.",
+      "partOf": "Toast",
+      "definition": "interface ToastAction { label: string; altText: string; onAction: () => void; }"
     },
     {
       "name": "ToastProps",
@@ -19381,6 +19462,18 @@
       "chain": [
         "space.scroll-padding.start",
         "space.12"
+      ],
+      "modes": {}
+    },
+    "space.scroll-padding.toast": {
+      "cssVar": "--space-scroll-padding-toast",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action.",
+      "value": "128px",
+      "chain": [
+        "space.scroll-padding.toast",
+        "space.32"
       ],
       "modes": {}
     },

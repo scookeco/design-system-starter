@@ -166,6 +166,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    anotherUser: {
+      description: 'Push a change by another person in the workspace, through the live channel (data stories)',
+      toolbar: {
+        title: 'Another user…',
+        icon: 'users',
+        items: [
+          { value: 'none', title: 'Another user…' },
+          { value: 'edit', title: 'Edits this record (or the first row)' },
+          { value: 'add', title: 'Adds a record' },
+          { value: 'delete', title: 'Deletes this record (or the first row)' },
+        ],
+      },
+    },
     failure: {
       description: 'Mock API failure rate',
       toolbar: {
@@ -180,7 +193,7 @@ const preview: Preview = {
       },
     },
   },
-  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0', role: 'admin' },
+  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0', role: 'admin', anotherUser: 'none' },
   loaders: [mswLoader()],
   decorators: [withContainerWidth, withTheme, withLocale, withMockSettings],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and

@@ -13,13 +13,20 @@
  *            the field registry; stacks below main when the container is narrow
  *   states   loading (skeletons mirror the anatomy, aria-busy) · error (shell stays up, Retry)
  *   overlays rename dialog, delete confirmation; toasts for results
+ *   live     another person's edit patches the page in place (the version moves on); their delete
+ *            replaces the page with "This record was deleted"
  *
  * Data: the record is read from the server cache with useRecord(id); the page holds no copy of it.
  * Writes go through named mutations (src/app/model/mutations.ts), each presented its own way:
- *   Rename   optimistic: the title changes at once ("Saving…"); a failure restores the old name
+ *   Rename   optimistic, through the record's write queue: the title changes at once ("Saving…",
+ *            or "Saving 2 changes…" when several are queued); a failure restores the old name
  *            and says so in a toast that stays; the typed name is kept for another try.
- *            A 409 (someone else changed it) shows a Banner with Reload instead.
- *   Archive  pessimistic: "Archiving…" on More, the other actions disabled, then the new status.
+ *            A 409 (someone else changed it) shows the ConflictPanel when the server sent its
+ *            version (yours and theirs; Keep mine or Take theirs), or a Banner with Reload.
+ *   Edit     the edit form (/records/:id/edit), a versioned write with the same conflict panel.
+ *   Archive  undoable, not confirmed: archived at once, the write held for the undo window, and a
+ *            toast with Undo (src/app/model/undo.ts); "Archiving…" on More once it's being sent.
+ *   Tags     removable in Properties, with the same Undo; Add tag puts one back.
  *   Delete   pessimistic, confirmed; refused for records on legal hold (the canDelete predicate).
  *
  * Permissions: each "More" item is shown only when the person holds its capability, and enabled
@@ -49,21 +56,40 @@ import {
   PageLayout,
   Skeleton,
   Stack,
+  Tag,
   Text,
   TextField,
   useFormat,
   useToast,
 } from '../index';
 import { ExampleShell } from './ExampleShell';
-import type { RecordEntity } from '../app/api/schemas';
-import { isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
+import { DeletedElsewhere } from './Freshness';
+import { MOVABLE_STATUSES, type MovableStatus, type RecordEntity } from '../app/api/schemas';
+import { useDeletedElsewhere } from '../app/model/live';
+import { usePendingWrites } from '../app/model/writeQueue';
+import {
+  conflictingRecord,
+  isConflict,
+  isForbidden,
+  useArchiveRecord,
+  useBulkDeleteRecords,
+  useRenameRecord,
+  useRestoreRecord,
+  useTagRecord,
+  useUntagRecord,
+} from '../app/model/mutations';
+import { isSystemTag } from '../app/model/predicates';
+import { openUndoWindow } from '../app/model/undo';
+import { isCancelled } from '../app/model/writeQueue';
 import { isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
 import { FieldDisplay, isNumericField } from '../app/registries/fields';
-import { RECORD_PROPERTIES } from '../app/registries/recordFields';
+import { RECORD_PROPERTIES, TAG_OPTIONS } from '../app/registries/recordFields';
 import { usePersonName } from '../app/registries/refs';
 import { useAppSession, useCan } from '../app/session';
+import { useNavigate } from '../app/url/useUrlState';
+import { ConflictPanel } from './ConflictPanel';
 
 interface Activity {
   id: string;
@@ -125,8 +151,8 @@ const SECTIONS: readonly { section: RecordSection; label: string }[] = [
 /** Each section is its own route: /records/<id>, /records/<id>/activity, /records/<id>/files. */
 const sectionHref = (record: RecordEntity, section: RecordSection) => (section === 'overview' ? `/records/${record.id}` : `/records/${record.id}/${section}`);
 
-/** A write to start on mount, so the gallery and tests can show each mutation state. */
-export type RecordPageAction = { kind: 'rename'; name: string } | { kind: 'archive' };
+/** A write to start on mount, so the gallery and tests can show each mutation state. Several names: renamed in quick succession. */
+export type RecordPageAction = { kind: 'rename'; name: string | readonly string[] } | { kind: 'archive' } | { kind: 'untag'; tag: string };
 
 export interface RecordPageProps {
   /** The record's id, from the route (/records/:id). */
@@ -137,12 +163,14 @@ export interface RecordPageProps {
   initialMenuOpen?: boolean;
   /** The section to show first. In a product this comes from the route. */
   initialSection?: RecordSection;
+  /** Open the shell's Jobs popover on first render (gallery and tests). */
+  initialJobsOpen?: boolean;
 }
 
-export function RecordPage({ recordId = 'r-1001', ...props }: RecordPageProps) {
+export function RecordPage({ recordId = 'r-1001', initialJobsOpen = false, ...props }: RecordPageProps) {
   const record = useRecord(recordId);
   return (
-    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: record.data?.name ?? 'Record' }}>
+    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: record.data?.name ?? 'Record' }} jobsOpen={initialJobsOpen}>
       <RecordPageContent recordId={recordId} {...props} />
     </ExampleShell>
   );
@@ -156,6 +184,9 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const ownerName = usePersonName(query.data?.ownerId ?? '');
   const rename = useRenameRecord(recordId);
   const archive = useArchiveRecord(recordId);
+  const restore = useRestoreRecord(recordId);
+  const untag = useUntagRecord(recordId);
+  const tag = useTagRecord(recordId);
   const remove = useBulkDeleteRecords();
   const can = useCan();
   const { refreshSession } = useAppSession();
@@ -168,6 +199,14 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const [nameError, setNameError] = useState<string | undefined>();
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
+  const deletedElsewhere = useDeletedElsewhere(recordId);
+  // Every write queued or in flight for this record, from any surface: the header says so. A write
+  // waiting out its undo window isn't being saved yet, so it isn't counted.
+  const pending = usePendingWrites(recordId).filter((op) => op.state !== 'held');
+  const archiving = pending.some((op) => op.label === 'Archiving…');
+  const navigate = useNavigate();
+  /** The record as it was when the rename was sent: the base a conflict is compared against. */
+  const [renameBase, setRenameBase] = useState<RecordEntity | undefined>();
 
   const addComment = (event: FormEvent) => {
     event.preventDefault();
@@ -179,6 +218,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const submitRename = (name: string) => {
     const record = query.data;
     if (!record) return;
+    setRenameBase(record);
     rename.mutate(
       { name, version: record.version },
       {
@@ -214,12 +254,67 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
     if (name !== query.data?.name) submitRename(name);
   };
 
-  const archiveRecord = () =>
-    archive.mutate(undefined, {
-      onSuccess: () => toast({ title: 'Record archived', description: 'It’s out of the active lists. Find it under Archived.', tone: 'success' }),
-      onError: (error) =>
-        toast({ title: 'Couldn’t archive the record', description: isForbidden(error) ? error.message : 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+  /**
+   * Archive is reversible, so it isn't confirmed first: it shows at once, waits out the undo window
+   * in the record's write queue, and the toast offers Undo. Undo inside the window drops the write
+   * unsent; after it (the toast's timer pauses on hover, so they can drift), it restores instead.
+   */
+  const archiveRecord = () => {
+    const current = query.data;
+    const previous = MOVABLE_STATUSES.find((s) => s === current?.status);
+    if (!current || !previous) return;
+    const window = openUndoWindow();
+    archive.mutate(
+      { hold: window.closed },
+      {
+        onError: (error) => {
+          if (isCancelled(error)) return; // Undone: nothing was sent.
+          toast({ title: 'Couldn’t archive the record', description: isForbidden(error) ? error.message : 'Nothing changed. Try again.', tone: 'danger', duration: Infinity });
+        },
+      },
+    );
+    toast({
+      title: 'Record archived',
+      description: `${current.name} is out of the active lists.`,
+      tone: 'success',
+      duration: window.ms,
+      action: { label: 'Undo', altText: 'Find it under the Archived tab to restore it.', onAction: () => undoArchive(window, previous) },
     });
+  };
+
+  const undoArchive = (window: ReturnType<typeof openUndoWindow>, previous: MovableStatus) => {
+    if (window.cancel()) return;
+    restore.mutate(
+      { status: previous },
+      { onError: () => toast({ title: 'Couldn’t undo the archive', description: 'It’s still archived. Try again from the Archived tab.', tone: 'danger', duration: Infinity }) },
+    );
+  };
+
+  /** Removing a tag is reversible too: at once, with Undo; after the window, Undo adds it back. */
+  const removeTag = (name: string) => {
+    const window = openUndoWindow();
+    untag.mutate(
+      { tag: name, hold: window.closed },
+      {
+        onError: (error) => {
+          if (!isCancelled(error)) toast({ title: 'Couldn’t remove the tag', description: 'It’s back. Try again.', tone: 'danger', duration: Infinity });
+        },
+      },
+    );
+    toast({
+      title: 'Tag removed',
+      description: `“${name}” is off this record.`,
+      tone: 'success',
+      duration: window.ms,
+      action: {
+        label: 'Undo',
+        altText: `Add “${name}” again with Add tag, under Properties.`,
+        onAction: () => {
+          if (!window.cancel()) tag.mutate({ tag: name });
+        },
+      },
+    });
+  };
 
   const deleteRecord = () =>
     remove.mutate(
@@ -241,9 +336,13 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
     if (!initialAction || started.current) return;
     started.current = true;
     if (initialAction.kind === 'rename') {
-      setNameDraft(initialAction.name);
-      submitRename(initialAction.name);
-    } else archiveRecord();
+      const names = typeof initialAction.name === 'string' ? [initialAction.name] : initialAction.name;
+      for (const name of names) {
+        setNameDraft(name);
+        submitRename(name);
+      }
+    } else if (initialAction.kind === 'untag') removeTag(initialAction.tag);
+    else archiveRecord();
   });
   const loaded = query.isSuccess;
   useEffect(() => {
@@ -263,6 +362,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
       </Center>
     );
   }
+
+  if (deletedElsewhere) return <DeletedElsewhere />;
 
   if (query.isError) {
     return (
@@ -317,11 +418,32 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   }
 
   const record = query.data;
+  const theirs = conflictingRecord(rename.error);
 
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
-        {isConflict(rename.error) ? (
+        {theirs && renameBase ? (
+          // The server sent its version: compare the name field by field and let the person choose.
+          <ConflictPanel
+            base={renameBase}
+            mine={{ ...renameBase, name: rename.variables?.name ?? renameBase.name }}
+            theirs={theirs}
+            fields={['name']}
+            pending={rename.isPending}
+            onResolve={({ name }) => {
+              if (name === undefined) rename.reset();
+              else {
+                setRenameBase(theirs);
+                rename.mutate({ name, version: theirs.version });
+              }
+            }}
+            onTakeTheirs={() => {
+              rename.reset();
+              void query.refetch();
+            }}
+          />
+        ) : isConflict(rename.error) ? (
           <Banner
             tone="warning"
             title="Someone else changed this record"
@@ -349,25 +471,32 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
               {isOnLegalHold(record) ? <Badge tone="warning">Legal hold</Badge> : null}
             </Cluster>
           }
-          description={rename.isPending ? 'Saving the new name…' : `Owned by ${ownerName ?? '…'} · updated ${format.relative(record.updatedAt)}`}
+          description={
+            pending.length > 1
+              ? `Saving ${format.number(pending.length)} changes…`
+              : (pending[0]?.label ?? (rename.isPending ? 'Saving the new name…' : `Owned by ${ownerName ?? '…'} · updated ${format.relative(record.updatedAt)}`))
+          }
           actions={
             <>
-              <Button variant="secondary" disabled={archive.isPending}>
+              <Button variant="secondary" disabled={archiving}>
                 Share
               </Button>
-              <Button disabled={archive.isPending} onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>
+              <Button disabled={archiving} onClick={() => toast({ title: 'Approval requested', tone: 'success' })}>
                 Request approval
               </Button>
               <Menu
                 defaultOpen={initialMenuOpen}
                 align="end"
                 trigger={
-                  <Button variant="secondary" icon="more" loading={archive.isPending}>
-                    {archive.isPending ? 'Archiving…' : 'More'}
+                  <Button variant="secondary" icon="more" loading={archiving}>
+                    {archiving ? 'Archiving…' : 'More'}
                   </Button>
                 }
                 // Shown when the person holds the capability; enabled when `can` allows it for this record.
                 items={[
+                  ...(can('record:edit')
+                    ? [{ label: 'Edit', disabled: !can('record:edit', record), onSelect: () => navigate(`/records/${record.id}/edit`) }]
+                    : []),
                   ...(can('record:rename')
                     ? [
                         {
@@ -413,7 +542,11 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
                         {field.label}
                       </Text>
                       <Text as="dd" numeric={isNumericField(field.type)}>
-                        <FieldDisplay field={field} entity={record} format={format} />
+                        {field.id === 'tags' && can('record:edit', record) ? (
+                          <TagEditor tags={record.tags} onRemove={removeTag} onAdd={(name) => tag.mutate({ tag: name })} />
+                        ) : (
+                          <FieldDisplay field={field} entity={record} format={format} />
+                        )}
                       </Text>
                     </Stack>
                   ))}
@@ -526,5 +659,25 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
         }
       />
     </Center>
+  );
+}
+
+/** A record's tags, editable: each removable (legal hold is legal's), and Add tag for the rest. */
+function TagEditor({ tags, onRemove, onAdd }: { tags: readonly string[]; onRemove: (tag: string) => void; onAdd: (tag: string) => void }) {
+  const addable = TAG_OPTIONS.filter((option) => !tags.includes(option));
+  return (
+    <Cluster gap="2xs" align="center">
+      {tags.map((name) => (isSystemTag(name) ? <Tag key={name}>{name}</Tag> : <Tag key={name} onRemove={() => onRemove(name)} removeLabel={`Remove tag ${name}`}>{name}</Tag>))}
+      {addable.length > 0 ? (
+        <Menu
+          trigger={
+            <Button variant="ghost" size="sm" icon="plus">
+              Add tag
+            </Button>
+          }
+          items={addable.map((option) => ({ label: option, onSelect: () => onAdd(option) }))}
+        />
+      ) : null}
+    </Cluster>
   );
 }

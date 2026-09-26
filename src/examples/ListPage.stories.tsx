@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { emptyWorkspace, fail, hold, malformed } from '../app/mocks/overrides';
+import { firstListedRecord } from '../app/mocks/live';
 import { ListPage } from './ListPage';
+
+/** The board's first card, and a column it isn't in. */
+const FIRST = firstListedRecord('acme');
+const MOVE = { id: FIRST?.id ?? 'r-1001', status: FIRST?.status === 'overdue' ? 'pending' : 'overdue' } as const;
 
 const meta = {
   title: 'Examples/List page',
@@ -42,10 +47,13 @@ export const BulkDeletePending: Story = {
   args: { initialSelection: 'page', initialBulkDelete: 'submit' },
   parameters: mswOverrides(hold('post', '/records/bulk-delete')),
 };
-/** Every draft, deleted by filter; the ones on legal hold fail and stay listed, with Retry. */
+/**
+ * Every draft, deleted by filter: "all matching" runs as a job, polled to the end here. The ones on
+ * legal hold fail: "done, 2 failed", each listed with its reason, and Retry failed.
+ */
 export const BulkDeletePartialFailure: Story = {
   args: { initialSelection: 'matching', initialBulkDelete: 'submit' },
-  parameters: mockApi({ url: '/records?view=drafts' }),
+  parameters: mockApi({ url: '/records?view=drafts', pollJobs: 20 }),
 };
 
 /** Viewer: no Drafts tab (the server hides drafts from this role), and New record disabled with the reason beside it. */
@@ -63,3 +71,25 @@ export const SaveViewDialog: Story = { tags: ['modal-open'], args: { initialView
 /** Fewer columns, from the Columns popover: part of the URL, so part of a saved view. */
 export const ColumnsChosen: Story = { parameters: mockApi({ url: '/records?columns=owner,status,amount' }) };
 
+
+// Keeping the list fresh: another person's changes arrive through the live channel once the page
+// has loaded (mockApi({ anotherUser })). The gallery's "Another user…" toolbar pushes one on demand.
+/** Three records added elsewhere: counted, not inserted, so the rows stay put until "Show 3 new". */
+export const LiveNewRecords: Story = { parameters: mockApi({ anotherUser: [{ kind: 'add' }, { kind: 'add' }, { kind: 'add' }] }) };
+/** The first row, edited elsewhere: patched in place (no reorder), with "Updated just now by …". */
+export const LiveRowUpdated: Story = { parameters: mockApi({ anotherUser: [{ kind: 'edit' }] }) };
+/** The first row, deleted elsewhere: it leaves every cached page, and the total drops. */
+export const LiveRowDeleted: Story = { parameters: mockApi({ anotherUser: [{ kind: 'delete' }] }) };
+
+/** A card moved on the board: sent at once (no confirmation), and the toast offers Undo, which moves it back. */
+export const BoardMoveUndoOffered: Story = { args: { initialMove: MOVE }, parameters: mockApi({ url: '/records?display=board', undoWindow: 'hold' }) };
+
+// Long-running jobs: seeded in a state and paused, so each is a still frame (mockApi({ jobs })).
+/** Queued: accepted, nothing done yet, and the page says exactly that. */
+export const JobQueued: Story = { parameters: mockApi({ jobs: [{ state: 'queued' }] }) };
+/** Running: "19 of 59", with Cancel (it stops between chunks; what's deleted stays deleted). */
+export const JobRunning: Story = { parameters: mockApi({ jobs: [{ state: 'running' }] }) };
+/** The job stopped: how far it got, why, and Dismiss. */
+export const JobFailed: Story = { parameters: mockApi({ jobs: [{ state: 'failed', done: 30, failures: 1 }] }) };
+/** Cancelled: how far it got, and that what it did stays done. */
+export const JobCancelled: Story = { parameters: mockApi({ jobs: [{ state: 'cancelled', done: 20 }] }) };

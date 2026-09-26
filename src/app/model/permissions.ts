@@ -13,10 +13,10 @@
  * hold can't be deleted), from the same named predicates the rest of the app uses.
  */
 import type { Capability, RecordEntity, Role } from '../api/schemas';
-import { canArchive, canDelete, canMove, canRename, isDraft } from './predicates';
+import { canArchive, canDelete, canEdit, canMove, canRename, isDraft } from './predicates';
 
 const VIEWER = ['workspace:read', 'record:read', 'account:read'] as const satisfies readonly Capability[];
-const EDITOR = [...VIEWER, 'record:read-drafts', 'record:create', 'record:rename', 'record:move', 'record:archive', 'account:create', 'people:create'] as const satisfies readonly Capability[];
+const EDITOR = [...VIEWER, 'record:read-drafts', 'record:create', 'record:rename', 'record:edit', 'record:move', 'record:archive', 'account:create', 'people:create'] as const satisfies readonly Capability[];
 const ADMIN = [...EDITOR, 'workspace:manage', 'record:delete', 'account:edit', 'members:manage', 'audit:read'] as const satisfies readonly Capability[];
 
 /** The ONE place roles map to capabilities. A new role, or a capability moving between roles, is an edit here. */
@@ -31,6 +31,7 @@ export interface Grant {
 type Subject = Pick<RecordEntity, 'status' | 'tags'>;
 const SUBJECT_RULES: Partial<Record<Capability, (subject: Subject) => boolean>> = {
   'record:rename': canRename,
+  'record:edit': canEdit,
   'record:move': canMove,
   'record:archive': canArchive,
   'record:delete': canDelete,
@@ -54,6 +55,7 @@ export const DENIAL_REASONS: Record<Capability, string> = {
   'record:read-drafts': 'Drafts are visible to editors. Ask a workspace admin for editor access.',
   'record:create': 'You have view-only access, so you can’t create records. Ask a workspace admin for editor access.',
   'record:rename': 'You have view-only access, so you can’t rename records. Ask a workspace admin for editor access.',
+  'record:edit': 'You have view-only access, so you can’t edit records. Ask a workspace admin for editor access.',
   'record:move': 'You have view-only access, so you can’t move records. Ask a workspace admin for editor access.',
   'record:archive': 'You have view-only access, so you can’t archive records. Ask a workspace admin for editor access.',
   'record:delete': 'Only workspace admins can delete records.',

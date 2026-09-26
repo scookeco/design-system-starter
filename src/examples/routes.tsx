@@ -49,6 +49,11 @@ const PersonRecord = page(async () => {
   return ({ params }) => <EntityRecordPage config={PERSON} id={params.id ?? ''} />;
 });
 const Setup = page(async () => noParams((await import('./SetupWizard')).SetupWizard));
+// Freshness and concurrency: the record edit form (a versioned write, with the conflict panel).
+const EditRecord = page(async () => {
+  const { CreateEditFlow } = await import('./CreateEditFlow');
+  return ({ params }) => <CreateEditFlow recordId={params.id ?? ''} />;
+});
 
 // AI patterns (PR: AI-native patterns). Under /assistant, so no /records/:id pattern shadows them.
 const AssistantChat = page(async () => noParams((await import('./AssistantChatPage')).AssistantChatPage));
@@ -76,6 +81,11 @@ export const ROUTES: readonly Route[] = [
   { path: '/records', layout: 'shell', page: List, guard: 'record:read', nav: '/records' },
   { path: '/records/new', layout: 'shell', page: Create, guard: 'record:create', nav: '/records' },
   { path: '/records/:id', layout: 'shell', page: Record, guard: 'record:read', nav: '/records' },
+  // ── Freshness and concurrency ──────────────────────────────────────────────────────────────────
+  // Above /records/:id/:section on purpose: routes match in table order, and "edit" would otherwise
+  // be read as a record section.
+  { path: '/records/:id/edit', layout: 'shell', page: EditRecord, guard: 'record:edit', nav: '/records' },
+  // ── end Freshness and concurrency ─────────────────────────────────────────────────────────────
   { path: '/records/:id/:section', layout: 'shell', page: Record, guard: 'record:read', nav: '/records' },
   { path: '/accounts', layout: 'shell', page: AccountList, guard: ACCOUNT.capabilities.read, nav: '/accounts' },
   { path: '/accounts/new', layout: 'shell', page: AccountForm, guard: 'account:create', nav: '/accounts' },

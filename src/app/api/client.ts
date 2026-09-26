@@ -50,13 +50,26 @@ export interface RequestOptions {
   body?: unknown;
   headers?: Record<string, string>;
   signal?: AbortSignal | undefined;
+  /**
+   * A versioned write: the version this change was based on, sent as `If-Match`. The server
+   * answers 409 (with the entity as it is now) if someone changed it since, and 428 if it's missing.
+   */
+  ifMatch?: number;
 }
+
+/** An entity version as an entity tag: version 3 → "3" (a strong validator, quoted as HTTP requires). */
+export const etag = (version: number) => `"${String(version)}"`;
 
 /** Fetch, then parse: `schema` decides what counts as a valid answer. */
 export async function request<S extends z.ZodType>(schema: S, path: string, options: RequestOptions = {}): Promise<z.infer<S>> {
   const response = await fetch(url(path), {
     method: options.method ?? 'GET',
-    headers: { Accept: 'application/json', ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }), ...options.headers },
+    headers: {
+      Accept: 'application/json',
+      ...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...(options.ifMatch === undefined ? {} : { 'If-Match': etag(options.ifMatch) }),
+      ...options.headers,
+    },
     ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
     ...(options.signal ? { signal: options.signal } : {}),
   });

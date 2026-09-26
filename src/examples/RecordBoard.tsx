@@ -30,9 +30,11 @@ export interface RecordBoardProps {
   /** The record being moved right now, if any. */
   movingId: string | undefined;
   onMove: (row: RecordRow, status: MovableStatus) => void;
+  /** A card's link was followed (scroll and focus restoration remember it). */
+  onOpen?: (link: HTMLAnchorElement) => void;
 }
 
-export function RecordBoard({ columns, statusCounts, allowMove, movingId, onMove }: RecordBoardProps) {
+export function RecordBoard({ columns, statusCounts, allowMove, movingId, onMove, onOpen }: RecordBoardProps) {
   const format = useFormat();
   const rows = new Map(columns.flatMap((column) => column.rows.map((row) => [row.id, row] as const)));
 
@@ -59,6 +61,7 @@ export function RecordBoard({ columns, statusCounts, allowMove, movingId, onMove
               moving={movingId === row.id}
               targets={MOVABLE_STATUSES.filter((s) => s !== row.statusKey)}
               onMove={(status) => onMove(row, status)}
+              onOpen={onOpen}
             />
           )}
         />
@@ -117,9 +120,10 @@ interface CardProps {
   moving: boolean;
   targets: readonly MovableStatus[];
   onMove: (status: MovableStatus) => void;
+  onOpen: ((link: HTMLAnchorElement) => void) | undefined;
 }
 
-function RecordCard({ row, format, allowMove, moving, targets, onMove }: CardProps) {
+function RecordCard({ row, format, allowMove, moving, targets, onMove, onOpen }: CardProps) {
   const canMoveThis = allowMove && row.movable && targets.length > 0;
   return (
     <Stack
@@ -138,7 +142,9 @@ function RecordCard({ row, format, allowMove, moving, targets, onMove }: CardPro
       <Card>
         <CardBody>
           <Stack gap="xs">
-            <Link href={`/records/${row.id}`}>{row.name}</Link>
+            <Link href={`/records/${row.id}`} onClick={(event) => onOpen?.(event.currentTarget)}>
+              {row.name}
+            </Link>
             <Cluster gap="2xs">
               <Badge tone={row.status.tone}>{row.status.label}</Badge>
               {row.legalHold ? <Badge tone="warning">Legal hold</Badge> : null}

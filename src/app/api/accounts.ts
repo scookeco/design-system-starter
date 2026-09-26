@@ -26,6 +26,6 @@ export interface AccountInput {
 export const postAccount = (tenant: Tenant, account: AccountInput, idempotencyKey: string) =>
   request(AccountSchema, base(tenant), { method: 'POST', body: account, headers: { 'Idempotency-Key': idempotencyKey } });
 
-/** Sends the version it was based on; a stale edit gets a 409. */
+/** Versioned (If-Match): a stale edit gets a 409 with the account as it is now. */
 export const patchAccount = (tenant: Tenant, id: string, changes: Partial<AccountInput>, version: number) =>
-  request(AccountSchema, `${base(tenant)}/${encodeURIComponent(id)}`, { method: 'PATCH', body: { ...changes, version } });
+  request(AccountSchema, `${base(tenant)}/${encodeURIComponent(id)}`, { method: 'PATCH', body: changes, ifMatch: version });

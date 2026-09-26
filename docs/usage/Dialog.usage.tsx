@@ -10,6 +10,7 @@ export const usage: UsageDoc = {
   whenNotToUse: [
     { situation: 'A long or multi-step form', instead: 'a full page from the Create and edit example' },
     { situation: 'Telling people something happened', instead: '`Toast` or `Banner`' },
+    { situation: 'Confirming something that can be undone (archive, move, remove a tag)', instead: 'do it at once and offer Undo in a `Toast` (its `action`); keep the dialog for what can’t be undone, and for bulk actions' },
     { situation: 'Choosing an action', instead: '`Menu`' },
   ],
   do: {

@@ -6,16 +6,22 @@ import { DocPage, DocSection, Rules } from '../ui/DocPage';
 const HOMES = [
   { home: 'Local state', holds: 'What one component owns: an open menu, a half-typed search, a form draft', example: 'The rename dialog’s typed name' },
   { home: 'Lifted state', holds: 'What two parts of one page coordinate on', example: 'The list’s selection (the table and the footer bar share it)' },
+  { home: 'Form draft', holds: 'An edit in progress, owned by its form (never the cache), with the version it started from; autosaved on the device', example: 'The edit form’s values and base record (useDraft)' },
   { home: 'Server cache', holds: 'Confirmed domain data, read through queries', example: 'A page of records, a record, the tab counts' },
   { home: 'URL', holds: 'What a copied link must reproduce: view, search, filters, sort, page, tab', example: '/records?view=open&q=lease&sort=-amount&page=2' },
 ] as const;
 
 const MUTATIONS = [
-  { verb: 'renameRecord', presents: 'Optimistic', patches: 'The record and every cached list page holding it, at once; both rolled back on failure unless a newer write landed', invalidates: 'The record, every list (counts can’t change)', failure: 'Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload; a 403 refreshes the session' },
-  { verb: 'moveRecord', presents: 'Pessimistic', patches: 'The record and every listed copy, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays' },
-  { verb: 'archiveRecord', presents: 'Pessimistic', patches: 'The record and every listed copy, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays' },
+  { verb: 'renameRecord', presents: 'Optimistic, queued', patches: 'The record and every cached list page holding it, at once (the queue’s preview); rebased on failure, never over a newer write', invalidates: 'The record, every list (counts can’t change)', failure: 'Old name back, a toast that stays, the typed name kept; a 409 shows the conflict panel (or Reload); a 403 refreshes the session' },
+  { verb: 'updateRecord', presents: 'Pessimistic, versioned (If-Match: the draft’s base)', patches: 'The record and every listed copy, with the server’s answer; on a 409, the record takes theirs', invalidates: 'Every list', failure: 'A 409 with no field changed on both sides is re-based and saved once; otherwise the conflict panel' },
+  { verb: 'moveRecord', presents: 'Pessimistic, queued, undoable', patches: 'The record and every listed copy, with the server’s answer', invalidates: 'Every list and count', failure: 'Nothing changed; a toast that stays. Undo moves it back' },
+  { verb: 'archiveRecord', presents: 'Optimistic, held for the undo window', patches: 'The record and every listed copy, at once', invalidates: 'Every list and count', failure: 'Undo inside the window sends nothing; after it, restoreRecord' },
+  { verb: 'restoreRecord', presents: 'Optimistic, queued', patches: 'The record and every listed copy', invalidates: 'Every list and count', failure: 'Still archived; a toast that stays' },
+  { verb: 'tagRecord · untagRecord', presents: 'Optimistic, queued; untag held for the undo window', patches: 'The record and every listed copy', invalidates: 'Every list', failure: 'The tag is back; legal hold is refused by both sides' },
   { verb: 'createRecord', presents: 'Pessimistic, with an idempotency key', patches: 'The new record’s detail entry', invalidates: 'Every list and count', failure: 'The draft stays; a retry sends the same key, so no duplicate' },
-  { verb: 'bulkDeleteRecords', presents: 'Pessimistic, confirmed', patches: 'Removes deleted records', invalidates: 'Every list and count', failure: 'Partial: a banner that stays (“50 deleted, 9 failed”) with Retry' },
+  { verb: 'bulkDeleteRecords', presents: 'Pessimistic, confirmed (listed ids)', patches: 'Removes deleted records', invalidates: 'Every list and count', failure: 'Partial: a banner that stays (“50 deleted, 9 failed”) with Retry' },
+  { verb: 'startBulkDelete', presents: 'A job, confirmed (“all N matching”)', patches: 'Appends the job, queued', invalidates: 'Nothing yet: each poll that moves the job refetches lists and counts', failure: 'Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed' },
+  { verb: 'cancelJob · dismissJob', presents: 'Pessimistic', patches: 'The job (cancelled), or removes it', invalidates: 'Every list and count (cancel)', failure: 'A finished job can’t be cancelled; a running one can’t be dismissed' },
   { verb: 'addPerson', presents: 'Pessimistic', patches: 'Appends to people', invalidates: 'People', failure: 'The dialog stays open with an error' },
   { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory', failure: 'The form stays, with a banner' },
   { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'Nothing else: records hold its id, so every row re-renders from the directory', failure: 'A banner; a 409 says someone else changed it' },
@@ -26,7 +32,7 @@ const MUTATIONS = [
 
 const ROLES = [
   { role: 'Viewer', holds: 'workspace:read, record:read, account:read', sees: 'Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive' },
-  { role: 'Editor', holds: 'Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create', sees: 'Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled' },
+  { role: 'Editor', holds: 'Viewer’s, plus record:read-drafts, record:create, rename, edit, move, archive, account:create, people:create', sees: 'Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled' },
   { role: 'Admin', holds: 'Editor’s, plus workspace:manage, record:delete, account:edit, members:manage, audit:read', sees: 'Everything, including the audit log; invites, changes and removes members' },
 ] as const;
 
@@ -64,10 +70,11 @@ tokens → primitives → components → layouts        the design system (src/i
                                          ↑
 src/app   api/        the client and zod schemas: every response is parsed at the boundary
           model/      cache keys, queries, named predicates, projections, mutations, selection,
-                      permissions (the role → capability mapping and the one predicate, can)
+                      permissions (the role → capability mapping and the one predicate, can),
+                      freshness (live), per-record write queues, conflicts, drafts, undo, jobs
           session.tsx the session: memberships, the active workspace, switch, sign out
           routing/    the route entry type, the matcher, RouteView and AppLink
-          url/        useUrlState and the list page's URL codec
+          url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
                                          ↑
@@ -316,14 +323,177 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
           items={[
             <>An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.</>,
             <>
-              Edits send the version they were based on. The server answers <code>409</code> if someone changed the record since, and the
-              page says so instead of silently overwriting their change.
+              Edits send the version they were based on as <code>If-Match</code>. The server answers <code>409</code> with its version if
+              someone changed the record since (and <code>428</code> without the header), and the page shows what changed instead of
+              silently overwriting it (see “Versions and conflicts” below).
             </>,
             <>A pending write disables the controls that would start it again. Errors that need action stay on screen until dismissed.</>,
             <>
               See them on the <StoryLink id="examples-record-page--rename-pending">record page</StoryLink> (rename pending, succeeded,
               failed and rolled back, conflict; archive pending) and the <StoryLink id="examples-create-and-edit--create-failed">create
               form</StoryLink>.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Keeping the store fresh">
+        <Rules
+          items={[
+            <>
+              The baseline is the cache policy: data is fresh for 30 s, and what’s on screen refetches when the window regains focus and
+              when the connection comes back (<code>createQueryClient</code>). Most CRUD screens need nothing more.
+            </>,
+            <>
+              Live events (<code>src/app/api/live.ts</code>) arrive per workspace: record updated, created, deleted. They’re parsed at the
+              boundary like any response, and the server filters them by the recipient’s grant, so a viewer never hears about a draft.
+            </>,
+            <>
+              One handler reconciles them (<code>src/app/model/live.ts</code>) with the mutations’ policy: an update patches the record and
+              every listed copy in place, a delete removes the row, a create is counted, not inserted. Events are idempotent by version, so a
+              late or replayed one, or the echo of this person’s own write, changes nothing.
+            </>,
+            <>
+              Rows never reorder under the cursor: lists are marked stale but the one on screen isn’t refetched. The list says “3 new
+              records since you opened this list” with <strong>Show 3 new</strong>, or “Updated just now by Priya Natarajan” after an
+              in-place change. See <StoryLink id="examples-list-page--live-new-records">new records</StoryLink>,{' '}
+              <StoryLink id="examples-list-page--live-row-updated">an edited row</StoryLink> and{' '}
+              <StoryLink id="examples-record-page--deleted-elsewhere">a record deleted while open</StoryLink>.
+            </>,
+            <>The subscription lives inside the workspace boundary: switching workspace or signing out unsubscribes.</>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Versions and conflicts">
+        <Rules
+          items={[
+            <>
+              Every record carries a <code>version</code> (also sent as an <code>ETag</code>). A write sends the version it was based on as{' '}
+              <code>If-Match</code>; a stale one gets <code>409</code> with the record as the server has it now (“theirs”).
+            </>,
+            <>
+              A conflict is compared field by field against the version the edit started from (<code>src/app/model/conflicts.ts</code>).
+              Fields only you changed keep yours; fields only they changed keep theirs. If none was changed on both sides, the edit is
+              re-based on their version and saved without asking.
+            </>,
+            <>
+              Otherwise the conflict panel shows yours and theirs side by side: <strong>Keep mine (overwrite)</strong>,{' '}
+              <strong>Take theirs</strong>, and a choice per field when several collide. Keep mine never sends back a field only they
+              changed. See <StoryLink id="examples-create-and-edit--edit-conflict-per-field">a conflict per field</StoryLink> and{' '}
+              <StoryLink id="examples-create-and-edit--edit-merged-with-theirs">a merge that needed no one</StoryLink>.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Per-record write queues">
+        <Rules
+          items={[
+            <>
+              Every write to one record, from any surface, goes through that record’s queue (<code>src/app/model/writeQueue.ts</code>),
+              which lives beside the cache, not in a page. Writes are sent one at a time, in order, each on the latest version this client
+              has confirmed, so three quick renames make three requests, none lost and none refused.
+            </>,
+            <>
+              Pending writes are kept apart from the confirmed record. The cache shows the preview: pending writes replayed, in order, on the
+              latest confirmed record. When one fails, only it is dropped and the rest replay; a newer record from a live event or a refetch
+              becomes the base, and is never overwritten by an old snapshot.
+            </>,
+            <>
+              The server audits every record write from its write path (created, renamed, edited field by field, tagged, untagged,
+              moved, archived, restored, deleted, each record a bulk job deletes), so the admin console’s audit log shows them.
+            </>,
+            <>
+              A move decided from a snapshot (an assistant’s proposal) passes <code>asRead</code>: it’s sent on the version it was
+              proposed from, so a stale one is still a 409 even after a live update refreshed the cache.
+            </>,
+            <>
+              The page says what’s pending (“Saving 2 changes…”; see{' '}
+              <StoryLink id="examples-record-page--renames-queued">queued renames</StoryLink>). Sign-out drops what hasn’t been sent.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Drafts">
+        <Rules
+          items={[
+            <>
+              A form owns its draft (<code>useDraft</code> in <code>src/app/model/drafts.ts</code>): the values and the record they started
+              from. Never the cache, which holds only what the server confirmed.
+            </>,
+            <>
+              Drafts autosave to <code>localStorage</code> per workspace, person and record, with every access guarded, and come back when
+              the form reopens (<StoryLink id="examples-create-and-edit--draft-restored">restored</StoryLink>). They’re cleared after a save,
+              on Discard, and for everyone on sign-out.
+            </>,
+            <>
+              While a draft is dirty, in-app navigation asks first (<code>useNavigationGuard</code>:{' '}
+              <StoryLink id="examples-create-and-edit--unsaved-changes-guard">Keep editing, Discard and leave, Leave, keep draft</StoryLink>)
+              and closing the tab gets the browser’s prompt. Back isn’t intercepted; the autosave covers it.
+            </>,
+            <>
+              When the record moves on under an open form (a refetch, a live event), a clean form follows quietly; a dirty one keeps every
+              keystroke and warns, with Review changes (<StoryLink id="examples-create-and-edit--edit-changed-while-editing">changed while
+              editing</StoryLink>).
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Undo or confirm">
+        <Rules
+          items={[
+            <>
+              If it can really be undone, don’t ask first: do it, and offer Undo in a toast (<code>Toast action</code>). Archive, a status
+              move and removing a tag work this way; delete and bulk delete still confirm, naming what will go.
+            </>,
+            <>
+              Undo has to be real (<code>src/app/model/undo.ts</code>). Archive and untag wait out a 6 s window in the record’s queue and
+              are dropped unsent on Undo; a move is sent at once and Undo sends the inverse. Undo after the window compensates, so the
+              toast’s timer (it pauses on hover and focus) and the window can drift harmlessly.
+            </>,
+            <>
+              The toast action’s <code>altText</code> says where else to do the same, for people who can’t reach the toast in time. See{' '}
+              <StoryLink id="examples-record-page--archive-undo-offered">archive with Undo</StoryLink> and{' '}
+              <StoryLink id="examples-list-page--board-move-undo-offered">a board move with Undo</StoryLink>.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="Long-running jobs">
+        <Rules
+          items={[
+            <>
+              A bulk action over “all N matching” runs as a job: the server answers <code>202</code> with the job, queued, and the page never
+              says “done” until the job does (<code>src/app/model/jobs.ts</code>).
+            </>,
+            <>
+              Status is truthful and in words: queued, running “20 of 59”, succeeded (a partial failure lists each failed item with its
+              reason), failed (the job stopped, and says why), cancelled (between chunks; what was done stays done).
+            </>,
+            <>
+              The list shows the latest job with Progress and what to do next: Cancel job while it runs, Retry N failed and Dismiss once it
+              ends. The shell’s header shows the person’s jobs on every page, so a job survives navigation (see{' '}
+              <StoryLink id="examples-list-page--job-running">a running job</StoryLink> and{' '}
+              <StoryLink id="examples-record-page--jobs-follow-you">jobs on another page</StoryLink>).
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="History, scroll and focus">
+        <Rules
+          items={[
+            <>
+              Push to open a record, a section, the edit form, a tab, a page, a display or a saved view. Replace for search, filters, sort,
+              columns and defaults. Neither for a save, a live update or an undo.
+            </>,
+            <>
+              Back (a pop) returns the list as it was left: scrolled where it was, with focus on the row that was opened (
+              <code>useListRestoration</code>). A fresh visit starts at the top.
             </>,
           ]}
         />
@@ -346,8 +516,9 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               last, disabled when the <code>canDelete</code> predicate rules every selected row out.
             </>,
             <>
-              Delete asks with the count in the question. A partial failure stays on screen (“50 deleted, 9 failed”) with the reasons and
-              Retry. See <StoryLink id="examples-list-page--bulk-delete-partial-failure">the partial failure story</StoryLink>.
+              Delete asks with the count in the question. Listed rows go in one request; a partial failure stays on screen (“50 deleted, 9
+              failed”) with the reasons and Retry. “All N matching” runs as a job, and its partial failure is listed on the job, with Retry
+              failed. See <StoryLink id="examples-list-page--bulk-delete-partial-failure">the partial failure story</StoryLink>.
             </>,
           ]}
         />
@@ -415,7 +586,18 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
             </>,
             <>
               Per-story server behaviour comes from <code>src/app/mocks/overrides.ts</code>: <code>hold</code>, <code>fail</code>,{' '}
-              <code>emptyWorkspace</code>, <code>malformed</code>. The database is reset before every story.
+              <code>emptyWorkspace</code>, <code>malformed</code>, and <code>theyEditFirst</code> (someone saves first: a real 409). The
+              database is reset before every story, and stored drafts are cleared.
+            </>,
+            <>
+              Another person’s changes come through the live channel. The toolbar’s <strong>Another user…</strong> pushes an edit, an add
+              or a delete on demand; a story scripts them with <code>mockApi({'{ anotherUser: [...] }'})</code>, delivered once the page has
+              settled and stayed settled, before the settled signal.
+            </>,
+            <>
+              <code>mockApi({'{ undoWindow }'})</code> holds the undo window open (<code>&apos;hold&apos;</code>) or shortens it;{' '}
+              <code>mockApi({'{ jobs }'})</code> seeds jobs paused in a state, and <code>pollJobs</code> runs them to the end. A write held
+              in its undo window counts as settled; a story that polls jobs settles when none is running.
             </>,
           ]}
         />

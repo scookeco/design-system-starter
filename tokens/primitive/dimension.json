@@ -72,6 +72,12 @@
         "unit": "px"
       }
     },
+    "32": {
+      "$value": {
+        "value": 128,
+        "unit": "px"
+      }
+    },
     "$type": "dimension",
     "$description": "4px spacing scale. Keys are multiples of 4px; half is 2px.",
     "half": {

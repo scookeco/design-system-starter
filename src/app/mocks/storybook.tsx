@@ -4,15 +4,25 @@
  * when the data has settled.
  */
 import { QueryClient, type QueryClient as QueryClientType } from '@tanstack/react-query';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 import type { Decorator } from '@storybook/react-vite';
+import { addons } from 'storybook/preview-api';
 import type { HttpHandler } from 'msw';
-import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
+import { ROLES, type Job, type Role, type Session, type Tenant } from '../api/schemas';
+import { draftStorage } from '../model/drafts';
+import { isActiveJob, jobSettings } from '../model/jobs';
+import { undoSettings } from '../model/undo';
+import { writeQueues } from '../model/writeQueue';
 import { AppProviders } from '../providers';
-import { createMemoryHistory } from '../url/history';
+import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
 import { aiHandlers } from './ai';
 import { handlers } from './handlers';
+import { seedJob, type JobSeed } from './jobs';
+import { anotherUser, mockLive, type AnotherUserChange } from './live';
+
+/** Storybook's own event for changing a global (core-events' UPDATE_GLOBALS; its module path is internal). */
+const UPDATE_GLOBALS = 'updateGlobals';
 
 /**
  * Settled: at least one query exists, nothing is fetching or mutating, and some query has an
@@ -25,36 +35,112 @@ const isSettled = (client: QueryClientType) => {
     queries.length > 0 &&
     queries.every((q) => q.state.fetchStatus === 'idle') &&
     queries.some((q) => q.state.status !== 'pending') &&
-    client.isMutating() === 0
+    // A write held in its undo window is waiting on the person, not the server: that's settled.
+    client.isMutating() === writeQueues(client).heldCount() &&
+    // A story that polls its jobs has settled when they've ended.
+    !(Number.isFinite(jobSettings.pollMs) && client.getQueryCache().findAll({ queryKey: [], predicate: (q) => q.queryKey[2] === 'jobs' }).some((q) => (q.state.data as { items: Job[] } | undefined)?.items.some(isActiveJob)))
   );
 };
 
-function SettledSignal({ client }: { client: QueryClientType }) {
+/**
+ * Also plays the story's scripted changes by another user (`mockApi({ anotherUser })`), once, the
+ * first time the page's own queries settle: the page has loaded, then the colleague's change
+ * arrives. The signal stays false until they've been delivered and whatever they invalidated has
+ * refetched, so a screenshot always shows the reconciled page.
+ */
+/** How long the page must stay settled before a scripted change lands. */
+const SCRIPT_QUIET_MS = 150;
+
+function SettledSignal({ client, tenant, script }: { client: QueryClientType; tenant: Tenant; script: readonly AnotherUserChange[] }) {
   useEffect(() => {
+    let pending = script.length > 0;
+    let quiet: ReturnType<typeof setTimeout> | undefined;
+    const play = () => {
+      quiet = undefined;
+      if (!pending || !isSettled(client)) return;
+      pending = false;
+      for (const change of script) anotherUser(tenant, change);
+      update();
+    };
     const update = () => {
-      document.documentElement.dataset.queriesSettled = String(isSettled(client));
+      // The script waits for a quiet moment, not the first settle: a page that loads in stages (the
+      // record, then the form's owners and accounts) must be fully on screen before the change lands.
+      if (pending && isSettled(client) && !quiet) quiet = setTimeout(play, SCRIPT_QUIET_MS);
+      document.documentElement.dataset.queriesSettled = String(!pending && isSettled(client));
     };
     update();
     const unsubscribeQueries = client.getQueryCache().subscribe(update);
     const unsubscribeMutations = client.getMutationCache().subscribe(update);
     return () => {
+      clearTimeout(quiet);
       unsubscribeQueries();
       unsubscribeMutations();
       delete document.documentElement.dataset.queriesSettled;
     };
-  }, [client]);
+  }, [client, tenant, script]);
+  return null;
+}
+
+/** The gallery's "Another user…" toolbar: one change per pick, on the record the page shows (or the list's first row). */
+const TOOLBAR_CHANGES = ['edit', 'add', 'delete'] as const;
+type ToolbarChange = (typeof TOOLBAR_CHANGES)[number];
+const isToolbarChange = (value: unknown): value is ToolbarChange => (TOOLBAR_CHANGES as readonly unknown[]).includes(value);
+
+function ToolbarChanges({ client, tenant, history, pushed, onPushed }: { client: QueryClientType; tenant: Tenant; history: MemoryHistory; pushed: unknown; onPushed: () => void }) {
+  const push = useEffectEvent((change: ToolbarChange) => {
+    // The record on screen: the URL's, or the one record the page has loaded (a record story opens at /).
+    const onRecord = /^\/records\/([^/]+)/.exec(history.location().pathname)?.[1];
+    const details = client.getQueryCache().findAll({ predicate: (q) => q.queryKey[2] === 'record' });
+    const loaded = details.length === 1 ? (details[0]?.queryKey[3] as { id?: string } | undefined)?.id : undefined;
+    const id = onRecord && onRecord !== 'new' ? onRecord : loaded;
+    anotherUser(tenant, change === 'add' ? { kind: 'add' } : { kind: change, ...(id ? { id } : {}) });
+    onPushed();
+  });
+  // Once per pick, once the page has loaded (a change that lands before the first answer is just
+  // part of it); the toolbar then goes back to "none", ready for the next one.
+  useEffect(() => {
+    if (!isToolbarChange(pushed)) return;
+    if (isSettled(client)) {
+      push(pushed);
+      return;
+    }
+    let done = false;
+    const unsubscribe = client.getQueryCache().subscribe(() => {
+      if (done || !isSettled(client)) return;
+      done = true;
+      queueMicrotask(() => {
+        unsubscribe();
+        push(pushed);
+      });
+    });
+    return () => {
+      done = true;
+      unsubscribe();
+    };
+  }, [client, pushed]);
   return null;
 }
 
 /** Stories never retry and never go stale: a failure shows at once, and nothing refetches mid-capture. */
 const storyClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 
-function StoryProviders({ session, tenant, url, children }: { session: Session; tenant: Tenant; url: string; children: ReactNode }) {
+interface StoryProvidersProps {
+  session: Session;
+  tenant: Tenant;
+  url: string;
+  script: readonly AnotherUserChange[];
+  pushed: unknown;
+  onPushed: () => void;
+  children: ReactNode;
+}
+
+function StoryProviders({ session, tenant, url, script, pushed, onPushed, children }: StoryProvidersProps) {
   const [client] = useState(storyClient);
   const [history] = useState(() => createMemoryHistory(url));
   return (
-    <AppProviders session={session} tenant={tenant} queryClient={client} history={history}>
-      <SettledSignal client={client} />
+    <AppProviders session={session} tenant={tenant} queryClient={client} history={history} live={mockLive}>
+      <SettledSignal client={client} tenant={tenant} script={script} />
+      <ToolbarChanges client={client} tenant={tenant} history={history} pushed={pushed} onPushed={onPushed} />
       {children}
     </AppProviders>
   );
@@ -70,7 +156,23 @@ export interface MockApiParameters {
   role?: Role | Partial<Record<Tenant, Role>>;
   /** The URL the page opens at, kept in an in-memory history so the gallery's own URL is never rewritten. */
   url?: string;
+  /**
+   * Changes another person makes once the page has loaded, delivered through the live channel
+   * (in order, before the settled signal). Deterministic: the same changes at the same moment.
+   */
+  anotherUser?: readonly AnotherUserChange[];
+  /** The undo window: 'hold' keeps it open (the toast and the held write stay), a number shortens it. Default 6 s. */
+  undoWindow?: 'hold' | number;
+  /** Jobs already in the person's list when the page opens, each paused in its state (a still frame). */
+  jobs?: readonly JobSeed[];
+  /**
+   * Poll running jobs every this many ms, so they advance and finish (the story settles once none is
+   * running). Off by default: a seeded job is a still frame.
+   */
+  pollJobs?: number;
 }
+
+const NO_SCRIPT: readonly AnotherUserChange[] = [];
 
 const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).includes(value) ? (value as Role) : 'admin';
 
@@ -80,10 +182,20 @@ const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).incl
  * server would return for it.
  */
 const withMockApi: Decorator = (Story, context) => {
-  const { tenant = 'acme', url = '/', role } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT, undoWindow = 6_000, pollJobs } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  undoSettings.windowMs = undoWindow === 'hold' ? Infinity : undoWindow;
+  jobSettings.pollMs = pollJobs ?? Infinity;
   setRoles(role ?? toolbarRole(context.globals.role));
   return (
-    <StoryProviders session={currentSession()} tenant={tenant} url={url}>
+    <StoryProviders
+      session={currentSession()}
+      tenant={tenant}
+      url={url}
+      script={script}
+      pushed={context.globals.anotherUser}
+      // Back to "none" (as the toolbar would), ready for the next pick.
+      onPushed={() => addons.getChannel().emit(UPDATE_GLOBALS, { globals: { anotherUser: 'none' } })}
+    >
       <Story />
     </StoryProviders>
   );
@@ -102,8 +214,13 @@ export const mockApiMeta = {
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
   // The assistant's routes (./ai) sit beside the rest; they import the same route wrapper, so they live in their own module.
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
-  beforeEach: () => {
+  beforeEach: (context: { parameters: { mockApi?: MockApiParameters } }) => {
     resetDb();
+    // Drafts autosave to this browser's storage: every story starts with none.
+    draftStorage.clearAll();
+    const { tenant = 'acme', jobs = [] } = context.parameters.mockApi ?? {};
+    // Seeded newest first, as the server lists them: the first seed is the latest job.
+    for (const job of [...jobs].reverse()) seedJob(tenant, job);
   },
 };
 

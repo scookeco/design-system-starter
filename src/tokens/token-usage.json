@@ -1193,6 +1193,15 @@
           ]
         },
         {
+          "token": "space.scroll-padding.toast",
+          "readBy": [
+            {
+              "unit": "AppShell",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -21878,12 +21887,123 @@
         "src/components/Toast/Toast.css"
       ],
       "composes": [
+        "Button",
         "Icon"
       ],
       "composesAll": [
-        "Icon"
+        "Button",
+        "Icon",
+        "Spinner"
       ],
       "tokens": [
+        {
+          "token": "button.danger.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.border",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
         {
           "token": "color.bg.elevated",
           "readBy": [
@@ -21894,8 +22014,21 @@
           ]
         },
         {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.border.default",
           "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
             {
               "unit": "Toast",
               "how": "css"
@@ -21912,8 +22045,21 @@
           ]
         },
         {
+          "token": "color.fg.disabled",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.muted",
           "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            },
             {
               "unit": "Toast",
               "how": "css"
@@ -21966,8 +22112,30 @@
           ]
         },
         {
+          "token": "ease.linear",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.standard",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.width",
           "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            },
             {
               "unit": "Toast",
               "how": "css"
@@ -21984,10 +22152,41 @@
           ]
         },
         {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.spin",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "radius.control",
           "readBy": [
             {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
               "unit": "Toast",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Spinner",
               "how": "css"
             }
           ]
@@ -22011,10 +22210,41 @@
           ]
         },
         {
+          "token": "size.control.lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.sm",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.icon.md",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
               "how": "css"
             }
           ]
@@ -22024,6 +22254,10 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
               "how": "css"
             }
           ]
@@ -22040,6 +22274,10 @@
         {
           "token": "size.target-min",
           "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
             {
               "unit": "Toast",
               "how": "css"
@@ -22068,7 +22306,20 @@
           "token": "space.gap.xs",
           "readBy": [
             {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
               "unit": "Toast",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Button",
               "how": "css"
             }
           ]
@@ -22077,7 +22328,20 @@
           "token": "space.inset.md",
           "readBy": [
             {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
               "unit": "Toast",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "Button",
               "how": "css"
             }
           ]
@@ -22092,8 +22356,21 @@
           ]
         },
         {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.label",
           "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
             {
               "unit": "Toast",
               "how": "css"
@@ -24700,6 +24977,18 @@
       "chain": [
         "space.scroll-padding.start",
         "space.12"
+      ],
+      "modes": {}
+    },
+    "space.scroll-padding.toast": {
+      "cssVar": "--space-scroll-padding-toast",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action.",
+      "value": "128px",
+      "chain": [
+        "space.scroll-padding.toast",
+        "space.32"
       ],
       "modes": {}
     },

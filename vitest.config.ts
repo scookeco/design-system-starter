@@ -7,5 +7,6 @@ export default defineConfig({
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     exclude: ['tests/visual/**', 'fixtures/**', 'node_modules/**'],
     environment: 'node',
+    setupFiles: ['tests/unit/setup.ts'],
   },
 });

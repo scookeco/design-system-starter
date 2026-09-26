@@ -75,6 +75,11 @@ export const AUDIT_LABELS: Record<AuditAction, string> = {
   'session.signed_in': 'Signed in',
   'api_key.created': 'API key created',
   'api_key.revoked': 'API key revoked',
+  'record.updated': 'Record edited',
+  'record.moved': 'Record moved',
+  'record.restored': 'Record restored',
+  'record.tagged': 'Tag added',
+  'record.untagged': 'Tag removed',
 };
 
 const ROLE_DESCRIPTIONS: Record<Role, string> = {

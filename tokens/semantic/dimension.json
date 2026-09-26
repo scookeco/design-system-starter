@@ -55,6 +55,10 @@
       "end": {
         "$value": "{space.20}",
         "$description": "Above a sticky action bar (AppShell, FocusedLayout and Drawer footers). At least the tallest bar."
+      },
+      "toast": {
+        "$value": "{space.32}",
+        "$description": "Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action."
       }
     }
   },

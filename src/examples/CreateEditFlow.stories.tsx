@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fail, hold } from '../app/mocks/overrides';
+import { fail, hold, theyEditFirst } from '../app/mocks/overrides';
+import { SEED_EPOCH } from '../app/mocks/seed';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
+import { draftStorage } from '../app/model/drafts';
 import { CreateEditFlow } from './CreateEditFlow';
 import { Guard } from './Permission';
 
@@ -40,3 +42,43 @@ export const AsViewerDenied: Story = {
   ),
 };
 
+
+// Edit: /records/:id/edit. The save is a versioned write (If-Match); theyEditFirst makes someone
+// else save a change first, so the save meets a 409 with their version.
+const edit = { recordId: 'r-1001' } as const;
+export const EditRecord: Story = { args: edit };
+export const EditSaved: Story = { args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true } };
+/** They changed the amount, you changed the name: no field collides, so your edit is re-based on their version and saved. */
+export const EditMergedWithTheirs: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ amountMinor: 9_900_000 })),
+};
+/** You both renamed it: yours and theirs side by side, Keep mine (overwrite) or Take theirs. */
+export const EditConflict: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ name: 'Hardware lease (renegotiated)' })),
+};
+/** You both changed the name and the amount: a choice per field, then Save these choices. */
+export const EditConflictPerField: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027', amount: '15000.00' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ name: 'Hardware lease (renegotiated)', amountMinor: 9_900_000 })),
+};
+
+// Drafts: the form owns its draft, autosaved on this device (localStorage, per workspace, person
+// and record). These stories put one there before the page opens.
+const storedDraft = (entity: string, values: Record<string, unknown>) => () => {
+  draftStorage.write(`acme:u-sam:${entity}`, { values: { name: '', owner: '', account: '', description: '', amount: '', renewal: '', remind: true, ...values }, base: undefined, savedAt: SEED_EPOCH - 5 * 60_000 });
+};
+/** The form opened with a draft kept from last time: restored, with Discard them. */
+export const DraftRestored: Story = { beforeEach: storedDraft('record:new', { name: 'Hardware lease', owner: 'acme-p02', amount: '12500' }) };
+/** Unsaved changes, and a link was followed: the guard holds the navigation and asks. */
+export const UnsavedChangesGuard: Story = {
+  tags: ['modal-open'],
+  args: { initialLeave: '/records' },
+  beforeEach: storedDraft('record:new', { name: 'Hardware lease', owner: 'acme-p02', amount: '12500' }),
+};
+/** Someone else saved the record while it was being edited: the typed changes stay, with a warning and Review changes. */
+export const EditChangedWhileEditing: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027' } },
+  parameters: mockApi({ anotherUser: [{ kind: 'edit', id: 'r-1001', changes: { amountMinor: 9_900_000 } }] }),
+};

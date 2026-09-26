@@ -1327,6 +1327,7 @@ States: open, defaultOpen.
 
 - A long or multi-step form → a full page from the Create and edit example
 - Telling people something happened → `Toast` or `Banner`
+- Confirming something that can be undone (archive, move, remove a tag) → do it at once and offer Undo in a `Toast` (its `action`); keep the dialog for what can’t be undone, and for bulk actions
 - Choosing an action → `Menu`
 
 **Do:** A focused quick-create: a short title, the fields, and the primary action last.
@@ -3911,6 +3912,7 @@ Props:
 - `onOpenChange?: (open: boolean) => void`
 - `duration?: number`: Auto-dismiss delay in ms. Infinity keeps it open (use for anything the user must act on).
 - `closeLabel?: string` = `'Dismiss'`: Label of the dismiss button.
+- `action?: ToastAction`: One action, such as Undo for a reversible change ("Record archived · Undo"). Give the toast a duration long enough to reach it (the undo window), and keep the same way out elsewhere on the page (altText says where).
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
@@ -3936,11 +3938,13 @@ Signature: `() => (toast: ToastInput) => void`
 
 - Confirming the outcome of an action that doesn’t change the page visibly: saved, copied, export started.
 - Call `useToast()` from inside the app; AppShell mounts the one `ToastProvider`.
+- Offering Undo after a reversible change (archive, move, remove a tag): `action={{ label: 'Undo', altText, onAction }}` with a `duration` as long as the undo window. Prefer this to asking “Are you sure?” first.
 
 **When not to use**
 
 - Something people must fix or act on → `Banner` in the page, or an inline field error
 - A form’s validation errors → field errors plus an error summary `Banner`
+- Undo for something that can’t really be undone (a permanent delete) → a confirming `Dialog` that names what will go
 
 **Do:** A short confirmation that disappears by itself. Press the button to see it.
 
@@ -3962,10 +3966,11 @@ Signature: `() => (toast: ToastInput) => void`
 
 - Toasts live in a labelled region; success, info and neutral are announced politely, danger and warning assertively.
 - The tone has an icon, never colour alone. Anything the user must act on needs `duration={Infinity}`, and usually isn’t a toast.
+- An action’s `altText` is required and announced with the toast: it tells people who can’t reach the button in time where else to do the same (“Find it under Archived to restore it”). Hovering or focusing the toast pauses its timer.
 
-Stories: `components-toast--success`, `components-toast--warning`, `components-toast--danger`, `components-toast--info`, `components-toast--neutral`, `components-toast--imperative`.
-Composes: Icon.
-Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `text.body`, `text.label`, `z.toast`.
+Stories: `components-toast--success`, `components-toast--warning`, `components-toast--danger`, `components-toast--info`, `components-toast--neutral`, `components-toast--with-action`, `components-toast--imperative`.
+Composes: Button, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.label`, `z.toast`.
 
 ### Toggle
 
@@ -4965,7 +4970,7 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 
 Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
 Composes: Button, Drawer, Icon, Kbd, Link, Nav, Spinner, Toast, Tooltip.
-Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `space.scroll-padding.toast`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
 
 ### AssistantPanel
 
@@ -5434,6 +5439,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `StepperStep` (`src/components/Stepper/Stepper.tsx`): `interface StepperStep { label: string; }`
 - `StreamStatus` (`src/components/StreamingText/StreamingText.tsx`): `type StreamStatus = 'pending' | 'streaming' | 'complete' | 'stopped' | 'error'` Where an answer is: waiting for its first token, arriving, finished, stopped by the person, or failed.
 - `TimelineEvent` (`src/components/Timeline/Timeline.tsx`): `interface TimelineEvent { id: string; actor: string; verb: string; target?: ReactNode; time: string; dateTime: string; detail?: string; }` One thing that happened: who did what to which, and when.
+- `ToastAction` (`src/components/Toast/Toast.tsx`): `interface ToastAction { label: string; altText: string; onAction: () => void; }` The one action a toast can offer, such as Undo. Choosing it closes the toast.
 - `ToastTone` (`src/components/Toast/Toast.tsx`): `type ToastTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 
 ## Guides in full
@@ -5726,10 +5732,11 @@ tokens → primitives → components → layouts        the design system (src/i
                                          ↑
 src/app   api/        the client and zod schemas: every response is parsed at the boundary
           model/      cache keys, queries, named predicates, projections, mutations, selection,
-                      permissions (the role → capability mapping and the one predicate, can)
+                      permissions (the role → capability mapping and the one predicate, can),
+                      freshness (live), per-record write queues, conflicts, drafts, undo, jobs
           session.tsx the session: memberships, the active workspace, switch, sign out
           routing/    the route entry type, the matcher, RouteView and AppLink
-          url/        useUrlState and the list page's URL codec
+          url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
                                          ↑
@@ -5772,7 +5779,7 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
 | Role | Holds | In the examples |
 |---|---|---|
 | Viewer | workspace:read, record:read, account:read | Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive |
-| Editor | Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create | Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled |
+| Editor | Viewer’s, plus record:read-drafts, record:create, rename, edit, move, archive, account:create, people:create | Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled |
 | Admin | Editor’s, plus workspace:manage, record:delete, account:edit, members:manage, audit:read | Everything, including the audit log; invites, changes and removes members |
 
 - Capabilities are `resource:action` strings. Roles map to them in exactly one place, and the session carries each membership’s capabilities as the server derived them. The client never decides anything from a role name.
@@ -5801,6 +5808,7 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
 |---|---|---|
 | Local state | What one component owns: an open menu, a half-typed search, a form draft | The rename dialog’s typed name |
 | Lifted state | What two parts of one page coordinate on | The list’s selection (the table and the footer bar share it) |
+| Form draft | An edit in progress, owned by its form (never the cache), with the version it started from; autosaved on the device | The edit form’s values and base record (useDraft) |
 | Server cache | Confirmed domain data, read through queries | A page of records, a record, the tab counts |
 | URL | What a copied link must reproduce: view, search, filters, sort, page, tab | /records?view=open&q=lease&sort=-amount&page=2 |
 
@@ -5816,11 +5824,16 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 
 | Mutation | Presents | Patches | Invalidates | On failure |
 |---|---|---|---|---|
-| `renameRecord` | Optimistic | The record and every cached list page holding it, at once; both rolled back on failure unless a newer write landed | The record, every list (counts can’t change) | Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload; a 403 refreshes the session |
-| `moveRecord` | Pessimistic | The record and every listed copy, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
-| `archiveRecord` | Pessimistic | The record and every listed copy, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
+| `renameRecord` | Optimistic, queued | The record and every cached list page holding it, at once (the queue’s preview); rebased on failure, never over a newer write | The record, every list (counts can’t change) | Old name back, a toast that stays, the typed name kept; a 409 shows the conflict panel (or Reload); a 403 refreshes the session |
+| `updateRecord` | Pessimistic, versioned (If-Match: the draft’s base) | The record and every listed copy, with the server’s answer; on a 409, the record takes theirs | Every list | A 409 with no field changed on both sides is re-based and saved once; otherwise the conflict panel |
+| `moveRecord` | Pessimistic, queued, undoable | The record and every listed copy, with the server’s answer | Every list and count | Nothing changed; a toast that stays. Undo moves it back |
+| `archiveRecord` | Optimistic, held for the undo window | The record and every listed copy, at once | Every list and count | Undo inside the window sends nothing; after it, restoreRecord |
+| `restoreRecord` | Optimistic, queued | The record and every listed copy | Every list and count | Still archived; a toast that stays |
+| `tagRecord · untagRecord` | Optimistic, queued; untag held for the undo window | The record and every listed copy | Every list | The tag is back; legal hold is refused by both sides |
 | `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count | The draft stays; a retry sends the same key, so no duplicate |
-| `bulkDeleteRecords` | Pessimistic, confirmed | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
+| `bulkDeleteRecords` | Pessimistic, confirmed (listed ids) | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
+| `startBulkDelete` | A job, confirmed (“all N matching”) | Appends the job, queued | Nothing yet: each poll that moves the job refetches lists and counts | Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed |
+| `cancelJob · dismissJob` | Pessimistic | The job (cancelled), or removes it | Every list and count (cancel) | A finished job can’t be cancelled; a running one can’t be dismissed |
 | `addPerson` | Pessimistic | Appends to people | People | The dialog stays open with an error |
 | `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory | The form stays, with a banner |
 | `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | Nothing else: records hold its id, so every row re-renders from the directory | A banner; a 409 says someone else changed it |
@@ -5829,9 +5842,55 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 | `inviteMember · changeRole · removeMember` | Pessimistic: it changes what someone else can do | Members (the answer) | Members, the audit log | The dialog stays open with the server’s reason (last admin, your own role, already a member) |
 
 - An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
-- Edits send the version they were based on. The server answers `409` if someone changed the record since, and the page says so instead of silently overwriting their change.
+- Edits send the version they were based on as `If-Match`. The server answers `409` with its version if someone changed the record since (and `428` without the header), and the page shows what changed instead of silently overwriting it (see “Versions and conflicts” below).
 - A pending write disables the controls that would start it again. Errors that need action stay on screen until dismissed.
 - See them on the [record page](src/examples/RecordPage.tsx) (rename pending, succeeded, failed and rolled back, conflict; archive pending) and the [create form](src/examples/CreateEditFlow.tsx).
+
+#### Keeping the store fresh
+
+- The baseline is the cache policy: data is fresh for 30 s, and what’s on screen refetches when the window regains focus and when the connection comes back (`createQueryClient`). Most CRUD screens need nothing more.
+- Live events (`src/app/api/live.ts`) arrive per workspace: record updated, created, deleted. They’re parsed at the boundary like any response, and the server filters them by the recipient’s grant, so a viewer never hears about a draft.
+- One handler reconciles them (`src/app/model/live.ts`) with the mutations’ policy: an update patches the record and every listed copy in place, a delete removes the row, a create is counted, not inserted. Events are idempotent by version, so a late or replayed one, or the echo of this person’s own write, changes nothing.
+- Rows never reorder under the cursor: lists are marked stale but the one on screen isn’t refetched. The list says “3 new records since you opened this list” with **Show 3 new**, or “Updated just now by Priya Natarajan” after an in-place change. See [new records](src/examples/ListPage.tsx), [an edited row](src/examples/ListPage.tsx) and [a record deleted while open](src/examples/RecordPage.tsx).
+- The subscription lives inside the workspace boundary: switching workspace or signing out unsubscribes.
+
+#### Versions and conflicts
+
+- Every record carries a `version` (also sent as an `ETag`). A write sends the version it was based on as `If-Match`; a stale one gets `409` with the record as the server has it now (“theirs”).
+- A conflict is compared field by field against the version the edit started from (`src/app/model/conflicts.ts`). Fields only you changed keep yours; fields only they changed keep theirs. If none was changed on both sides, the edit is re-based on their version and saved without asking.
+- Otherwise the conflict panel shows yours and theirs side by side: **Keep mine (overwrite)**, **Take theirs**, and a choice per field when several collide. Keep mine never sends back a field only they changed. See [a conflict per field](src/examples/CreateEditFlow.tsx) and [a merge that needed no one](src/examples/CreateEditFlow.tsx).
+
+#### Per-record write queues
+
+- Every write to one record, from any surface, goes through that record’s queue (`src/app/model/writeQueue.ts`), which lives beside the cache, not in a page. Writes are sent one at a time, in order, each on the latest version this client has confirmed, so three quick renames make three requests, none lost and none refused.
+- Pending writes are kept apart from the confirmed record. The cache shows the preview: pending writes replayed, in order, on the latest confirmed record. When one fails, only it is dropped and the rest replay; a newer record from a live event or a refetch becomes the base, and is never overwritten by an old snapshot.
+- The server audits every record write from its write path (created, renamed, edited field by field, tagged, untagged, moved, archived, restored, deleted, each record a bulk job deletes), so the admin console’s audit log shows them.
+- A move decided from a snapshot (an assistant’s proposal) passes `asRead`: it’s sent on the version it was proposed from, so a stale one is still a 409 even after a live update refreshed the cache.
+- The page says what’s pending (“Saving 2 changes…”; see [queued renames](src/examples/RecordPage.tsx)). Sign-out drops what hasn’t been sent.
+
+#### Drafts
+
+- A form owns its draft (`useDraft` in `src/app/model/drafts.ts`): the values and the record they started from. Never the cache, which holds only what the server confirmed.
+- Drafts autosave to `localStorage` per workspace, person and record, with every access guarded, and come back when the form reopens ([restored](src/examples/CreateEditFlow.tsx)). They’re cleared after a save, on Discard, and for everyone on sign-out.
+- While a draft is dirty, in-app navigation asks first (`useNavigationGuard`: [Keep editing, Discard and leave, Leave, keep draft](src/examples/CreateEditFlow.tsx)) and closing the tab gets the browser’s prompt. Back isn’t intercepted; the autosave covers it.
+- When the record moves on under an open form (a refetch, a live event), a clean form follows quietly; a dirty one keeps every keystroke and warns, with Review changes ([changed while editing](src/examples/CreateEditFlow.tsx)).
+
+#### Undo or confirm
+
+- If it can really be undone, don’t ask first: do it, and offer Undo in a toast (`Toast action`). Archive, a status move and removing a tag work this way; delete and bulk delete still confirm, naming what will go.
+- Undo has to be real (`src/app/model/undo.ts`). Archive and untag wait out a 6 s window in the record’s queue and are dropped unsent on Undo; a move is sent at once and Undo sends the inverse. Undo after the window compensates, so the toast’s timer (it pauses on hover and focus) and the window can drift harmlessly.
+- The toast action’s `altText` says where else to do the same, for people who can’t reach the toast in time. See [archive with Undo](src/examples/RecordPage.tsx) and [a board move with Undo](src/examples/ListPage.tsx).
+
+#### Long-running jobs
+
+- A bulk action over “all N matching” runs as a job: the server answers `202` with the job, queued, and the page never says “done” until the job does (`src/app/model/jobs.ts`).
+- Status is truthful and in words: queued, running “20 of 59”, succeeded (a partial failure lists each failed item with its reason), failed (the job stopped, and says why), cancelled (between chunks; what was done stays done).
+- The list shows the latest job with Progress and what to do next: Cancel job while it runs, Retry N failed and Dismiss once it ends. The shell’s header shows the person’s jobs on every page, so a job survives navigation (see [a running job](src/examples/ListPage.tsx) and [jobs on another page](src/examples/RecordPage.tsx)).
+
+#### History, scroll and focus
+
+- Push to open a record, a section, the edit form, a tab, a page, a display or a saved view. Replace for search, filters, sort, columns and defaults. Neither for a save, a live update or an undo.
+- Back (a pop) returns the list as it was left: scrolled where it was, with focus on the row that was opened (`useListRestoration`). A fresh visit starts at the top.
 
 #### Selection and bulk actions
 
@@ -5839,7 +5898,7 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - The header box selects the page, then offers “Select all N matching”. That selection is the *filter*, sent to the server as a filter, never as a list of ids it would have to load.
 - A selection belongs to one filter: change the search, a filter or the view and it clears. Paging and sorting keep it.
 - While anything is selected the shell’s sticky footer shows the count (announced politely), Clear selection, and Delete last, disabled when the `canDelete` predicate rules every selected row out.
-- Delete asks with the count in the question. A partial failure stays on screen (“50 deleted, 9 failed”) with the reasons and Retry. See [the partial failure story](src/examples/ListPage.tsx).
+- Delete asks with the count in the question. Listed rows go in one request; a partial failure stays on screen (“50 deleted, 9 failed”) with the reasons and Retry. “All N matching” runs as a job, and its partial failure is listed on the job, with Retry failed. See [the partial failure story](src/examples/ListPage.tsx).
 
 #### Registries: fields as config
 
@@ -5859,7 +5918,9 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - Stories and tests talk to a real HTTP mock (MSW) over a seeded, deterministic database: 240 and 120 records for two tenants, the same on every run.
 - The toolbar’s **Latency** and **Failures** controls change how the mock server behaves. Failures are real 500 responses through the real client, so the error states you see are the ones users would.
 - The visual suite pins latency and failures to 0 in the story URL, freezes the page clock at the instant the data was seeded for (so “3 days ago” holds), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose (a loading or pending state) is tagged `busy`.
-- Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`. The database is reset before every story.
+- Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`, and `theyEditFirst` (someone saves first: a real 409). The database is reset before every story, and stored drafts are cleared.
+- Another person’s changes come through the live channel. The toolbar’s **Another user…** pushes an edit, an add or a delete on demand; a story scripts them with `mockApi({ anotherUser: [...] })`, delivered once the page has settled and stayed settled, before the settled signal.
+- `mockApi({ undoWindow })` holds the undo window open (`'hold'`) or shortens it; `mockApi({ jobs })` seeds jobs paused in a state, and `pollJobs` runs them to the end. A write held in its undo window counts as settled; a story that polls jobs settles when none is running.
 
 ```
 const meta = {
@@ -6820,6 +6881,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `space.inset.xs` `var(--space-inset-xs)`: `4px`. Padding inside a box.
 - `space.scroll-padding.end` `var(--space-scroll-padding-end)`: `80px`. Above a sticky action bar (AppShell, FocusedLayout and Drawer footers). At least the tallest bar.
 - `space.scroll-padding.start` `var(--space-scroll-padding-start)`: `48px`. Below a sticky header row (Table). At least the header's height.
+- `space.scroll-padding.toast` `var(--space-scroll-padding-toast)`: `128px`. Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action.
 - `text.body` `var(--text-body)`: `400 0.875rem/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Default for paragraphs, table cells and form values.
 - `text.body-lg` `var(--text-body-lg)`: `400 1rem/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Lead paragraphs and page introductions.
 - `text.caption` `var(--text-caption)`: `400 0.75rem/1.375 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Helper text, metadata and timestamps.
