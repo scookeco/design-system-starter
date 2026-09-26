@@ -55,3 +55,16 @@ export { CodeBlock, type CodeBlockProps } from './CodeBlock/CodeBlock';
 export { Divider, type DividerProps } from './Divider/Divider';
 export { Toggle, type ToggleProps } from './Toggle/Toggle';
 export { HoverCard, type HoverCardProps } from './HoverCard/HoverCard';
+// AI patterns
+export { Kbd, type KbdProps } from './Kbd/Kbd';
+export { AiMarker, type AiMarkerProps } from './AiMarker/AiMarker';
+export { StreamingText, type StreamingTextProps, type StreamStatus } from './StreamingText/StreamingText';
+export { Message, type MessageProps, type MessageRole } from './Message/Message';
+export { ChatThread, type ChatThreadProps } from './ChatThread/ChatThread';
+export { Composer, type ComposerProps, type ComposerAttachment } from './Composer/Composer';
+export { Citation, SourcesList, type CitationProps, type SourcesListProps, type Source } from './Citation/Citation';
+export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
+export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
+export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';
+export { Disclosure, type DisclosureProps } from './Disclosure/Disclosure';
+export { Accordion, type AccordionProps, type AccordionItem } from './Accordion/Accordion';

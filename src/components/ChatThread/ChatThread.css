@@ -1,0 +1,60 @@
+@layer components {
+  /* 1. block: fills its container; the scroller inside is what scrolls */
+  .chat-thread {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-block-size: 0;
+  }
+
+  /* 2. parts */
+  .chat-thread__scroller {
+    flex: 1;
+    min-block-size: 0;
+    overflow-y: auto;
+    padding: var(--space-inset-md);
+
+    /* Focus scrolls clear of the Jump to latest button, never under it (WCAG 2.4.11). */
+    scroll-padding-block-end: var(--space-scroll-padding-end);
+  }
+
+  .chat-thread__scroller:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+
+  .chat-thread__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chat-thread__turn {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .chat-thread__empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: 100%;
+  }
+
+  .chat-thread__jump {
+    position: absolute;
+    inset-block-end: var(--space-inset-sm);
+    inset-inline: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .chat-thread__jump > * {
+    pointer-events: auto;
+  }
+}

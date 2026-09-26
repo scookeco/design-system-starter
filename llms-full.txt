@@ -79,24 +79,33 @@ UI rules (design system v0)
 
 ## Components
 
+- [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [ChatThread](docs/usage/ChatThread.usage.tsx): The scrolling list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
+- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
+- [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
 - [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
 - [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
@@ -105,6 +114,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
@@ -113,6 +123,8 @@ UI rules (design system v0)
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
+- [StreamingText](docs/usage/StreamingText.usage.tsx): Text that arrives token by token
+- [Suggestion](docs/usage/Suggestion.usage.tsx): A multi-line text field that can show an inline AI…
 - [Switch](docs/usage/Switch.usage.tsx): An on/off setting that takes effect as a setting, not a form answer
 - [Table](docs/usage/Table.usage.tsx): Data table: native table semantics, sticky header, tabular numbers
 - [Tabs](docs/usage/Tabs.usage.tsx): Tabs: arrow-key roving focus and ARIA wiring come from Radix Tabs
@@ -169,6 +181,119 @@ UI rules (design system v0)
 - [Sign in](src/examples/SignInPage.tsx)
 
 ## Components reference
+
+### Accordion
+
+component · `src/components/Accordion/Accordion.tsx` · usage: `docs/usage/Accordion.usage.tsx`
+
+A stack of titled sections that open and close: steps an agent took, FAQ-style details. Each title is a heading wrapping a button with aria-expanded; arrow keys move between titles. From Radix Accordion. `single` (default) keeps one open; `multiple` lets several stay open.
+
+Props:
+- `items: readonly AccordionItem[]`
+- `headingLevel?: 2 | 3 | 4 | 5 | 6` = `3`: Heading level of each item's title, so the outline stays right where it sits.
+- `type?: 'single'`
+- `value?: string`
+- `defaultValue?: string`
+- `onValueChange?: (value: string) => void`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: headingLevel (2 | 3 | 4 | 5 | 6); type (multiple | single).
+
+**When to use**
+
+- A stack of titled sections where people open one or a few: the steps an agent took, grouped settings help, an FAQ.
+- `single` (default) keeps one open; `multiple` lets several stay open. Set `headingLevel` to fit the page outline.
+
+**When not to use**
+
+- One section of details → `Disclosure`
+- Sections that are pages of their own → `NavTabs`
+- A form split into steps → the Wizard archetype (`SetupWizard`)
+
+**Do:** Each title names a step and its status sits beside it.
+
+```tsx
+<Accordion
+  defaultValue="check"
+  items={[
+    { value: 'search', title: 'Search records', meta: <Badge tone="success">Done</Badge>, content: '12 records matched.' },
+    { value: 'check', title: 'Check permissions', meta: <Badge tone="success">Done</Badge>, content: 'You can move 10 of them.' },
+  ]}
+/>
+```
+
+**Don't:** Every section holds one line: show the lines instead.
+
+```tsx
+<Accordion
+  items={[
+    { value: 'a', title: 'Owner', content: 'Sam Rivera' },
+    { value: 'b', title: 'Status', content: 'Active' },
+  ]}
+/>
+```
+
+**Accessibility**
+
+- Each title is a heading at `headingLevel` wrapping a button with `aria-expanded` (Radix Accordion). Arrow keys move between titles; Home and End jump.
+- A disabled item stays in the list and says why in its title or content.
+
+Stories: `components-accordion--single`, `components-accordion--multiple`, `components-accordion--all-closed`, `components-accordion--with-disabled-item`.
+Composes: Disclosure, Icon.
+Tokens read: `color.bg.hover`, `color.border.default`, `color.fg.default`, `ease.standard`, `icon.stroke`, `motion.fast`, `radius.control`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.xs`, `text.body`, `text.label`.
+
+### AiMarker
+
+component · `src/components/AiMarker/AiMarker.tsx` · usage: `docs/usage/AiMarker.usage.tsx`
+
+Marks content the AI wrote and a person hasn't accepted or edited yet: a sparkle and a text label on the AI tint. Never colour alone, and never on content a person wrote.
+
+Props:
+- `children?: string` = `'AI-generated'`: What the AI did, in words: "AI-generated", "Drafted with AI", "Suggested by AI". The text carries the meaning; the tint only reinforces it.
+- `variant?: 'badge' | 'inline'` = `'badge'`: badge: a pill beside a block or a field. inline: a quiet label inside a line of text or a header.
+- …plus the native attributes of `AriaAttributes`, `Attributes`, `DOMAttributes`, `HTMLAttributes`, `RefAttributes`.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: variant (badge | inline).
+
+**When to use**
+
+- Content the AI wrote that a person hasn’t accepted or edited yet: a drafted field, a generated summary, a proposed change.
+- `badge` beside a block or field; `inline` in a header or a line of text (an assistant turn’s header).
+
+**When not to use**
+
+- Content a person accepted or edited → nothing: remove the mark, or record “edited” in the content’s history
+- A button that runs an AI action → a `Button` with the sparkle and a verb (“Suggest description”)
+- A status → `Badge`
+
+**Do:** The label says what the AI did; the tint and sparkle only reinforce it.
+
+```tsx
+<Cluster gap="sm">
+  <Text as="span">Summary</Text>
+  <AiMarker>Drafted with AI</AiMarker>
+</Cluster>
+```
+
+**Don't:** A sparkle alone: colour and an icon aren’t a label, and it reads as decoration.
+
+```tsx
+<Cluster gap="sm">
+  <Text as="span">Summary ✦</Text>
+</Cluster>
+```
+
+**Accessibility**
+
+- The text is the meaning (WCAG 1.4.1): it is read with the content, and the tint only reinforces it. The sparkle icon is hidden from assistive technology.
+- Keep the label short and specific; it is read every time the content is.
+
+Stories: `components-aimarker--badge`, `components-aimarker--inline`, `components-aimarker--custom-label`.
+Composes: Icon.
+Tokens read: `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `font.weight.strong`, `icon.stroke`, `radius.pill`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.inset.2xs`, `space.inset.sm`, `text.caption`.
 
 ### Avatar
 
@@ -529,6 +654,59 @@ Stories: `components-card--default`, `components-card--footer-between`, `compone
 Composes: Heading, Text.
 Tokens read: `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `radius.surface`, `shadow.card`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
+### ChatThread
+
+component · `src/components/ChatThread/ChatThread.tsx` · usage: `docs/usage/ChatThread.usage.tsx`
+
+The scrolling list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers "Jump to latest"), and is a named, focusable region so it scrolls from the keyboard. It is deliberately not a live region: the answer's own StreamingText announces sentences, so tokens are never read one by one.
+
+Props:
+- `label: string`: Accessible name of the scrollable thread ("Conversation about Master cleaning agreement"). Required.
+- `children?: ReactNode`: The turns, oldest first: Message elements (give each a stable key).
+- `empty?: ReactNode`: Shown instead of the thread when it has no turns: suggested prompts, not a blank box.
+- `jumpLabel?: string` = `'Jump to latest'`: Label of the button that returns to the newest turn after scrolling up.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- The scrolling list of turns in a conversation with an assistant: in an `AssistantPanel` beside the page, or a full chat page.
+- Give it the space to fill (a flex column); it follows new output while the person is at the bottom and offers “Jump to latest” when they scroll up.
+- Pass suggested prompts as `empty`, never a blank box.
+
+**When not to use**
+
+- A record’s comments or activity → `Timeline`
+- Notifications → `Toast` or an inbox list
+
+**Do:** An empty thread offers prompts to start from.
+
+```tsx
+<ChatThread
+  label="Conversation"
+  empty={<EmptyState reason="first-use" title="Ask about this record" description="Answers cite its fields and activity." action={<Button variant="secondary">When does it renew?</Button>} />}
+/>
+```
+
+**Don't:** Turns stacked as paragraphs: no roles, no authors, nothing to navigate by.
+
+```tsx
+<div>
+  <Text>When does it renew?</Text>
+  <Text>15 January 2027.</Text>
+</div>
+```
+
+**Accessibility**
+
+- The thread is a named, focusable region (`label`), so it scrolls from the keyboard; turns are a list.
+- It is deliberately not a live region (`role="log"` would read every token): each answer’s `StreamingText` announces complete sentences instead.
+- Scrolling keeps focus clear of “Jump to latest” (`space.scroll-padding.end`).
+
+Stories: `components-chatthread--conversation`, `components-chatthread--streaming`, `components-chatthread--empty`.
+Composes: Button, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.lg`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.end`, `text.body-lg`, `text.label`.
+
 ### Checkbox
 
 component · `src/components/Checkbox/Checkbox.tsx` · usage: `docs/usage/Checkbox.usage.tsx`
@@ -583,6 +761,70 @@ Stories: `components-checkbox--unchecked`, `components-checkbox--checked`, `comp
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.fg.on-action`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.xs`, `text.body`, `text.caption`.
 
+### Citation
+
+component · `src/components/Citation/Citation.tsx` · usage: `docs/usage/Citation.usage.tsx`
+
+A numbered inline citation, [1], that follows through to its source in a SourcesList: activating it moves focus to that source. It is a real link, never an inert label.
+
+Props:
+- `number: number`: The source's number, as it appears in the SourcesList (1-based).
+- `sources: string`: The `id` of the SourcesList this cites.
+- `title: string`: The source's title, for the accessible name ("Source 1: Renews on"). Required: a bare number means nothing when heard.
+- `onActivate?: (number: number) => void`: Called when the citation is followed, with its number: highlight the source (and its passage) there.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+#### SourcesList
+
+component, part of Citation. The numbered sources behind an answer, one card each (title, origin, excerpt, a link to the source). Citations in the text point here; the one followed last is marked with aria-current.
+
+Props:
+- `id: string`: Id that Citations point at (their `sources` prop). Use a useId() value: it must be unique on the page.
+- `sources: readonly Source[]`
+- `label?: string` = `'Sources'`: Heading above the list.
+- `active?: number | undefined`: The source last followed from a Citation (1-based): marked as current.
+- `summary?: ReactNode`: Rendered after the heading, before the list (a provenance line: "Based on 1 record and 3 activity entries").
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- An AI answer that makes claims: number each claim’s source inline ([1]) and list the sources under the answer, each with where it came from and a link to it.
+- Give the `SourcesList` a `useId()` id and pass it to every `Citation` as `sources`; `onActivate` highlights the source (and, in a record, the cited field).
+
+**When not to use**
+
+- Footnotes in content people wrote → a plain list of links
+- A link to one page → `Link`
+
+**Do:** Each claim cites a source that says where it came from and links to it.
+
+```tsx
+<Stack gap="sm">
+  <Text>
+    It renews on 15 January 2027
+    <Citation number={1} sources="usage-sources" title="Renews on" />.
+  </Text>
+  <SourcesList id="usage-sources" sources={[{ title: 'Renews on', origin: 'Record field', excerpt: '15 Jan 2027', href: '#properties', hrefLabel: 'Show in record' }]} />
+</Stack>
+```
+
+**Don't:** An inert “[1]”: a citation that can’t be followed is decoration, not provenance.
+
+```tsx
+<Text>It renews on 15 January 2027 [1].</Text>
+```
+
+**Accessibility**
+
+- A citation is a real link named “Source 1: Renews on”, not the bare number; following it moves focus to the source, which is marked `aria-current`.
+- Citations sit inside running text, so the inline exception to the 24px target size applies; don’t use them as standalone controls.
+
+Stories: `components-citation--in-answer`, `components-citation--active-source`, `components-citation--sources-only`.
+Composes: Link.
+Tokens read: `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.fg.link`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.control`, `radius.indicator`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.sm`, `text.body`, `text.caption`, `text.label`.
+
 ### CodeBlock
 
 component · `src/components/CodeBlock/CodeBlock.tsx` · usage: `docs/usage/CodeBlock.usage.tsx`
@@ -628,6 +870,64 @@ States: copyable.
 Stories: `components-codeblock--default`, `components-codeblock--multi-line`, `components-codeblock--no-language`, `components-codeblock--not-copyable`.
 Composes: Button, CopyButton, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
+
+### Composer
+
+component · `src/components/Composer/Composer.tsx` · usage: `docs/usage/Composer.usage.tsx`
+
+Where the person writes to the assistant: a text box that grows with its content, attachment chips, Send (or Stop while an answer arrives) and a keyboard hint. Enter sends and Shift+Enter adds a line, except while an IME composition is open.
+
+Props:
+- `label: string`: Accessible name of the text box ("Ask about this record"). Required; shown only to assistive technology.
+- `placeholder?: string`
+- `value?: string`: Controlled text. Pair with onValueChange.
+- `defaultValue?: string` = `''`
+- `onValueChange?: (value: string) => void`
+- `onSend: (text: string) => void`: Send the message. Called with the trimmed text; the composer clears itself when uncontrolled.
+- `streaming?: boolean` = `false`: An answer is arriving: Send becomes Stop, and Enter doesn't send. Typing the next question still works.
+- `onStop?: () => void`: Stop the answer that is arriving.
+- `maxLength?: number`: Characters allowed. The count shows from 80% of it; over the limit, Send is disabled with the reason.
+- `attachments?: readonly ComposerAttachment[]` = `[]`: Chips for attached files, each with a Remove button.
+- `onRemoveAttachment?: (id: string) => void`
+- `onAttach?: (files: File[]) => void`: Shows an Attach button that opens the file picker.
+- `disabled?: boolean` = `false`: The whole composer is unavailable (no permission, a hard limit reached). Say why in `note`.
+- `note?: ReactNode` = `'AI can make mistakes. Check important info.'`: A quiet line under the box: the disclaimer, or why it's disabled.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: streaming, disabled.
+
+**When to use**
+
+- Where the person writes to an assistant, pinned under a `ChatThread`: Enter sends, Shift+Enter adds a line, and the box grows with its content.
+- Set `streaming` while an answer arrives: Send becomes Stop (`onStop`). Typing the next question still works.
+- Keep the disclaimer (`note`) unless the surface shows it elsewhere; set `maxLength` when the model has a limit.
+
+**When not to use**
+
+- A search box → `SearchField`
+- A comment on a record → `Textarea` with a Comment button
+
+**Do:** Labelled, with the keys and the disclaimer under it.
+
+```tsx
+<Composer label="Ask about this record" placeholder="Ask about this record…" onSend={() => undefined} />
+```
+
+**Don't:** A one-line field with no Send button: multi-line questions are impossible and nothing says Enter sends.
+
+```tsx
+<TextField label="Ask" />
+```
+
+**Accessibility**
+
+- The text box is labelled (`label`, visually hidden) and described by the key hint; the count joins the description from 80% of `maxLength`.
+- Enter never sends during an IME composition. Over the limit, Send is disabled and the count says by how much; paste is never blocked.
+- Stop is always reachable while an answer arrives.
+
+Stories: `components-composer--empty`, `components-composer--with-text`, `components-composer--streaming`, `components-composer--with-attachments`, `components-composer--near-limit`, `components-composer--over-limit`, `components-composer--disabled`.
+Composes: Button, Icon, Kbd, Spinner, Tag.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
 
 ### CopyButton
 
@@ -767,6 +1067,59 @@ States: open, defaultOpen.
 Stories: `components-dialog--closed`, `components-dialog--open`, `components-dialog--small`, `components-dialog--large`, `components-dialog--without-description`.
 Composes: Icon.
 Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.modal`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `text.body`, `text.heading-3`, `z.modal`.
+
+### Disclosure
+
+component · `src/components/Disclosure/Disclosure.tsx` · usage: `docs/usage/Disclosure.usage.tsx`
+
+One section that shows and hides its details: an assistant's tool activity or reasoning, an advanced option. The toggle is a button with aria-expanded; from Radix Collapsible. For a stack of sections where opening one may close another, use Accordion.
+
+Props:
+- `summary: string`: The always-visible summary, and the toggle's accessible name ("Searched 12 records"). Required.
+- `meta?: ReactNode`: Beside the summary: a status Badge ("Done"), a count. Not part of the toggle.
+- `children: ReactNode`: What opens: tool input and output, reasoning steps, details.
+- `open?: boolean`
+- `defaultOpen?: boolean` = `false`: Closed by default: details are there when wanted, not in the way.
+- `onOpenChange?: (open: boolean) => void`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: open, defaultOpen.
+
+**When to use**
+
+- One section of details people sometimes want: an assistant’s tool activity (what it searched, what it found), its reasoning, an advanced option.
+- Closed by default; the summary says what’s inside (“Searched 12 records”), with a status in `meta`.
+
+**When not to use**
+
+- Several related sections, one open at a time → `Accordion`
+- Panels the person switches between → `Tabs`
+- Content everyone needs → show it; don’t hide it behind a toggle
+
+**Do:** The summary says what happened; the details are one click away.
+
+```tsx
+<Disclosure summary="Searched records matching “overdue”" meta={<Badge tone="success">Done</Badge>}>
+  <Text>12 records matched. 2 are archived and were left out.</Text>
+</Disclosure>
+```
+
+**Don't:** A vague summary: nobody knows whether it’s worth opening.
+
+```tsx
+<Disclosure summary="Details">
+  <Text>12 records matched.</Text>
+</Disclosure>
+```
+
+**Accessibility**
+
+- The toggle is a button with `aria-expanded` and `aria-controls` (Radix Collapsible); Enter and Space toggle it.
+- Content that opens is in the reading order right after the toggle, so nothing is lost when it opens.
+
+Stories: `components-disclosure--closed`, `components-disclosure--open`, `components-disclosure--with-meta`.
+Composes: Icon.
+Tokens read: `color.bg.hover`, `color.fg.default`, `ease.standard`, `icon.stroke`, `motion.fast`, `radius.control`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `text.body`, `text.label`.
 
 ### Divider
 
@@ -944,6 +1297,59 @@ Variants: reason (first-use | no-results | error); headingLevel (1 | 2 | 3 | 4).
 Stories: `components-emptystate--first-use`, `components-emptystate--no-results`, `components-emptystate--load-error`, `components-emptystate--without-action`.
 Composes: Heading, Icon, Text.
 Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.inset.lg`, `space.inset.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### Feedback
+
+component · `src/components/Feedback/Feedback.tsx` · usage: `docs/usage/Feedback.usage.tsx`
+
+Thumbs up or down on one AI result, with an optional reason after a thumbs down. Both are toggle buttons (aria-pressed) with visible labels; a polite status confirms what was sent.
+
+Props:
+- `onFeedback: (feedback: FeedbackValue) => void`: Called on a thumbs up at once, and on a thumbs down when the reason is sent or skipped.
+- `label?: string` = `'Rate this answer'`: Names what is being rated, for the group's accessible name ("Rate this answer").
+- `reasons?: readonly string[]` = `REASONS`: Choices offered after a thumbs down. Keep them few and specific.
+- `thanks?: string` = `'Thanks. Feedback helps us check and improve answers.'`: Shown, and announced, once feedback is sent: say what it's for.
+- `defaultValue?: FeedbackValue`: A rating already given (a reloaded conversation).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- Under an AI result (an answer, a summary, a suggestion) to learn whether it helped.
+- A thumbs down asks for a reason, which the person can skip. Say what feedback is for in `thanks`.
+
+**When not to use**
+
+- Rating the product or a support conversation → a survey, not per-result feedback
+- Reporting harmful content → a “Report” action that reaches a person
+
+**Do:** Two labelled toggles; the reason comes only after a thumbs down.
+
+```tsx
+<Feedback onFeedback={() => undefined} />
+```
+
+**Don't:** Unlabelled buttons that don’t say whether anything was sent.
+
+```tsx
+<Cluster gap="xs">
+  <Button variant="ghost" size="sm">
+    👍
+  </Button>
+  <Button variant="ghost" size="sm">
+    👎
+  </Button>
+</Cluster>
+```
+
+**Accessibility**
+
+- Both are toggle buttons with visible labels (“Helpful”, “Not helpful”) and `aria-pressed`, in a group named by `label`.
+- A polite status, present from mount, announces the thanks once feedback is sent.
+
+Stories: `components-feedback--not-rated`, `components-feedback--rated-helpful`, `components-feedback--rated-not-helpful`, `components-feedback--custom-reasons`.
+Composes: Button, Field, Icon, RadioGroup, Spinner, Toggle.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
 ### FileUpload
 
@@ -1128,6 +1534,52 @@ States: open, defaultOpen.
 Stories: `components-hovercard--closed`, `components-hovercard--open`, `components-hovercard--open-top`.
 Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `space.gap.xs`, `space.inset.md`, `text.body`, `z.dropdown`.
 
+### Kbd
+
+component · `src/components/Kbd/Kbd.tsx` · usage: `docs/usage/Kbd.usage.tsx`
+
+A key the person presses, in a key-cap style: keyboard hints ("Tab to accept"), shortcut lists.
+
+Props:
+- `children: string`: One key, as printed on it: "Tab", "Esc", "Enter", "⌘". For a combination, render one Kbd per key.
+- …plus the native attributes of `AriaAttributes`, `Attributes`, `DOMAttributes`, `HTMLAttributes`, `RefAttributes`.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- A key the person presses, named in a hint or a list of shortcuts: “Tab to accept”, “Shift Enter for a new line”.
+- One Kbd per key; a combination is several side by side.
+
+**When not to use**
+
+- Code, a command or a value to copy → `CodeBlock`, or inline `<code>`
+- A clickable shortcut → a `Button` whose label names the action; mention the key beside it
+
+**Do:** The hint names the keys and what they do.
+
+```tsx
+<Text>
+  <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss
+</Text>
+```
+
+**Don't:** A combination in one cap reads as one strange key.
+
+```tsx
+<Text>
+  Press <Kbd>Shift+Enter</Kbd>
+</Text>
+```
+
+**Accessibility**
+
+- Renders `<kbd>`, which screen readers read as plain text: the key names must be words people say (“Esc”, “Enter”), with symbols (⌘) only beside a word.
+- A hint with keys needs a pointer path too: a visible button for the same action.
+
+Stories: `components-kbd--single-key`, `components-kbd--combination`.
+Tokens read: `color.bg.surface`, `color.border.strong`, `color.fg.default`, `radius.indicator`, `size.icon.sm`, `space.inset.2xs`, `text.code`.
+
 ### Link
 
 component · `src/components/Link/Link.tsx` · usage: `docs/usage/Link.usage.tsx`
@@ -1245,6 +1697,63 @@ States: open, defaultOpen.
 Stories: `components-menu--closed`, `components-menu--open`, `components-menu--account-menu`.
 Composes: Icon.
 Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `z.dropdown`.
+
+### Message
+
+component · `src/components/Message/Message.tsx` · usage: `docs/usage/Message.usage.tsx`
+
+One turn in a ChatThread: a header (who, when, the AI mark), the content, and actions (copy, retry, edit, feedback) once it has finished. User turns are tinted and aligned to the inline end; assistant turns run full width. Tool and system turns are compact notes. Render inside ChatThread.
+
+Props:
+- `role: MessageRole`
+- `author: string`: Who it's from, shown in the header and naming the message ("You", "Assistant", "Search records").
+- `time?: DateInput`: When it was sent. Formatted with useFormat(); omit for pending turns.
+- `status?: StreamStatus` = `'complete'`: An assistant turn's state: its actions show once it's no longer pending or streaming.
+- `children: ReactNode`: The content: StreamingText for assistant turns, text for user turns, a Disclosure for tool activity.
+- `error?: string`: Why the turn failed, with the next step ("Too many requests. Try again in 30 seconds.").
+- `copyText?: string`: The turn's text for Copy. Shows a Copy action.
+- `onRetry?: () => void`: Shows Retry (assistant: ask again; user: resend a failed message).
+- `onEdit?: () => void`: Shows Edit on a user turn: puts its text back in the composer.
+- `feedback?: ReactNode`: A Feedback control for an assistant turn.
+- `marker?: ReactNode` = `role === 'assistant' ? <AiMarker variant="inline" /> : null`: The AI mark on an assistant turn. Defaults to an AiMarker; pass null only where the whole surface is already marked.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: role (user | assistant | tool | system); status (pending | streaming | complete | stopped | error).
+
+**When to use**
+
+- One turn inside a `ChatThread`: `user` (tinted, at the inline end), `assistant` (full width, AI-marked), `tool` (what the assistant ran, usually a `Disclosure`) or `system` (a note such as “You stopped the answer”).
+- Actions appear once a turn has finished: Copy (`copyText`), Retry, Edit (user turns) and a `Feedback` control.
+
+**When not to use**
+
+- Comments on a record → the record page’s activity list (`Timeline` or the activity feed)
+- A one-off AI result inside a form → `Suggestion`, or the content with an `AiMarker`
+
+**Do:** An assistant turn: who, when, the AI mark, the answer, then its actions.
+
+```tsx
+<Message role="assistant" author="Assistant" time="2026-09-14T10:04:05Z" copyText="It renews on 15 January 2027." onRetry={() => undefined} feedback={<Feedback onFeedback={() => undefined} />}>
+  <StreamingText text="It renews on **15 January 2027**." />
+</Message>
+```
+
+**Don't:** An answer as plain text with no author, time, mark or actions: it can’t be checked, copied or retried.
+
+```tsx
+<Text>It renews on 15 January 2027.</Text>
+```
+
+**Accessibility**
+
+- Each turn is an `article` named by its author, so screen-reader users can move turn by turn.
+- An error shows as text with an icon (`role="alert"`) and a Retry; never colour alone.
+- The assistant avatar is decorative; the author name and the AI marker carry the meaning.
+
+Stories: `components-message--user`, `components-message--assistant`, `components-message--assistant-streaming`, `components-message--assistant-pending`, `components-message--assistant-stopped`, `components-message--assistant-error`, `components-message--tool`, `components-message--system`.
+Composes: AiMarker, Avatar, Button, CopyButton, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `color.bg.selected`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `size.avatar.lg`, `size.avatar.md`, `size.avatar.sm`, `size.content.sm`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
 ### Meter
 
@@ -1706,6 +2215,67 @@ Stories: `components-radiogroup--unselected`, `components-radiogroup--selected`,
 Composes: Field, Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
+### ReviewChanges
+
+component · `src/components/ReviewChanges/ReviewChanges.tsx` · usage: `docs/usage/ReviewChanges.usage.tsx`
+
+Changes an AI proposes, reviewed before anything happens: each as a diff (a field's before and after, or a text rewrite word by word) with Accept and Reject, plus Accept all and Reject all. Only accepted changes are applied, then each shows its outcome and Undo restores the previous values. A change the person can't make says why instead of offering Accept.
+
+Props:
+- `title: string`: Heading of the review ("Proposed changes to 6 records").
+- `changes: readonly ProposedChange[]`
+- `decisions?: Readonly<Record<string, ChangeDecision>>`: Controlled decisions. Undecided changes are left out: nothing is applied without a decision.
+- `defaultDecisions?: Readonly<Record<string, ChangeDecision>>` = `{}`
+- `onDecisionsChange?: (decisions: Record<string, ChangeDecision>) => void`
+- `onApply: (acceptedIds: string[]) => void`: Apply the accepted changes (ids in list order).
+- `applying?: boolean` = `false`: Applying: the button shows progress and the decisions lock.
+- `outcomes?: Readonly<Record<string, ChangeOutcome>>`: Once applied: each change's outcome by id. Shows the results and Undo.
+- `onUndo?: () => void`: Restore what was there before. Shown once changes are applied.
+- `undoing?: boolean` = `false`
+- `undone?: boolean` = `false`: The applied changes were undone: says so, and the review is closed.
+- `summary?: ReactNode`: Extra content under the heading: provenance ("Based on 42 records matching Overdue").
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: applying, undoing, undone.
+
+**When to use**
+
+- Before an AI changes anything: the proposed changes as diffs (a field’s before and after, or a text rewrite word by word), each accepted or rejected, then applied together.
+- After applying, pass `outcomes` (each change’s result) and `onUndo`: one Undo restores exactly what was there before.
+- Mark a change the person can’t make with `blockedReason` instead of hiding it, so the count adds up.
+
+**When not to use**
+
+- A single suggestion inside a field → `Suggestion`
+- Changes a person made by hand → the action itself, with a Toast and Undo
+
+**Do:** Each change shows what it was, what it will be and why; nothing is applied until accepted.
+
+```tsx
+<ReviewChanges
+  title="Proposed changes to 1 record"
+  changes={[{ id: 'c1', target: 'Master cleaning agreement', field: 'Status', before: 'Overdue', after: 'Pending', reason: 'A signed renewal was added on 12 Sep.' }]}
+  onApply={() => undefined}
+/>
+```
+
+**Don't:** An AI action that applies at once with no preview: people can’t see what will change, or undo it.
+
+```tsx
+<Text>
+  <Button>Fix overdue records with AI</Button>
+</Text>
+```
+
+**Accessibility**
+
+- Removed and added text is struck through and underlined as well as tinted, and each carries a visually hidden “removed”/“added” (or “Was … will be …”), because screen readers don’t announce `del` and `ins`.
+- Accept and Reject are toggle buttons (`aria-pressed`) grouped per change and named by it; the count of accepted changes and the result after applying are polite status messages.
+
+Stories: `components-reviewchanges--reviewing`, `components-reviewchanges--partly-decided`, `components-reviewchanges--text-rewrite`, `components-reviewchanges--with-blocked-change`, `components-reviewchanges--applying`, `components-reviewchanges--applied`, `components-reviewchanges--partly-failed`, `components-reviewchanges--undone`.
+Composes: AiMarker, Badge, Button, Icon, Spinner, Toggle.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.border`, `color.status.danger.fg`, `color.status.info.bg`, `color.status.info.border`, `color.status.info.fg`, `color.status.neutral.bg`, `color.status.neutral.border`, `color.status.neutral.fg`, `color.status.success.bg`, `color.status.success.border`, `color.status.success.fg`, `color.status.warning.bg`, `color.status.warning.border`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-4`, `text.label`.
+
 ### SearchField
 
 component · `src/components/SearchField/SearchField.tsx` · usage: `docs/usage/SearchField.usage.tsx`
@@ -2141,6 +2711,120 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 Stories: `components-stepper--first-step`, `components-stepper--middle-step`, `components-stepper--last-step`, `components-stepper--all-completed`, `components-stepper--narrow`.
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.fg.on-action`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.pill`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `text.caption`, `text.label`.
+
+### StreamingText
+
+component · `src/components/StreamingText/StreamingText.tsx` · usage: `docs/usage/StreamingText.usage.tsx`
+
+Text that arrives token by token (an AI answer), rendered as safe Markdown with a caret while it streams. It holds no timers: the parent appends to `text`, so a story or test can pin any moment. Screen readers hear it through one polite live region, present from mount: "Generating…", then each sentence or paragraph once it is complete (never token by token, and never the whole answer again at the end), then "Stopped" if the person stops it. Text already there on mount (history) is not announced.
+
+Props:
+- `text: string`: Everything received so far, as Markdown. The parent appends tokens; this renders what it's given.
+- `status?: StreamStatus` = `'complete'`
+- `citation?: (number: number) => ReactNode`: Renders a numbered citation ([1]) found in the text, usually a Citation.
+- `pendingLabel?: string` = `'Generating…'`: Shown, and announced, before the first token arrives.
+- `stoppedLabel?: string` = `'Stopped.'`: Announced when the person stops the answer.
+- `codeLabel?: string` = `'Code from the answer'`: Accessible name of code blocks in the answer.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: status (pending | streaming | complete | stopped | error).
+
+**When to use**
+
+- An AI answer that arrives token by token: pass everything received so far as `text` and the `status` (pending, streaming, complete, stopped, error).
+- Any AI output shown as Markdown, streamed or not: it renders safely (no raw HTML, safe links only, no images).
+
+**When not to use**
+
+- Text a person wrote → `Text`: Markdown rendering belongs to model output
+- A wait with no partial result → `Spinner` or `Progress`
+
+**Do:** Partial text with a caret while it arrives; the parent appends, the component renders.
+
+```tsx
+<StreamingText text="It renews on **15 January 2027**, unless either side" status="streaming" />
+```
+
+**Don't:** A spinner that hides the answer until it’s finished: people wait without seeing progress, and can’t stop early.
+
+```tsx
+<Spinner label="Generating answer" />
+```
+
+**Accessibility**
+
+- One polite live region, present from mount, announces “Generating…”, then each sentence or paragraph once it is complete, then “Stopped” if the person stops it. Never token by token, and never the whole answer again at the end.
+- Text already there on mount (history) isn’t announced.
+- The caret and the thinking dots are hidden from assistive technology and hold still under reduced motion (`motion.pulse` is 0).
+- Model output is untrusted: raw HTML renders as text, links are http(s), mailto or in-app only, images are never loaded, and headings become bold text so an answer can’t change the page outline.
+
+Stories: `components-streamingtext--pending`, `components-streamingtext--streaming`, `components-streamingtext--streaming-code`, `components-streamingtext--complete`, `components-streamingtext--stopped`, `components-streamingtext--with-citations`, `components-streamingtext--unsafe-input`.
+Composes: Button, CodeBlock, CopyButton, Icon, Link, Markdown, Spinner.
+Tokens read: `border.width.default`, `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.pulse`, `motion.slow`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
+
+### Suggestion
+
+component · `src/components/Suggestion/Suggestion.tsx` · usage: `docs/usage/Suggestion.usage.tsx`
+
+A multi-line text field that can show an inline AI suggestion as ghost text: Tab accepts it, Escape dismisses it, and typing over it ignores it. The suggestion is marked as AI, is never the field's value until accepted, and never moves the caret or focus. Screen readers hear "Suggestion ready" once, politely, with the text and the keys; the field's value reads as what was typed.
+
+Props:
+- `label: string`: Visible label and accessible name. Required.
+- `value: string`: What the person has written.
+- `onValueChange: (value: string) => void`
+- `suggestion?: string | undefined`: The AI's suggested continuation of `value`, shown as muted ghost text after it. It is never part of the value until accepted. Undefined or empty: no suggestion.
+- `pending?: boolean` = `false`: The suggestion is still arriving: shown, but it can't be accepted until it's complete.
+- `onAccept: () => void`: Tab (or Accept): the caller appends the suggestion to the value.
+- `onDismiss: () => void`: Escape, Dismiss, or typing over it: the caller drops the suggestion.
+- `description?: string`: Supporting text, linked with aria-describedby.
+- `error?: string`
+- `rows?: number` = `4`: Visible rows before it grows.
+- `id?: string`: Id of the text box, for an error summary link. Generated when omitted.
+- `disabled?: boolean` = `false`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: pending, disabled.
+
+**When to use**
+
+- A text field where the AI can suggest what comes next (a description, a reply): the suggestion shows as ghost text, Tab accepts, Esc dismisses, typing over it ignores it.
+- The caller owns the value and the suggestion: append on `onAccept`, drop on `onDismiss`. Keep what was there before, so one Undo restores it.
+- Put the AI action (“Suggest description”) beside the field, never in place of writing it by hand.
+
+**When not to use**
+
+- A long draft that needs review before it lands → a generated block marked with `AiMarker`, or `ReviewChanges` for a rewrite
+- A field with no AI → `Textarea`
+
+**Do:** Muted ghost text after what was typed, marked as AI, with the keys and buttons to accept or dismiss.
+
+```tsx
+<Suggestion
+  label="Description"
+  value="Covers facilities maintenance,"
+  onValueChange={() => undefined}
+  suggestion=" cleaning and security for both offices."
+  onAccept={() => undefined}
+  onDismiss={() => undefined}
+/>
+```
+
+**Don't:** AI text written straight into the value: it looks like the person’s own words and nobody accepted it.
+
+```tsx
+<Textarea label="Description" defaultValue="Covers facilities maintenance, cleaning and security for both offices." />
+```
+
+**Accessibility**
+
+- The ghost text is never part of the value, so the field reads as what was typed; the suggestion is in the field’s description, and a polite status says “Suggestion ready” once, never character by character.
+- Tab accepts only while a complete suggestion shows; otherwise Tab moves focus as usual. Esc dismisses without closing a surrounding dialog.
+- Accept and Dismiss buttons give pointer and switch users the same choice; the mark is text (“AI suggestion”), not colour alone.
+
+Stories: `components-suggestion--ready`, `components-suggestion--pending`, `components-suggestion--no-suggestion`, `components-suggestion--empty-field`, `components-suggestion--with-error`, `components-suggestion--disabled`.
+Composes: AiMarker, Button, Field, Icon, Kbd, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
 
 ### Switch
 
@@ -3964,18 +4648,24 @@ Semantic and component tokens as var() references, for inline custom properties 
 
 ## Types
 
+- `AccordionItem` (`src/components/Accordion/Accordion.tsx`): `interface AccordionItem { value: string; title: string; meta?: ReactNode; content: ReactNode; disabled?: boolean; }`
 - `AvatarSize` (`src/components/Avatar/Avatar.tsx`): `type AvatarSize = 'sm' | 'md' | 'lg'`
 - `BadgeTone` (`src/components/Badge/Badge.tsx`): `type BadgeTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 - `BannerTone` (`src/components/Banner/Banner.tsx`): `type BannerTone = 'info' | 'success' | 'warning' | 'danger'`
 - `BreadcrumbLink` (`src/components/Breadcrumbs/Breadcrumbs.tsx`): `interface BreadcrumbLink { label: string; href: string; }`
 - `ButtonSize` (`src/components/Button/Button.tsx`): `type ButtonSize = 'sm' | 'md' | 'lg'`
 - `ButtonVariant` (`src/components/Button/Button.tsx`): `type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'`
+- `ChangeDecision` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeDecision = 'accepted' | 'rejected'`
+- `ChangeOutcome` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }` How each change went once applied: done, or why it failed.
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
+- `ComposerAttachment` (`src/components/Composer/Composer.tsx`): `interface ComposerAttachment { id: string; name: string; }`
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long'`
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
+- `FeedbackRating` (`src/components/Feedback/Feedback.tsx`): `type FeedbackRating = 'up' | 'down'`
+- `FeedbackValue` (`src/components/Feedback/Feedback.tsx`): `interface FeedbackValue { rating: FeedbackRating; reason?: string; }`
 - `FileRejection` (`src/components/FileUpload/FileUpload.tsx`): `interface FileRejection { file: File; reason: 'type' | 'size'; message: string; }` A picked or dropped file that broke a limit, with a message ready to show.
 - `FileUploadItem` (`src/components/FileUpload/FileUpload.tsx`): `interface FileUploadItem { id: string; name: string; size: number; progress?: number; error?: string; }` A file in the list. The caller owns the list: it adds accepted files, reports progress and removes them.
 - `Formatter` (`src/format/format.ts`): `interface Formatter extends LocaleSettings { date: (value: DateInput, style?: DateStyle) => string; time: (value: DateInput) => string; dateTime: (value: DateInput, options?: { withZone?: boolean; }) => string; relative: (value: DateInput, now?: DateInput) => string; number: (value: number, options?: { maximumFractionDigits?: number; }) => string; percent: (value: number, options?: { maximumFractionDigits?: number; }) => string; compact: (value: number) => string; money: (minor: number, currency: string, options?: { compact?: boolean; }) => string; list: (items: readonly string[], type?: 'conjunction' | 'disjunction') => string; fileSize: (bytes: number) => string; }`
@@ -3990,10 +4680,12 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `LocaleSettings` (`src/format/format.ts`): `interface LocaleSettings { locale: string; timeZone: string; }` Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings ("$" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.
 - `MenuEntry` (`src/components/Menu/Menu.tsx`): `type MenuEntry = MenuItem | 'separator'` An item, or 'separator' for a divider between groups.
 - `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; }`
+- `MessageRole` (`src/components/Message/Message.tsx`): `type MessageRole = 'user' | 'assistant' | 'tool' | 'system'` Who a turn is from: the person, the assistant, a tool the assistant ran, or the system (a note in the thread).
 - `MeterStatus` (`src/components/Meter/Meter.tsx`): `type MeterStatus = 'ok' | 'warning' | 'danger'`
 - `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconName; }`
 - `NavSection` (`src/components/Nav/Nav.tsx`): `interface NavSection { label?: string; items: readonly NavItem[]; }`
 - `NavTab` (`src/components/NavTabs/NavTabs.tsx`): `interface NavTab { label: string; href: string; }`
+- `ProposedChange` (`src/components/ReviewChanges/ReviewChanges.tsx`): `interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }` One proposed change: a field's old and new value, or a text rewrite shown word by word.
 - `RadioOption` (`src/components/RadioGroup/RadioGroup.tsx`): `interface RadioOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `RatioToken` (`src/tokens/tokens.ts`): `type RatioToken = keyof typeof vars.ratio`
 - `ScrollRegionToken` (`src/tokens/tokens.ts`): `type ScrollRegionToken = keyof typeof vars.size['scroll-region']`
@@ -4002,11 +4694,13 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `SidebarWidthToken` (`src/tokens/tokens.ts`): `type SidebarWidthToken = keyof typeof vars.size.sidebar`
 - `SkeletonShape` (`src/components/Skeleton/Skeleton.tsx`): `type SkeletonShape = 'text' | 'block' | 'table-row'`
 - `SortDirection` (`src/components/Table/Table.tsx`): `type SortDirection = 'ascending' | 'descending'`
+- `Source` (`src/components/Citation/Citation.tsx`): `interface Source { title: string; origin: string; excerpt?: string; href?: string; hrefLabel?: string; }`
 - `SpinnerSize` (`src/components/Spinner/Spinner.tsx`): `type SpinnerSize = 'sm' | 'md'`
 - `StatDelta` (`src/components/Stat/Stat.tsx`): `interface StatDelta { value: string; direction: StatDirection; tone?: StatTone; }`
 - `StatDirection` (`src/components/Stat/Stat.tsx`): `type StatDirection = 'up' | 'down' | 'flat'`
 - `StatTone` (`src/components/Stat/Stat.tsx`): `type StatTone = 'positive' | 'negative' | 'neutral'` Whether the change is good news. Separate from direction: fewer overdue records is down and positive.
 - `StepperStep` (`src/components/Stepper/Stepper.tsx`): `interface StepperStep { label: string; }`
+- `StreamStatus` (`src/components/StreamingText/StreamingText.tsx`): `type StreamStatus = 'pending' | 'streaming' | 'complete' | 'stopped' | 'error'` Where an answer is: waiting for its first token, arriving, finished, stopped by the person, or failed.
 - `TimelineEvent` (`src/components/Timeline/Timeline.tsx`): `interface TimelineEvent { id: string; actor: string; verb: string; target?: ReactNode; time: string; dateTime: string; detail?: string; }` One thing that happened: who did what to which, and when.
 - `ToastTone` (`src/components/Toast/Toast.tsx`): `type ToastTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 
@@ -5073,6 +5767,9 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `color.action.danger-hover` `var(--color-action-danger-hover)`: `#b91c1c` (dark `#fca5a5`)
 - `color.action.primary` `var(--color-action-primary)`: `#4f46e5` (dark `#818cf8`). Primary action fill.
 - `color.action.primary-hover` `var(--color-action-primary-hover)`: `#4338ca` (dark `#a5b4fc`)
+- `color.ai.bg` `var(--color-ai-bg)`: `#f5f3ff` (dark `#2e1065`). Background tint of AI-generated content and the AI marker.
+- `color.ai.border` `var(--color-ai-border)`: `#c4b5fd` (dark `#5b21b6`). Border of AI-generated content and the AI marker.
+- `color.ai.fg` `var(--color-ai-fg)`: `#6d28d9` (dark `#c4b5fd`). Text and icons of the AI marker and AI actions.
 - `color.bg.canvas` `var(--color-bg-canvas)`: `#f8fafc` (dark `#020617`). Page background behind surfaces.
 - `color.bg.elevated` `var(--color-bg-elevated)`: `#ffffff` (dark `#1e293b`). Popovers, dialogs, toasts. Lighter than surface in dark mode.
 - `color.bg.hover` `var(--color-bg-hover)`: `#f1f5f9` (dark `#1e293b`). Hover wash on neutral interactive rows and ghost controls.
@@ -5151,6 +5848,9 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `shadow.card` `var(--shadow-card)`: `0 1px 2px 0 #0206171a`. Resting surfaces on the canvas: cards, tables.
 - `shadow.modal` `var(--shadow-modal)`: `0 20px 25px -5px #02061733, 0 8px 10px -6px #0206171a`. Dialogs and drawers above the scrim.
 - `shadow.popover` `var(--shadow-popover)`: `0 4px 6px -1px #0206171a, 0 2px 4px -2px #0206171a`. Menus, selects, tooltips: floats above the page, closes on its own.
+- `size.assistant.default` `var(--size-assistant-default)`: `24rem`. AssistantPanel widths: the resize range and the width it opens at.
+- `size.assistant.max` `var(--size-assistant-max)`: `36rem`. AssistantPanel widths: the resize range and the width it opens at.
+- `size.assistant.min` `var(--size-assistant-min)`: `20rem`. AssistantPanel widths: the resize range and the width it opens at.
 - `size.avatar.lg` `var(--size-avatar-lg)`: `40px`. Avatar diameters.
 - `size.avatar.md` `var(--size-avatar-md)`: `32px`. Avatar diameters.
 - `size.avatar.sm` `var(--size-avatar-sm)`: `24px`. Avatar diameters.

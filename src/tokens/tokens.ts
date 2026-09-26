@@ -110,7 +110,12 @@ export const vars = {
         "border": "var(--color-status-neutral-border)"
       }
     },
-    "focus": "var(--color-focus)"
+    "focus": "var(--color-focus)",
+    "ai": {
+      "fg": "var(--color-ai-fg)",
+      "bg": "var(--color-ai-bg)",
+      "border": "var(--color-ai-border)"
+    }
   },
   "space": {
     "gap": {
@@ -172,6 +177,11 @@ export const vars = {
     "drawer": {
       "sm": "var(--size-drawer-sm)",
       "md": "var(--size-drawer-md)"
+    },
+    "assistant": {
+      "min": "var(--size-assistant-min)",
+      "default": "var(--size-assistant-default)",
+      "max": "var(--size-assistant-max)"
     },
     "overlay-max": "var(--size-overlay-max)",
     "scroll-region": {

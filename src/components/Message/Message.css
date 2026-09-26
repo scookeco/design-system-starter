@@ -1,0 +1,89 @@
+@layer components {
+  /* 1. block */
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  /* 2. parts */
+  .message__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    font: var(--text-caption);
+  }
+
+  .message__avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-avatar-sm);
+    block-size: var(--size-avatar-sm);
+    border: 1px solid var(--color-ai-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-ai-bg);
+    color: var(--color-ai-fg);
+  }
+
+  .message__author {
+    color: var(--color-fg-default);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .message__time {
+    color: var(--color-fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .message__body {
+    min-inline-size: 0;
+    color: var(--color-fg-default);
+    font: var(--text-body);
+  }
+
+  .message__error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    color: var(--color-status-danger-fg);
+    font: var(--text-body);
+  }
+
+  .message__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  /* 3. variants: the person's turns are tinted and sit at the inline end */
+  .message[data-role="user"] {
+    align-self: flex-end;
+    align-items: flex-end;
+    max-inline-size: var(--size-content-sm);
+  }
+
+  .message[data-role="user"] .message__body {
+    padding-block: var(--space-inset-sm);
+    padding-inline: var(--space-inset-md);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-selected);
+    white-space: pre-wrap;
+  }
+
+  .message[data-role="tool"] {
+    padding-inline-start: var(--space-inset-lg);
+  }
+
+  .message[data-role="system"] {
+    align-self: center;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+}

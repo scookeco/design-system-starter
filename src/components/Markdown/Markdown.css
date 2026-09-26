@@ -1,0 +1,40 @@
+@layer components {
+  /* 1. block: model output, laid out with the body text's rhythm */
+  .markdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    min-inline-size: 0;
+    color: var(--color-fg-default);
+    font: var(--text-body);
+    overflow-wrap: anywhere;
+  }
+
+  /* 2. parts */
+  .markdown__paragraph,
+  .markdown__heading {
+    margin: 0;
+  }
+
+  .markdown__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    margin: 0;
+    padding-inline-start: var(--space-inset-lg);
+  }
+
+  .markdown__quote {
+    margin: 0;
+    padding-inline-start: var(--space-inset-sm);
+    border-inline-start: var(--border-width-default) solid var(--color-border-strong);
+    color: var(--color-fg-muted);
+  }
+
+  .markdown__code {
+    padding-inline: var(--space-inset-2xs);
+    border-radius: var(--radius-indicator);
+    background: var(--color-bg-subtle);
+    font: var(--text-code);
+  }
+}

@@ -40,6 +40,10 @@ export const pairs: ContrastPair[] = [
   // Banner: body text and links sit on the tone's background.
   ...STATUSES.map((s) => ({ fg: 'color.fg.default', bg: `color.status.${s}.bg`, min: TEXT })),
   ...STATUSES.map((s) => ({ fg: 'color.fg.link', bg: `color.status.${s}.bg`, min: TEXT })),
+  // AI marker and AI-generated content: the label and body text on the AI tint, the tint's border on surfaces.
+  { fg: 'color.ai.fg', bg: 'color.ai.bg', min: TEXT },
+  { fg: 'color.fg.default', bg: 'color.ai.bg', min: TEXT },
+  ...SURFACES.map((bg) => ({ fg: 'color.ai.fg', bg, min: TEXT })),
   { fg: 'button.primary.fg', bg: 'button.primary.bg', min: TEXT },
   { fg: 'button.primary.fg', bg: 'button.primary.bg-hover', min: TEXT },
   { fg: 'button.secondary.fg', bg: 'button.secondary.bg', min: TEXT },

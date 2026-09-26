@@ -79,24 +79,33 @@ UI rules (design system v0)
 
 ## Components
 
+- [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [ChatThread](docs/usage/ChatThread.usage.tsx): The scrolling list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
+- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
+- [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
 - [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
 - [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
@@ -105,6 +114,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
@@ -113,6 +123,8 @@ UI rules (design system v0)
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
+- [StreamingText](docs/usage/StreamingText.usage.tsx): Text that arrives token by token
+- [Suggestion](docs/usage/Suggestion.usage.tsx): A multi-line text field that can show an inline AI…
 - [Switch](docs/usage/Switch.usage.tsx): An on/off setting that takes effect as a setting, not a form answer
 - [Table](docs/usage/Table.usage.tsx): Data table: native table semantics, sticky header, tabular numbers
 - [Tabs](docs/usage/Tabs.usage.tsx): Tabs: arrow-key roving focus and ARIA wiring come from Radix Tabs
