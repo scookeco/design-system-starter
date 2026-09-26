@@ -17,6 +17,7 @@ const NAV: readonly NavSection[] = [
     items: [
       { label: 'Home', href: '/home', icon: 'home' },
       { label: 'Records', href: '/records', icon: 'file' },
+      { label: 'Accounts', href: '/accounts', icon: 'building' },
       { label: 'People', href: '/people', icon: 'users' },
     ],
   },

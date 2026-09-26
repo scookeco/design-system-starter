@@ -167,10 +167,14 @@ export interface RecordQuery {
   q: string;
   status: readonly RecordStatus[];
   view: RecordView;
+  /** Only this account's records, by id: a related-entity page is the same query, joined. */
+  account?: string;
+  /** Only this person's records, by id. */
+  owner?: string;
   sort: SortKey;
   page: number;
   pageSize: number;
 }
 
 /** A filter without paging or sort: what "Select all N matching" selects, and what counts count. */
-export type RecordFilter = Pick<RecordQuery, 'q' | 'status' | 'view'>;
+export type RecordFilter = Pick<RecordQuery, 'q' | 'status' | 'view' | 'account' | 'owner'>;

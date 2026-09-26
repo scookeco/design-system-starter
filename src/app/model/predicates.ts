@@ -9,7 +9,7 @@ import type { RecordEntity, RecordFilter, RecordStatus, RecordView } from '../ap
  * A record joined with its owner's name, for search. The name is looked up by id at the moment of
  * matching (the server joins it from people), never stored on the record.
  */
-export type SearchableRecord = Pick<RecordEntity, 'status' | 'name'> & { ownerName: string };
+export type SearchableRecord = Pick<RecordEntity, 'status' | 'name' | 'ownerId' | 'accountId'> & { ownerName: string };
 
 export const isArchived = (record: Pick<RecordEntity, 'status'>) => record.status === 'archived';
 export const isDraft = (record: Pick<RecordEntity, 'status'>) => record.status === 'draft';
@@ -42,8 +42,10 @@ export const matchesSearch = (record: Pick<SearchableRecord, 'name' | 'ownerName
   return needle === '' || fold(record.name).includes(needle) || fold(record.ownerName).includes(needle);
 };
 
+/** The search and the joins (one account's, one owner's records), before any tab or status. */
+export const matchesScope = (record: SearchableRecord, filter: Pick<RecordFilter, 'q' | 'account' | 'owner'>) =>
+  (!filter.account || record.accountId === filter.account) && (!filter.owner || record.ownerId === filter.owner) && matchesSearch(record, filter.q);
+
 /** One filter, used for the rows, the counts and "Select all N matching". */
 export const matchesFilter = (record: SearchableRecord, filter: RecordFilter) =>
-  VIEW_PREDICATES[filter.view](record) &&
-  (filter.status.length === 0 || filter.status.includes(record.status)) &&
-  matchesSearch(record, filter.q);
+  VIEW_PREDICATES[filter.view](record) && (filter.status.length === 0 || filter.status.includes(record.status)) && matchesScope(record, filter);

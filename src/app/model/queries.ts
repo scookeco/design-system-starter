@@ -89,6 +89,7 @@ export function useAccount(id: string) {
   return useQuery({
     queryKey: accountKeys.detail(partition, id),
     queryFn: ({ signal }) => getAccount(tenant, id, signal),
+    enabled: id !== '',
     initialData: () => client.getQueryData<{ items: Account[] }>(accountKeys.list(partition))?.items.find((a) => a.id === id),
     initialDataUpdatedAt: () => client.getQueryState(accountKeys.list(partition))?.dataUpdatedAt,
   });

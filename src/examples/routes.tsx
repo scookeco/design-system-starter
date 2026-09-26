@@ -4,6 +4,7 @@
  * all read from here; nothing else knows the list of pages.
  */
 import { lazy, type ComponentType } from 'react';
+import { ACCOUNT, PERSON } from '../app/registries/entities';
 import type { Route, RouteProps } from '../app/routing/routes';
 import type { RecordSection } from './RecordPage';
 import type { SettingsSection } from './SettingsPage';
@@ -25,6 +26,28 @@ const Settings = page(async () => {
   const { SettingsPage } = await import('./SettingsPage');
   return ({ params }) => <SettingsPage initialSection={(params.section as SettingsSection | undefined) ?? 'profile'} />;
 });
+// Schema-driven: accounts and people get their pages from their entity config, not hand-built ones.
+const Entities = () => import('./EntityPages');
+const AccountList = page(async () => {
+  const { EntityListPage } = await Entities();
+  return () => <EntityListPage config={ACCOUNT} />;
+});
+const AccountRecord = page(async () => {
+  const { EntityRecordPage } = await Entities();
+  return ({ params }) => <EntityRecordPage config={ACCOUNT} id={params.id ?? ''} />;
+});
+const AccountForm = page(async () => {
+  const { EntityFormPage } = await Entities();
+  return ({ params }) => <EntityFormPage config={ACCOUNT} {...(params.id ? { id: params.id } : {})} />;
+});
+const PeopleList = page(async () => {
+  const { EntityListPage } = await Entities();
+  return () => <EntityListPage config={PERSON} />;
+});
+const PersonRecord = page(async () => {
+  const { EntityRecordPage } = await Entities();
+  return ({ params }) => <EntityRecordPage config={PERSON} id={params.id ?? ''} />;
+});
 const Setup = page(async () => noParams((await import('./SetupWizard')).SetupWizard));
 
 export const ROUTES: readonly Route[] = [
@@ -34,6 +57,12 @@ export const ROUTES: readonly Route[] = [
   { path: '/records/new', layout: 'shell', page: Create, guard: 'record:create', nav: '/records' },
   { path: '/records/:id', layout: 'shell', page: Record, guard: 'record:read', nav: '/records' },
   { path: '/records/:id/:section', layout: 'shell', page: Record, guard: 'record:read', nav: '/records' },
+  { path: '/accounts', layout: 'shell', page: AccountList, guard: ACCOUNT.capabilities.read, nav: '/accounts' },
+  { path: '/accounts/new', layout: 'shell', page: AccountForm, guard: 'account:create', nav: '/accounts' },
+  { path: '/accounts/:id', layout: 'shell', page: AccountRecord, guard: ACCOUNT.capabilities.read, nav: '/accounts' },
+  { path: '/accounts/:id/edit', layout: 'shell', page: AccountForm, guard: 'account:edit', nav: '/accounts' },
+  { path: '/people', layout: 'shell', page: PeopleList, guard: PERSON.capabilities.read, nav: '/people' },
+  { path: '/people/:id', layout: 'shell', page: PersonRecord, guard: PERSON.capabilities.read, nav: '/people' },
   { path: '/settings', layout: 'shell', page: Settings, guard: 'workspace:read', nav: '/settings' },
   { path: '/settings/:section', layout: 'shell', page: Settings, guard: 'workspace:read', nav: '/settings' },
   { path: '/setup', layout: 'focused', page: Setup, guard: 'workspace:manage', nav: '' },

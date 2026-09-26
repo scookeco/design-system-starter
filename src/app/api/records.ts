@@ -23,6 +23,8 @@ const filterParams = (filter: RecordFilter) => {
   if (filter.q) params.set('q', filter.q);
   if (filter.status.length > 0) params.set('status', filter.status.join(','));
   params.set('view', filter.view);
+  if (filter.account) params.set('account', filter.account);
+  if (filter.owner) params.set('owner', filter.owner);
   return params;
 };
 

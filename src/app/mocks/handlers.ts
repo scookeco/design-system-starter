@@ -24,7 +24,7 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesSearch, type SearchableRecord } from '../model/predicates';
+import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
 import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
 import { bump, currentSession, db, endSession, grantFor, isSignedIn, touch } from './db';
@@ -75,7 +75,9 @@ const parseFilter = (url: URL): RecordFilter => {
       const parsed = RecordStatusSchema.safeParse(s);
       return parsed.success ? [parsed.data] : [];
     });
-  return { q: url.searchParams.get('q') ?? '', status, view: view.success ? view.data : 'all' };
+  const account = url.searchParams.get('account');
+  const owner = url.searchParams.get('owner');
+  return { q: url.searchParams.get('q') ?? '', status, view: view.success ? view.data : 'all', ...(account ? { account } : {}), ...(owner ? { owner } : {}) };
 };
 
 /** The server joins a record with its owner's name (by id) before searching, as a database would. */
@@ -134,12 +136,12 @@ const workspaceHandlers = [
   http.get(
     `${API}/records/counts`,
     handle('record:read', ({ tenant, grant, request }) => {
-      const { q, status } = parseFilter(new URL(request.url));
+      const filter = parseFilter(new URL(request.url));
       const join = searchable(tenant);
       const records = db(tenant).records.filter((r) => canSee(grant, r)).map(join);
-      const counts = Object.fromEntries(RECORD_VIEWS.map((view: RecordView) => [view, records.filter((r) => matchesFilter(r, { q, status, view })).length]));
+      const counts = Object.fromEntries(RECORD_VIEWS.map((view: RecordView) => [view, records.filter((r) => matchesFilter(r, { ...filter, view })).length]));
       // A column's count is its whole status for this search, whatever the status filter narrows the rows to.
-      const searched = records.filter((r) => matchesSearch(r, q));
+      const searched = records.filter((r) => matchesScope(r, filter));
       const statuses = Object.fromEntries(RECORD_STATUSES.map((s) => [s, searched.filter(hasStatus(s)).length]));
       return HttpResponse.json({ counts, statuses });
     }),
