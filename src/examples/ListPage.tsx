@@ -10,11 +10,16 @@
  * landmarks, navigation and the toast region; the page fills main.
  *
  * Anatomy:
- *   header   PageHeader: title + description | page actions
+ *   header   PageHeader: title + description | page actions (New record disabled with its reason for viewers)
+ *   saved    SavedViewsBar: the person's saved views, "Modified", View options (save as, save changes,
+ *            rename, open by default, delete); the default opens when the URL is bare
  *   views    NavTabs (All · Open · Drafts · Archived) with server counts; each view is a predicate
- *   toolbar  SearchField · Filters Popover (status checkboxes)   (role="search")
+ *   toolbar  SearchField · Filters Popover (status checkboxes) · Columns Popover   (role="search") | Display: Table · Board
  *   chips    one removable Tag per active filter; removing one moves focus to the next chip, or to Filters
- *   content  one of: skeleton rows (loading) · table · empty state (first use | no results | error)
+ *   content  one of: skeleton rows (loading) · table or board · empty state (first use | no results | error)
+ *            The table and the board are two surfaces over ONE query and ONE projection: the same
+ *            rows, the board grouped by the per-status predicates (toBoard), its column totals from
+ *            the same server counts as the tabs. Neither keeps its own copy.
  *   footer   Pagination: "1–10 of 219", from the server's total. Its summary is the page's one live
  *            region for the count; while loading or failed, a caption announces that instead.
  *   select   a checkbox per row, named after it; the header box selects the page, then offers
@@ -27,8 +32,8 @@
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
  *
- * URL: the view, search, filters, sort and page live in the query string (useUrlState), so any
- * view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
+ * URL: the view, search, filters, sort, page, display, columns and saved view live in the query
+ * string (useUrlState), so any view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
  * debounced search is a refinement (replace). The half-typed search stays out of the URL.
  *
  * Selection belongs to one filter: change the search, a filter or the view and it clears.
@@ -49,6 +54,7 @@ import {
   Pagination,
   Popover,
   SearchField,
+  SegmentedControl,
   Skeleton,
   Stack,
   Table,
@@ -64,9 +70,9 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { BulkDeleteResult, RecordStatus, SortKey } from '../app/api/schemas';
-import { useBulkDeleteRecords, useCreateRecord, type BulkSelection } from '../app/model/mutations';
-import { statusOptionsFor, toRow, VIEWS } from '../app/model/projections';
+import type { BulkDeleteResult, MovableStatus, RecordStatus, SortKey } from '../app/api/schemas';
+import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
+import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
   EMPTY_SELECTION,
@@ -82,14 +88,18 @@ import {
 } from '../app/model/selection';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
+import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { gated, PermissionNote } from './Permission';
+import { RecordBoard } from './RecordBoard';
+import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
 const PAGE_SIZE = 10;
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
-const COLUMNS = 6;
 
 type SortColumn = 'name' | 'amount' | 'updated';
 const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | 'descending' } => ({
@@ -108,6 +118,8 @@ export interface ListPageProps {
   initialSelection?: 'page' | 'matching';
   /** With a selection: open the delete confirmation, or confirm it straight away (gallery and tests). */
   initialBulkDelete?: 'confirm' | 'submit';
+  /** Open a saved-view dialog on first render (gallery and tests). */
+  initialViewDialog?: SavedViewDialog;
 }
 
 /**
@@ -156,6 +168,7 @@ function ListPageContent({
   initialDialogOpen = false,
   initialFiltersOpen = false,
   initialSelection,
+  initialViewDialog,
   selection,
   onSelectionChange,
   result,
@@ -165,6 +178,9 @@ function ListPageContent({
   const format = useFormat();
   const createRecord = useCreateRecord();
   const retryDelete = useBulkDeleteRecords();
+  const move = useMoveRecord();
+  const can = useCan();
+  const createPermission = usePermission('record:create');
 
   const [url, nav] = useUrlState(listCodec);
   const query = { ...url, q: url.q.trim(), pageSize: PAGE_SIZE };
@@ -182,6 +198,9 @@ function ListPageContent({
   const [nameError, setNameError] = useState<string | undefined>();
 
   const statusOptions = statusOptionsFor(query.view);
+  const shown = new Set(url.columns);
+  // The default saved view applies only when the list opened with nothing in its URL.
+  const [openedBare] = useState(() => listCodec.serialise(url) === '');
   const rows = (list.data?.items ?? []).map(toRow);
   const total = list.data?.total ?? 0;
   const filtered = query.q.trim() !== '' || query.status.length > 0;
@@ -235,6 +254,15 @@ function ListPageContent({
     setFocusChip(index);
   };
 
+  const moveRecord = (row: RecordRow, status: MovableStatus) =>
+    move.mutate(
+      { record: row, status },
+      {
+        onSuccess: () => toast({ title: `Moved to ${STATUS[status].label}`, description: row.name, tone: 'success' }),
+        onError: () => toast({ title: 'Couldn’t move the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+      },
+    );
+
   const toggleSort = (column: SortColumn) => refine({ sort: (query.sort === column ? `-${column}` : column) as SortKey });
 
   const submitCreate = (event?: FormEvent) => {
@@ -269,39 +297,47 @@ function ListPageContent({
               Export
             </Button>
           </Tooltip>
-          <Dialog
-            title="New record"
-            description="Records start as drafts, owned by you, until they are sent."
-            open={dialogOpen}
-            onOpenChange={setDialogOpen}
-            trigger={<Button icon="plus">New record</Button>}
-            footer={
-              <>
-                <Button variant="secondary" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={() => submitCreate()} loading={createRecord.isPending}>
-                  Create record
-                </Button>
-              </>
-            }
-          >
-            <Stack as="form" gap="md" onSubmit={submitCreate}>
-              <TextField label="Name" value={draftName} onChange={(event) => setDraftName(event.target.value)} error={nameError} required />
-            </Stack>
-          </Dialog>
+          {createPermission.allowed ? (
+            <Dialog
+              title="New record"
+              description="Records start as drafts, owned by you, until they are sent."
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              trigger={<Button icon="plus">New record</Button>}
+              footer={
+                <>
+                  <Button variant="secondary" onClick={() => setDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={() => submitCreate()} loading={createRecord.isPending}>
+                    Create record
+                  </Button>
+                </>
+              }
+            >
+              <Stack as="form" gap="md" onSubmit={submitCreate}>
+                <TextField label="Name" value={draftName} onChange={(event) => setDraftName(event.target.value)} error={nameError} required />
+              </Stack>
+            </Dialog>
+          ) : (
+            <Button icon="plus" {...gated(createPermission)}>
+              New record
+            </Button>
+          )}
         </>
       }
     />
   );
 
   // First use: nothing in the workspace at all, whatever the view.
-  const firstUse = counts.data !== undefined && !filtered && counts.data.all + counts.data.archived === 0;
+  const firstUse = counts.data !== undefined && !filtered && counts.data.counts.all + counts.data.counts.archived === 0;
 
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
         {header}
+        <PermissionNote permission={createPermission} />
+        <SavedViewsBar url={url} nav={nav} openedBare={openedBare} initialDialog={initialViewDialog} />
 
         {firstUse ? (
           <EmptyState
@@ -309,7 +345,7 @@ function ListPageContent({
             title="Create your first record"
             description="Records keep each agreement, its owner and its amount in one place."
             action={
-              <Button icon="plus" onClick={() => setDialogOpen(true)}>
+              <Button icon="plus" onClick={() => setDialogOpen(true)} {...gated(createPermission)}>
                 New record
               </Button>
             }
@@ -318,8 +354,8 @@ function ListPageContent({
           <>
             <NavTabs
               label="Record views"
-              items={VIEWS.map(({ view, label }) => ({
-                label: counts.data ? `${label} (${format.number(counts.data[view])})` : label,
+              items={VIEWS.filter((v) => !v.requires || can(v.requires)).map(({ view, label }) => ({
+                label: counts.data ? `${label} (${format.number(counts.data.counts[view])})` : label,
                 // A tab keeps the search, drops filters the new view can't use, and starts at page 1.
                 href: nav.href({ view, status: [], page: 1 }),
               }))}
@@ -328,31 +364,62 @@ function ListPageContent({
             />
 
             <Stack gap="sm">
-              <Cluster as="form" role="search" gap="sm" align="end" onSubmit={(event) => event.preventDefault()}>
-                <SearchField
-                  label="Search records"
+              <Cluster align="end" gap="sm">
+                <Cluster as="form" role="search" gap="sm" align="end" onSubmit={(event) => event.preventDefault()}>
+                  <SearchField
+                    label="Search records"
+                    hideLabel
+                    placeholder="Search by name or owner"
+                    value={searchText}
+                    onValueChange={setSearchText}
+                  />
+                  <Popover
+                    label="Filter by status"
+                    open={filtersOpen}
+                    onOpenChange={setFiltersOpen}
+                    trigger={
+                      <Button ref={filtersRef} variant="secondary" icon="settings">
+                        {query.status.length > 0 ? `Filters (${format.number(query.status.length)})` : 'Filters'}
+                      </Button>
+                    }
+                  >
+                    <Text size="caption" tone="muted">
+                      Status
+                    </Text>
+                    {statusOptions.map(({ value, label }) => (
+                      <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
+                    ))}
+                  </Popover>
+                  {url.display === 'table' ? (
+                    <Popover
+                      label="Columns"
+                      trigger={
+                        <Button variant="secondary">{url.columns.length < COLUMNS.length ? `Columns (${format.number(url.columns.length)})` : 'Columns'}</Button>
+                      }
+                    >
+                      <Text size="caption" tone="muted">
+                        Show columns
+                      </Text>
+                      {COLUMNS.map(({ id, label }) => (
+                        <Checkbox
+                          key={id}
+                          label={label}
+                          checked={shown.has(id)}
+                          // A refinement: replace. The order is the table's, whatever order they're ticked in.
+                          onCheckedChange={(checked) => nav.replace({ columns: COLUMNS.map((c) => c.id).filter((c) => (c === id ? checked === true : shown.has(c))) })}
+                        />
+                      ))}
+                    </Popover>
+                  ) : null}
+                </Cluster>
+                {/* Two surfaces, one query: switching is navigation (push), so Back returns to the other one. */}
+                <SegmentedControl
+                  label="Display"
                   hideLabel
-                  placeholder="Search by name or owner"
-                  value={searchText}
-                  onValueChange={setSearchText}
+                  options={DISPLAYS}
+                  value={url.display}
+                  onValueChange={(display) => nav.push({ display: display as Display })}
                 />
-                <Popover
-                  label="Filter by status"
-                  open={filtersOpen}
-                  onOpenChange={setFiltersOpen}
-                  trigger={
-                    <Button ref={filtersRef} variant="secondary" icon="settings">
-                      {query.status.length > 0 ? `Filters (${format.number(query.status.length)})` : 'Filters'}
-                    </Button>
-                  }
-                >
-                  <Text size="caption" tone="muted">
-                    Status
-                  </Text>
-                  {statusOptions.map(({ value, label }) => (
-                    <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
-                  ))}
-                </Popover>
               </Cluster>
               {query.status.length > 0 ? (
                 <Cluster as="ul" role="list" aria-label="Active filters" gap="xs">
@@ -393,7 +460,7 @@ function ListPageContent({
               </Banner>
             ) : null}
 
-            {list.isSuccess && rows.length > 0 && pageSelection === true && total > rows.length ? (
+            {url.display === 'table' && list.isSuccess && rows.length > 0 && pageSelection === true && total > rows.length ? (
               <Cluster gap="xs" align="center">
                 {selection.scope === 'matching' ? (
                   <>
@@ -424,15 +491,16 @@ function ListPageContent({
                         </Text>
                       </TableHeaderCell>
                       <TableHeaderCell>Name</TableHeaderCell>
-                      <TableHeaderCell>Owner</TableHeaderCell>
-                      <TableHeaderCell>Status</TableHeaderCell>
-                      <TableHeaderCell>Updated</TableHeaderCell>
-                      <TableHeaderCell numeric>Amount</TableHeaderCell>
+                      {COLUMNS.filter((c) => shown.has(c.id)).map((c) => (
+                        <TableHeaderCell key={c.id} numeric={c.id === 'amount'}>
+                          {c.label}
+                        </TableHeaderCell>
+                      ))}
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {SKELETON_ROWS.map((key) => (
-                      <Skeleton key={key} shape="table-row" columns={COLUMNS} />
+                      <Skeleton key={key} shape="table-row" columns={2 + shown.size} />
                     ))}
                   </TableBody>
                 </Table>
@@ -461,6 +529,14 @@ function ListPageContent({
                   ) : undefined
                 }
               />
+            ) : url.display === 'board' ? (
+              <RecordBoard
+                columns={toBoard(rows, query.view, query.status)}
+                statusCounts={counts.data?.statuses}
+                allowMove={can('record:move')}
+                movingId={move.isPending ? move.variables.record.id : undefined}
+                onMove={moveRecord}
+              />
             ) : (
               <Table caption="Records" hideCaption maxHeight="md">
                 <TableHead>
@@ -471,14 +547,20 @@ function ListPageContent({
                     <TableHeaderCell sort={sort.column === 'name' ? sort.direction : undefined} onSort={() => toggleSort('name')}>
                       Name
                     </TableHeaderCell>
-                    <TableHeaderCell>Owner</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell sort={sort.column === 'updated' ? sort.direction : undefined} onSort={() => toggleSort('updated')}>
-                      Updated
-                    </TableHeaderCell>
-                    <TableHeaderCell numeric sort={sort.column === 'amount' ? sort.direction : undefined} onSort={() => toggleSort('amount')}>
-                      Amount
-                    </TableHeaderCell>
+                    {/* The visible columns are URL state (and so part of a saved view), in their fixed order. */}
+                    {shown.has('owner') ? <TableHeaderCell>Owner</TableHeaderCell> : null}
+                    {shown.has('account') ? <TableHeaderCell>Account</TableHeaderCell> : null}
+                    {shown.has('status') ? <TableHeaderCell>Status</TableHeaderCell> : null}
+                    {shown.has('updated') ? (
+                      <TableHeaderCell sort={sort.column === 'updated' ? sort.direction : undefined} onSort={() => toggleSort('updated')}>
+                        Updated
+                      </TableHeaderCell>
+                    ) : null}
+                    {shown.has('amount') ? (
+                      <TableHeaderCell numeric sort={sort.column === 'amount' ? sort.direction : undefined} onSort={() => toggleSort('amount')}>
+                        Amount
+                      </TableHeaderCell>
+                    ) : null}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -495,15 +577,27 @@ function ListPageContent({
                       <TableCell rowHeader>
                         <Link href={`/records/${row.id}`}>{row.name}</Link>
                       </TableCell>
-                      <TableCell>{row.ownerName}</TableCell>
-                      <TableCell>
-                        <Cluster gap="2xs">
-                          <Badge tone={row.status.tone}>{row.status.label}</Badge>
-                          {row.legalHold ? <Badge tone="warning">Legal hold</Badge> : null}
-                        </Cluster>
-                      </TableCell>
-                      <TableCell>{format.date(row.updatedAt)}</TableCell>
-                      <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell>
+                      {/* Joined by id at render: the row holds ids, the people and account caches hold the names. */}
+                      {shown.has('owner') ? (
+                        <TableCell>
+                          <PersonRef id={row.ownerId} plain />
+                        </TableCell>
+                      ) : null}
+                      {shown.has('account') ? (
+                        <TableCell>
+                          <AccountRef id={row.accountId} />
+                        </TableCell>
+                      ) : null}
+                      {shown.has('status') ? (
+                        <TableCell>
+                          <Cluster gap="2xs">
+                            <Badge tone={row.status.tone}>{row.status.label}</Badge>
+                            {row.legalHold ? <Badge tone="warning">Legal hold</Badge> : null}
+                          </Cluster>
+                        </TableCell>
+                      ) : null}
+                      {shown.has('updated') ? <TableCell>{format.date(row.updatedAt)}</TableCell> : null}
+                      {shown.has('amount') ? <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell> : null}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -546,7 +640,8 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
   const toast = useToast();
   const format = useFormat();
   const bulkDelete = useBulkDeleteRecords();
-  const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined);
+  const deletePermission = usePermission('record:delete');
+  const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined && deletePermission.allowed);
   const count = selectedCount(selection);
   const deletable = deletableCount(selection);
   const skipped = count - deletable;
@@ -568,7 +663,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
   // Gallery and tests: confirm straight away, once.
   const submitted = useRef(false);
   const submitOnMount = useEffectEvent(() => {
-    if (initialBulkDelete !== 'submit' || submitted.current) return;
+    if (initialBulkDelete !== 'submit' || submitted.current || !deletePermission.allowed) return;
     submitted.current = true;
     confirm();
   });
@@ -579,7 +674,9 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
       <Cluster justify="between" align="center">
         <Cluster gap="sm" align="center">
           <Text aria-live="polite">{`${format.number(count)} selected`}</Text>
-          {skipped > 0 ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
+          {/* Why Delete is unavailable, once: the role, if that's the reason; otherwise any records on legal hold. */}
+          {skipped > 0 && deletePermission.allowed ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
+          <PermissionNote permission={deletePermission} />
         </Cluster>
         <Cluster gap="sm">
           <Button variant="ghost" onClick={onClear} disabled={bulkDelete.isPending}>
@@ -598,7 +695,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
               if (!bulkDelete.isPending) setConfirmOpen(open);
             }}
             trigger={
-              <Button variant="danger" disabled={deletable === 0}>
+              <Button variant="danger" disabled={deletable === 0} {...gated(deletePermission)}>
                 Delete
               </Button>
             }

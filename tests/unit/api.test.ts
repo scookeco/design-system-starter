@@ -4,12 +4,13 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError, ContractError, reporting } from '../../src/app/api/client';
+import { getAccount, listAccounts, patchAccount, postAccount } from '../../src/app/api/accounts';
 import { countRecords, getRecord, listRecords, patchRecordName, postBulkDelete, postRecord } from '../../src/app/api/records';
 import type { RecordQuery } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
 import { resetDb } from '../../src/app/mocks/db';
 import { handlers } from '../../src/app/mocks/handlers';
-import { seedRecords } from '../../src/app/mocks/seed';
+import { seedAccounts, seedPeople, seedRecords } from '../../src/app/mocks/seed';
 
 const server = setupServer(...handlers);
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
@@ -33,6 +34,36 @@ describe('seed data', () => {
   });
 });
 
+describe('entities joined by id', () => {
+  it('every record points at a person and an account that exist, by id', () => {
+    for (const tenant of ['acme', 'globex'] as const) {
+      const people = new Set(seedPeople(tenant).map((p) => p.id));
+      const accounts = new Set(seedAccounts(tenant).map((a) => a.id));
+      for (const record of seedRecords(tenant)) {
+        expect(people.has(record.ownerId)).toBe(true);
+        expect(record.accountId !== null && accounts.has(record.accountId)).toBe(true);
+      }
+    }
+    expect(seedAccounts('acme')).toEqual(seedAccounts('acme'));
+  });
+
+  it('serves accounts per tenant, creates once per key and refuses a stale edit', async () => {
+    const { items } = await listAccounts('acme');
+    expect(items.map((a) => a.id)).toEqual(seedAccounts('acme').map((a) => a.id));
+    expect(items.every((a) => a.arr.currency === 'USD')).toBe(true);
+    await expect(getAccount('globex', items[0]?.id ?? '')).rejects.toMatchObject({ status: 404 });
+
+    const input = { name: 'Relecloud', domain: 'relecloud.example', industry: 'Software', ownerId: 'acme-p02', arrMinor: 5_000_000, customerSince: '2026-09-01' };
+    const created = await postAccount('acme', input, 'acct-1');
+    expect((await postAccount('acme', input, 'acct-1')).id).toBe(created.id);
+
+    const renamed = await patchAccount('acme', created.id, { name: 'Relecloud Inc.' }, created.version);
+    expect(renamed).toMatchObject({ name: 'Relecloud Inc.', version: created.version + 1, domain: 'relecloud.example' });
+    await expect(patchAccount('acme', created.id, { name: 'Stale' }, created.version)).rejects.toMatchObject({ status: 409, current: { name: 'Relecloud Inc.' } });
+    await expect(postAccount('acme', { ...input, ownerId: 'nobody' }, 'acct-2')).rejects.toMatchObject({ status: 422 });
+  });
+});
+
 describe('mock API', () => {
   it('searches, filters, sorts and pages on the server, with the total of every match', async () => {
     const page = await listRecords('acme', query({ status: ['active'], sort: '-amount', pageSize: 10 }));
@@ -43,7 +74,12 @@ describe('mock API', () => {
     expect(page.total).toBe(seedRecords('acme').filter((r) => r.status === 'active').length);
 
     const searched = await listRecords('acme', query({ q: 'LEASE' }));
-    expect(searched.items.every((r) => r.name.toLowerCase().includes('lease') || r.owner.name.toLowerCase().includes('lease'))).toBe(true);
+    expect(searched.items.every((r) => r.name.toLowerCase().includes('lease'))).toBe(true);
+    // The server joins the owner's name by id before searching: "priya" finds Priya Natarajan's records.
+    const priya = seedPeople('acme').find((p) => p.name.startsWith('Priya'));
+    const byOwner = await listRecords('acme', query({ q: 'priya', pageSize: 100 }));
+    expect(byOwner.total).toBe(seedRecords('acme').filter((r) => r.ownerId === priya?.id).length);
+    expect(byOwner.items.every((r) => r.ownerId === priya?.id)).toBe(true);
   });
 
   it('keeps tenants apart', async () => {

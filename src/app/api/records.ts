@@ -10,6 +10,7 @@ import {
   RecordCountsSchema,
   RecordPageSchema,
   RecordSchema,
+  type MovableStatus,
   type RecordFilter,
   type RecordQuery,
   type Tenant,
@@ -22,6 +23,8 @@ const filterParams = (filter: RecordFilter) => {
   if (filter.q) params.set('q', filter.q);
   if (filter.status.length > 0) params.set('status', filter.status.join(','));
   params.set('view', filter.view);
+  if (filter.account) params.set('account', filter.account);
+  if (filter.owner) params.set('owner', filter.owner);
   return params;
 };
 
@@ -50,6 +53,8 @@ export const postPerson = (tenant: Tenant, name: string) => request(PersonSchema
 export interface NewRecord {
   name: string;
   ownerId?: string;
+  /** The account it belongs to, by id; null (or left out) for none yet. */
+  accountId?: string | null;
   amountMinor?: number;
   renewsOn?: string;
   tags?: readonly string[];
@@ -62,6 +67,10 @@ export const postRecord = (tenant: Tenant, record: NewRecord, idempotencyKey: st
 /** Sends the version it was based on; the server answers 409 if someone changed the record since. */
 export const patchRecordName = (tenant: Tenant, id: string, name: string, version: number) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}`, { method: 'PATCH', body: { name, version } });
+
+/** Move between statuses (a board column). Versioned: a stale move gets a 409. */
+export const postStatus = (tenant: Tenant, id: string, status: MovableStatus, version: number) =>
+  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/status`, { method: 'POST', body: { status, version } });
 
 export const postArchive = (tenant: Tenant, id: string) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/archive`, { method: 'POST' });

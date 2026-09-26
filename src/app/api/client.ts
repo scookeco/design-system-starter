@@ -4,16 +4,16 @@
  * cache, so nothing downstream has to defend against it.
  */
 import type { z } from 'zod';
-import { ErrorBodySchema, type RecordEntity } from './schemas';
+import { ErrorBodySchema, type Account, type RecordEntity } from './schemas';
 
 /** A response the server sent on purpose: 4xx or 5xx with a code. */
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
-  /** On a 409 conflict: the record as the server has it now. */
-  readonly current: RecordEntity | undefined;
+  /** On a 409 conflict: the entity as the server has it now. */
+  readonly current: RecordEntity | Account | undefined;
 
-  constructor(status: number, code: string, message: string, current?: RecordEntity) {
+  constructor(status: number, code: string, message: string, current?: RecordEntity | Account) {
     super(message);
     this.name = 'ApiError';
     this.status = status;

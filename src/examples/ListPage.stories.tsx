@@ -28,6 +28,10 @@ export const SecondPage: Story = { parameters: mockApi({ url: '/records?page=2' 
 export const OpenedFromLink: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount' }) };
 /** Another tenant: its own records, currency and counts, under its own cache keys. */
 export const OtherTenant: Story = { parameters: mockApi({ tenant: 'globex' }) };
+/** The same query as a board: one column per status the view lets through, totals from the server's counts. */
+export const Board: Story = { parameters: mockApi({ url: '/records?display=board' }) };
+/** A filter narrows the board to its columns, as it narrows the table to its rows. */
+export const BoardFiltered: Story = { parameters: mockApi({ url: '/records?display=board&view=open&q=lease' }) };
 export const RowsSelected: Story = { args: { initialSelection: 'page' } };
 /** "Select all N matching": the selection is the filter, not the ids on this page. */
 export const AllMatchingSelected: Story = { args: { initialSelection: 'matching' } };
@@ -43,3 +47,19 @@ export const BulkDeletePartialFailure: Story = {
   args: { initialSelection: 'matching', initialBulkDelete: 'submit' },
   parameters: mockApi({ url: '/records?view=drafts' }),
 };
+
+/** Viewer: no Drafts tab (the server hides drafts from this role), and New record disabled with the reason beside it. */
+export const AsViewer: Story = { parameters: mockApi({ role: 'viewer' }) };
+/** Viewer on the board: the same columns, minus drafts, and no Move to… on any card. */
+export const AsViewerBoard: Story = { parameters: mockApi({ role: 'viewer', url: '/records?display=board' }) };
+/** Editor: can create and move, but only admins delete. The bulk bar's Delete says so. */
+export const AsEditorWithSelection: Story = { args: { initialSelection: 'page' }, parameters: mockApi({ role: 'editor' }) };
+
+/** A saved view, chosen: its config is in the URL (saved=acme-v1), and the Select names it. */
+export const SavedViewChosen: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount&saved=acme-v1' }) };
+/** The URL has moved on from the saved view (a column hidden): "Modified", with Save changes in View options. */
+export const SavedViewModified: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount&columns=owner,status,updated,amount&saved=acme-v1' }) };
+export const SaveViewDialog: Story = { tags: ['modal-open'], args: { initialViewDialog: 'save' }, parameters: mockApi({ url: '/records?view=open&status=overdue' }) };
+/** Fewer columns, from the Columns popover: part of the URL, so part of a saved view. */
+export const ColumnsChosen: Story = { parameters: mockApi({ url: '/records?columns=owner,status,amount' }) };
+

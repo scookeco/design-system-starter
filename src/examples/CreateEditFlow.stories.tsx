@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fail, hold } from '../app/mocks/overrides';
-import { mockApiMeta, mswOverrides } from '../app/mocks/storybook';
+import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { CreateEditFlow } from './CreateEditFlow';
+import { Guard } from './Permission';
 
 const valid = { name: 'Hardware lease', owner: 'acme-p02', amount: '12500', renewal: 'end' };
 
@@ -24,3 +25,18 @@ export const Created: Story = { args: { initialDraft: valid, initialSubmitting: 
 /** The server failed: the draft stays, and a retry reuses the idempotency key. */
 export const CreateFailed: Story = { args: { initialDraft: valid, initialSubmitting: true }, parameters: mswOverrides(fail('post', '/records')) };
 export const QuickCreateOpen: Story = { tags: ['modal-open'], args: { initialQuickCreateOpen: true } };
+
+/**
+ * The route guard for a viewer: the page is replaced by the 403 page, from the same `can` the New
+ * record button and the create mutation use. Nothing on it queries, so it isn't a data story.
+ */
+export const AsViewerDenied: Story = {
+  tags: ['!data'],
+  parameters: mockApi({ role: 'viewer' }),
+  render: (args) => (
+    <Guard capability="record:create" current="/records">
+      <CreateEditFlow {...args} />
+    </Guard>
+  ),
+};
+

@@ -2,10 +2,13 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RecordEntity } from '../../src/app/api/schemas';
-import { seedRecords } from '../../src/app/mocks/seed';
+import { seedAccounts, seedPeople, seedRecords } from '../../src/app/mocks/seed';
 import { FIELD_REGISTRY, FIELD_TYPES, FieldDisplay, FieldInput, fieldReporting, type FieldDef, type FieldRegistry } from '../../src/app/registries/fields';
 import { RECORD_PROPERTIES } from '../../src/app/registries/recordFields';
 import { createFormatter } from '../../src/format/format';
+import { renderWithApp, setupMockApi } from './app-harness';
+
+setupMockApi();
 
 afterEach(() => {
   cleanup();
@@ -14,7 +17,9 @@ afterEach(() => {
 
 const format = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
 const record = seedRecords('acme')[0] as RecordEntity;
-const context = { format, currency: 'USD', people: [record.owner] };
+const owner = seedPeople('acme').find((p) => p.id === record.ownerId);
+const account = seedAccounts('acme').find((a) => a.id === record.accountId);
+const context = { format, currency: 'USD', people: owner ? [owner] : [], accounts: account ? [account] : [] };
 
 describe('field registry', () => {
   it('has an entry for every field type', () => {
@@ -28,8 +33,8 @@ describe('field registry', () => {
     expect(Object.keys(incomplete)).not.toContain('tags');
   });
 
-  it('renders every record property through its entry', () => {
-    render(
+  it('renders every record property through its entry, joining people and accounts by id', async () => {
+    renderWithApp(
       <dl>
         {RECORD_PROPERTIES.map((field) => (
           <dd key={field.id}>
@@ -38,7 +43,9 @@ describe('field registry', () => {
         ))}
       </dl>,
     );
-    expect(screen.getByText(record.owner.name)).toBeTruthy();
+    // References resolve through the people and account caches: the record itself holds only ids.
+    expect(await screen.findByText(owner?.name ?? '')).toBeTruthy();
+    expect((await screen.findByRole('link', { name: account?.name ?? '' })).getAttribute('href')).toBe(`/accounts/${record.accountId ?? ''}`);
     expect(screen.getByText(format.money(record.amount.minor, record.amount.currency))).toBeTruthy();
     expect(screen.getByText(record.id)).toBeTruthy();
   });

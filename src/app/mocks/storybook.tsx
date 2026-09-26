@@ -7,10 +7,10 @@ import { QueryClient, type QueryClient as QueryClientType } from '@tanstack/reac
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Decorator } from '@storybook/react-vite';
 import type { HttpHandler } from 'msw';
-import type { Tenant } from '../api/schemas';
+import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
 import { AppProviders } from '../providers';
 import { createMemoryHistory } from '../url/history';
-import { resetDb } from './db';
+import { currentSession, resetDb, setRoles } from './db';
 import { handlers } from './handlers';
 
 /**
@@ -48,11 +48,11 @@ function SettledSignal({ client }: { client: QueryClientType }) {
 /** Stories never retry and never go stale: a failure shows at once, and nothing refetches mid-capture. */
 const storyClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 
-function StoryProviders({ tenant, url, children }: { tenant: Tenant; url: string; children: ReactNode }) {
+function StoryProviders({ session, tenant, url, children }: { session: Session; tenant: Tenant; url: string; children: ReactNode }) {
   const [client] = useState(storyClient);
   const [history] = useState(() => createMemoryHistory(url));
   return (
-    <AppProviders tenant={tenant} queryClient={client} history={history}>
+    <AppProviders session={session} tenant={tenant} queryClient={client} history={history}>
       <SettledSignal client={client} />
       {children}
     </AppProviders>
@@ -62,15 +62,27 @@ function StoryProviders({ tenant, url, children }: { tenant: Tenant; url: string
 export interface MockApiParameters {
   /** The workspace the story runs in (default acme). */
   tenant?: Tenant;
+  /**
+   * The signed-in person's role, in every workspace or per workspace. Wins over the gallery's Role
+   * toolbar, so a story about a role always shows that role (the visual suite pins the toolbar to admin).
+   */
+  role?: Role | Partial<Record<Tenant, Role>>;
   /** The URL the page opens at, kept in an in-memory history so the gallery's own URL is never rewritten. */
   url?: string;
 }
 
-/** Wraps a story in the app providers, from its `parameters.mockApi`. */
+const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).includes(value) ? (value as Role) : 'admin';
+
+/**
+ * Wraps a story in the app providers, from its `parameters.mockApi`. The role goes to the mock
+ * server first (it's the server that decides), and the session the app mounts with is the one the
+ * server would return for it.
+ */
 const withMockApi: Decorator = (Story, context) => {
-  const { tenant = 'acme', url = '/' } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  const { tenant = 'acme', url = '/', role } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  setRoles(role ?? toolbarRole(context.globals.role));
   return (
-    <StoryProviders tenant={tenant} url={url}>
+    <StoryProviders session={currentSession()} tenant={tenant} url={url}>
       <Story />
     </StoryProviders>
   );

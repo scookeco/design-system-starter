@@ -7,12 +7,18 @@
  * The same handlers serve Storybook (msw/browser via msw-storybook-addon) and Vitest (msw/node).
  */
 import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
+import type { AccountInput } from '../api/accounts';
 import {
+  MOVABLE_STATUSES,
   RECORD_STATUSES,
   RECORD_VIEWS,
   RecordStatusSchema,
   RecordViewSchema,
+  SavedViewConfigSchema,
   TenantSchema,
+  type Account,
+  type SavedView,
+  type Capability,
   type RecordEntity,
   type RecordFilter,
   type RecordStatus,
@@ -20,28 +26,47 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canRename, matchesFilter } from '../model/predicates';
+import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
+import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
-import { db, touch } from './db';
-import { SEED_EPOCH } from './seed';
+import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
+import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 
 const API = '*/api/t/:tenant';
 
-const error = (status: number, code: string, message: string, current?: RecordEntity) =>
+const error = (status: number, code: string, message: string, current?: RecordEntity | Account) =>
   HttpResponse.json({ error: { code, message, ...(current ? { current } : {}) } }, { status });
 
-/** Latency, then the failure roll, then the handler. Every handler goes through this. */
+/** Latency, then the failure roll. */
+const settle = async (): Promise<Response | undefined> => {
+  if (mockConfig.latencyMs > 0) await delay(mockConfig.latencyMs);
+  if (mockConfig.failureRate > 0 && mockConfig.random() < mockConfig.failureRate) {
+    return error(500, 'server_error', 'The server hit a problem. Try again.');
+  }
+  return undefined;
+};
+
+/**
+ * Latency, the failure roll, the workspace, then the capability the route requires, then the
+ * handler. Every workspace route declares its capability (deny by default): the server checks it
+ * against the role it holds for the signed-in person, whatever the client did or didn't check.
+ * Object-level rules (archived, legal hold) are the handler's, after this.
+ */
 const handle =
-  (resolver: (args: { tenant: Tenant; request: Request; params: Record<string, string | readonly string[] | undefined> }) => Response | Promise<Response>): HttpResponseResolver =>
+  (
+    capability: Capability,
+    resolver: (args: { tenant: Tenant; grant: Grant; request: Request; params: Record<string, string | readonly string[] | undefined> }) => Response | Promise<Response>,
+  ): HttpResponseResolver =>
   async ({ request, params }) => {
-    if (mockConfig.latencyMs > 0) await delay(mockConfig.latencyMs);
-    if (mockConfig.failureRate > 0 && mockConfig.random() < mockConfig.failureRate) {
-      return error(500, 'server_error', 'The server hit a problem. Try again.');
-    }
+    const failed = await settle();
+    if (failed) return failed;
+    if (!isSignedIn()) return error(401, 'signed_out', 'Sign in to continue.');
     const tenant = TenantSchema.safeParse(params.tenant);
     if (!tenant.success) return error(404, 'unknown_tenant', 'No such workspace.');
-    return resolver({ tenant: tenant.data, request, params });
+    const grant = grantFor(tenant.data);
+    if (!can(grant, capability)) return error(403, 'forbidden', DENIAL_REASONS[capability]);
+    return resolver({ tenant: tenant.data, grant, request, params });
   };
 
 const parseFilter = (url: URL): RecordFilter => {
@@ -52,7 +77,26 @@ const parseFilter = (url: URL): RecordFilter => {
       const parsed = RecordStatusSchema.safeParse(s);
       return parsed.success ? [parsed.data] : [];
     });
-  return { q: url.searchParams.get('q') ?? '', status, view: view.success ? view.data : 'all' };
+  const account = url.searchParams.get('account');
+  const owner = url.searchParams.get('owner');
+  return { q: url.searchParams.get('q') ?? '', status, view: view.success ? view.data : 'all', ...(account ? { account } : {}), ...(owner ? { owner } : {}) };
+};
+
+/** The server joins a record with its owner's name (by id) before searching, as a database would. */
+const searchable = (tenant: Tenant) => {
+  const names = new Map(db(tenant).people.map((p) => [p.id, p.name]));
+  return (record: RecordEntity): SearchableRecord => ({ ...record, ownerName: names.get(record.ownerId) ?? '' });
+};
+
+const validAccount = (tenant: Tenant, body: Partial<AccountInput>): AccountInput | undefined => {
+  const name = body.name?.trim();
+  const domain = body.domain?.trim();
+  const industry = body.industry?.trim();
+  if (!name || !domain || !industry) return undefined;
+  if (!db(tenant).people.some((p) => p.id === body.ownerId)) return undefined;
+  if (typeof body.arrMinor !== 'number' || !Number.isInteger(body.arrMinor) || body.arrMinor < 0) return undefined;
+  if (!body.customerSince || !/^\d{4}-\d{2}-\d{2}$/.test(body.customerSince)) return undefined;
+  return { name, domain, industry, ownerId: body.ownerId as string, arrMinor: body.arrMinor, customerSince: body.customerSince };
 };
 
 const collator = new Intl.Collator('en', { sensitivity: 'base', numeric: true });
@@ -72,16 +116,18 @@ const clampInt = (value: string | null, fallback: number, min: number, max: numb
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
 };
 
-export const handlers = [
+const workspaceHandlers = [
   http.get(
     `${API}/records`,
-    handle(({ tenant, request }) => {
+    handle('record:read', ({ tenant, grant, request }) => {
       const url = new URL(request.url);
       const filter = parseFilter(url);
       const sort = url.searchParams.get('sort');
       const pageSize = clampInt(url.searchParams.get('pageSize'), 25, 1, 100);
+      const join = searchable(tenant);
+      // Roles shape the projection: what this grant can't see is filtered in the query, so totals and pages stay honest.
       const matches = db(tenant)
-        .records.filter((r) => matchesFilter(r, filter))
+        .records.filter((r) => canSee(grant, r) && matchesFilter(join(r), filter))
         .sort((a, b) => COMPARE[isSortKey(sort) ? sort : 'name'](a, b) || a.id.localeCompare(b.id));
       const pages = Math.max(1, Math.ceil(matches.length / pageSize));
       const page = clampInt(url.searchParams.get('page'), 1, 1, pages);
@@ -91,28 +137,31 @@ export const handlers = [
 
   http.get(
     `${API}/records/counts`,
-    handle(({ tenant, request }) => {
-      const { q, status } = parseFilter(new URL(request.url));
-      const counts = Object.fromEntries(
-        RECORD_VIEWS.map((view: RecordView) => [view, db(tenant).records.filter((r) => matchesFilter(r, { q, status, view })).length]),
-      );
-      return HttpResponse.json({ counts });
+    handle('record:read', ({ tenant, grant, request }) => {
+      const filter = parseFilter(new URL(request.url));
+      const join = searchable(tenant);
+      const records = db(tenant).records.filter((r) => canSee(grant, r)).map(join);
+      const counts = Object.fromEntries(RECORD_VIEWS.map((view: RecordView) => [view, records.filter((r) => matchesFilter(r, { ...filter, view })).length]));
+      // A column's count is its whole status for this search, whatever the status filter narrows the rows to.
+      const searched = records.filter((r) => matchesScope(r, filter));
+      const statuses = Object.fromEntries(RECORD_STATUSES.map((s) => [s, searched.filter(hasStatus(s)).length]));
+      return HttpResponse.json({ counts, statuses });
     }),
   ),
 
   http.get(
     `${API}/people`,
-    handle(({ tenant }) => HttpResponse.json({ items: db(tenant).people })),
+    handle('record:read', ({ tenant }) => HttpResponse.json({ items: db(tenant).people })),
   ),
 
   http.post(
     `${API}/people`,
-    handle(async ({ tenant, request }) => {
+    handle('people:create', async ({ tenant, request }) => {
       const partition = db(tenant);
       const body = (await request.json()) as Partial<{ name: string }>;
       const name = body.name?.trim();
       if (!name) return error(422, 'invalid', 'Enter a name.');
-      const person = { id: `${tenant}-p${String(partition.people.length + 1).padStart(2, '0')}`, name };
+      const person = { id: `${tenant}-p${String(partition.people.length + 1).padStart(2, '0')}`, name, email: emailFor(name) };
       partition.people.push(person);
       return HttpResponse.json(person, { status: 201 });
     }),
@@ -120,33 +169,40 @@ export const handlers = [
 
   http.get(
     `${API}/records/:id`,
-    handle(({ tenant, params }) => {
-      const record = db(tenant).records.find((r) => r.id === params.id);
+    handle('record:read', ({ tenant, grant, params }) => {
+      const record = db(tenant).records.find((r) => r.id === params.id && canSee(grant, r));
       return record ? HttpResponse.json(record) : error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
     }),
   ),
 
   http.post(
     `${API}/records`,
-    handle(async ({ tenant, request }) => {
+    handle('record:create', async ({ tenant, request }) => {
       const key = request.headers.get('Idempotency-Key');
       if (!key) return error(400, 'idempotency_key_required', 'Creates need an Idempotency-Key header.');
       const partition = db(tenant);
       const replay = partition.created.get(key);
-      if (replay) return HttpResponse.json(replay, { status: 201 });
+      if (replay && 'status' in replay) return HttpResponse.json(replay, { status: 201 });
 
-      const body = (await request.json()) as Partial<{ name: string; ownerId: string; amountMinor: number; renewsOn: string; tags: string[] }>;
-      // Defaults for a quick create: the signed-in person owns it, no amount yet, renews in a year.
+      const body = (await request.json()) as Partial<{ name: string; ownerId: string; accountId: string | null; amountMinor: number; renewsOn: string; tags: string[] }>;
+      // Defaults for a quick create: the signed-in person owns it, no account or amount yet, renews in a year.
       const owner = body.ownerId === undefined ? partition.people[0] : partition.people.find((p) => p.id === body.ownerId);
+      const accountId = body.accountId ?? null;
       const renewsOn = body.renewsOn ?? new Date(SEED_EPOCH + 365 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-      if (!body.name?.trim() || !owner || (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')) {
+      if (
+        !body.name?.trim() ||
+        !owner ||
+        (accountId !== null && !partition.accounts.some((a) => a.id === accountId)) ||
+        (body.amountMinor !== undefined && typeof body.amountMinor !== 'number')
+      ) {
         return error(422, 'invalid', 'Some fields are missing or invalid.');
       }
       const currency = WORKSPACES[tenant].currency;
       const record = touch({
         id: `${tenant === 'acme' ? 'r' : 'g'}-${String(partition.nextId)}`,
         name: body.name.trim(),
-        owner,
+        ownerId: owner.id,
+        accountId,
         status: 'draft',
         amount: { minor: Math.round(body.amountMinor ?? 0), currency },
         updatedAt: new Date(SEED_EPOCH).toISOString(),
@@ -163,7 +219,7 @@ export const handlers = [
 
   http.patch(
     `${API}/records/:id`,
-    handle(async ({ tenant, request, params }) => {
+    handle('record:rename', async ({ tenant, request, params }) => {
       const partition = db(tenant);
       const index = partition.records.findIndex((r) => r.id === params.id);
       const current = partition.records[index];
@@ -180,7 +236,7 @@ export const handlers = [
 
   http.post(
     `${API}/records/:id/archive`,
-    handle(({ tenant, params }) => {
+    handle('record:archive', ({ tenant, params }) => {
       const partition = db(tenant);
       const index = partition.records.findIndex((r) => r.id === params.id);
       const current = partition.records[index];
@@ -193,8 +249,26 @@ export const handlers = [
   ),
 
   http.post(
+    `${API}/records/:id/status`,
+    handle('record:move', async ({ tenant, request, params }) => {
+      const partition = db(tenant);
+      const index = partition.records.findIndex((r) => r.id === params.id);
+      const current = partition.records[index];
+      if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<{ status: string; version: number }>;
+      const status = MOVABLE_STATUSES.find((s) => s === body.status);
+      if (!status) return error(422, 'invalid', 'Choose draft, pending, active or overdue.');
+      if (!canMove(current)) return error(409, 'archived', 'Archived records can’t be moved. Restore it first.', current);
+      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this record.', current);
+      const next = touch({ ...current, status });
+      partition.records[index] = next;
+      return HttpResponse.json(next);
+    }),
+  ),
+
+  http.post(
     `${API}/records/bulk-delete`,
-    handle(async ({ tenant, request }) => {
+    handle('record:delete', async ({ tenant, request }) => {
       const partition = db(tenant);
       const body = (await request.json()) as { ids?: string[]; filter?: Partial<RecordFilter> };
       const filter: RecordFilter | undefined = body.filter
@@ -204,7 +278,8 @@ export const handlers = [
             view: RecordViewSchema.catch('all').parse(body.filter.view),
           }
         : undefined;
-      const targets = filter ? partition.records.filter((r) => matchesFilter(r, filter)) : partition.records.filter((r) => body.ids?.includes(r.id));
+      const join = searchable(tenant);
+      const targets = filter ? partition.records.filter((r) => matchesFilter(join(r), filter)) : partition.records.filter((r) => body.ids?.includes(r.id));
       const deleted: string[] = [];
       const failed: { id: string; name: string; reason: string }[] = [];
       for (const record of targets) {
@@ -215,4 +290,133 @@ export const handlers = [
       return HttpResponse.json({ deleted, failed });
     }),
   ),
+
+  http.get(
+    `${API}/accounts`,
+    handle('account:read', ({ tenant }) => HttpResponse.json({ items: db(tenant).accounts })),
+  ),
+
+  http.get(
+    `${API}/accounts/:id`,
+    handle('account:read', ({ tenant, params }) => {
+      const account = db(tenant).accounts.find((a) => a.id === params.id);
+      return account ? HttpResponse.json(account) : error(404, 'not_found', 'This account doesn’t exist, or was deleted.');
+    }),
+  ),
+
+  http.post(
+    `${API}/accounts`,
+    handle('account:create', async ({ tenant, request }) => {
+      const key = request.headers.get('Idempotency-Key');
+      if (!key) return error(400, 'idempotency_key_required', 'Creates need an Idempotency-Key header.');
+      const partition = db(tenant);
+      const replay = partition.created.get(key);
+      if (replay && 'domain' in replay) return HttpResponse.json(replay, { status: 201 });
+      const body = (await request.json()) as Partial<AccountInput>;
+      const input = validAccount(tenant, body);
+      if (!input) return error(422, 'invalid', 'Some fields are missing or invalid.');
+      const { arrMinor, ...fields } = input;
+      const account: Account = {
+        id: `${tenant}-a${String(partition.accounts.length + 1).padStart(2, '0')}`,
+        ...fields,
+        arr: { minor: arrMinor, currency: WORKSPACES[tenant].currency },
+        version: 1,
+      };
+      partition.accounts.push(account);
+      partition.created.set(key, account);
+      return HttpResponse.json(account, { status: 201 });
+    }),
+  ),
+
+  http.patch(
+    `${API}/accounts/:id`,
+    handle('account:edit', async ({ tenant, request, params }) => {
+      const partition = db(tenant);
+      const index = partition.accounts.findIndex((a) => a.id === params.id);
+      const current = partition.accounts[index];
+      if (!current) return error(404, 'not_found', 'This account doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<AccountInput> & { version?: number };
+      const input = validAccount(tenant, { name: current.name, domain: current.domain, industry: current.industry, ownerId: current.ownerId, arrMinor: current.arr.minor, customerSince: current.customerSince, ...body });
+      if (!input) return error(422, 'invalid', 'Some fields are missing or invalid.');
+      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this account.', current);
+      const { arrMinor, ...rest } = input;
+      const next = bump({ ...current, ...rest, arr: { minor: arrMinor, currency: current.arr.currency } });
+      partition.accounts[index] = next;
+      return HttpResponse.json(next);
+    }),
+  ),
+];
+
+/** Saved views: the signed-in person's, in this workspace. Anyone who can read the list may keep views of it. */
+const myViews = (tenant: Tenant) => {
+  const partition = db(tenant);
+  const mine = partition.views.get(currentUserId()) ?? [];
+  partition.views.set(currentUserId(), mine);
+  return mine;
+};
+
+const viewHandlers = [
+  http.get(
+    `${API}/views`,
+    handle('record:read', ({ tenant }) => HttpResponse.json({ items: myViews(tenant) })),
+  ),
+
+  http.post(
+    `${API}/views`,
+    handle('record:read', async ({ tenant, request }) => {
+      const body = (await request.json()) as Partial<{ name: string; config: unknown }>;
+      const name = body.name?.trim();
+      const config = SavedViewConfigSchema.safeParse(body.config);
+      if (!name || !config.success) return error(422, 'invalid', 'Name the view.');
+      const views = myViews(tenant);
+      if (views.some((v) => v.name.toLowerCase() === name.toLowerCase())) return error(422, 'duplicate', `You already have a view called “${name}”.`);
+      const partition = db(tenant);
+      const view: SavedView = { id: `${tenant}-v${String(partition.nextViewId)}`, name, config: config.data, isDefault: false };
+      partition.nextViewId += 1;
+      views.push(view);
+      return HttpResponse.json(view, { status: 201 });
+    }),
+  ),
+
+  http.patch(
+    `${API}/views/:id`,
+    handle('record:read', async ({ tenant, request, params }) => {
+      const views = myViews(tenant);
+      const index = views.findIndex((v) => v.id === params.id);
+      const current = views[index];
+      if (!current) return error(404, 'not_found', 'This view doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<{ name: string; config: unknown; isDefault: boolean }>;
+      const name = body.name === undefined ? current.name : body.name.trim();
+      const config = body.config === undefined ? { success: true as const, data: current.config } : SavedViewConfigSchema.safeParse(body.config);
+      if (!name || !config.success) return error(422, 'invalid', 'Name the view.');
+      if (views.some((v) => v.id !== current.id && v.name.toLowerCase() === name.toLowerCase())) return error(422, 'duplicate', `You already have a view called “${name}”.`);
+      // One default per person per workspace: setting one unsets the other.
+      if (body.isDefault === true) for (const [i, v] of views.entries()) views[i] = { ...v, isDefault: false };
+      const next: SavedView = { ...current, name, config: config.data, isDefault: body.isDefault ?? current.isDefault };
+      views[index] = next;
+      return HttpResponse.json(next);
+    }),
+  ),
+
+  http.delete(
+    `${API}/views/:id`,
+    handle('record:read', ({ tenant, params }) => {
+      const views = myViews(tenant);
+      const index = views.findIndex((v) => v.id === params.id);
+      if (index === -1) return error(404, 'not_found', 'This view doesn’t exist, or was deleted.');
+      views.splice(index, 1);
+      return HttpResponse.json({ deleted: String(params.id) });
+    }),
+  ),
+];
+
+export const handlers = [
+  ...workspaceHandlers,
+  ...viewHandlers,
+  // The session: not workspace data, so outside the tenant routes.
+  http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
+  http.delete('*/api/session', async () => {
+    endSession();
+    return HttpResponse.json({ signedOut: true });
+  }),
 ];

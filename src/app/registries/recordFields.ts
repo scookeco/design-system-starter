@@ -7,7 +7,8 @@ import type { FieldDef, FieldType } from './fields';
 
 /** The properties rail on the record page. */
 export const RECORD_PROPERTIES: readonly FieldDef<RecordEntity>[] = [
-  { type: 'person', id: 'owner', label: 'Owner', get: (r) => r.owner },
+  { type: 'person', id: 'owner', label: 'Owner', get: (r) => r.ownerId },
+  { type: 'account', id: 'account', label: 'Account', get: (r) => r.accountId },
   { type: 'status', id: 'status', label: 'Status', get: (r) => r.status },
   { type: 'money', id: 'amount', label: 'Amount', get: (r) => r.amount },
   { type: 'date', id: 'renewsOn', label: 'Renews on', get: (r) => r.renewsOn },
@@ -28,6 +29,7 @@ export const CREATE_FIELDS = {
   details: [
     { type: 'text', id: 'name', label: 'Name' },
     { type: 'person', id: 'owner', label: 'Owner' },
+    { type: 'account', id: 'account', label: 'Account (optional)' },
   ],
   terms: [{ type: 'money', id: 'amount', label: 'Amount' }],
 } as const satisfies Record<string, readonly FormFieldDef<string>[]>;

@@ -25,7 +25,7 @@ describe('predicates', () => {
   });
 
   it('match search on name or owner, ignoring case and accents', () => {
-    const record = { ...first(records), name: 'Café lease', owner: { id: 'p', name: 'Zoë Ng' } };
+    const record = { ...first(records), name: 'Café lease', ownerName: 'Zoë Ng' };
     expect(matchesFilter(record, { q: 'cafe', status: [], view: 'all' })).toBe(true);
     expect(matchesFilter(record, { q: 'ZOE', status: [], view: 'all' })).toBe(true);
     expect(matchesFilter(record, { q: 'cafe', status: ['draft'], view: 'all' })).toBe(record.status === 'draft');
@@ -36,7 +36,7 @@ describe('projections', () => {
   it('derive a row from an entity without copying what it doesn’t need', () => {
     const record = first(records.filter((r) => r.tags.includes('legal-hold')));
     const row = toRow(record);
-    expect(row).toMatchObject({ id: record.id, ownerName: record.owner.name, legalHold: true, deletable: false, status: STATUS[record.status] });
+    expect(row).toMatchObject({ id: record.id, ownerId: record.ownerId, accountId: record.accountId, legalHold: true, deletable: false, status: STATUS[record.status] });
     expect(row.deletable).toBe(canDelete(record));
   });
 
@@ -47,10 +47,12 @@ describe('projections', () => {
 });
 
 describe('cache keys', () => {
-  it('lead with the tenant, then the resource, then the params', () => {
+  it('lead with the partition (tenant, then permission scope), then the resource, then the params', () => {
     const query = { q: '', status: [], view: 'all', sort: 'name', page: 1, pageSize: 10 } as const;
-    expect(recordKeys.list('acme', query)).toEqual(['acme', 'records', query]);
-    expect(recordKeys.list('acme', query).slice(0, 2)).toEqual(recordKeys.lists('acme'));
-    expect(recordKeys.detail('globex', 'g-1001')).toEqual(['globex', 'record', { id: 'g-1001' }]);
+    expect(recordKeys.list(['acme', 'admin'], query)).toEqual(['acme', 'admin', 'records', query]);
+    expect(recordKeys.list(['acme', 'admin'], query).slice(0, 3)).toEqual(recordKeys.lists(['acme', 'admin']));
+    expect(recordKeys.detail(['globex', 'viewer'], 'g-1001')).toEqual(['globex', 'viewer', 'record', { id: 'g-1001' }]);
+    // A viewer's list and an admin's are different entries: neither can answer for the other.
+    expect(recordKeys.list(['acme', 'viewer'], query)).not.toEqual(recordKeys.list(['acme', 'admin'], query));
   });
 });

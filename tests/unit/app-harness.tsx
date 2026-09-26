@@ -5,11 +5,11 @@
 import { QueryClient } from '@tanstack/react-query';
 import { render, type RenderResult } from '@testing-library/react';
 import { setupServer } from 'msw/node';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
-import type { Tenant } from '../../src/app/api/schemas';
+import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
-import { resetDb } from '../../src/app/mocks/db';
+import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
 import { handlers } from '../../src/app/mocks/handlers';
 import { AppProviders } from '../../src/app/providers';
 import { createMemoryHistory, type MemoryHistory } from '../../src/app/url/history';
@@ -29,14 +29,24 @@ export const setupMockApi = () => {
 
 export const testClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
 
+/** The app's providers for a hook or a component, with the mock server's current session (admin unless setRoles says otherwise). */
+export const wrapperFor =
+  (client: QueryClient, tenant: Tenant = 'acme') =>
+  ({ children }: { children: ReactNode }) => (
+    <AppProviders session={currentSession()} tenant={tenant} queryClient={client}>
+      {children}
+    </AppProviders>
+  );
+
 export const renderWithApp = (
   ui: ReactElement,
-  { tenant = 'acme', client = testClient(), url = '/' }: { tenant?: Tenant; client?: QueryClient; url?: string } = {},
+  { tenant = 'acme', client = testClient(), url = '/', role }: { tenant?: Tenant; client?: QueryClient; url?: string; role?: Role } = {},
 ): RenderResult & { client: QueryClient; history: MemoryHistory } => {
   const history = createMemoryHistory(url);
+  if (role) setRoles(role);
   return {
     ...render(
-      <AppProviders tenant={tenant} queryClient={client} history={history}>
+      <AppProviders session={currentSession()} tenant={tenant} queryClient={client} history={history}>
         {ui}
       </AppProviders>,
     ),
