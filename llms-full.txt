@@ -9,7 +9,8 @@ UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
   allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
 - Compose system components and layout primitives, imported from src/index.ts.
-  Never import radix-ui outside src/components or src/primitives.
+  Never import radix-ui outside src/components or src/primitives, or
+  react-aria-components and @internationalized/* outside src/components.
 - Never restyle a system component with className or style. Need a new look?
   Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
   a lint disable with a reason, an owner and a removal condition.
@@ -5058,7 +5059,7 @@ The design system draws; the app layer knows. Everything about fetching, caching
 
 #### Why the system stays UI-only
 
-- The system’s runtime dependencies are exactly `react`, `react-dom` and `radix-ui`. A unit test fails the build if that list changes.
+- The system’s runtime dependencies are exactly `react`, `react-dom`, `radix-ui` and `react-aria-components` (with its date library, `@internationalized/date`), all UI. A unit test fails the build if that list changes.
 - Data libraries (`msw`, `@tanstack/react-query`, `zod`) are devDependencies. ESLint rejects them, and any import from `src/app`, in `src/components`, `src/primitives` and `src/layouts`, with a fixture per boundary in `npm run test:rules`.
 - So components take values and callbacks, never queries. An app is free to choose another cache or another server, and the system doesn’t change.
 - The one data-shaped part the system does ship is formatting: `LocaleProvider` and `useFormat()`. Every number, date and amount a person reads goes through it.
@@ -5796,7 +5797,8 @@ UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
   allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
 - Compose system components and layout primitives, imported from src/index.ts.
-  Never import radix-ui outside src/components or src/primitives.
+  Never import radix-ui outside src/components or src/primitives, or
+  react-aria-components and @internationalized/* outside src/components.
 - Never restyle a system component with className or style. Need a new look?
   Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
   a lint disable with a reason, an owner and a removal condition.

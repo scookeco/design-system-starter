@@ -20,7 +20,7 @@ import type { TokenUsage } from './checks/token-usage.ts';
 const root = resolve(import.meta.dirname, '..');
 const dist = join(root, 'dist/index.js');
 const usage = JSON.parse(readFileSync(join(root, 'src/tokens/token-usage.json'), 'utf8')) as TokenUsage;
-const EXTERNAL = [/^react($|\/)/, /^react-dom($|\/)/, /^radix-ui($|\/)/];
+const EXTERNAL = [/^react($|\/)/, /^react-dom($|\/)/, /^radix-ui($|\/)/, /^react-aria-components($|\/)/, /^@internationalized\//];
 
 let code: string;
 try {

@@ -38,8 +38,9 @@ function DataPage() {
         <Rules
           items={[
             <>
-              The system’s runtime dependencies are exactly <code>react</code>, <code>react-dom</code> and <code>radix-ui</code>. A unit
-              test fails the build if that list changes.
+              The system’s runtime dependencies are exactly <code>react</code>, <code>react-dom</code>, <code>radix-ui</code> and{' '}
+              <code>react-aria-components</code> (with its date library, <code>@internationalized/date</code>), all UI. A unit test fails
+              the build if that list changes.
             </>,
             <>
               Data libraries (<code>msw</code>, <code>@tanstack/react-query</code>, <code>zod</code>) are devDependencies. ESLint rejects

@@ -9,7 +9,8 @@ UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
   allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
 - Compose system components and layout primitives, imported from src/index.ts.
-  Never import radix-ui outside src/components or src/primitives.
+  Never import radix-ui outside src/components or src/primitives, or
+  react-aria-components and @internationalized/* outside src/components.
 - Never restyle a system component with className or style. Need a new look?
   Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
   a lint disable with a reason, an owner and a removal condition.

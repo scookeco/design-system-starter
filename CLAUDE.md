@@ -22,7 +22,7 @@ Work on a branch. Never commit to `main` directly.
 - `src/tokens/token-usage.json`: **generated** map of the tokens each component, primitive and layout reads (directly, through props, or through what it composes). Shown in the gallery's Tokens panel. Changing any system CSS or a token means `npm run tokens`, or the unit test and `tokens:check` fail.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
 - `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden (token-typed props).
-- `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
+- `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`; the only code allowed to import `react-aria-components` and `@internationalized/date` (Combobox, MultiSelect, DatePicker, DateRangePicker, NumberField).
 - `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks), `AssistantPanel` (an assistant in AppShell's `assistant` slot). Import components and primitives; nothing below imports them.
 - `src/format/`: locale formatting over Intl (`LocaleProvider`, `useFormat`). Part of the system; exported from `src/index.ts`.
 - `src/app/`: the **app layer** the examples use, NOT the design system: `api/` (client + zod schemas; every response is parsed at the boundary), `model/` (cache keys `[tenant, scope, resource, params]`, queries, named predicates, projections, named mutations, selection, `permissions.ts`), `session.tsx` (memberships, workspace switch, sign-out, `useCan`), `routing/` (route type, matcher, `RouteView`, `AppLink`), `url/` (`useUrlState`), `registries/` (field registry, `entities.ts`: entityType → fields), `mocks/` (MSW handlers, seeded db, story wiring). TanStack Query, zod and MSW are devDependencies and may only be imported here and in examples.
@@ -56,7 +56,8 @@ UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
   allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
 - Compose system components and layout primitives, imported from src/index.ts.
-  Never import radix-ui outside src/components or src/primitives.
+  Never import radix-ui outside src/components or src/primitives, or
+  react-aria-components and @internationalized/* outside src/components.
 - Never restyle a system component with className or style. Need a new look?
   Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
   a lint disable with a reason, an owner and a removal condition.
@@ -99,7 +100,7 @@ UI rules (design system v0)
 
 ## Data rules (the app layer)
 
-- The design system is UI-only: runtime `dependencies` stay exactly react, react-dom and radix-ui (a unit test enforces it). Never import msw, @tanstack/*, zod or `src/app` from `src/components`, `src/primitives` or `src/layouts` (lint enforces it, with fixtures).
+- The design system is UI-only: runtime `dependencies` stay exactly react, react-dom, radix-ui, react-aria-components and its date library @internationalized/date (a unit test enforces it). Never import msw, @tanstack/*, zod or `src/app` from `src/components`, `src/primitives` or `src/layouts` (lint enforces it, with fixtures).
 - Pages never fetch or write the cache directly: read with the queries in `src/app/model/queries.ts`, write with one named mutation per domain verb in `src/app/model/mutations.ts`, and document what each patches and invalidates.
 - Parse every response with its zod schema (`src/app/api/client.ts`); add the schema before the endpoint.
 - "What counts as X" is one named predicate in `src/app/model/predicates.ts`, used by filters, counts, badges, guards and the mock server alike.

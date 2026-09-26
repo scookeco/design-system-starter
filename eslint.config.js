@@ -23,6 +23,18 @@ const VENDOR_UI = {
   group: ['radix-ui', 'radix-ui/*', '@radix-ui/*'],
   message: 'Vendor UI is wrapped by the design system. Import the system component from the public entry point instead.',
 };
+// React Aria (react-aria-components, for comboboxes, date pickers and number fields) and its date
+// library may only be imported inside src/components: not in primitives, layouts, src/format or
+// consumer code. Its own building blocks (react-aria, react-stately, @react-aria/*, …) are
+// transitive dependencies, not ours, so they are banned everywhere, components included.
+const REACT_ARIA = {
+  group: ['react-aria-components', 'react-aria-components/*', '@internationalized/*'],
+  message: 'React Aria is wrapped by system components in src/components only. Import the system component (Combobox, DatePicker, NumberField…) from the public entry point.',
+};
+const REACT_ARIA_INTERNALS = {
+  group: ['react-aria', 'react-aria/*', 'react-stately', 'react-stately/*', '@react-aria/*', '@react-stately/*', '@react-types/*'],
+  message: 'Transitive React Aria packages are not dependencies of the system. Use react-aria-components (inside src/components) instead.',
+};
 const SYSTEM_INTERNALS = {
   group: ['**/components/**', '**/primitives/**', '**/layouts/**', '**/internal/**', '**/tokens/**', '**/styles/**', '**/format/**'],
   message: 'Import from the design system public entry point (src/index.ts), not its internals.',
@@ -49,6 +61,20 @@ const DATA_LIBRARIES = {
 const LAYOUT_VENDOR_UI = {
   group: VENDOR_UI.group,
   message: 'Layouts compose system components and primitives. Wrap vendor UI in src/components or src/primitives first.',
+};
+
+// Each layer below or beside components gets its own message, so test:rules can tell the boundaries apart.
+const PRIMITIVE_REACT_ARIA = {
+  group: REACT_ARIA.group,
+  message: 'Layout primitives are layout, not behaviour: React Aria is wrapped in src/components only.',
+};
+const LAYOUT_REACT_ARIA = {
+  group: REACT_ARIA.group,
+  message: 'Layouts compose system components: wrap React Aria in src/components first.',
+};
+const FORMAT_REACT_ARIA = {
+  group: REACT_ARIA.group,
+  message: 'src/format is the one formatting system (Intl): date pickers read it through useFormat(), never the other way round.',
 };
 
 const ESCAPE_HATCH = 'Escape hatch. Needs "// eslint-disable-next-line no-restricted-syntax -- <reason>; owner: <team>; remove when: <condition>". Prefer proposing a variant.';
@@ -82,35 +108,42 @@ export default defineConfig(
       '@eslint-community/eslint-comments/require-description': ['error', { ignore: [] }],
       '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
       '@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: false }],
-      'no-restricted-imports': ['error', { patterns: [VENDOR_UI] }],
+      'no-restricted-imports': ['error', { patterns: [VENDOR_UI, REACT_ARIA, REACT_ARIA_INTERNALS] }],
     },
   },
   {
     name: 'system/components',
-    files: ['src/components/**', 'src/format/**'],
+    files: ['src/components/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT, DATA_LIBRARIES] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT, DATA_LIBRARIES, REACT_ARIA_INTERNALS] }],
+    },
+  },
+  {
+    name: 'system/format',
+    files: ['src/format/**'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, CORE_TO_LAYOUT, DATA_LIBRARIES, FORMAT_REACT_ARIA, REACT_ARIA_INTERNALS] }],
     },
   },
   {
     name: 'system/primitives',
     files: ['src/primitives/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT, CORE_TO_LAYOUT, DATA_LIBRARIES] }],
+      'no-restricted-imports': ['error', { patterns: [UPWARD_FROM_SYSTEM, PRIMITIVE_TO_COMPONENT, CORE_TO_LAYOUT, DATA_LIBRARIES, PRIMITIVE_REACT_ARIA, REACT_ARIA_INTERNALS] }],
     },
   },
   {
     name: 'system/layouts',
     files: ['src/layouts/**'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [LAYOUT_VENDOR_UI, UPWARD_FROM_SYSTEM, DATA_LIBRARIES] }],
+      'no-restricted-imports': ['error', { patterns: [LAYOUT_VENDOR_UI, UPWARD_FROM_SYSTEM, DATA_LIBRARIES, LAYOUT_REACT_ARIA, REACT_ARIA_INTERNALS] }],
     },
   },
   {
     name: 'consumer',
     files: CONSUMER,
     rules: {
-      'no-restricted-imports': ['error', { patterns: [VENDOR_UI, SYSTEM_INTERNALS] }],
+      'no-restricted-imports': ['error', { patterns: [VENDOR_UI, REACT_ARIA, REACT_ARIA_INTERNALS, SYSTEM_INTERNALS] }],
       'no-restricted-syntax': [
         'error',
         {

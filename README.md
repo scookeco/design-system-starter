@@ -2,7 +2,7 @@
 
 A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, page layouts (app shell, page regions, signed-out and focused-task frames), a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
-Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
+Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour (React Aria Components for comboboxes, date pickers and number fields), plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
 
 ## Quick start
 
@@ -55,7 +55,7 @@ src/styles/             index.css (layer order) · reset · generated tokens.css
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden
-src/components/         the components; the only place (with primitives) Radix is imported
+src/components/         the components; the only place (with primitives) Radix is imported, and the only place React Aria is
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks), AssistantPanel (an assistant beside the page)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
 src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
@@ -94,7 +94,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Vendor UI only inside the system; consumers use the public entry | `no-restricted-imports` (ESLint) | `eslint.config.js` |
 | Layers import downward only (see the layer table below) | `no-restricted-imports` per layer; `test:rules` needs a fixture for every direction | `eslint.config.js`, `scripts/test-rules.ts` |
 | Media and container queries use breakpoint tokens (queries can't read `var()`, and Stylelint only checks declarations) | Vitest: every query length equals a `size.breakpoint.*` value | `tests/unit/css.test.ts` |
-| The system is UI-only: runtime `dependencies` are exactly react, react-dom and radix-ui | Vitest | `tests/unit/dependencies.test.ts` |
+| The system is UI-only: runtime `dependencies` are exactly react, react-dom, radix-ui, react-aria-components and @internationalized/date | Vitest | `tests/unit/dependencies.test.ts` |
 | Data libraries (msw, TanStack Query, zod) and `src/app` never enter the system | `no-restricted-imports` in the components, primitives and layouts blocks; a fixture per boundary | `eslint.config.js`, `fixtures/violations/eslint-*-imports-data.tsx` |
 | Only trusted data enters the cache: every API response is parsed with its zod schema | Vitest: an invalid payload becomes an error and the cache stays empty | `src/app/api/client.ts`, `tests/unit/api.test.ts` |
 | Every field type has a registry entry; unknown types fall back and never throw | TypeScript (registry keyed on the union, proved with `@ts-expect-error`) and Vitest | `src/app/registries/fields.tsx`, `tests/unit/registry.test.tsx` |
@@ -123,8 +123,8 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 | Examples (consumer code) | `src/examples/` | the public entry `src/index.ts` and `src/app`; no vendor UI, no `className`/`style` | none: no CSS |
 | App layer (consumer code) | `src/app/` | the public entry, the data libraries (TanStack Query, zod, MSW); no vendor UI, no `className`/`style` | none: no CSS |
 | Layouts | `src/layouts/` | components, primitives, tokens; no vendor UI, no examples, no `src/app`, no data libraries | `layouts` |
-| Components | `src/components/` | other components, primitives, tokens, `src/format`, Radix; no layouts, no examples, no `src/app`, no data libraries | `components` |
-| Formatting | `src/format/` | `Intl` only; no components, no data libraries | none: no CSS |
+| Components | `src/components/` | other components, primitives, tokens, `src/format`, Radix, React Aria Components; no layouts, no examples, no `src/app`, no data libraries | `components` |
+| Formatting | `src/format/` | `Intl` only; no components, no React Aria, no data libraries | none: no CSS |
 | Primitives | `src/primitives/` | other primitives, tokens; no components, no layouts, no data libraries | `primitives` |
 | Tokens | `tokens/` → `src/styles/tokens.css`, `src/tokens/tokens.ts` | nothing | `tokens` |
 
@@ -142,7 +142,7 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 ## Bundle size budgets
 
-`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom` and `radix-ui` left out as the consumer's own dependencies:
+`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom`, `radix-ui`, `react-aria-components` and `@internationalized/date` left out as the consumer's own dependencies:
 
 | Budget | Limit | Measures |
 |---|---|---|
