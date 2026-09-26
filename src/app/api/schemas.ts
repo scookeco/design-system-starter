@@ -115,6 +115,36 @@ export const BulkDeleteResultSchema = z.object({
 });
 export type BulkDeleteResult = z.infer<typeof BulkDeleteResultSchema>;
 
+/**
+ * A long-running job, as the server reports it: truthful status, never "done" at enqueue.
+ *   queued → running (done of total) → succeeded | failed | cancelled
+ * A job that deleted most and failed on a few is `succeeded` with its `failed` items listed (a
+ * partial failure), not `failed`; `failed` means the job itself stopped (`error` says why).
+ */
+export const JOB_STATES = ['queued', 'running', 'succeeded', 'failed', 'cancelled'] as const;
+export const JobStateSchema = z.enum(JOB_STATES);
+export type JobState = z.infer<typeof JobStateSchema>;
+
+export const JobSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal('bulk-delete'),
+  state: JobStateSchema,
+  /** What it's doing, in words ("Delete 59 records matching Drafts"). */
+  label: z.string().min(1),
+  /** Items it will process, fixed when it was queued. */
+  total: z.number().int().nonnegative(),
+  /** Items processed so far, succeeded or not. */
+  done: z.number().int().nonnegative(),
+  /** Items that couldn't be processed, and why. */
+  failed: z.array(z.object({ id: z.string(), name: z.string(), reason: z.string() })),
+  /** Why the job itself stopped (state failed). */
+  error: z.string().optional(),
+  createdAt: z.iso.datetime({ offset: true }),
+  updatedAt: z.iso.datetime({ offset: true }),
+});
+export type Job = z.infer<typeof JobSchema>;
+export const JobsSchema = z.object({ items: z.array(JobSchema) });
+
 export const ErrorBodySchema = z.object({
   error: z.object({
     code: z.string(),

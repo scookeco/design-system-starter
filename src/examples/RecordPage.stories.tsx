@@ -82,3 +82,9 @@ export const RenameForbidden: Story = {
 export const EditedElsewhere: Story = { parameters: mockApi({ anotherUser: [{ kind: 'edit', id: 'r-1001', changes: { name: 'Annual hosting agreement (renegotiated)' } }] }) };
 /** Another person deleted this record while it was open: the page says so instead of offering actions on it. */
 export const DeletedElsewhere: Story = { parameters: mockApi({ anotherUser: [{ kind: 'delete', id: 'r-1001' }] }) };
+
+/** A job started on the list keeps going on every page: the shell's Jobs popover follows it. */
+export const JobsFollowYou: Story = {
+  args: { initialJobsOpen: true },
+  parameters: mockApi({ jobs: [{ state: 'running' }, { state: 'succeeded', total: 12, failures: 2, label: 'Delete 12 records matching “lease”' }] }),
+};

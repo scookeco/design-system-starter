@@ -28,6 +28,9 @@
  *            selection, and Delete last, guarded by the canDelete predicate
  *   overlays create dialog; bulk delete confirmation naming the count; toast on success; a
  *            banner that stays for a partial failure ("98 deleted, 2 failed") with Retry
+ *   jobs     "Delete all N matching" runs as a job (src/app/model/jobs.ts): JobBanner shows its
+ *            truthful progress (queued, 20 of 59, done with 2 failed, stopped, cancelled) with
+ *            Cancel, Retry failed and Dismiss; the shell's Jobs popover follows it on every page
  *   live     changes made elsewhere (src/app/model/live.ts): an edited row updates in place, a
  *            deleted one leaves, new ones wait behind "3 new records · Show 3 new", so rows never
  *            reorder under the cursor
@@ -74,7 +77,7 @@ import {
   useToast,
 } from '../index';
 import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
-import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
+import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, useStartBulkDelete, type BulkSelection } from '../app/model/mutations';
 import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
@@ -98,6 +101,7 @@ import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
 import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
 import { LiveListNotice } from './Freshness';
+import { JobBanner } from './Jobs';
 import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
 import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
@@ -155,6 +159,7 @@ export function ListPage(props: ListPageProps) {
               setSelection(EMPTY_SELECTION);
               setResult(outcome.failed.length > 0 ? outcome : undefined);
             }}
+            onJobStarted={() => setSelection(EMPTY_SELECTION)}
           />
         ) : undefined
       }
@@ -475,6 +480,9 @@ function ListPageContent({
             {/* Changes made elsewhere: new rows wait for "Show N new", so nothing moves under the cursor. */}
             <LiveListNotice />
 
+            {/* A bulk job over "all matching": its truthful progress, then Retry failed or Dismiss. */}
+            <JobBanner />
+
             {result ? (
               <Banner
                 tone="warning"
@@ -665,24 +673,50 @@ interface BulkActionBarProps {
   initialBulkDelete: ListPageProps['initialBulkDelete'];
   onClear: () => void;
   onDone: (result: BulkDeleteResult) => void;
+  /** "All matching" went to a job: the selection is done with. */
+  onJobStarted: () => void;
 }
 
 /**
  * The bulk bar, in the shell's sticky footer while anything is selected: the count, then the
  * actions, destructive last. Delete is pessimistic and confirmed with the count in the question.
  */
-function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkActionBarProps) {
+function BulkActionBar({ selection, initialBulkDelete, onClear, onDone, onJobStarted }: BulkActionBarProps) {
   const toast = useToast();
   const format = useFormat();
   const bulkDelete = useBulkDeleteRecords();
+  const startJob = useStartBulkDelete();
   const deletePermission = usePermission('record:delete');
+  const pending = bulkDelete.isPending || startJob.isPending;
   const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined && deletePermission.allowed);
   const count = selectedCount(selection);
   const deletable = deletableCount(selection);
   const skipped = count - deletable;
   const records = plural(format.number(count), count, 'record', 'records');
 
-  const confirm = (target: BulkSelection = toBulkSelection(selection)) =>
+  /**
+   * "All N matching" can be thousands of records: it runs as a job on the server, with truthful
+   * progress in the shell and on the list (JobBanner), never a request held open. Listed ids are
+   * few: one request, answered in full.
+   */
+  const confirm = (target: BulkSelection = toBulkSelection(selection)) => {
+    if ('filter' in target) {
+      startJob.mutate(
+        { filter: target.filter, label: `Delete ${records}` },
+        {
+          onSuccess: () => {
+            setConfirmOpen(false);
+            onJobStarted();
+            toast({ title: `Deleting ${records}`, description: 'It runs in the background: follow it above the list, or under Jobs on any page.', tone: 'info' });
+          },
+          onError: () => {
+            setConfirmOpen(false);
+            toast({ title: 'Nothing was deleted', description: 'The job couldn’t be started. Your selection is kept: try again.', tone: 'danger', duration: Infinity });
+          },
+        },
+      );
+      return;
+    }
     bulkDelete.mutate(target, {
       onSuccess: (outcome) => {
         setConfirmOpen(false);
@@ -694,6 +728,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
         toast({ title: 'Nothing was deleted', description: 'The server didn’t answer. Your selection is kept: try again.', tone: 'danger', duration: Infinity });
       },
     });
+  };
 
   // Gallery and tests: confirm straight away, once.
   const submitted = useRef(false);
@@ -714,7 +749,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
           <PermissionNote permission={deletePermission} />
         </Cluster>
         <Cluster gap="sm">
-          <Button variant="ghost" onClick={onClear} disabled={bulkDelete.isPending}>
+          <Button variant="ghost" onClick={onClear} disabled={pending}>
             Clear selection
           </Button>
           <Dialog
@@ -727,7 +762,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
             }
             open={confirmOpen}
             onOpenChange={(open) => {
-              if (!bulkDelete.isPending) setConfirmOpen(open);
+              if (!pending) setConfirmOpen(open);
             }}
             trigger={
               <Button variant="danger" disabled={deletable === 0} {...gated(deletePermission)}>
@@ -736,11 +771,11 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
             }
             footer={
               <>
-                <Button variant="secondary" disabled={bulkDelete.isPending} onClick={() => setConfirmOpen(false)}>
+                <Button variant="secondary" disabled={pending} onClick={() => setConfirmOpen(false)}>
                   Cancel
                 </Button>
-                <Button variant="danger" loading={bulkDelete.isPending} onClick={() => confirm()}>
-                  {bulkDelete.isPending ? 'Deleting…' : `Delete ${records}`}
+                <Button variant="danger" loading={pending} onClick={() => confirm()}>
+                  {pending ? 'Deleting…' : `Delete ${records}`}
                 </Button>
               </>
             }

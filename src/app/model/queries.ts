@@ -4,12 +4,14 @@
  */
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { getAccount, listAccounts } from '../api/accounts';
+import { listJobs } from '../api/jobs';
 import { listViews } from '../api/views';
 import { countRecords, getRecord, listPeople, listRecords } from '../api/records';
-import type { Account, RecordFilter, RecordQuery } from '../api/schemas';
+import type { Account, Job, RecordFilter, RecordQuery } from '../api/schemas';
 import { usePartition } from '../session';
 import { useTenant } from '../tenant';
-import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
+import { isActiveJob, jobSettings } from './jobs';
+import { accountKeys, jobKeys, recordKeys, viewKeys, type Partition } from './keys';
 
 /**
  * keepPreviousData, but never across a partition: the previous page may stay on screen while the
@@ -103,3 +105,32 @@ export function useSavedViews() {
   return useQuery({ queryKey: viewKeys.list(partition), queryFn: ({ signal }) => listViews(tenant, signal), select: (data) => data.items });
 }
 
+
+/**
+ * The signed-in person's jobs in this workspace (src/app/model/jobs.ts), polled while any is queued
+ * or running. When a job moves on, the records it touched have changed: lists and counts refetch.
+ */
+export function useJobs() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  const key = jobKeys.list(partition);
+  return useQuery({
+    queryKey: key,
+    queryFn: async ({ signal }) => {
+      const before = client.getQueryData<{ items: Job[] }>(key)?.items ?? [];
+      const answer = await listJobs(tenant, signal);
+      const moved = answer.items.some((job) => {
+        const was = before.find((b) => b.id === job.id);
+        return was !== undefined && (was.done !== job.done || was.state !== job.state);
+      });
+      if (moved) {
+        void client.invalidateQueries({ queryKey: recordKeys.lists(partition) });
+        void client.invalidateQueries({ queryKey: recordKeys.counts(partition) });
+      }
+      return answer;
+    },
+    select: (data) => data.items,
+    refetchInterval: (query) => (query.state.data?.items.some(isActiveJob) && Number.isFinite(jobSettings.pollMs) ? jobSettings.pollMs : false),
+  });
+}

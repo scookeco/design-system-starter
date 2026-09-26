@@ -33,3 +33,8 @@ export const viewKeys = {
   list: (p: Partition) => [...p, 'views', {}] as const,
 };
 
+
+export const jobKeys = {
+  /** The signed-in person's jobs in this partition, polled while any is running. */
+  list: (p: Partition) => [...p, 'jobs', {}] as const,
+};

@@ -16,6 +16,7 @@ import {
 } from '../../src/app/model/selection';
 import { seedRecords } from '../../src/app/mocks/seed';
 import { ListPage } from '../../src/examples/ListPage';
+import { jobSettings } from '../../src/app/model/jobs';
 import { renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
@@ -91,7 +92,8 @@ describe('list page selection and bulk delete', () => {
     expect(screen.getByText('10 selected')).toBeTruthy();
   });
 
-  it('confirms with the count, then reports a partial failure that stays, with Retry', async () => {
+  it('confirms with the count, then runs “all matching” as a job that reports its partial failure, with Retry', async () => {
+    jobSettings.pollMs = 5;
     const drafts = seedRecords('acme').filter((r) => r.status === 'draft');
     const held = drafts.filter((r) => r.tags.includes('legal-hold'));
     renderWithApp(<ListPage initialSelection="matching" />, { url: '/records?view=drafts' });
@@ -99,8 +101,11 @@ describe('list page selection and bulk delete', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     const dialog = await screen.findByRole('dialog', { name: `Delete ${String(drafts.length)} records?` });
     fireEvent.click(within(dialog).getByRole('button', { name: `Delete ${String(drafts.length)} records` }));
-    expect(await screen.findByText(`${String(drafts.length - held.length)} deleted, ${String(held.length)} failed`)).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Retry' })).toBeTruthy();
+    await screen.findByText('Finished, with failures', {}, { timeout: 5000 });
+    expect(screen.getByRole('progressbar', { name: `Delete ${String(drafts.length)} records` }).getAttribute('aria-valuetext')).toBe(
+      `${String(drafts.length - held.length)} done, ${String(held.length)} failed`,
+    );
+    expect(screen.getByRole('button', { name: `Retry ${String(held.length)} failed` })).toBeTruthy();
     expect(screen.queryByText(/selected$/)).toBeNull();
   });
 });

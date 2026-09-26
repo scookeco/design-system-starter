@@ -47,10 +47,13 @@ export const BulkDeletePending: Story = {
   args: { initialSelection: 'page', initialBulkDelete: 'submit' },
   parameters: mswOverrides(hold('post', '/records/bulk-delete')),
 };
-/** Every draft, deleted by filter; the ones on legal hold fail and stay listed, with Retry. */
+/**
+ * Every draft, deleted by filter: "all matching" runs as a job, polled to the end here. The ones on
+ * legal hold fail: "done, 2 failed", each listed with its reason, and Retry failed.
+ */
 export const BulkDeletePartialFailure: Story = {
   args: { initialSelection: 'matching', initialBulkDelete: 'submit' },
-  parameters: mockApi({ url: '/records?view=drafts' }),
+  parameters: mockApi({ url: '/records?view=drafts', pollJobs: 20 }),
 };
 
 /** Viewer: no Drafts tab (the server hides drafts from this role), and New record disabled with the reason beside it. */
@@ -80,3 +83,13 @@ export const LiveRowDeleted: Story = { parameters: mockApi({ anotherUser: [{ kin
 
 /** A card moved on the board: sent at once (no confirmation), and the toast offers Undo, which moves it back. */
 export const BoardMoveUndoOffered: Story = { args: { initialMove: MOVE }, parameters: mockApi({ url: '/records?display=board', undoWindow: 'hold' }) };
+
+// Long-running jobs: seeded in a state and paused, so each is a still frame (mockApi({ jobs })).
+/** Queued: accepted, nothing done yet, and the page says exactly that. */
+export const JobQueued: Story = { parameters: mockApi({ jobs: [{ state: 'queued' }] }) };
+/** Running: "19 of 59", with Cancel (it stops between chunks; what's deleted stays deleted). */
+export const JobRunning: Story = { parameters: mockApi({ jobs: [{ state: 'running' }] }) };
+/** The job stopped: how far it got, why, and Dismiss. */
+export const JobFailed: Story = { parameters: mockApi({ jobs: [{ state: 'failed', done: 30, failures: 1 }] }) };
+/** Cancelled: how far it got, and that what it did stays done. */
+export const JobCancelled: Story = { parameters: mockApi({ jobs: [{ state: 'cancelled', done: 20 }] }) };

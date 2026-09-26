@@ -163,12 +163,14 @@ export interface RecordPageProps {
   initialMenuOpen?: boolean;
   /** The section to show first. In a product this comes from the route. */
   initialSection?: RecordSection;
+  /** Open the shell's Jobs popover on first render (gallery and tests). */
+  initialJobsOpen?: boolean;
 }
 
-export function RecordPage({ recordId = 'r-1001', ...props }: RecordPageProps) {
+export function RecordPage({ recordId = 'r-1001', initialJobsOpen = false, ...props }: RecordPageProps) {
   const record = useRecord(recordId);
   return (
-    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: record.data?.name ?? 'Record' }}>
+    <ExampleShell current="/records" trail={{ items: [{ label: 'Records', href: '/records' }], current: record.data?.name ?? 'Record' }} jobsOpen={initialJobsOpen}>
       <RecordPageContent recordId={recordId} {...props} />
     </ExampleShell>
   );

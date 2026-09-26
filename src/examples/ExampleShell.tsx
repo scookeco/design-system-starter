@@ -12,6 +12,7 @@ import { useOptionalAppSession, type AppSession } from '../app/session';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
 import { CommandMenu } from './CommandMenu';
+import { JobsIndicator } from './Jobs';
 
 const NAV: readonly NavSection[] = [
   {
@@ -55,13 +56,15 @@ export interface ExampleShellProps {
   initialPaletteQuery?: string;
   /** Open the shortcuts overlay (gallery and tests). */
   initialShortcutsOpen?: boolean;
+  /** Open the jobs popover on first render (gallery and tests). */
+  jobsOpen?: boolean;
   children: ReactNode;
 }
 
 const HELP_ITEMS: readonly MenuEntry[] = [{ label: 'Help centre' }, { label: 'Contact support' }];
 const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={HELP_ITEMS} />;
 
-export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, children }: ExampleShellProps) {
+export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, jobsOpen = false, children }: ExampleShellProps) {
   const app = useOptionalAppSession();
   const injected = useContext(AssistantSlot);
   const panel = assistant ?? injected;
@@ -76,11 +79,15 @@ export function ExampleShell({ current, trail, footer, assistant, initialPalette
       {...(panel ? { assistant: panel } : {})}
       actions={
         app ? (
-          <CommandMenu
-            helpOpen={shortcutsOpen}
-            onHelpOpenChange={setShortcutsOpen}
-            {...(initialPaletteQuery === undefined ? {} : { defaultOpen: true, initialQuery: initialPaletteQuery })}
-          />
+          <>
+            <CommandMenu
+              helpOpen={shortcutsOpen}
+              onHelpOpenChange={setShortcutsOpen}
+              {...(initialPaletteQuery === undefined ? {} : { defaultOpen: true, initialQuery: initialPaletteQuery })}
+            />
+            {/* Freshness and concurrency: the person's long-running jobs, on every page (nothing when there are none). */}
+            <JobsIndicator defaultOpen={jobsOpen} />
+          </>
         ) : undefined
       }
       help={app ? <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[...HELP_ITEMS, { label: 'Keyboard shortcuts', shortcut: '?', onSelect: () => setShortcutsOpen(true) }]} /> : HELP}

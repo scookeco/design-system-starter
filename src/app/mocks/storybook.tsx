@@ -8,8 +8,9 @@ import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 import type { Decorator } from '@storybook/react-vite';
 import { addons } from 'storybook/preview-api';
 import type { HttpHandler } from 'msw';
-import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
+import { ROLES, type Job, type Role, type Session, type Tenant } from '../api/schemas';
 import { draftStorage } from '../model/drafts';
+import { isActiveJob, jobSettings } from '../model/jobs';
 import { undoSettings } from '../model/undo';
 import { writeQueues } from '../model/writeQueue';
 import { AppProviders } from '../providers';
@@ -17,6 +18,7 @@ import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
 import { aiHandlers } from './ai';
 import { handlers } from './handlers';
+import { seedJob, type JobSeed } from './jobs';
 import { anotherUser, mockLive, type AnotherUserChange } from './live';
 
 /** Storybook's own event for changing a global (core-events' UPDATE_GLOBALS; its module path is internal). */
@@ -34,7 +36,9 @@ const isSettled = (client: QueryClientType) => {
     queries.every((q) => q.state.fetchStatus === 'idle') &&
     queries.some((q) => q.state.status !== 'pending') &&
     // A write held in its undo window is waiting on the person, not the server: that's settled.
-    client.isMutating() === writeQueues(client).heldCount()
+    client.isMutating() === writeQueues(client).heldCount() &&
+    // A story that polls its jobs has settled when they've ended.
+    !(Number.isFinite(jobSettings.pollMs) && client.getQueryCache().findAll({ queryKey: [], predicate: (q) => q.queryKey[2] === 'jobs' }).some((q) => (q.state.data as { items: Job[] } | undefined)?.items.some(isActiveJob)))
   );
 };
 
@@ -138,6 +142,13 @@ export interface MockApiParameters {
   anotherUser?: readonly AnotherUserChange[];
   /** The undo window: 'hold' keeps it open (the toast and the held write stay), a number shortens it. Default 6 s. */
   undoWindow?: 'hold' | number;
+  /** Jobs already in the person's list when the page opens, each paused in its state (a still frame). */
+  jobs?: readonly JobSeed[];
+  /**
+   * Poll running jobs every this many ms, so they advance and finish (the story settles once none is
+   * running). Off by default: a seeded job is a still frame.
+   */
+  pollJobs?: number;
 }
 
 const NO_SCRIPT: readonly AnotherUserChange[] = [];
@@ -150,8 +161,9 @@ const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).incl
  * server would return for it.
  */
 const withMockApi: Decorator = (Story, context) => {
-  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT, undoWindow = 6_000 } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT, undoWindow = 6_000, pollJobs } = (context.parameters.mockApi ?? {}) as MockApiParameters;
   undoSettings.windowMs = undoWindow === 'hold' ? Infinity : undoWindow;
+  jobSettings.pollMs = pollJobs ?? Infinity;
   setRoles(role ?? toolbarRole(context.globals.role));
   return (
     <StoryProviders
@@ -181,10 +193,13 @@ export const mockApiMeta = {
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
   // The assistant's routes (./ai) sit beside the rest; they import the same route wrapper, so they live in their own module.
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
-  beforeEach: () => {
+  beforeEach: (context: { parameters: { mockApi?: MockApiParameters } }) => {
     resetDb();
     // Drafts autosave to this browser's storage: every story starts with none.
     draftStorage.clearAll();
+    const { tenant = 'acme', jobs = [] } = context.parameters.mockApi ?? {};
+    // Seeded newest first, as the server lists them: the first seed is the latest job.
+    for (const job of [...jobs].reverse()) seedJob(tenant, job);
   },
 };
 

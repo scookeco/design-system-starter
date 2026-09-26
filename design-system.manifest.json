@@ -447,7 +447,11 @@
         "examples-list-page--live-new-records",
         "examples-list-page--live-row-updated",
         "examples-list-page--live-row-deleted",
-        "examples-list-page--board-move-undo-offered"
+        "examples-list-page--board-move-undo-offered",
+        "examples-list-page--job-queued",
+        "examples-list-page--job-running",
+        "examples-list-page--job-failed",
+        "examples-list-page--job-cancelled"
       ]
     },
     {
@@ -491,7 +495,8 @@
         "examples-record-page--as-editor-more-actions",
         "examples-record-page--rename-forbidden",
         "examples-record-page--edited-elsewhere",
-        "examples-record-page--deleted-elsewhere"
+        "examples-record-page--deleted-elsewhere",
+        "examples-record-page--jobs-follow-you"
       ]
     },
     {

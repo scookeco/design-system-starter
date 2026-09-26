@@ -18,7 +18,11 @@
  *   tagRecord ·        optimistic   detail + listed copies (preview)  lists           (untag is held for the
  *   untagRecord        (undoable)                                                     undo window)
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
- *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts
+ *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts        (listed ids)
+ *   startBulkDelete    pessimistic  jobs (appends, queued)     nothing yet: the job's polls refetch lists
+ *                                                              and counts as it deletes ("all matching")
+ *   cancelJob          pessimistic  jobs (the entry)           jobs
+ *   dismissJob         pessimistic  jobs (removes)             nothing
  *   addPerson          pessimistic  people (appends)           people
  *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key)
  *   updateAccount      pessimistic  directory entry, detail      nothing else: records hold the id, so
@@ -30,14 +34,15 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
+import { deleteJob, postBulkDeleteJob, postCancelJob } from '../api/jobs';
 import { deleteView, patchView, postView } from '../api/views';
 import { patchRecord, postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postRestore, postStatus, type NewRecord, type RecordChanges } from '../api/records';
-import type { Account, Capability, MovableStatus, SavedView, SavedViewConfig, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
+import type { Account, Capability, Job, MovableStatus, SavedView, SavedViewConfig, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { applyChanges, compareVersions, realConflicts } from './conflicts';
-import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
+import { accountKeys, jobKeys, recordKeys, viewKeys, type Partition } from './keys';
 import { isSystemTag } from './predicates';
 import { confirmRecord, isCancelled, writeQueues } from './writeQueue';
 
@@ -453,3 +458,56 @@ export function useDeleteView() {
   });
 }
 
+
+type Jobs = { items: Job[] };
+
+/**
+ * startBulkDelete: a bulk delete over "all N matching" (or a retry of the ids that failed) as a
+ * job. The answer is the job, queued (202): it's appended to the person's jobs and the shell shows
+ * its progress from then on. Nothing is deleted, or said to be, until the job reports it.
+ */
+export function useStartBulkDelete() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const grant = useGrant();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'startBulkDelete'],
+    mutationFn: (selection: { filter: RecordFilter; label: string } | { ids: readonly string[]; label: string }) => {
+      refuseUnless(grant, 'record:delete');
+      return postBulkDeleteJob(tenant, selection);
+    },
+    onSuccess: (job) => {
+      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => ({ items: [job, ...(current?.items ?? []).filter((j) => j.id !== job.id)] }));
+    },
+  });
+}
+
+/** cancelJob: pessimistic. Stops between chunks; what's done stays done, and the job says how far it got. */
+export function useCancelJob() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'cancelJob'],
+    mutationFn: (id: string) => postCancelJob(tenant, id),
+    onSuccess: (job) => {
+      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.map((j) => (j.id === job.id ? job : j)) } : current));
+      return Promise.all([client.invalidateQueries({ queryKey: recordKeys.lists(partition) }), client.invalidateQueries({ queryKey: recordKeys.counts(partition) })]);
+    },
+  });
+}
+
+/** dismissJob: pessimistic. A finished job the person has read leaves their list. */
+export function useDismissJob() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'dismissJob'],
+    mutationFn: (id: string) => deleteJob(tenant, id),
+    onSuccess: ({ dismissed }) => {
+      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.filter((j) => j.id !== dismissed) } : current));
+    },
+  });
+}

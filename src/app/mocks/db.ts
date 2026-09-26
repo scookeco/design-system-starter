@@ -2,7 +2,7 @@
  * The mock server's in-memory database, one partition per tenant. Seeded deterministically and
  * reset before every story and test, so one story's writes never leak into the next.
  */
-import { SessionSchema, TENANTS, type Account, type Person, type RecordEntity, type Role, type SavedView, type Session, type Tenant } from '../api/schemas';
+import { SessionSchema, TENANTS, type Account, type Job, type Person, type RecordEntity, type Role, type SavedView, type Session, type Tenant } from '../api/schemas';
 import { ROLE_CAPABILITIES, type Grant } from '../model/permissions';
 import { SEED_EPOCH, seedAccounts, seedPeople, seedRecords, seedViews } from './seed';
 
@@ -16,6 +16,20 @@ interface Partition {
   /** Saved views, per person (user id). Nobody sees anyone else's. */
   views: Map<string, SavedView[]>;
   nextViewId: number;
+  /** Long-running jobs, with what the server keeps to itself: the ids it will process, and whether it's been dismissed. */
+  jobs: MockJob[];
+  nextJobId: number;
+}
+
+/**
+ * A job as the mock server holds it. `paused` jobs never advance (a story's still frame);
+ * `failAt` stops one with an error once that many items are done (the "failed" state).
+ */
+export interface MockJob extends Job {
+  targets: string[];
+  dismissed: boolean;
+  paused: boolean;
+  failAt?: number;
 }
 
 /** Who the identity provider says is signed in. */
@@ -32,6 +46,8 @@ const fresh = (tenant: Tenant): Partition => {
     nextId: 1001 + records.length,
     views: new Map([[SIGNED_IN.id, views]]),
     nextViewId: views.length + 1,
+    jobs: [],
+    nextJobId: 1,
   };
 };
 

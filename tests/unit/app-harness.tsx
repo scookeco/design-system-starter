@@ -11,6 +11,7 @@ import type { LiveSource } from '../../src/app/api/live';
 import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
 import { draftStorage } from '../../src/app/model/drafts';
+import { jobSettings } from '../../src/app/model/jobs';
 import { undoSettings } from '../../src/app/model/undo';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
 import { aiHandlers } from '../../src/app/mocks/ai';
@@ -27,6 +28,8 @@ export const setupMockApi = () => {
     resetDb();
     draftStorage.clearAll();
     undoSettings.windowMs = 6_000;
+    // Jobs don't poll unless a test asks: it drives them itself.
+    jobSettings.pollMs = Infinity;
     configureMocks({ latencyMs: 0, failureRate: 0, random: Math.random });
   });
   afterEach(() => server.resetHandlers());

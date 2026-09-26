@@ -35,6 +35,8 @@ import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 // B2B power features: the inbox and the admin console (members, audit log).
 import { b2bHandlers } from './b2b';
+// Freshness and concurrency: long-running jobs.
+import { advance, idsMatching, isActive, publicJob, queueBulkDelete } from './jobs';
 
 const API = '*/api/t/:tenant';
 
@@ -406,6 +408,61 @@ const workspaceHandlers = [
   ),
 ];
 
+/**
+ * Jobs: long-running work as data. Starting one answers 202 Accepted with the job, queued, never
+ * a 200 that pretends it's done. Every read of the jobs moves the running ones along (see jobs.ts).
+ */
+const jobHandlers = [
+  http.get(
+    `${API}/jobs`,
+    handle('record:read', ({ tenant }) => {
+      const jobs = db(tenant).jobs;
+      for (const job of jobs) advance(tenant, job);
+      return HttpResponse.json({ items: jobs.filter((j) => !j.dismissed).map(publicJob) });
+    }),
+  ),
+
+  http.post(
+    `${API}/jobs/bulk-delete`,
+    handle('record:delete', async ({ tenant, request }) => {
+      const body = (await request.json()) as { ids?: string[]; filter?: Partial<RecordFilter>; label?: string };
+      const label = body.label?.trim();
+      if (!label || (!body.ids && !body.filter)) return error(422, 'invalid', 'Say what to delete.');
+      const targets = body.filter
+        ? idsMatching(tenant, {
+            q: body.filter.q ?? '',
+            status: (body.filter.status ?? []).filter((s): s is RecordStatus => (RECORD_STATUSES as readonly string[]).includes(s)),
+            view: RecordViewSchema.catch('all').parse(body.filter.view),
+          })
+        : db(tenant).records.filter((r) => body.ids?.includes(r.id)).map((r) => r.id);
+      return HttpResponse.json(publicJob(queueBulkDelete(tenant, targets, label)), { status: 202 });
+    }),
+  ),
+
+  http.post(
+    `${API}/jobs/:id/cancel`,
+    handle('record:delete', ({ tenant, params }) => {
+      const job = db(tenant).jobs.find((j) => j.id === params.id && !j.dismissed);
+      if (!job) return error(404, 'not_found', 'This job doesn’t exist.');
+      if (!isActive(job)) return error(409, 'finished', 'This job has already finished.');
+      // Stops between chunks: what's deleted stays deleted, and the job says how far it got.
+      job.state = 'cancelled';
+      return HttpResponse.json(publicJob(job));
+    }),
+  ),
+
+  http.delete(
+    `${API}/jobs/:id`,
+    handle('record:read', ({ tenant, params }) => {
+      const job = db(tenant).jobs.find((j) => j.id === params.id && !j.dismissed);
+      if (!job) return error(404, 'not_found', 'This job doesn’t exist.');
+      if (isActive(job)) return error(409, 'running', 'A running job can’t be dismissed. Cancel it first.');
+      job.dismissed = true;
+      return HttpResponse.json({ dismissed: job.id });
+    }),
+  ),
+];
+
 /** Saved views: the signed-in person's, in this workspace. Anyone who can read the list may keep views of it. */
 const myViews = (tenant: Tenant) => {
   const partition = db(tenant);
@@ -471,6 +528,7 @@ const viewHandlers = [
 
 export const handlers = [
   ...workspaceHandlers,
+  ...jobHandlers,
   ...viewHandlers,
   ...b2bHandlers,
   // The session: not workspace data, so outside the tenant routes.
