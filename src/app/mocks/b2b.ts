@@ -8,7 +8,7 @@
  * the log is a projection of the mutations, not something each page remembers to write.
  */
 import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
-import { AUDIT_ACTIONS, type AuditAction, type AuditEvent, type Member } from '../api/admin';
+import { type AuditAction, type AuditEvent, type Member } from '../api/admin';
 import { INBOX_KINDS, TRIAGE_ACTIONS, type InboxItem, type InboxKind, type TriageAction } from '../api/inbox';
 import { RoleSchema, TenantSchema, type Capability, type RecordEntity, type Role, type Tenant } from '../api/schemas';
 import { isEmail, removalBlocked, roleChangeBlocked } from '../model/members';
@@ -132,6 +132,24 @@ const seedMembers = (tenant: Tenant): Member[] => {
 const API_KEY = { type: 'api-key' as const, id: 'ak_7f3c', label: 'Deploy key ak_7f3c…' };
 const SYSTEM = { type: 'system' as const, id: 'system', label: 'System' };
 
+/**
+ * The actions the seeded history draws from: the original vocabulary, fixed, so adding an action
+ * to AUDIT_ACTIONS never reshuffles the seeded log (live writes use the rest).
+ */
+const SEEDED_ACTIONS = [
+  'member.invited',
+  'member.role_changed',
+  'member.removed',
+  'record.created',
+  'record.renamed',
+  'record.archived',
+  'record.deleted',
+  'account.updated',
+  'session.signed_in',
+  'api_key.created',
+  'api_key.revoked',
+] as const satisfies readonly AuditAction[];
+
 /** The audit log's history (its own PRNG stream, seed + 5): newest first, like the live log. */
 const seedAudit = (tenant: Tenant): AuditEvent[] => {
   const random = seededRandom(TENANT_SPECS[tenant].seed + 5);
@@ -150,7 +168,7 @@ const seedAudit = (tenant: Tenant): AuditEvent[] => {
         ? pick(random, ['record.archived', 'session.signed_in'] as const)
         : actor.type === 'api-key'
           ? pick(random, ['record.created', 'record.renamed'] as const)
-          : pick(random, AUDIT_ACTIONS);
+          : pick(random, SEEDED_ACTIONS);
     const record = pick(random, records);
     const other = pick(random, people);
     const target = action.startsWith('member.')
@@ -216,6 +234,13 @@ const audit = (tenant: Tenant, s: B2bState, event: Omit<AuditEvent, 'id' | 'at' 
   });
   s.nextEvent += 1;
 };
+
+/**
+ * A record write, audited from the records handlers (src/app/mocks/handlers.ts) and the job runner:
+ * the record's name as it was at the time, and what changed. The same log as the member writes.
+ */
+export const auditRecord = (tenant: Tenant, action: AuditAction, record: Pick<RecordEntity, 'id' | 'name'>, changes: AuditEvent['changes'] = [], outcome: AuditEvent['outcome'] = 'success') =>
+  audit(tenant, state(tenant), { action, target: { type: 'record', id: record.id, label: record.name }, outcome, changes });
 
 const memberLabel = (tenant: Tenant, member: Member) => seedPeople(tenant).find((p) => p.id === member.personId)?.name ?? member.email;
 

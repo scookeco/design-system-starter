@@ -41,6 +41,12 @@ export const AUDIT_ACTIONS = [
   'session.signed_in',
   'api_key.created',
   'api_key.revoked',
+  // Record writes added with the write queues: each named record mutation has its own verb.
+  'record.updated',
+  'record.moved',
+  'record.restored',
+  'record.tagged',
+  'record.untagged',
 ] as const;
 export const AuditActionSchema = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditActionSchema>;

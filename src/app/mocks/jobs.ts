@@ -6,6 +6,7 @@
  */
 import { JobSchema, type Job, type JobState, type RecordFilter, type Tenant } from '../api/schemas';
 import { canDelete, matchesFilter, type SearchableRecord } from '../model/predicates';
+import { auditRecord } from './b2b';
 import { db, type MockJob } from './db';
 import { SEED_EPOCH } from './seed';
 
@@ -61,7 +62,10 @@ export const advance = (tenant: Tenant, job: MockJob) => {
   for (const id of job.targets.slice(job.done, job.done + JOB_CHUNK)) {
     const record = partition.records.find((r) => r.id === id);
     if (record && !canDelete(record)) job.failed.push({ id, name: record.name, reason: 'on legal hold' });
-    else partition.records = partition.records.filter((r) => r.id !== id);
+    else if (record) {
+      partition.records = partition.records.filter((r) => r.id !== id);
+      auditRecord(tenant, 'record.deleted', record);
+    }
     job.done += 1;
     if (job.failAt !== undefined && job.done >= job.failAt) {
       job.state = 'failed';

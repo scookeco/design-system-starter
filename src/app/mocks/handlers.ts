@@ -34,7 +34,7 @@ import { bump, currentSession, currentUserId, db, endSession, grantFor, isSigned
 import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 // B2B power features: the inbox and the admin console (members, audit log).
-import { b2bHandlers } from './b2b';
+import { auditRecord, b2bHandlers } from './b2b';
 // Freshness and concurrency: long-running jobs.
 import { advance, idsMatching, isActive, publicJob, queueBulkDelete } from './jobs';
 
@@ -92,6 +92,27 @@ const precondition = (request: Request, current: RecordEntity | Account): Respon
 /** An entity with its version as the ETag header, so a client can also read it from there. */
 const withETag = (entity: RecordEntity | Account, init?: ResponseInit) =>
   HttpResponse.json(entity, { ...init, headers: { ETag: `"${String(entity.version)}"` } });
+
+/**
+ * Audit an edit: a name-only change is a rename, a tags-only change is a tag added or removed, and
+ * anything else is an edit, with each changed field's before and after.
+ */
+const auditRecordEdit = (tenant: Tenant, before: RecordEntity, after: RecordEntity) => {
+  const fields: [string, (r: RecordEntity) => string | null][] = [
+    ['name', (r) => r.name],
+    ['ownerId', (r) => r.ownerId],
+    ['accountId', (r) => r.accountId],
+    ['amount', (r) => String(r.amount.minor)],
+    ['renewsOn', (r) => r.renewsOn],
+    ['tags', (r) => r.tags.join(', ')],
+  ];
+  const changes = fields.filter(([, get]) => get(before) !== get(after)).map(([field, get]) => ({ field, before: get(before), after: get(after) }));
+  if (changes.length === 0) return;
+  const only = changes.length === 1 ? changes[0]?.field : undefined;
+  if (only === 'name') auditRecord(tenant, 'record.renamed', after, changes);
+  else if (only === 'tags') auditRecord(tenant, after.tags.length > before.tags.length ? 'record.tagged' : 'record.untagged', after, changes);
+  else auditRecord(tenant, 'record.updated', after, changes);
+};
 
 /** A rename sends only the name; anything more is an edit. */
 const renameOrEdit = (body: unknown): Capability =>
@@ -241,6 +262,7 @@ const workspaceHandlers = [
       partition.nextId += 1;
       partition.records.unshift(record);
       partition.created.set(key, record);
+      auditRecord(tenant, 'record.created', record);
       return HttpResponse.json(record, { status: 201 });
     }),
   ),
@@ -270,6 +292,7 @@ const workspaceHandlers = [
         tags: [...(rest.tags ?? current.tags)],
       });
       partition.records[index] = next;
+      auditRecordEdit(tenant, current, next);
       return withETag(next);
     }),
   ),
@@ -284,6 +307,7 @@ const workspaceHandlers = [
       if (!canArchive(current)) return error(409, 'already_archived', 'This record is already archived.', current);
       const next = touch({ ...current, status: 'archived' });
       partition.records[index] = next;
+      auditRecord(tenant, 'record.archived', next, [{ field: 'status', before: current.status, after: 'archived' }]);
       return HttpResponse.json(next);
     }),
   ),
@@ -303,6 +327,7 @@ const workspaceHandlers = [
       if (refused) return refused;
       const next = touch({ ...current, status });
       partition.records[index] = next;
+      auditRecord(tenant, 'record.restored', next, [{ field: 'status', before: current.status, after: status }]);
       return withETag(next);
     }),
   ),
@@ -322,6 +347,7 @@ const workspaceHandlers = [
       if (refused) return refused;
       const next = touch({ ...current, status });
       partition.records[index] = next;
+      auditRecord(tenant, 'record.moved', next, [{ field: 'status', before: current.status, after: status }]);
       return withETag(next);
     }),
   ),
@@ -347,6 +373,7 @@ const workspaceHandlers = [
         else failed.push({ id: record.id, name: record.name, reason: 'on legal hold' });
       }
       partition.records = partition.records.filter((r) => !deleted.includes(r.id));
+      for (const record of targets) if (deleted.includes(record.id)) auditRecord(tenant, 'record.deleted', record);
       return HttpResponse.json({ deleted, failed });
     }),
   ),
