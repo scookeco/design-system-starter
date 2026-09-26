@@ -27,7 +27,7 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canEdit, canMove, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
+import { canArchive, canDelete, canEdit, canMove, hasStatus, isOnLegalHold, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
 import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
 import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
@@ -256,6 +256,7 @@ const workspaceHandlers = [
       if (body.accountId !== undefined && body.accountId !== null && !partition.accounts.some((a) => a.id === body.accountId)) return error(422, 'invalid', 'Choose an account.');
       if (body.amountMinor !== undefined && (!Number.isInteger(body.amountMinor) || body.amountMinor < 0)) return error(422, 'invalid', 'Enter an amount of 0 or more.');
       if (!canEdit(current)) return error(403, 'forbidden', 'Archived records can’t be changed.');
+      if (body.tags !== undefined && isOnLegalHold(current) !== body.tags.includes('legal-hold')) return error(403, 'forbidden', 'Legal hold is set and lifted by legal.');
       const refused = precondition(request, current);
       if (refused) return refused;
       const { amountMinor, name, ...rest } = body;
@@ -282,6 +283,25 @@ const workspaceHandlers = [
       const next = touch({ ...current, status: 'archived' });
       partition.records[index] = next;
       return HttpResponse.json(next);
+    }),
+  ),
+
+  http.post(
+    `${API}/records/:id/restore`,
+    handle('record:archive', async ({ tenant, request, params }) => {
+      const partition = db(tenant);
+      const index = partition.records.findIndex((r) => r.id === params.id);
+      const current = partition.records[index];
+      if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<{ status: string }>;
+      const status = MOVABLE_STATUSES.find((s) => s === body.status);
+      if (!status) return error(422, 'invalid', 'Choose draft, pending, active or overdue.');
+      if (canArchive(current)) return error(409, 'not_archived', 'This record isn’t archived.', current);
+      const refused = precondition(request, current);
+      if (refused) return refused;
+      const next = touch({ ...current, status });
+      partition.records[index] = next;
+      return withETag(next);
     }),
   ),
 

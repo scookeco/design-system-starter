@@ -11,6 +11,7 @@ import type { LiveSource } from '../../src/app/api/live';
 import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
 import { draftStorage } from '../../src/app/model/drafts';
+import { undoSettings } from '../../src/app/model/undo';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
 import { aiHandlers } from '../../src/app/mocks/ai';
 import { handlers } from '../../src/app/mocks/handlers';
@@ -25,6 +26,7 @@ export const setupMockApi = () => {
   beforeEach(() => {
     resetDb();
     draftStorage.clearAll();
+    undoSettings.windowMs = 6_000;
     configureMocks({ latencyMs: 0, failureRate: 0, random: Math.random });
   });
   afterEach(() => server.resetHandlers());

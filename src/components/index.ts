@@ -9,7 +9,7 @@ export { Switch, type SwitchProps } from './Switch/Switch';
 export { Checkbox, type CheckboxProps, type CheckedState } from './Checkbox/Checkbox';
 export { Badge, type BadgeProps, type BadgeTone } from './Badge/Badge';
 export { Dialog, type DialogProps } from './Dialog/Dialog';
-export { Toast, ToastProvider, useToast, type ToastProps, type ToastProviderProps, type ToastTone } from './Toast/Toast';
+export { Toast, ToastProvider, useToast, type ToastAction, type ToastProps, type ToastProviderProps, type ToastTone } from './Toast/Toast';
 export {
   Table,
   TableHead,

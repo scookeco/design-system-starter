@@ -96,7 +96,7 @@ describe('renameRecord (optimistic)', () => {
 });
 
 describe('pessimistic mutations', () => {
-  it('archiveRecord changes nothing until the server answers, then patches the detail and refetches lists and counts', async () => {
+  it('archiveRecord shows at once, is sent when its hold is released, then refetches lists and counts', async () => {
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
@@ -114,9 +114,15 @@ describe('pessimistic mutations', () => {
     }));
     await waitFor(() => expect(result.current.hook.counts.isSuccess).toBe(true));
     const countsBefore = client.getQueryState(recordKeys.count(ACME, { q: '', status: [] }))?.dataUpdateCount ?? 0;
-    result.current.hook.archive.mutate();
+    let closeWindow: () => void = () => undefined;
+    const hold = new Promise<void>((resolve) => {
+      closeWindow = resolve;
+    });
+    result.current.hook.archive.mutate({ hold });
     await waitFor(() => expect(result.current.hook.archive.isPending).toBe(true));
-    expect(cached()?.status).toBe(original.status);
+    // Optimistic: archived in the cache at once, while the write waits out its undo window.
+    expect(cached()?.status).toBe('archived');
+    closeWindow();
     release();
     await waitFor(() => expect(result.current.hook.archive.isSuccess).toBe(true));
     expect(cached()?.status).toBe('archived');

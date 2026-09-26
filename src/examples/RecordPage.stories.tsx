@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fail, hold, theyEditFirst } from '../app/mocks/overrides';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
+import { seedRecords } from '../app/mocks/seed';
+import { isSystemTag } from '../app/model/predicates';
 import { RecordPage } from './RecordPage';
 
 const meta = {
@@ -12,6 +14,12 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/** The first seeded record with a tag a person can remove (legal hold isn't one). */
+const TAGGED = (() => {
+  const record = seedRecords('acme').find((r) => r.tags.some((t) => !isSystemTag(t)));
+  return { id: record?.id ?? 'r-1001', tag: record?.tags.find((t) => !isSystemTag(t)) ?? '' };
+})();
 
 const rename = { initialAction: { kind: 'rename', name: 'Master cleaning agreement 2027' } } as const;
 
@@ -42,8 +50,19 @@ export const RenameConflict: Story = {
 };
 /** A 409 that carries their version: the conflict panel compares the names, with Keep mine and Take theirs. */
 export const RenameConflictWithTheirs: Story = { args: rename, parameters: mswOverrides(theyEditFirst({ name: 'Master cleaning agreement (renewed)' })) };
-/** Pessimistic archive, in flight: "Archiving…" on More, the other actions disabled. */
-export const ArchivePending: Story = { tags: ['busy'], args: { initialAction: { kind: 'archive' } }, parameters: mswOverrides(hold('post', '/records/:id/archive')) };
+/** Archive, once its undo window has closed and the request is in flight: "Archiving…" on More, the other actions disabled. */
+export const ArchivePending: Story = {
+  tags: ['busy'],
+  args: { initialAction: { kind: 'archive' } },
+  parameters: { ...mswOverrides(hold('post', '/records/:id/archive')), ...mockApi({ undoWindow: 0 }) },
+};
+/** Archive without an "Are you sure?": archived at once, held in the undo window, with Undo in the toast. */
+export const ArchiveUndoOffered: Story = { args: { initialAction: { kind: 'archive' } }, parameters: mockApi({ undoWindow: 'hold' }) };
+/** A tag removed from Properties: gone at once, with Undo; Add tag puts one back. */
+export const TagRemovedUndoOffered: Story = {
+  args: { recordId: TAGGED.id, initialAction: { kind: 'untag', tag: TAGGED.tag } },
+  parameters: mockApi({ undoWindow: 'hold' }),
+};
 
 /** Viewer: the More menu holds only what a viewer can do. Items they lack the capability for are hidden. */
 export const AsViewerMoreActions: Story = { tags: ['modal-open'], args: { initialMenuOpen: true }, parameters: mockApi({ role: 'viewer' }) };

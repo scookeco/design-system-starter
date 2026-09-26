@@ -88,6 +88,10 @@ export const patchRecordName = (tenant: Tenant, id: string, name: string, versio
 export const postStatus = (tenant: Tenant, id: string, status: MovableStatus, version: number) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/status`, { method: 'POST', body: { status }, ifMatch: version });
 
+/** Undo an archive: back to the status it had. Versioned, and allowed only for an archived record. */
+export const postRestore = (tenant: Tenant, id: string, status: MovableStatus, version: number) =>
+  request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/restore`, { method: 'POST', body: { status }, ifMatch: version });
+
 export const postArchive = (tenant: Tenant, id: string) =>
   request(RecordSchema, `${base(tenant)}/records/${encodeURIComponent(id)}/archive`, { method: 'POST' });
 

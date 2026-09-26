@@ -42,3 +42,6 @@ export const EDIT_FIELDS = [
   { type: 'money', id: 'amount', label: 'Amount', get: (r: RecordEntity) => r.amount },
 ] as const satisfies readonly FieldDef<RecordEntity>[];
 export type EditFieldId = (typeof EDIT_FIELDS)[number]['id'];
+
+/** The tags a person can put on a record from its page. Legal hold isn't one: legal sets and lifts it. */
+export const TAG_OPTIONS = ['priority', 'renewal', 'vendor', 'customer', 'internal'] as const;

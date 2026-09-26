@@ -14,7 +14,8 @@
  *                confirmed record from anywhere (a live event, a refetch that lands while ops are
  *                pending) becomes the base the preview is replayed on
  *   held ops     an op can wait before it sends (the undo window, src/app/model/undo.ts): it shows in
- *                the preview at once and is sent when released, or dropped if it's cancelled first
+ *                the preview at once and joins the line when released, or is dropped if it's
+ *                cancelled first
  *
  * The queues live beside the QueryClient (one set per cache), not in a component, so a write keeps
  * going when the page that started it unmounts. Sign-out drops everything not yet sent.
@@ -44,7 +45,7 @@ export interface QueuedWrite {
    * Send it. `version` is the latest version this client has confirmed (the answer to the previous
    * write included). A write that must be based on an older version (a form's draft) ignores it.
    */
-  send: (version: number) => Promise<RecordEntity>;
+  send: (version: number, confirmed: RecordEntity | undefined) => Promise<RecordEntity>;
   /** The version to use if this client has never seen the record's detail (a card on a board). */
   fallbackVersion?: number;
   /** Wait for this before sending (the undo window). Rejecting it cancels the op. */
@@ -53,6 +54,8 @@ export interface QueuedWrite {
 
 /** A write dropped before it was sent: its hold was cancelled (Undo), or the session ended. */
 export class WriteCancelled extends Error {
+  readonly cancelled = true;
+
   constructor() {
     super('The write was cancelled before it was sent.');
     this.name = 'WriteCancelled';
@@ -184,8 +187,8 @@ class WriteQueues {
     const run2 = async (before: Promise<unknown>) => {
       await Promise.race([before, cancelled]);
       setState('sending');
-      const version = this.latestConfirmed(queue)?.version ?? write.fallbackVersion ?? 0;
-      return write.send(version);
+      const confirmed = this.latestConfirmed(queue);
+      return write.send(confirmed?.version ?? write.fallbackVersion ?? 0, confirmed);
     };
 
     return run().then(
@@ -203,6 +206,9 @@ class WriteQueues {
       },
     );
   }
+
+  /** Writes waiting out an undo window: nothing is on the wire for them yet. */
+  heldCount = () => [...this.queues.values()].reduce((n, queue) => n + queue.ops.filter((op) => op.state === 'held').length, 0);
 
   /** Drop everything not yet sent (sign-out). A request already on the wire can't be recalled. */
   cancelUnsent() {

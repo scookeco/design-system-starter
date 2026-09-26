@@ -73,7 +73,7 @@ import {
   useFormat,
   useToast,
 } from '../index';
-import type { BulkDeleteResult, MovableStatus, RecordStatus, SortKey } from '../app/api/schemas';
+import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
 import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
 import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
@@ -91,6 +91,7 @@ import {
 } from '../app/model/selection';
 import { useRecordCounts, useRecordList } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
+import { undoSettings } from '../app/model/undo';
 import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
@@ -124,6 +125,8 @@ export interface ListPageProps {
   initialBulkDelete?: 'confirm' | 'submit';
   /** Open a saved-view dialog on first render (gallery and tests). */
   initialViewDialog?: SavedViewDialog;
+  /** Move this record to this status once rows load, as the board's Move to… would (gallery and tests). */
+  initialMove?: { id: string; status: MovableStatus };
 }
 
 /**
@@ -173,6 +176,7 @@ function ListPageContent({
   initialFiltersOpen = false,
   initialSelection,
   initialViewDialog,
+  initialMove,
   selection,
   onSelectionChange,
   result,
@@ -216,9 +220,11 @@ function ListPageContent({
   // Gallery and tests: make the initial selection once the rows are here.
   const selectedInitially = useRef(false);
   const selectOnLoad = useEffectEvent(() => {
-    if (!initialSelection || selectedInitially.current) return;
+    if (selectedInitially.current) return;
     selectedInitially.current = true;
-    onSelectionChange(initialSelection === 'page' ? togglePage(EMPTY_SELECTION, rows) : selectMatching(filter, total));
+    const moving = initialMove ? rows.find((r) => r.id === initialMove.id) : undefined;
+    if (moving && initialMove) moveRecord(moving, initialMove.status);
+    if (initialSelection) onSelectionChange(initialSelection === 'page' ? togglePage(EMPTY_SELECTION, rows) : selectMatching(filter, total));
   });
   const loaded = list.isSuccess;
   useEffect(() => {
@@ -258,14 +264,36 @@ function ListPageContent({
     setFocusChip(index);
   };
 
-  const moveRecord = (row: RecordRow, status: MovableStatus) =>
+  /**
+   * A move is reversible, so it isn't confirmed: it's sent at once and the toast offers Undo, which
+   * moves it back (a compensating write through the same queue, so it follows the move).
+   */
+  const moveRecord = (row: RecordRow, status: MovableStatus) => {
+    const previous = MOVABLE_STATUSES.find((s) => s === row.statusKey);
+    const failed = (title: string) => () => toast({ title, description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity });
     move.mutate(
       { record: row, status },
       {
-        onSuccess: () => toast({ title: `Moved to ${STATUS[status].label}`, description: row.name, tone: 'success' }),
-        onError: () => toast({ title: 'Couldn’t move the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+        onSuccess: () =>
+          toast({
+            title: `Moved to ${STATUS[status].label}`,
+            description: row.name,
+            tone: 'success',
+            duration: undoSettings.windowMs,
+            ...(previous
+              ? {
+                  action: {
+                    label: 'Undo',
+                    altText: `Move it back to ${STATUS[previous].label} with the card’s Move to… menu.`,
+                    onAction: () => move.mutate({ record: row, status: previous }, { onError: failed('Couldn’t undo the move') }),
+                  },
+                }
+              : {}),
+          }),
+        onError: failed('Couldn’t move the record'),
       },
     );
+  };
 
   const toggleSort = (column: SortColumn) => refine({ sort: (query.sort === column ? `-${column}` : column) as SortKey });
 

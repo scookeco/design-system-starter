@@ -25,6 +25,16 @@ export const Danger: Story = { args: { tone: 'danger', title: 'Could not save', 
 export const Info: Story = { args: { tone: 'info', title: 'Export started', description: undefined } };
 export const Neutral: Story = { args: { tone: 'neutral', title: 'Filters cleared', description: undefined } };
 
+/** A reversible change, confirmed with an Undo instead of an "Are you sure?" beforehand. */
+export const WithAction: Story = {
+  args: {
+    tone: 'success',
+    title: 'Record archived',
+    description: 'Hardware lease',
+    action: { label: 'Undo', altText: 'Find it under Archived to restore it.', onAction: () => undefined },
+  },
+};
+
 function Trigger() {
   const toast = useToast();
   return <Button onClick={() => toast({ title: 'Saved', tone: 'success' })}>Show toast</Button>;

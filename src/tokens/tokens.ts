@@ -137,7 +137,8 @@ export const vars = {
     },
     "scroll-padding": {
       "start": "var(--space-scroll-padding-start)",
-      "end": "var(--space-scroll-padding-end)"
+      "end": "var(--space-scroll-padding-end)",
+      "toast": "var(--space-scroll-padding-toast)"
     }
   },
   "size": {

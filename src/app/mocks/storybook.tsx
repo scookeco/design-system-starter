@@ -10,6 +10,8 @@ import { addons } from 'storybook/preview-api';
 import type { HttpHandler } from 'msw';
 import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
 import { draftStorage } from '../model/drafts';
+import { undoSettings } from '../model/undo';
+import { writeQueues } from '../model/writeQueue';
 import { AppProviders } from '../providers';
 import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
@@ -31,7 +33,8 @@ const isSettled = (client: QueryClientType) => {
     queries.length > 0 &&
     queries.every((q) => q.state.fetchStatus === 'idle') &&
     queries.some((q) => q.state.status !== 'pending') &&
-    client.isMutating() === 0
+    // A write held in its undo window is waiting on the person, not the server: that's settled.
+    client.isMutating() === writeQueues(client).heldCount()
   );
 };
 
@@ -133,6 +136,8 @@ export interface MockApiParameters {
    * (in order, before the settled signal). Deterministic: the same changes at the same moment.
    */
   anotherUser?: readonly AnotherUserChange[];
+  /** The undo window: 'hold' keeps it open (the toast and the held write stay), a number shortens it. Default 6 s. */
+  undoWindow?: 'hold' | number;
 }
 
 const NO_SCRIPT: readonly AnotherUserChange[] = [];
@@ -145,7 +150,8 @@ const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).incl
  * server would return for it.
  */
 const withMockApi: Decorator = (Story, context) => {
-  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  const { tenant = 'acme', url = '/', role, anotherUser: script = NO_SCRIPT, undoWindow = 6_000 } = (context.parameters.mockApi ?? {}) as MockApiParameters;
+  undoSettings.windowMs = undoWindow === 'hold' ? Infinity : undoWindow;
   setRoles(role ?? toolbarRole(context.globals.role));
   return (
     <StoryProviders

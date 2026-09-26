@@ -23,6 +23,9 @@ export const canRename = (record: Pick<RecordEntity, 'status'>) => !isArchived(r
 export const canEdit = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canArchive = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canDelete = (record: Pick<RecordEntity, 'tags'>) => !isOnLegalHold(record);
+/** Tags a person can add or remove. Legal hold is set and lifted by legal, never from a record page. */
+export const isSystemTag = (tag: string) => tag === 'legal-hold';
+
 /** Moving between board columns: anything not archived (archive and restore are their own verbs). */
 export const canMove = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 

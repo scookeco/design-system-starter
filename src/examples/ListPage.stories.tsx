@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { emptyWorkspace, fail, hold, malformed } from '../app/mocks/overrides';
+import { firstListedRecord } from '../app/mocks/live';
 import { ListPage } from './ListPage';
+
+/** The board's first card, and a column it isn't in. */
+const FIRST = firstListedRecord('acme');
+const MOVE = { id: FIRST?.id ?? 'r-1001', status: FIRST?.status === 'overdue' ? 'pending' : 'overdue' } as const;
 
 const meta = {
   title: 'Examples/List page',
@@ -72,3 +77,6 @@ export const LiveNewRecords: Story = { parameters: mockApi({ anotherUser: [{ kin
 export const LiveRowUpdated: Story = { parameters: mockApi({ anotherUser: [{ kind: 'edit' }] }) };
 /** The first row, deleted elsewhere: it leaves every cached page, and the total drops. */
 export const LiveRowDeleted: Story = { parameters: mockApi({ anotherUser: [{ kind: 'delete' }] }) };
+
+/** A card moved on the board: sent at once (no confirmation), and the toast offers Undo, which moves it back. */
+export const BoardMoveUndoOffered: Story = { args: { initialMove: MOVE }, parameters: mockApi({ url: '/records?display=board', undoWindow: 'hold' }) };

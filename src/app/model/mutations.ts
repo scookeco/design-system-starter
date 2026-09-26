@@ -12,7 +12,11 @@
  *                                   on a 409: detail := theirs                        with no field changed on
  *                                                                                     both sides is re-based once)
  *   moveRecord         pessimistic  detail + listed copies (answer)   lists, counts   (board column)
- *   archiveRecord      pessimistic  detail + listed copies (answer)   lists, counts
+ *   archiveRecord      optimistic,  detail + listed copies (preview)  lists, counts   (held for the undo
+ *                      undoable                                                       window; Undo drops it)
+ *   restoreRecord      optimistic   detail + listed copies (preview)  lists, counts   (Undo, once sent)
+ *   tagRecord ·        optimistic   detail + listed copies (preview)  lists           (untag is held for the
+ *   untagRecord        (undoable)                                                     undo window)
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts
  *   addPerson          pessimistic  people (appends)           people
@@ -27,14 +31,15 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { deleteView, patchView, postView } from '../api/views';
-import { patchRecord, postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord, type RecordChanges } from '../api/records';
+import { patchRecord, postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postRestore, postStatus, type NewRecord, type RecordChanges } from '../api/records';
 import type { Account, Capability, MovableStatus, SavedView, SavedViewConfig, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { applyChanges, compareVersions, realConflicts } from './conflicts';
 import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
-import { confirmRecord, writeQueues } from './writeQueue';
+import { isSystemTag } from './predicates';
+import { confirmRecord, isCancelled, writeQueues } from './writeQueue';
 
 /**
  * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
@@ -193,7 +198,16 @@ export function useMoveRecord() {
   });
 }
 
-/** archiveRecord: pessimistic, through the record's write queue. Nothing changes until the server says so; then lists and counts refetch. */
+/** Lists and counts: what a status or tag change can move rows between. */
+const invalidateListsAndCounts = (client: QueryClient, partition: Partition) =>
+  Promise.all([client.invalidateQueries({ queryKey: recordKeys.lists(partition) }), client.invalidateQueries({ queryKey: recordKeys.counts(partition) })]);
+
+/**
+ * archiveRecord: optimistic, undoable, through the record's write queue. Pass the undo window's
+ * `hold` (src/app/model/undo.ts): the record shows as archived at once, and the request waits for
+ * the window; Undo inside it drops the write unsent (the mutation fails with WriteCancelled).
+ * Without a hold, it's sent at once.
+ */
 export function useArchiveRecord(id: string) {
   const tenant = useTenant();
   const partition = usePartition();
@@ -201,15 +215,72 @@ export function useArchiveRecord(id: string) {
   const client = useQueryClient();
   return useMutation({
     mutationKey: [...partition, 'archiveRecord', { id }],
-    mutationFn: () => {
+    mutationFn: ({ hold }: { hold?: Promise<void> }) => {
       refuseUnless(grant, 'record:archive', client.getQueryData<RecordEntity>(recordKeys.detail(partition, id)));
-      return writeQueues(client).enqueue(partition, id, { label: 'Archiving…', send: () => postArchive(tenant, id) });
+      return writeQueues(client).enqueue(partition, id, {
+        label: 'Archiving…',
+        apply: (record) => ({ ...record, status: 'archived' }),
+        ...(hold ? { hold } : {}),
+        send: () => postArchive(tenant, id),
+      });
     },
-    onSuccess: () =>
-      Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]),
+    onSettled: (_data, error) => (isCancelled(error) ? undefined : invalidateListsAndCounts(client, partition)),
+  });
+}
+
+/** restoreRecord: optimistic, through the queue. Undo for an archive that was already sent: back to its status. */
+export function useRestoreRecord(id: string) {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const grant = useGrant();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'restoreRecord', { id }],
+    mutationFn: ({ status }: { status: MovableStatus }) => {
+      refuseUnless(grant, 'record:archive');
+      return writeQueues(client).enqueue(partition, id, {
+        label: 'Restoring…',
+        apply: (record) => ({ ...record, status }),
+        send: (latest) => postRestore(tenant, id, status, latest),
+      });
+    },
+    onSettled: () => invalidateListsAndCounts(client, partition),
+  });
+}
+
+/**
+ * tagRecord / untagRecord: optimistic, through the queue; untag is undoable like archive (pass the
+ * undo window's hold), and tagging is its compensation. Each sends the whole tag list worked out at
+ * SEND time from the latest confirmed record, so it never undoes a tag change queued before it.
+ * Legal hold is not a person's to change (isSystemTag): refused here and by the server.
+ */
+export function useUntagRecord(id: string) {
+  return useTagWrite(id, 'remove');
+}
+
+export function useTagRecord(id: string) {
+  return useTagWrite(id, 'add');
+}
+
+function useTagWrite(id: string, change: 'add' | 'remove') {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const grant = useGrant();
+  const client = useQueryClient();
+  const next = (tags: readonly string[], tag: string) => (change === 'add' ? (tags.includes(tag) ? [...tags] : [...tags, tag]) : tags.filter((t) => t !== tag));
+  return useMutation({
+    mutationKey: [...partition, change === 'add' ? 'tagRecord' : 'untagRecord', { id }],
+    mutationFn: ({ tag, hold }: { tag: string; hold?: Promise<void> }) => {
+      refuseUnless(grant, 'record:edit', client.getQueryData<RecordEntity>(recordKeys.detail(partition, id)));
+      if (isSystemTag(tag)) throw new ApiError(403, 'forbidden', 'Legal hold is set and lifted by legal.');
+      return writeQueues(client).enqueue(partition, id, {
+        label: change === 'add' ? 'Adding the tag…' : 'Removing the tag…',
+        apply: (record) => ({ ...record, tags: next(record.tags, tag) }),
+        ...(hold ? { hold } : {}),
+        send: (latest, confirmed) => patchRecord(tenant, id, { tags: next(confirmed?.tags ?? [], tag) }, latest),
+      });
+    },
+    onSettled: (_data, error) => (isCancelled(error) ? undefined : client.invalidateQueries({ queryKey: recordKeys.lists(partition) })),
   });
 }
 

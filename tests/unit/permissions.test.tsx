@@ -99,12 +99,12 @@ describe('mutations refuse before sending', () => {
     setRoles('viewer');
     const requests = countRequests();
     const viewer = renderHook(() => useArchiveRecord(target.id), { wrapper: wrapperFor(testClient()) });
-    await expect(viewer.result.current.mutateAsync()).rejects.toMatchObject({ status: 403 });
+    await expect(viewer.result.current.mutateAsync({})).rejects.toMatchObject({ status: 403 });
     expect(requests.seen.filter((r) => r.startsWith('POST'))).toEqual([]);
     requests.stop();
     setRoles('editor');
     const editor = renderHook(() => useArchiveRecord(target.id), { wrapper: wrapperFor(testClient()) });
-    await expect(editor.result.current.mutateAsync()).resolves.toMatchObject({ status: 'archived' });
+    await expect(editor.result.current.mutateAsync({})).resolves.toMatchObject({ status: 'archived' });
   });
 });
 

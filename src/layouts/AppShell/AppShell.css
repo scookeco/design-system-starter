@@ -160,6 +160,16 @@
     outline: none;
   }
 
+  /*
+   * While a toast is open it sits over the end of main (it's fixed at the inline end, bottom). Focus
+   * scrolls clear of it, and main keeps room to scroll the last controls out from under it, so a
+   * toast that stays (an Undo, an error) never hides the focused element (WCAG 2.4.11).
+   */
+  .app-shell:has(~ * .toast-viewport > *) .app-shell__main {
+    padding-block-end: var(--space-scroll-padding-toast);
+    scroll-padding-block-end: var(--space-scroll-padding-toast);
+  }
+
   /* 3. variant: the wide sidebar collapsed to an icon rail (the Nav hides its own labels) */
   @container app-shell (inline-size >= 48rem) {
     .app-shell__frame[data-sidebar="collapsed"] {
