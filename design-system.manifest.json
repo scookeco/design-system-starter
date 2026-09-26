@@ -239,6 +239,24 @@
   ],
   "examples": [
     {
+      "title": "Admin console",
+      "summary": "An admin console. Two list pages behind NavTabs, built from the list archetype:",
+      "path": "src/examples/AdminConsole.tsx",
+      "stories": [
+        "examples-admin-console--members",
+        "examples-admin-console--members-as-editor",
+        "examples-admin-console--invite-dialog",
+        "examples-admin-console--change-role-review",
+        "examples-admin-console--remove-confirm",
+        "examples-admin-console--members-load-error",
+        "examples-admin-console--audit-log",
+        "examples-admin-console--audit-filtered",
+        "examples-admin-console--audit-row-expanded",
+        "examples-admin-console--audit-no-results",
+        "examples-admin-console--audit-forbidden"
+      ]
+    },
+    {
       "title": "AI bulk changes",
       "summary": "GOLDEN EXAMPLE (AI): an agent that proposes bulk changes, reviewed before anything happens.",
       "path": "src/examples/AiReviewChanges.tsx",
@@ -361,6 +379,24 @@
         "examples-error-pages--not-found",
         "examples-error-pages--server-error",
         "examples-error-pages--forbidden"
+      ]
+    },
+    {
+      "title": "Inbox",
+      "summary": "An inbox with triage. The archetype for working through a queue one item at a time: a SplitView (the list and the open item side by side, one pane on a narrow screen), the open item and the tab in the URL, and keyboard triage from the shortcut registry:",
+      "path": "src/examples/InboxPage.tsx",
+      "stories": [
+        "examples-inbox--default",
+        "examples-inbox--conversation-open",
+        "examples-inbox--with-selection",
+        "examples-inbox--archived",
+        "examples-inbox--shortcuts-overlay",
+        "examples-inbox--narrow-list",
+        "examples-inbox--narrow-conversation",
+        "examples-inbox--as-viewer",
+        "examples-inbox--loading",
+        "examples-inbox--load-error",
+        "examples-inbox--empty"
       ]
     },
     {

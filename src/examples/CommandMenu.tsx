@@ -37,10 +37,20 @@ export const GO_KEYS: Readonly<Record<string, string>> = {
   '/accounts': 'g a',
   '/people': 'g p',
   '/settings': 'g s',
+  '/inbox': 'g i',
+  '/admin/members': 'g m',
 };
 
 /** An icon per top-level section, for Jump to rows. */
-const SECTION_ICONS: Readonly<Record<string, IconName>> = { '/home': 'home', '/records': 'file', '/accounts': 'building', '/people': 'users', '/settings': 'settings' };
+const SECTION_ICONS: Readonly<Record<string, IconName>> = {
+  '/home': 'home',
+  '/records': 'file',
+  '/accounts': 'building',
+  '/people': 'users',
+  '/settings': 'settings',
+  '/inbox': 'inbox',
+  '/admin': 'shield',
+};
 
 interface PaletteAction {
   id: string;
@@ -56,6 +66,7 @@ interface PaletteAction {
 export const PALETTE_ACTIONS: readonly PaletteAction[] = [
   { id: 'action:new-record', label: 'New record', keywords: ['create', 'add'], icon: 'plus', capability: 'record:create', href: '/records/new' },
   { id: 'action:new-account', label: 'New account', keywords: ['create', 'add', 'customer'], icon: 'plus', capability: 'account:create', href: '/accounts/new' },
+  { id: 'action:invite', label: 'Invite member', keywords: ['add', 'user', 'team'], icon: 'users', capability: 'members:manage', href: '/admin/members?invite=1' },
 ];
 
 /** Pages the palette can jump to: routes without params, in the shell, deduplicated by title. */

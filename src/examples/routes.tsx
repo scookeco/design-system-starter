@@ -58,6 +58,17 @@ const AiRecordCopilot = page(async () => {
   const { RecordCopilot } = await import('./RecordCopilot');
   return ({ params }) => <RecordCopilot recordId={params.id ?? ''} />;
 });
+// ── B2B power features: the inbox and the admin console ─────────────────────────────────────
+const Inbox = page(async () => noParams((await import('./InboxPage')).InboxPage));
+const Members = page(async () => {
+  const { AdminConsole } = await import('./AdminConsole');
+  return () => <AdminConsole section="members" />;
+});
+const Audit = page(async () => {
+  const { AdminConsole } = await import('./AdminConsole');
+  return () => <AdminConsole section="audit" />;
+});
+// ── end B2B power features ──────────────────────────────────────────────────────────────────
 
 export const ROUTES: readonly Route[] = [
   { path: '/', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
@@ -81,4 +92,10 @@ export const ROUTES: readonly Route[] = [
   { path: '/assistant/tidy-overdue', layout: 'shell', page: AiTidyOverdue, guard: 'record:move', nav: '/records' },
   { path: '/assistant/records/:id', layout: 'shell', page: AiRecordCopilot, guard: 'record:read', nav: '/records' },
   // --- end AI patterns ---
+  // ── B2B power features: the inbox and the admin console (titles name them in the command palette) ──
+  { path: '/inbox', layout: 'shell', page: Inbox, guard: 'workspace:read', nav: '/inbox', title: 'Inbox' },
+  { path: '/admin', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
+  { path: '/admin/members', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
+  { path: '/admin/audit', layout: 'shell', page: Audit, guard: 'audit:read', nav: '/admin/members', title: 'Audit log' },
+  // ── end B2B power features ──
 ];

@@ -17,12 +17,19 @@ const NAV: readonly NavSection[] = [
   {
     items: [
       { label: 'Home', href: '/home', icon: 'home' },
+      { label: 'Inbox', href: '/inbox', icon: 'inbox' },
       { label: 'Records', href: '/records', icon: 'file' },
       { label: 'Accounts', href: '/accounts', icon: 'building' },
       { label: 'People', href: '/people', icon: 'users' },
     ],
   },
-  { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: 'settings' }] },
+  {
+    label: 'Workspace',
+    items: [
+      { label: 'Settings', href: '/settings', icon: 'settings' },
+      { label: 'Admin', href: '/admin/members', icon: 'shield' },
+    ],
+  },
 ];
 
 /**
@@ -46,18 +53,20 @@ export interface ExampleShellProps {
   assistant?: ReactNode;
   /** Open the command palette with this query (gallery and tests). */
   initialPaletteQuery?: string;
+  /** Open the shortcuts overlay (gallery and tests). */
+  initialShortcutsOpen?: boolean;
   children: ReactNode;
 }
 
 const HELP_ITEMS: readonly MenuEntry[] = [{ label: 'Help centre' }, { label: 'Contact support' }];
 const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={HELP_ITEMS} />;
 
-export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, children }: ExampleShellProps) {
+export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, children }: ExampleShellProps) {
   const app = useOptionalAppSession();
   const injected = useContext(AssistantSlot);
   const panel = assistant ?? injected;
   // Inside the app: the command palette (⌘K) and the shortcuts overlay (?), which the Help menu opens too.
-  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(initialShortcutsOpen);
   return (
     <AppShell
       brand={app ? WORKSPACES[app.tenant].name : 'Acme'}

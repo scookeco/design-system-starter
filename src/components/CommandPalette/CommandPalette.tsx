@@ -206,43 +206,43 @@ export function CommandPalette({
               {loading ? <Spinner /> : null}
               <Kbd keys="escape" {...(platform ? { platform } : {})} />
             </div>
-            <div className="command-palette__results">
-              {flat.length > 0 ? (
-                <div id={`${id}-listbox`} role="listbox" aria-label={label}>
-                  {visible.map((group) => (
-                    <div className="command-palette__group" role="group" aria-labelledby={`${id}-${group.id}`} key={group.id}>
-                      <div className="command-palette__heading" id={`${id}-${group.id}`} role="presentation">
-                        {group.label}
-                      </div>
-                      {group.items.map((item) => {
-                        index += 1;
-                        const mine = index;
-                        return (
-                          <div
-                            key={item.id}
-                            id={optionId(mine)}
-                            className="command-palette__option"
-                            role="option"
-                            aria-selected={mine === current}
-                            {...(item.shortcut ? { 'aria-keyshortcuts': ariaKeyShortcuts(item.shortcut, platform) } : {})}
-                            onPointerMove={() => setActive(mine)}
-                            onClick={() => run(item)}
-                          >
-                            {item.icon ? <Icon name={item.icon} /> : null}
-                            <span className="command-palette__text">
-                              <span className="command-palette__label">{item.label}</span>
-                              {item.description ? <span className="command-palette__description">{item.description}</span> : null}
-                            </span>
-                            {item.shortcut ? <Kbd keys={item.shortcut} {...(platform ? { platform } : {})} /> : null}
-                          </div>
-                        );
-                      })}
+            {/* The listbox is the scroll container: a combobox's popup scrolls with the active option, from the input. */}
+            {flat.length > 0 ? (
+              <div className="command-palette__results" id={`${id}-listbox`} role="listbox" aria-label={label}>
+                {visible.map((group) => (
+                  <div className="command-palette__group" role="group" aria-labelledby={`${id}-${group.id}`} key={group.id}>
+                    <div className="command-palette__heading" id={`${id}-${group.id}`} role="presentation">
+                      {group.label}
                     </div>
-                  ))}
-                </div>
-              ) : null}
-              {flat.length === 0 && !loading ? <p className="command-palette__empty">{emptyMessage}</p> : null}
-            </div>
+                    {group.items.map((item) => {
+                      index += 1;
+                      const mine = index;
+                      return (
+                        <div
+                          key={item.id}
+                          id={optionId(mine)}
+                          className="command-palette__option"
+                          role="option"
+                          aria-selected={mine === current}
+                          {...(item.shortcut ? { 'aria-keyshortcuts': ariaKeyShortcuts(item.shortcut, platform) } : {})}
+                          onPointerMove={() => setActive(mine)}
+                          onClick={() => run(item)}
+                        >
+                          {item.icon ? <Icon name={item.icon} /> : null}
+                          <span className="command-palette__text">
+                            <span className="command-palette__label">{item.label}</span>
+                            {item.description ? <span className="command-palette__description">{item.description}</span> : null}
+                          </span>
+                          {item.shortcut ? <Kbd keys={item.shortcut} {...(platform ? { platform } : {})} /> : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="command-palette__results">{loading ? null : <p className="command-palette__empty">{emptyMessage}</p>}</div>
+            )}
             <div className="command-palette__footer">
               <span className="command-palette__hint">
                 <Kbd keys="arrowup" {...(platform ? { platform } : {})} />

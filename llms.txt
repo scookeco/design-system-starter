@@ -185,6 +185,7 @@ UI rules (design system v0)
 
 ## Examples
 
+- [Admin console](src/examples/AdminConsole.tsx)
 - [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
 - [Assistant chat](src/examples/AssistantChatPage.tsx)
@@ -194,6 +195,7 @@ UI rules (design system v0)
 - [Dashboard](src/examples/DashboardPage.tsx)
 - [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
+- [Inbox](src/examples/InboxPage.tsx)
 - [List page](src/examples/ListPage.tsx)
 - [Record copilot](src/examples/RecordCopilot.tsx)
 - [Record page](src/examples/RecordPage.tsx)

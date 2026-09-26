@@ -17,7 +17,7 @@ import { canArchive, canDelete, canMove, canRename, isDraft } from './predicates
 
 const VIEWER = ['workspace:read', 'record:read', 'account:read'] as const satisfies readonly Capability[];
 const EDITOR = [...VIEWER, 'record:read-drafts', 'record:create', 'record:rename', 'record:move', 'record:archive', 'account:create', 'people:create'] as const satisfies readonly Capability[];
-const ADMIN = [...EDITOR, 'workspace:manage', 'record:delete', 'account:edit'] as const satisfies readonly Capability[];
+const ADMIN = [...EDITOR, 'workspace:manage', 'record:delete', 'account:edit', 'members:manage', 'audit:read'] as const satisfies readonly Capability[];
 
 /** The ONE place roles map to capabilities. A new role, or a capability moving between roles, is an edit here. */
 export const ROLE_CAPABILITIES: Record<Role, readonly Capability[]> = { viewer: VIEWER, editor: EDITOR, admin: ADMIN };
@@ -61,4 +61,6 @@ export const DENIAL_REASONS: Record<Capability, string> = {
   'account:create': 'You have view-only access, so you can’t add accounts. Ask a workspace admin for editor access.',
   'account:edit': 'Only workspace admins can edit accounts.',
   'people:create': 'You have view-only access, so you can’t add people. Ask a workspace admin for editor access.',
+  'members:manage': 'Only workspace admins can invite, change or remove members.',
+  'audit:read': 'Only workspace admins can see the audit log.',
 };

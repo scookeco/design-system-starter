@@ -30,6 +30,11 @@ export const CAPABILITIES = [
   'account:create',
   'account:edit',
   'people:create',
+  // B2B power features: the admin console.
+  /** Invite members, change their roles, remove them. Everyone in the workspace can see who's in it. */
+  'members:manage',
+  /** Read the workspace's audit log. */
+  'audit:read',
 ] as const;
 export const CapabilitySchema = z.enum(CAPABILITIES);
 export type Capability = z.infer<typeof CapabilitySchema>;
