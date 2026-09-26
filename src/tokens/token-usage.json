@@ -18220,6 +18220,442 @@
         }
       ]
     },
+    "SplitView": {
+      "kind": "layout",
+      "dir": "src/layouts/SplitView",
+      "exports": [
+        "SplitView"
+      ],
+      "stylesheets": [
+        "src/layouts/SplitView/SplitView.css"
+      ],
+      "composes": [
+        "Button"
+      ],
+      "composesAll": [
+        "Button",
+        "Icon",
+        "Spinner"
+      ],
+      "tokens": [
+        {
+          "token": "button.danger.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.border",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.disabled",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.linear",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.standard",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            },
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.spin",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.surface",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.sm",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.scroll-region.lg",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.sidebar.lg",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "SplitView",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Stack": {
       "kind": "primitive",
       "dir": "src/primitives/Stack",

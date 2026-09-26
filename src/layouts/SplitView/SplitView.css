@@ -1,0 +1,89 @@
+@layer layouts {
+  /* 1. block: the container the panes respond to */
+  .split-view {
+    --split-view-list-size: var(--size-sidebar-lg);
+
+    container: split-view / inline-size;
+    display: flex;
+    align-items: stretch;
+    min-inline-size: 0;
+    block-size: var(--size-scroll-region-lg);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-surface);
+    overflow: hidden;
+  }
+
+  /* 2. parts: each pane scrolls on its own */
+  .split-view__list,
+  .split-view__detail {
+    min-inline-size: 0;
+    overflow-y: auto;
+    scroll-padding-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .split-view__list {
+    flex: none;
+    inline-size: var(--split-view-list-size);
+  }
+
+  .split-view__detail {
+    flex: 1;
+  }
+
+  /* A 24px target around a hairline. */
+  .split-view__divider {
+    position: relative;
+    flex: none;
+    inline-size: var(--size-target-min);
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .split-view__divider::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 0;
+    inline-size: 1px;
+    margin-inline: auto;
+    background: var(--color-border-default);
+  }
+
+  .split-view__divider:hover::before,
+  .split-view__divider:focus-visible::before {
+    inline-size: var(--focus-ring-width);
+    background: var(--color-focus);
+  }
+
+  .split-view__divider:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+
+  .split-view__back {
+    display: none;
+  }
+
+  /* 4. responsive: below the breakpoint token one pane shows, the one data-show names */
+  @container split-view (inline-size < 40rem) {
+    .split-view__divider {
+      display: none;
+    }
+
+    .split-view__list {
+      flex: 1;
+      inline-size: auto;
+    }
+
+    .split-view[data-show="list"] .split-view__detail,
+    .split-view[data-show="detail"] .split-view__list {
+      display: none;
+    }
+
+    .split-view__back {
+      display: block;
+      padding: var(--space-inset-xs);
+    }
+  }
+}

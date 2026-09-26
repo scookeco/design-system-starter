@@ -173,6 +173,7 @@ UI rules (design system v0)
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
+- [SplitView](docs/usage/SplitView.usage.tsx): A list and the selected item side by side
 
 ## Utilities
 
@@ -5216,6 +5217,68 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 Stories: `layouts-pagelayout--main-only`, `layouts-pagelayout--with-aside`, `layouts-pagelayout--with-nav`, `layouts-pagelayout--nav-and-aside`, `layouts-pagelayout--narrow-stacked`.
 Tokens read: `size.sidebar.lg`, `size.sidebar.sm`, `space.gap.lg`.
+
+### SplitView
+
+layout · `src/layouts/SplitView/SplitView.tsx` · usage: `docs/usage/SplitView.usage.tsx`
+
+A list and the selected item side by side (an inbox, a queue, a file browser), each pane scrolling on its own. The divider resizes the list: drag it, focus it and use ← → (Home and End for the limits), or click it to step through preset widths. Below the size.breakpoint.sm container width it collapses to one pane, the one `show` names, with a Back button above the detail. It lays out; the page owns selection and what the panes hold.
+
+Props:
+- `list: ReactNode`: The list: rows to move through.
+- `detail: ReactNode`: The selected item, beside the list.
+- `listLabel: string`: Accessible names of the two regions ("Conversations", "Conversation"). Required.
+- `detailLabel: string`
+- `show?: 'list' | 'detail'` = `'list'`: On a narrow container only one pane fits: which one shows. Wide containers always show both. Show the detail once something is opened, the list again on Back.
+- `onBack?: () => void`: Narrow only: the Back button above the detail. Omit onBack to leave it out.
+- `backLabel?: string` = `'Back'`
+- `listSize?: number`: The list pane's width in percent (25–65). Uncontrolled default 40.
+- `defaultListSize?: number` = `40`
+- `onListSizeChange?: (size: number) => void`
+- `resizeLabel?: string` = `'Resize list'`: Accessible name of the divider.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: show (list | detail).
+
+**When to use**
+
+- Working through a list one item at a time without losing your place: an inbox, a review queue, support tickets, a file browser.
+- When people move between neighbouring items often (j and k), so opening each on its own page would cost a round trip.
+
+**When not to use**
+
+- A list people scan and filter, then open one thing → the list page (`ListPage`) and a record page
+- A record with properties beside it → `PageLayout` with an aside
+
+**Do:** Both regions named; the page keeps the selection (in the URL) and passes `show` for narrow screens.
+
+```tsx
+<SplitView
+  listLabel="Conversations"
+  detailLabel="Conversation"
+  list={<Text>Northwind renewal · Contoso invoice · …</Text>}
+  detail={<Text>Northwind renewal: the conversation.</Text>}
+/>
+```
+
+**Don't:** Two boxes side by side by hand: no resizing, no keyboard, and on a phone both squeeze into half a screen.
+
+```tsx
+<Box padding="md">
+  <Text>List | Detail</Text>
+</Box>
+```
+
+**Accessibility**
+
+- Each pane is a named region and scrolls on its own, with the scroll-padding tokens so focus is never hidden at its edges.
+- The divider is a focusable separator (aria-valuenow is the list’s width in percent): ← → resize by 5%, Home and End go to the limits; a click steps through preset widths, the single-pointer alternative to dragging (WCAG 2.2 SC 2.5.7).
+- Below the sm breakpoint it collapses to one pane; `onBack` adds a Back button above the detail. Move focus into the detail when it opens, and back to the row on Back.
+
+Stories: `layouts-splitview--default`, `layouts-splitview--wide-list`, `layouts-splitview--narrow-list`, `layouts-splitview--narrow-detail`.
+Composes: Button, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `color.focus`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `size.sidebar.lg`, `size.target-min`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body-lg`, `text.label`.
 
 ## Utilities reference
 

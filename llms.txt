@@ -173,6 +173,7 @@ UI rules (design system v0)
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
+- [SplitView](docs/usage/SplitView.usage.tsx): A list and the selected item side by side
 
 ## Utilities
 

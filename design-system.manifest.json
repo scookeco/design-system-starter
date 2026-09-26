@@ -13299,6 +13299,221 @@
       ]
     },
     {
+      "name": "SplitView",
+      "kind": "layout",
+      "source": "src/layouts/SplitView/SplitView.tsx",
+      "status": null,
+      "description": "A list and the selected item side by side (an inbox, a queue, a file browser), each pane scrolling on its own. The divider resizes the list: drag it, focus it and use ← → (Home and End for the limits), or click it to step through preset widths. Below the size.breakpoint.sm container width it collapses to one pane, the one `show` names, with a Back button above the detail. It lays out; the page owns selection and what the panes hold.",
+      "docs": "docs/usage/SplitView.usage.tsx",
+      "props": [
+        {
+          "name": "list",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The list: rows to move through."
+        },
+        {
+          "name": "detail",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The selected item, beside the list."
+        },
+        {
+          "name": "listLabel",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible names of the two regions (\"Conversations\", \"Conversation\"). Required."
+        },
+        {
+          "name": "detailLabel",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "show",
+          "type": "'list' | 'detail'",
+          "required": false,
+          "default": "'list'",
+          "description": "On a narrow container only one pane fits: which one shows. Wide containers always show both. Show the detail once something is opened, the list again on Back.",
+          "values": [
+            "list",
+            "detail"
+          ]
+        },
+        {
+          "name": "onBack",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Narrow only: the Back button above the detail. Omit onBack to leave it out."
+        },
+        {
+          "name": "backLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Back'",
+          "description": null
+        },
+        {
+          "name": "listSize",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "The list pane's width in percent (25–65). Uncontrolled default 40."
+        },
+        {
+          "name": "defaultListSize",
+          "type": "number",
+          "required": false,
+          "default": "40",
+          "description": null
+        },
+        {
+          "name": "onListSizeChange",
+          "type": "(size: number) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "resizeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Resize list'",
+          "description": "Accessible name of the divider."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "show": [
+          "list",
+          "detail"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Working through a list one item at a time without losing your place: an inbox, a review queue, support tickets, a file browser.",
+          "When people move between neighbouring items often (j and k), so opening each on its own page would cost a round trip."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A list people scan and filter, then open one thing",
+            "instead": "the list page (`ListPage`) and a record page"
+          },
+          {
+            "situation": "A record with properties beside it",
+            "instead": "`PageLayout` with an aside"
+          }
+        ],
+        "do": {
+          "caption": "Both regions named; the page keeps the selection (in the URL) and passes `show` for narrow screens.",
+          "code": "<SplitView\n  listLabel=\"Conversations\"\n  detailLabel=\"Conversation\"\n  list={<Text>Northwind renewal · Contoso invoice · …</Text>}\n  detail={<Text>Northwind renewal: the conversation.</Text>}\n/>"
+        },
+        "dont": {
+          "caption": "Two boxes side by side by hand: no resizing, no keyboard, and on a phone both squeeze into half a screen.",
+          "code": "<Box padding=\"md\">\n  <Text>List | Detail</Text>\n</Box>"
+        },
+        "accessibility": [
+          "Each pane is a named region and scrolls on its own, with the scroll-padding tokens so focus is never hidden at its edges.",
+          "The divider is a focusable separator (aria-valuenow is the list’s width in percent): ← → resize by 5%, Home and End go to the limits; a click steps through preset widths, the single-pointer alternative to dragging (WCAG 2.2 SC 2.5.7).",
+          "Below the sm breakpoint it collapses to one pane; `onBack` adds a Back button above the detail. Move focus into the detail when it opens, and back to the row on Back."
+        ]
+      },
+      "unit": {
+        "dir": "src/layouts/SplitView",
+        "stories": [
+          {
+            "id": "layouts-splitview--default",
+            "name": "Default"
+          },
+          {
+            "id": "layouts-splitview--wide-list",
+            "name": "Wide List"
+          },
+          {
+            "id": "layouts-splitview--narrow-list",
+            "name": "Narrow List"
+          },
+          {
+            "id": "layouts-splitview--narrow-detail",
+            "name": "Narrow Detail"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.focus",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "radius.surface",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.scroll-region.lg",
+          "size.sidebar.lg",
+          "size.target-min",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.body-lg",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "SplitViewProps",
+      "kind": "type-only",
+      "source": "src/layouts/SplitView/SplitView.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SplitView",
+      "propsOf": "SplitView"
+    },
+    {
       "name": "Stack",
       "kind": "primitive",
       "source": "src/primitives/Stack/Stack.tsx",

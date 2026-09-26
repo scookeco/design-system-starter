@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Combobox, DatePicker, InlineEdit, LocaleProvider, NumberField, Toolbar, ToolbarButton } from '../../src/index';
+import { Combobox, DatePicker, InlineEdit, LocaleProvider, NumberField, SplitView, Toolbar, ToolbarButton } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -124,5 +124,38 @@ describe('Toolbar', () => {
     const stops = [toolbar, ...toolbar.querySelectorAll<HTMLElement>('*')].filter((el) => el.tabIndex === 0);
     expect(stops).toHaveLength(1);
     expect(screen.getAllByRole('button').every((b) => b.tabIndex === -1)).toBe(true);
+  });
+});
+
+describe('SplitView', () => {
+  const view = (props: Partial<Parameters<typeof SplitView>[0]> = {}) => render(<SplitView list={<p>list</p>} detail={<p>detail</p>} listLabel="Conversations" detailLabel="Conversation" {...props} />);
+
+  it('names both regions and resizes the list from the keyboard, within its limits', () => {
+    const onListSizeChange = vi.fn();
+    view({ onListSizeChange });
+    expect(screen.getByRole('region', { name: 'Conversations' })).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Conversation' })).toBeTruthy();
+    const divider = screen.getByRole('separator', { name: 'Resize list' });
+    expect(divider.getAttribute('aria-valuenow')).toBe('40');
+    fireEvent.keyDown(divider, { key: 'ArrowRight' });
+    expect(divider.getAttribute('aria-valuenow')).toBe('45');
+    fireEvent.keyDown(divider, { key: 'End' });
+    expect(divider.getAttribute('aria-valuenow')).toBe('65');
+    fireEvent.keyDown(divider, { key: 'ArrowRight' });
+    expect(divider.getAttribute('aria-valuenow')).toBe('65');
+    fireEvent.keyDown(divider, { key: 'Home' });
+    expect(onListSizeChange).toHaveBeenLastCalledWith(25);
+  });
+
+  it('steps through preset widths on a click: the single-pointer alternative to dragging', () => {
+    view();
+    const divider = screen.getByRole('separator');
+    divider.setPointerCapture = () => undefined;
+    fireEvent.pointerDown(divider, { pointerId: 1 });
+    fireEvent.pointerUp(divider, { pointerId: 1 });
+    expect(divider.getAttribute('aria-valuenow')).toBe('55');
+    fireEvent.pointerDown(divider, { pointerId: 1 });
+    fireEvent.pointerUp(divider, { pointerId: 1 });
+    expect(divider.getAttribute('aria-valuenow')).toBe('30');
   });
 });
