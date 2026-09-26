@@ -57,4 +57,10 @@
   .chat-thread__jump > * {
     pointer-events: auto;
   }
+
+  /* 3. variant: the page scrolls, so the jump button sticks above the page's sticky action bar */
+  .chat-thread[data-scroll="page"] .chat-thread__jump {
+    position: sticky;
+    inset-block-end: var(--space-scroll-padding-end);
+  }
 }

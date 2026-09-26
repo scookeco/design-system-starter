@@ -51,3 +51,5 @@ export const Empty: Story = {
     ),
   },
 };
+/** The thread grows and the page scrolls (a full chat page, with the composer in AppShell's footer). */
+export const PageScroll: Story = { args: { children: turns, scroll: 'page' } };

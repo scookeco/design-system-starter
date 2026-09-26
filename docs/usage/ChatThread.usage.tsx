@@ -7,6 +7,7 @@ export const usage: UsageDoc = {
     'The scrolling list of turns in a conversation with an assistant: in an `AssistantPanel` beside the page, or a full chat page.',
     'Give it the space to fill (a flex column); it follows new output while the person is at the bottom and offers “Jump to latest” when they scroll up.',
     'Pass suggested prompts as `empty`, never a blank box.',
+    'On a full chat page set `scroll="page"`: the thread grows, AppShell’s main scrolls (the Composer goes in AppShell’s `footer`), and it follows the output there.',
   ],
   whenNotToUse: [
     { situation: 'A record’s comments or activity', instead: '`Timeline`' },

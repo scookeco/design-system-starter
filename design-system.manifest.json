@@ -2976,7 +2976,7 @@
       "kind": "component",
       "source": "src/components/ChatThread/ChatThread.tsx",
       "status": null,
-      "description": "The scrolling list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers \"Jump to latest\"), and is a named, focusable region so it scrolls from the keyboard. It is deliberately not a live region: the answer's own StreamingText announces sentences, so tokens are never read one by one.",
+      "description": "The list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers \"Jump to latest\"). Scrolling itself, it is a named, focusable region, so it scrolls from the keyboard. It is deliberately not a live region: each answer's StreamingText announces sentences, so tokens are never read one by one.",
       "docs": "docs/usage/ChatThread.usage.tsx",
       "props": [
         {
@@ -2984,7 +2984,7 @@
           "type": "string",
           "required": true,
           "default": null,
-          "description": "Accessible name of the scrollable thread (\"Conversation about Master cleaning agreement\"). Required."
+          "description": "Accessible name of the thread (\"Conversation about Master cleaning agreement\"). Required."
         },
         {
           "name": "children",
@@ -3006,6 +3006,17 @@
           "required": false,
           "default": "'Jump to latest'",
           "description": "Label of the button that returns to the newest turn after scrolling up."
+        },
+        {
+          "name": "scroll",
+          "type": "'self' | 'page'",
+          "required": false,
+          "default": "'self'",
+          "description": "self: the thread scrolls in its own region, filling its container (a panel). page: the thread grows and the page's scroll region (AppShell's main) scrolls; it follows the output there (a full chat page, with the Composer in AppShell's footer).",
+          "values": [
+            "self",
+            "page"
+          ]
         }
       ],
       "inherits": [],
@@ -3015,13 +3026,19 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {},
+      "variants": {
+        "scroll": [
+          "self",
+          "page"
+        ]
+      },
       "states": [],
       "usage": {
         "whenToUse": [
           "The scrolling list of turns in a conversation with an assistant: in an `AssistantPanel` beside the page, or a full chat page.",
           "Give it the space to fill (a flex column); it follows new output while the person is at the bottom and offers “Jump to latest” when they scroll up.",
-          "Pass suggested prompts as `empty`, never a blank box."
+          "Pass suggested prompts as `empty`, never a blank box.",
+          "On a full chat page set `scroll=\"page\"`: the thread grows, AppShell’s main scrolls (the Composer goes in AppShell’s `footer`), and it follows the output there."
         ],
         "whenNotToUse": [
           {
@@ -3061,6 +3078,10 @@
           {
             "id": "components-chatthread--empty",
             "name": "Empty"
+          },
+          {
+            "id": "components-chatthread--page-scroll",
+            "name": "Page Scroll"
           }
         ],
         "composes": [

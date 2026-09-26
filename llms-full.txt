@@ -87,7 +87,7 @@ UI rules (design system v0)
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
-- [ChatThread](docs/usage/ChatThread.usage.tsx): The scrolling list of turns in a conversation
+- [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
@@ -659,21 +659,25 @@ Tokens read: `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `col
 
 component · `src/components/ChatThread/ChatThread.tsx` · usage: `docs/usage/ChatThread.usage.tsx`
 
-The scrolling list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers "Jump to latest"), and is a named, focusable region so it scrolls from the keyboard. It is deliberately not a live region: the answer's own StreamingText announces sentences, so tokens are never read one by one.
+The list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers "Jump to latest"). Scrolling itself, it is a named, focusable region, so it scrolls from the keyboard. It is deliberately not a live region: each answer's StreamingText announces sentences, so tokens are never read one by one.
 
 Props:
-- `label: string`: Accessible name of the scrollable thread ("Conversation about Master cleaning agreement"). Required.
+- `label: string`: Accessible name of the thread ("Conversation about Master cleaning agreement"). Required.
 - `children?: ReactNode`: The turns, oldest first: Message elements (give each a stable key).
 - `empty?: ReactNode`: Shown instead of the thread when it has no turns: suggested prompts, not a blank box.
 - `jumpLabel?: string` = `'Jump to latest'`: Label of the button that returns to the newest turn after scrolling up.
+- `scroll?: 'self' | 'page'` = `'self'`: self: the thread scrolls in its own region, filling its container (a panel). page: the thread grows and the page's scroll region (AppShell's main) scrolls; it follows the output there (a full chat page, with the Composer in AppShell's footer).
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: scroll (self | page).
 
 **When to use**
 
 - The scrolling list of turns in a conversation with an assistant: in an `AssistantPanel` beside the page, or a full chat page.
 - Give it the space to fill (a flex column); it follows new output while the person is at the bottom and offers “Jump to latest” when they scroll up.
 - Pass suggested prompts as `empty`, never a blank box.
+- On a full chat page set `scroll="page"`: the thread grows, AppShell’s main scrolls (the Composer goes in AppShell’s `footer`), and it follows the output there.
 
 **When not to use**
 
@@ -704,7 +708,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - It is deliberately not a live region (`role="log"` would read every token): each answer’s `StreamingText` announces complete sentences instead.
 - Scrolling keeps focus clear of “Jump to latest” (`space.scroll-padding.end`).
 
-Stories: `components-chatthread--conversation`, `components-chatthread--streaming`, `components-chatthread--empty`.
+Stories: `components-chatthread--conversation`, `components-chatthread--streaming`, `components-chatthread--empty`, `components-chatthread--page-scroll`.
 Composes: Button, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.lg`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.end`, `text.body-lg`, `text.label`.
 
