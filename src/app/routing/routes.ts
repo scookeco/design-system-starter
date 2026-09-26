@@ -10,10 +10,10 @@ import type { ComponentType } from 'react';
 import type { Capability } from '../api/schemas';
 
 /**
- * The frame a page renders in. `shell` is AppShell (signed-in pages, with the nav); `focused` is
- * FocusedLayout (a multi-step task with an exit). Pages compose their own frame, because they fill
- * its slots (breadcrumbs, the sticky footer); the router uses this to frame what it renders in a
- * page's place (the 403 page), and the route test checks it against the page.
+ * The frame a page renders in: `shell` is AppShell (signed-in pages, with the nav); `focused` is
+ * FocusedLayout (a multi-step task with an exit). Pages compose their frame themselves, because they
+ * fill its slots (breadcrumbs, the sticky footer), so this is declared, not applied: it keeps each
+ * row readable as path → layout + page + guard, and says which frame a new page must compose.
  */
 export type RouteLayout = 'shell' | 'focused';
 
