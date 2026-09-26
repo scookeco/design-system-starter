@@ -63,7 +63,7 @@ import { STATUS } from '../app/model/status';
 import { FieldDisplay, isNumericField } from '../app/registries/fields';
 import { RECORD_PROPERTIES } from '../app/registries/recordFields';
 import { usePersonName } from '../app/registries/refs';
-import { useCan } from '../app/session';
+import { useAppSession, useCan } from '../app/session';
 
 interface Activity {
   id: string;
@@ -158,6 +158,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const archive = useArchiveRecord(recordId);
   const remove = useBulkDeleteRecords();
   const can = useCan();
+  const { refreshSession } = useAppSession();
   const [section, setSection] = useState<RecordSection>(initialSection);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -185,6 +186,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
         onError: (error) => {
           if (isConflict(error)) return; // The Banner explains it.
           if (isForbidden(error)) {
+            // The server knows better: a role may have changed. Ask again; the UI follows the new capabilities.
+            void refreshSession();
             toast({ title: 'You can’t rename this record', description: `${error.message} It’s back to “${record.name}”.`, tone: 'danger', duration: Infinity });
             return;
           }

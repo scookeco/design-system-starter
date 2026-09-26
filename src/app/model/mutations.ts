@@ -19,11 +19,11 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
-import type { Account, Capability, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage, Tenant } from '../api/schemas';
-import { useGrant } from '../session';
+import type { Account, Capability, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
+import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
-import { accountKeys, recordKeys } from './keys';
+import { accountKeys, recordKeys, type Partition } from './keys';
 
 /**
  * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
@@ -38,8 +38,8 @@ import { accountKeys, recordKeys } from './keys';
  * rename under sort-by-name, a move out of a tab), which is what the invalidation that follows is
  * for; the patch makes the edit visible everywhere at once, before any refetch lands.
  */
-export const patchListedRecord = (client: QueryClient, tenant: Tenant, id: string, patch: (listed: RecordEntity) => RecordEntity | undefined) =>
-  client.setQueriesData<RecordPage>({ queryKey: recordKeys.lists(tenant) }, (page) => {
+export const patchListedRecord = (client: QueryClient, partition: Partition, id: string, patch: (listed: RecordEntity) => RecordEntity | undefined) =>
+  client.setQueriesData<RecordPage>({ queryKey: recordKeys.lists(partition) }, (page) => {
     const index = page?.items.findIndex((r) => r.id === id) ?? -1;
     const listed = page?.items[index];
     if (!page || !listed) return undefined;
@@ -69,11 +69,12 @@ export const isConflict = (error: unknown): error is ApiError => error instanceo
  */
 export function useRenameRecord(id: string) {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
-  const key = recordKeys.detail(tenant, id);
+  const key = recordKeys.detail(partition, id);
   return useMutation({
-    mutationKey: [tenant, 'renameRecord', { id }],
+    mutationKey: [...partition, 'renameRecord', { id }],
     mutationFn: ({ name, version }: { name: string; version: number }) => {
       refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
       return patchRecordName(tenant, id, name, version);
@@ -82,12 +83,12 @@ export function useRenameRecord(id: string) {
       // Refused before the optimistic patch, so a denied rename never flashes the new name.
       refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
       // A read in flight must not land on top of the optimistic name: not the detail, not a list.
-      await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(tenant) })]);
+      await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(partition) })]);
       const previous = client.getQueryData<RecordEntity>(key);
       if (previous) client.setQueryData<RecordEntity>(key, { ...previous, name });
       // Every cached list page holding this record shows the new name too (see patchListedRecord).
       let listedName: string | undefined;
-      patchListedRecord(client, tenant, id, (listed) => {
+      patchListedRecord(client, partition, id, (listed) => {
         listedName ??= listed.name;
         return listed.version === version ? { ...listed, name } : undefined;
       });
@@ -101,19 +102,19 @@ export function useRenameRecord(id: string) {
       }
       const previousName = context?.previousName;
       if (previousName !== undefined) {
-        patchListedRecord(client, tenant, id, (listed) => (listed.name === name && listed.version === version ? { ...listed, name: previousName } : undefined));
+        patchListedRecord(client, partition, id, (listed) => (listed.name === name && listed.version === version ? { ...listed, name: previousName } : undefined));
       }
     },
     onSuccess: (renamed) => {
       client.setQueryData(key, renamed);
-      patchListedRecord(client, tenant, id, () => renamed);
+      patchListedRecord(client, partition, id, () => renamed);
     },
     // Returning the promise keeps the mutation pending until the refetch lands. After a conflict the
     // detail is left alone: the page says so and the person chooses when to reload.
     onSettled: (_data, error) =>
       Promise.all([
         isConflict(error) ? undefined : client.invalidateQueries({ queryKey: key, exact: true }),
-        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
       ]),
   });
 }
@@ -124,20 +125,21 @@ export function useRenameRecord(id: string) {
  */
 export function useMoveRecord() {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'moveRecord'],
+    mutationKey: [...partition, 'moveRecord'],
     mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => {
-      refuseUnless(grant, 'record:move', client.getQueryData<RecordEntity>(recordKeys.detail(tenant, record.id)));
+      refuseUnless(grant, 'record:move', client.getQueryData<RecordEntity>(recordKeys.detail(partition, record.id)));
       return postStatus(tenant, record.id, status, record.version);
     },
     onSuccess: (moved) => {
-      client.setQueryData(recordKeys.detail(tenant, moved.id), moved);
-      patchListedRecord(client, tenant, moved.id, () => moved);
+      client.setQueryData(recordKeys.detail(partition, moved.id), moved);
+      patchListedRecord(client, partition, moved.id, () => moved);
       return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
+        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
       ]);
     },
   });
@@ -146,20 +148,21 @@ export function useMoveRecord() {
 /** archiveRecord: pessimistic. Nothing changes until the server says so; then lists and counts refetch. */
 export function useArchiveRecord(id: string) {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'archiveRecord', { id }],
+    mutationKey: [...partition, 'archiveRecord', { id }],
     mutationFn: () => {
-      refuseUnless(grant, 'record:archive', client.getQueryData<RecordEntity>(recordKeys.detail(tenant, id)));
+      refuseUnless(grant, 'record:archive', client.getQueryData<RecordEntity>(recordKeys.detail(partition, id)));
       return postArchive(tenant, id);
     },
     onSuccess: (archived) => {
-      client.setQueryData(recordKeys.detail(tenant, id), archived);
-      patchListedRecord(client, tenant, id, () => archived);
+      client.setQueryData(recordKeys.detail(partition, id), archived);
+      patchListedRecord(client, partition, id, () => archived);
       return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
+        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
       ]);
     },
   });
@@ -172,19 +175,20 @@ export function useArchiveRecord(id: string) {
  */
 export function useCreateRecord() {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'createRecord'],
+    mutationKey: [...partition, 'createRecord'],
     mutationFn: ({ record, idempotencyKey }: { record: NewRecord; idempotencyKey: string }) => {
       refuseUnless(grant, 'record:create');
       return postRecord(tenant, record, idempotencyKey);
     },
     onSuccess: (created) => {
-      client.setQueryData(recordKeys.detail(tenant, created.id), created);
+      client.setQueryData(recordKeys.detail(partition, created.id), created);
       return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
+        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
       ]);
     },
   });
@@ -199,19 +203,20 @@ export type BulkSelection = { ids: readonly string[] } | { filter: RecordFilter 
  */
 export function useBulkDeleteRecords() {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'bulkDeleteRecords'],
+    mutationKey: [...partition, 'bulkDeleteRecords'],
     mutationFn: (selection: BulkSelection) => {
       refuseUnless(grant, 'record:delete');
       return postBulkDelete(tenant, selection);
     },
     onSuccess: (result) => {
-      for (const id of result.deleted) client.removeQueries({ queryKey: recordKeys.detail(tenant, id), exact: true });
+      for (const id of result.deleted) client.removeQueries({ queryKey: recordKeys.detail(partition, id), exact: true });
       return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(tenant) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(tenant) }),
+        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
+        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
       ]);
     },
   });
@@ -220,17 +225,18 @@ export function useBulkDeleteRecords() {
 /** addPerson: pessimistic. The quick-create for an owner: appends the new person, then refetches people. */
 export function useAddPerson() {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'addPerson'],
+    mutationKey: [...partition, 'addPerson'],
     mutationFn: (name: string) => {
       refuseUnless(grant, 'people:create');
       return postPerson(tenant, name);
     },
     onSuccess: (person) => {
-      client.setQueryData<{ items: Person[] }>(recordKeys.people(tenant), (current) => (current ? { items: [...current.items, person] } : current));
-      return client.invalidateQueries({ queryKey: recordKeys.people(tenant) });
+      client.setQueryData<{ items: Person[] }>(recordKeys.people(partition), (current) => (current ? { items: [...current.items, person] } : current));
+      return client.invalidateQueries({ queryKey: recordKeys.people(partition) });
     },
   });
 }
@@ -242,18 +248,19 @@ const upsertAccount = (current: { items: Account[] } | undefined, account: Accou
 /** createAccount: pessimistic, with an idempotency key. Seeds the detail and appends to the directory. */
 export function useCreateAccount() {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'createAccount'],
+    mutationKey: [...partition, 'createAccount'],
     mutationFn: ({ account, idempotencyKey }: { account: AccountInput; idempotencyKey: string }) => {
       refuseUnless(grant, 'account:create');
       return postAccount(tenant, account, idempotencyKey);
     },
     onSuccess: (created) => {
-      client.setQueryData(accountKeys.detail(tenant, created.id), created);
-      client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, created));
-      return client.invalidateQueries({ queryKey: accountKeys.list(tenant) });
+      client.setQueryData(accountKeys.detail(partition, created.id), created);
+      client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, created));
+      return client.invalidateQueries({ queryKey: accountKeys.list(partition) });
     },
   });
 }
@@ -265,17 +272,18 @@ export function useCreateAccount() {
  */
 export function useUpdateAccount(id: string) {
   const tenant = useTenant();
+  const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [tenant, 'updateAccount', { id }],
+    mutationKey: [...partition, 'updateAccount', { id }],
     mutationFn: ({ changes, version }: { changes: Partial<AccountInput>; version: number }) => {
       refuseUnless(grant, 'account:edit');
       return patchAccount(tenant, id, changes, version);
     },
     onSuccess: (updated) => {
-      client.setQueryData(accountKeys.detail(tenant, id), updated);
-      client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, updated));
+      client.setQueryData(accountKeys.detail(partition, id), updated);
+      client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, updated));
     },
   });
 }

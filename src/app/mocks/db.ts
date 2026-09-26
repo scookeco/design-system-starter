@@ -31,12 +31,20 @@ let writes = 0;
 const SIGNED_IN = { id: 'u-sam', name: 'Sam Rivera', email: 'sam.rivera@example.com' };
 const ADMIN_EVERYWHERE = Object.fromEntries(TENANTS.map((t) => [t, 'admin'])) as Record<Tenant, Role>;
 let roles: Record<Tenant, Role> = { ...ADMIN_EVERYWHERE };
+let signedIn = true;
 
 export const resetDb = () => {
   partitions = new Map(TENANTS.map((tenant) => [tenant, fresh(tenant)]));
   writes = 0;
   roles = { ...ADMIN_EVERYWHERE };
+  signedIn = true;
 };
+
+/** Sign-out ends the session on the server: every later request is a 401. */
+export const endSession = () => {
+  signedIn = false;
+};
+export const isSignedIn = () => signedIn;
 
 /** Set the signed-in person's role: one for every workspace, or per workspace. Stories and tests use this. */
 export const setRoles = (next: Role | Partial<Record<Tenant, Role>>) => {

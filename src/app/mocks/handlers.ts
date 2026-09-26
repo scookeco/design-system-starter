@@ -27,7 +27,7 @@ import {
 import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesSearch, type SearchableRecord } from '../model/predicates';
 import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
-import { bump, currentSession, db, grantFor, touch } from './db';
+import { bump, currentSession, db, endSession, grantFor, isSignedIn, touch } from './db';
 import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 
@@ -59,6 +59,7 @@ const handle =
   async ({ request, params }) => {
     const failed = await settle();
     if (failed) return failed;
+    if (!isSignedIn()) return error(401, 'signed_out', 'Sign in to continue.');
     const tenant = TenantSchema.safeParse(params.tenant);
     if (!tenant.success) return error(404, 'unknown_tenant', 'No such workspace.');
     const grant = grantFor(tenant.data);
@@ -345,5 +346,9 @@ const workspaceHandlers = [
 export const handlers = [
   ...workspaceHandlers,
   // The session: not workspace data, so outside the tenant routes.
-  http.get('*/api/session', async () => (await settle()) ?? HttpResponse.json(currentSession())),
+  http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
+  http.delete('*/api/session', async () => {
+    endSession();
+    return HttpResponse.json({ signedOut: true });
+  }),
 ];

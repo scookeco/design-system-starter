@@ -28,6 +28,18 @@ const useHistory = () => {
   return history ?? (defaultHistory ??= browserHistory());
 };
 
+/** Navigate to a path: push (a new entry) by default, replace to rewrite this one. */
+export function useNavigate() {
+  const history = useHistory();
+  return useCallback((href: string, { replace = false }: { replace?: boolean } = {}) => (replace ? history.replace(href) : history.push(href)), [history]);
+}
+
+/** The current path, following Back, Forward and every push. */
+export function usePathname() {
+  const history = useHistory();
+  return useSyncExternalStore(history.subscribe, () => history.location().pathname);
+}
+
 export interface UrlStateActions<T> {
   /** Navigate: a new history entry. */
   push: (next: Partial<T>) => void;
