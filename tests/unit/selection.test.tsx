@@ -17,7 +17,7 @@ import {
 import { seedRecords } from '../../src/app/mocks/seed';
 import { ListPage } from '../../src/examples/ListPage';
 import { jobSettings } from '../../src/app/model/jobs';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -68,10 +68,11 @@ describe('selection model', () => {
   });
 });
 
-describe('list page selection and bulk delete', () => {
+describe('list page selection and bulk delete', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('names each row checkbox, offers "Select all N matching", and shows the count in the bar', async () => {
     renderWithApp(<ListPage />, { url: '/records' });
-    const header = await screen.findByRole('checkbox', { name: 'Select all on this page' });
+    // The header checkbox only renders with the loaded rows, so finding it means the first page settled.
+    const header = await screen.findByRole('checkbox', { name: 'Select all on this page' }, FIRST_PAINT);
     expect(screen.getAllByRole('checkbox', { name: /^Select (?!all)/ })).toHaveLength(10);
     fireEvent.click(header);
     expect(screen.getByText('10 selected')).toBeTruthy();
@@ -82,7 +83,7 @@ describe('list page selection and bulk delete', () => {
 
   it('clears the selection when the filter changes', async () => {
     const { history } = renderWithApp(<ListPage />, { url: '/records' });
-    fireEvent.click(await screen.findByRole('checkbox', { name: 'Select all on this page' }));
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'Select all on this page' }, FIRST_PAINT));
     expect(screen.getByText('10 selected')).toBeTruthy();
     act(() => history.replace('/records?status=active'));
     await waitFor(() => expect(screen.queryByText('10 selected')).toBeNull());
@@ -97,7 +98,7 @@ describe('list page selection and bulk delete', () => {
     const drafts = seedRecords('acme').filter((r) => r.status === 'draft');
     const held = drafts.filter((r) => r.tags.includes('legal-hold'));
     renderWithApp(<ListPage initialSelection="matching" />, { url: '/records?view=drafts' });
-    await screen.findByText(`${String(drafts.length)} selected`);
+    await screen.findByText(`${String(drafts.length)} selected`, {}, FIRST_PAINT);
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     const dialog = await screen.findByRole('dialog', { name: `Delete ${String(drafts.length)} records?` });
     fireEvent.click(within(dialog).getByRole('button', { name: `Delete ${String(drafts.length)} records` }));
@@ -107,5 +108,5 @@ describe('list page selection and bulk delete', () => {
     );
     expect(screen.getByRole('button', { name: `Retry ${String(held.length)} failed` })).toBeTruthy();
     expect(screen.queryByText(/selected$/)).toBeNull();
-  }, 20_000);
+  });
 });

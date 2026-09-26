@@ -36,6 +36,22 @@ export const setupMockApi = () => {
   afterAll(() => server.close());
 };
 
+/**
+ * Budget for a test that mounts a whole page and drives it: a lazy route chunk, first render, its
+ * queries, then several interactions and writes. Quiet, these take 0.5–2.5 s; with Playwright
+ * running beside them they took up to 10 s and failed on Vitest's 5 s default. Each wait inside
+ * still gives up after its own timeout, so a missing element fails with its own message, not this.
+ * Pass it per test or per describe, never globally: a unit test that needs it has a problem.
+ */
+export const PAGE_FLOW_TIMEOUT = 30_000;
+
+/**
+ * For the first wait after mounting a page, or after navigating to a route not loaded yet: it
+ * covers loading the chunk, the first render and the first queries, the slowest step under load.
+ * Later waits in the same test use the default (setup.ts).
+ */
+export const FIRST_PAINT = { timeout: 15_000 };
+
 export const testClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
 
 /** The app's providers for a hook or a component, with the mock server's current session (admin unless setRoles says otherwise). */

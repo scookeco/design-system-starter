@@ -9,7 +9,7 @@ import { AppProviders } from '../../src/app/providers';
 import { useAppSession } from '../../src/app/session';
 import { createMemoryHistory } from '../../src/app/url/history';
 import { ListPage } from '../../src/examples/ListPage';
-import { server, setupMockApi, testClient } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, server, setupMockApi, testClient } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -33,37 +33,49 @@ const mount = (tenant: Tenant = 'acme', client = testClient()) => {
   return { ...view, client, history, rerenderWith: (session: ReturnType<typeof currentSession>) => view.rerender(ui(session)) };
 };
 
-const pager = async () => within(await screen.findByRole('navigation', { name: 'Records pages' })).getByRole('status');
+/** The list's "1–10 of N": waits for the first page to load. */
+const pager = async () => within(await screen.findByRole('navigation', { name: 'Records pages' }, FIRST_PAINT)).getByRole('status');
+/** The same, read now: for use inside waitFor. */
+const pagerText = () => within(screen.getByRole('navigation', { name: 'Records pages' })).getByRole('status').textContent;
 /** "1–10 of N" for a tenant's All tab, as an admin, from the seed. */
 const firstPageOf = (tenant: Tenant) => `1–10 of ${String(seedRecords(tenant).filter((r) => r.status !== 'archived').length)}`;
 
-describe('tenant boundary', () => {
+describe('tenant boundary', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('switching workspace cancels the old one’s reads: a late answer never reaches the new screen', async () => {
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    let heldAcme = false;
+    const held: Request[] = [];
+    let answered = 0;
     server.use(
-      http.get('*/api/t/acme/records', async () => {
-        heldAcme = true;
+      http.get('*/api/t/acme/records', async ({ request }) => {
+        held.push(request);
         await gate;
+        answered += 1;
         return HttpResponse.json({ items: seedRecords('acme').slice(0, 10), total: 999, page: 1, pageSize: 10 });
       }),
     );
     const { client } = mount('acme');
-    await waitFor(() => expect(heldAcme).toBe(true));
+    const acmeQueries = () => client.getQueryCache().findAll({ queryKey: ['acme'] });
+    // Switch only once acme's list is in flight and held, so the switch lands mid-request on every run.
+    await waitFor(() => expect(held.length).toBeGreaterThan(0), FIRST_PAINT);
     act(() => app?.switchTenant('globex'));
-    await waitFor(async () => expect((await pager()).textContent).toBe(firstPageOf('globex')));
+    await waitFor(() => expect(pagerText()).toBe(firstPageOf('globex')), FIRST_PAINT);
+    // The switch aborted the held reads, so their answers have nowhere to land.
+    expect(held.every((request) => request.signal.aborted)).toBe(true);
+    // Let them answer anyway. Once every handler has returned and no acme read is in flight, a late answer
+    // has either landed or been dropped: nothing is left to race, however slow the machine.
     release();
-    // Give the late acme answer every chance to land, then look again: still Globex, in EUR.
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect((await pager()).textContent).toBe(firstPageOf('globex'));
+    await waitFor(() => expect(answered).toBe(held.length));
+    await waitFor(() => expect(acmeQueries().some((q) => q.state.fetchStatus === 'fetching')).toBe(false));
+    // Still Globex, in EUR.
+    expect(pagerText()).toBe(firstPageOf('globex'));
     expect(screen.getAllByText(/€/).length).toBeGreaterThan(0);
     expect(screen.queryByText(seedRecords('acme')[0]?.name ?? '?')).toBeNull();
-    // Globex's data lives only under globex keys.
+    // Globex's data lives only under globex keys, and the late acme answer (total 999) reached no key at all.
     expect(client.getQueryCache().findAll({ queryKey: ['globex'] }).length).toBeGreaterThan(0);
-    expect(client.getQueryCache().findAll({ queryKey: ['acme'] }).every((q) => q.state.status !== 'success' || q.state.fetchStatus === 'idle')).toBe(true);
+    expect(acmeQueries().some((q) => (q.state.data as { total?: number } | undefined)?.total === 999)).toBe(false);
   });
 
   it('the account menu switches workspace and the brand follows', async () => {
@@ -72,13 +84,13 @@ describe('tenant boundary', () => {
     expect(screen.getAllByText('Acme').length).toBeGreaterThan(0);
     fireEvent.keyDown(screen.getByRole('button', { name: 'Sam Rivera' }), { key: 'Enter' });
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Switch to Globex' }));
-    await waitFor(async () => expect((await pager()).textContent).toBe(firstPageOf('globex')));
+    await waitFor(() => expect(pagerText()).toBe(firstPageOf('globex')), FIRST_PAINT);
     expect(screen.getAllByText('Globex').length).toBeGreaterThan(0);
     expect(screen.queryByText('Acme')).toBeNull();
   });
 });
 
-describe('permission scope boundary', () => {
+describe('permission scope boundary', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('a narrower role never reads what a broader one cached, and the broader partition is dropped', async () => {
     const { client, rerenderWith } = mount('acme');
     expect((await pager()).textContent).toBe(firstPageOf('acme'));
@@ -97,7 +109,7 @@ describe('permission scope boundary', () => {
   });
 });
 
-describe('session boundary', () => {
+describe('session boundary', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('sign-out cancels everything, empties the query and mutation caches, and ends the server session', async () => {
     const { client } = mount('acme');
     await pager();
