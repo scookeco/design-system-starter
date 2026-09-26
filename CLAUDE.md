@@ -23,10 +23,10 @@ Work on a branch. Never commit to `main` directly.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
 - `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
-- `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks). Import components and primitives; nothing below imports them.
+- `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks), `AssistantPanel` (an assistant in AppShell's `assistant` slot). Import components and primitives; nothing below imports them.
 - `src/format/`: locale formatting over Intl (`LocaleProvider`, `useFormat`). Part of the system; exported from `src/index.ts`.
 - `src/app/`: the **app layer** the examples use, NOT the design system: `api/` (client + zod schemas; every response is parsed at the boundary), `model/` (cache keys `[tenant, scope, resource, params]`, queries, named predicates, projections, named mutations, selection, `permissions.ts`), `session.tsx` (memberships, workspace switch, sign-out, `useCan`), `routing/` (route type, matcher, `RouteView`, `AppLink`), `url/` (`useUrlState`), `registries/` (field registry, `entities.ts`: entityType → fields), `mocks/` (MSW handlers, seeded db, story wiring). TanStack Query, zod and MSW are devDependencies and may only be imported here and in examples.
-- `src/examples/`: **golden examples**, one per archetype: `ListPage` (table and `RecordBoard`, `SavedViews`), `RecordPage`, `CreateEditFlow`, `EntityPages` (schema-driven list, record and form for any entity config), `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages` (404, 403, error). `ExampleShell` is the app's shell composition; `routes.tsx` is the route table and `App.tsx` assembles it. Data pages read and write through `src/app`.
+- `src/examples/`: **golden examples**, one per archetype: `ListPage` (table and `RecordBoard`, `SavedViews`), `RecordPage`, `CreateEditFlow`, `EntityPages` (schema-driven list, record and form for any entity config), `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `ErrorPages` (404, 403, error); AI: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` (sharing `AssistantTurns`). `ExampleShell` is the app's shell composition; `routes.tsx` is the route table and `App.tsx` assembles it. Data pages read and write through `src/app`.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `tests/visual/fixtures/`: one story per WCAG 2.2 check that the check must fail (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`).
@@ -46,7 +46,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Motion, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Motion, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents, AI patterns. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 
@@ -90,6 +90,10 @@ UI rules (design system v0)
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
+- AI: render model output with StreamingText (never raw HTML), cite sources
+  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
+  never let AI write without ReviewChanges (or an explicit accept) and an Undo.
+  The assistant acts only through the person's own can() and named mutations.
 ```
 <!-- agent-rules:end -->
 
@@ -105,4 +109,5 @@ UI rules (design system v0)
 - Records reference accounts and people by id. Show a name through `PersonRef`/`AccountRef` (or a `person`/`account` field), never a copied string.
 - Keys lead with the partition (`usePartition()`: tenant, then permission scope). A record write patches its detail and every cached list page holding it (`patchListedRecord`), then invalidates.
 - Permissions: capabilities in `CAPABILITIES`, roles mapped in `ROLE_CAPABILITIES` (the only place), one predicate `can`. Controls ask it (page actions disabled with a visible reason, menu items hidden), routes are guarded by it, every mutation refuses with it before sending, and every mock route declares its capability. Never branch on a role name.
+- The assistant (`src/app/model/ai.ts`) has no grant of its own: requests refuse with `can` before sending, the mock reads with `canSee` and proposes only where `can` holds, and applying a proposal goes through the named mutations. Its answers are mutations, so the settled signal waits for a stream; pin other moments with the overrides in `src/app/mocks/ai.ts`.
 - New screens are rows in `src/examples/routes.tsx` with a guard. A new entity that fits the list, record and form archetypes is an entry in `src/app/registries/entities.ts`.

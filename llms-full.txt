@@ -43,6 +43,10 @@ UI rules (design system v0)
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
+- AI: render model output with StreamingText (never raw HTML), cite sources
+  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
+  never let AI write without ReviewChanges (or an explicit accept) and an Undo.
+  The assistant acts only through the person's own can() and named mutations.
 ```
 
 ## Guides
@@ -64,6 +68,7 @@ UI rules (design system v0)
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Anything new starts as a proposal on the decision ladder, lands in…
 - [Testing](docs/guides/Testing.stories.tsx): The gallery is the test fixture.
 - [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
+- [AI patterns](docs/guides/AiPatterns.stories.tsx): AI in this system is a set of shared parts, not a separate product…
 
 ## Foundations
 
@@ -5027,6 +5032,10 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 | Sign-in (signed out) | Any signed-out page: sign-in, sign-up, password reset, a verification code. | [Sign in](src/examples/SignInPage.tsx)`src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step. |
 | Wizard | A task whose later steps depend on earlier ones: first-run setup, a multi-step create. | [Setup wizard](src/examples/SetupWizard.tsx)`src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit. |
 | Dashboard | A home or overview page: how things are, and what needs attention. | [Dashboard](src/examples/DashboardPage.tsx)`src/examples/DashboardPage.tsx` | A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table. |
+| Assistant beside a page (AI) | People ask questions about the record or page they are on, with it still in view. | [Record copilot](src/examples/RecordCopilot.tsx)`src/examples/RecordCopilot.tsx` | The existing record page with an AssistantPanel in the shell (WithAssistant): answers that cite fields and activity, sources that link into the record, tool activity, Stop, Retry, Edit, Feedback, a refusal and each failure in its own words. |
+| Inline AI in a form (AI) | A field the AI can draft (a description, a reply), beside writing it by hand. | [Create with AI](src/examples/CreateWithAi.tsx)`src/examples/CreateWithAi.tsx` | Suggest beside the field, disabled with a reason per role; ghost text (Tab or Accept, Esc or Dismiss); accepted text marked “Drafted with AI” until edited; one Undo back to what was there. |
+| AI-proposed changes (AI) | An agent would change data: many records, or any write at all. | [AI bulk changes](src/examples/AiReviewChanges.tsx)`src/examples/AiReviewChanges.tsx` | The agent’s steps, a proposal limited to what the person could do, ReviewChanges (accept or reject each, apply), apply and undo through the named mutation, partial failure, a refusal for a viewer. |
+| Chat page (AI) | Open-ended, multi-turn questions that span the workspace. | [Assistant chat](src/examples/AssistantChatPage.tsx)`src/examples/AssistantChatPage.tsx` | History in PageLayout’s nav with the open conversation in the URL, new chat, rename and delete, the composer in the sticky footer, and streaming, stopped, refused, rate-limited and failed answers. |
 | Error and 404 | A page that doesn’t exist (inside the shell), or a failure before the app can load (in AuthLayout). | [Error pages](src/examples/ErrorPages.tsx)`src/examples/ErrorPages.tsx` | EmptyState as the h1, plain words, Try again and a way home; a 403 page for a route the role can’t open, saying who can change that. |
 
 #### How to copy one
@@ -5038,6 +5047,7 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 - Format every number, date and amount with `useFormat()`; never by hand.
 - A new page is a row in the route table (`src/examples/routes.tsx`) with the capability that guards it. A new entity that fits the list, record and form archetypes is an entry in `src/app/registries/entities.ts`, not three new pages.
 - Ask `can` (through `useCan` or `usePermission`) before showing an action: disable page and bar actions with the reason beside them, hide overflow-menu items and card actions. The mutation and the server refuse as well.
+- AI surfaces follow the same rules and add their own (citations, review before any write, undo, the assistant acting only as the person): see the AI patterns guide.
 - A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.
 
 <!-- docs/guides/Data.stories.tsx -->
@@ -5820,6 +5830,10 @@ UI rules (design system v0)
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
+- AI: render model output with StreamingText (never raw HTML), cite sources
+  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
+  never let AI write without ReviewChanges (or an explicit accept) and an Undo.
+  The assistant acts only through the person's own can() and named mutations.
 ```
 
 #### Keeping them current
@@ -5828,6 +5842,92 @@ Nothing in the three files is written by hand. `npm run manifest` regenerates th
 
 - They go stale when an export, a prop, a JSDoc comment, a story, a usage doc, a guide, the token usage map, the agent rules or the README’s Scripts table changes. Run `npm run manifest` and commit the result with the change.
 - A description comes from the JSDoc on the export, or else the first “when to use” line of its usage doc. To improve an entry, improve those, never the generated files.
+
+<!-- docs/guides/AiPatterns.stories.tsx -->
+
+### AI patterns
+
+AI in this system is a set of shared parts, not a separate product: streaming answers, inline suggestions, citations, proposed changes with undo, and one assistant that acts only as the signed-in person. Define them once here so every team doesn’t invent its own.
+
+#### Which surface
+
+Put the AI where the work is. The manual path stays beside it, equally visible.
+
+**AI surfaces and their examples**
+
+| Surface | Choose when | Avoid when | Parts | Example |
+|---|---|---|---|---|
+| Inline suggestion | The next words of a field are predictable and taking them is cheap (Tab). | The result is long enough that accepting it is a decision: use a reviewed block or ReviewChanges. | Suggestion, AiMarker, Kbd | [Create with AI](src/examples/CreateWithAi.tsx) |
+| Side panel | Questions about the page the person is on, with the page still in view. | A one-shot transform they’d accept or reject outright: put that action beside the field. | AssistantPanel, ChatThread, Message, Composer, StreamingText, Citation | [Record copilot](src/examples/RecordCopilot.tsx) |
+| Proposed changes | The AI would change data: show every change as a diff, applied only after review. | Never skip it for writes, however small. | ReviewChanges, Disclosure or Accordion (steps), AiMarker | [AI bulk changes](src/examples/AiReviewChanges.tsx) |
+| Full chat page | Open-ended, multi-turn questions that span the workspace. | Anything tied to one record or one field: keep the AI where the work is. | ChatThread (scroll="page"), Composer in AppShell’s footer, history in PageLayout’s nav | [Assistant chat](src/examples/AssistantChatPage.tsx) |
+
+#### Provenance and citations
+
+- Every claim that matters cites its source. `StreamingText` renders numbered citations through a `Citation` renderer; the `SourcesList` under the answer says where each came from (a record field, an activity entry, a list) and links to it. A citation is a link from the moment it appears: the mock sends sources before tokens.
+- Show the work: tool activity (“Read Master cleaning agreement and its activity”, “Found 18 overdue records you can see”) as collapsed `Disclosure`s above the answer, so the person can check what it looked at.
+- Mark what the AI wrote with `AiMarker` (text, never colour alone) until a person accepts or edits it. Assistant turns carry it in their header.
+
+#### Consent before acting, and undo after
+
+- The AI suggests; the person decides. Suggestions are ghost text that isn’t the field’s value until Tab or Accept. Changes to data are proposals shown in `ReviewChanges`; nothing is applied until the person accepts changes and chooses Apply.
+- Applying goes through the same named mutations as a person’s own edits (`moveRecord`), so it is permission-checked, versioned (a stale proposal gets a 409, reported per change) and patches the cache like any write.
+- Keep what was there before. One Undo restores it: the field’s previous text, or every applied record moved back with the version its move returned.
+- Stop is always available while an answer arrives, and what arrived stays.
+
+#### What the AI may and may not do
+
+The assistant has no permissions of its own. It is the person, typing faster.
+
+- **Reads** only what the person can see: the mock server filters with the same `canSee` as the list, so a viewer’s assistant never sees drafts, and it reads only its own workspace’s partition; another workspace’s id is not found.
+- **Proposes** only what the person could do by hand: a change is proposed only where `can(grant, 'record:move', record)` holds. Without the capability it refuses with the same denial reason a disabled button shows.
+- **Asks** the same predicate before sending: `useAssistant` and `useDraftSuggestion` refuse with `can` before any request, controls that start AI actions are disabled with the reason, AI pages have route guards, and every AI route declares its capability on the server.
+- **Never** writes on its own, never widens a query past the person’s scope, and never puts another workspace’s data in its context. Requests carry ids and filters, not data: the server reads the data itself, as the person.
+
+```
+client    can(grant, 'record:read')  before useAssistant sends        src/app/model/ai.ts
+          can(grant, 'record:create') before a draft suggestion       src/app/model/ai.ts
+          usePermission(...)          disables Propose / Suggest      src/examples/*
+route     guard: record:read | record:create | record:move            src/examples/routes.tsx
+server    handle('record:read', ...)  every AI route                  src/app/mocks/ai.ts
+          canSee(grant, record)       every record it reads
+          can(grant, 'record:move', record)  every change it proposes
+apply     moveRecord refuses with can() before sending; the server checks again
+```
+
+#### Honest failure and refusals
+
+Each failure has its own words and next step. None of them invents an answer.
+
+**Failure states and what they say**
+
+| State | What it says | Example |
+|---|---|---|
+| Refused: out of scope | One line: what it can help with instead. Not an error, no Retry. | [Open](src/examples/AssistantChatPage.tsx) |
+| Refused: permission | The same denial reason a disabled button shows, and who can change it. | [Open](src/examples/AiReviewChanges.tsx) |
+| Rate limited (429) | The server’s message, with when to try again; Retry. | [Open](src/examples/RecordCopilot.tsx) |
+| Content filter | The text so far stays; the filter is named; Retry or rephrase. | [Open](src/examples/RecordCopilot.tsx) |
+| Connection dropped | The text so far stays; “Nothing was changed”; Retry. | [Open](src/examples/RecordCopilot.tsx) |
+| Stopped by the person | The text so far stays, noted as stopped; Retry. | [Open](src/examples/AssistantChatPage.tsx) |
+
+A persistent, quiet disclaimer sits under every composer: “AI can make mistakes. Check important info.”
+
+#### Streaming and accessibility
+
+- `ChatThread` is not a live region (`role="log"` would read every token). Each answer’s `StreamingText` owns one polite status, present from mount: “Generating…”, then each sentence or paragraph once it is complete, then “Stopped” if stopped. It never re-reads the whole answer, and history isn’t announced.
+- A suggestion is announced once when it is complete (“Suggestion ready. Press Tab to accept or Escape to dismiss.”), and its text is in the field’s description. The field’s value reads as what was typed.
+- The caret and the thinking dots are decorative and hold still under reduced motion (`motion.pulse` is 0). Every AI action has a keyboard path and a single-pointer path (Accept and Dismiss beside Tab and Esc; Widen beside dragging the panel).
+
+#### Model output is untrusted input
+
+- Answers render through the system’s own Markdown renderer, which builds React elements only: no `dangerouslySetInnerHTML`, raw HTML shows as text, links are http(s), mailto or in-app only, images are never loaded (an image URL is a way to leak what’s on screen), and headings become bold text.
+- Structured output is validated before it is used: every streamed event is parsed with zod at the boundary, and a malformed one ends the answer as an error rather than rendering half of it. Proposed changes are re-checked by the write path when applied.
+- Assume prompt injection: content the AI reads can carry instructions, so it can’t act without the person’s review.
+
+#### Testing AI surfaces
+
+- The mock assistant (`src/app/mocks/ai.ts`) is scripted and seeded: the same question gets the same answer, split into the same tokens. With the gallery’s latency at 0 (the visual suite) an answer completes at once.
+- Pin other moments with overrides: `aiHoldAfter(n)` (mid-stream; tag the story `busy`), `aiRateLimited`, `aiContentFiltered`, `aiNetworkDropped`, `aiMalformed`, `aiNoHistory`. Component stories take their text as props, so any moment can be shown without a server.
 
 ## Semantic tokens
 

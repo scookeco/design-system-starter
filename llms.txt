@@ -43,6 +43,10 @@ UI rules (design system v0)
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
+- AI: render model output with StreamingText (never raw HTML), cite sources
+  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
+  never let AI write without ReviewChanges (or an explicit accept) and an Undo.
+  The assistant acts only through the person's own can() and named mutations.
 ```
 
 ## Guides
@@ -64,6 +68,7 @@ UI rules (design system v0)
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Anything new starts as a proposal on the decision ladder, lands in…
 - [Testing](docs/guides/Testing.stories.tsx): The gallery is the test fixture.
 - [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
+- [AI patterns](docs/guides/AiPatterns.stories.tsx): AI in this system is a set of shared parts, not a separate product…
 
 ## Foundations
 
