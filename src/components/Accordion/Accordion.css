@@ -1,0 +1,15 @@
+@layer components {
+  .accordion {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .accordion__item {
+    padding-block: var(--space-inset-xs);
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .accordion__heading {
+    margin: 0;
+  }
+}

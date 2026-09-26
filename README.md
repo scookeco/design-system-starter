@@ -56,14 +56,14 @@ src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden
 src/components/         the components; the only place (with primitives) Radix is imported
-src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
+src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks), AssistantPanel (an assistant beside the page)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
 src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
                         predicates, projections, mutations, selection, permissions), session.tsx (memberships, workspace
                         switch, sign-out), routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState),
                         registries/ (field registry, entityType → fields), mocks/ (MSW)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
-src/examples/           golden example pages, one per archetype, the schema-driven entity pages, and the app's route table
+src/examples/           golden example pages, one per archetype (and four AI examples), the schema-driven entity pages, and the app's route table
                         (routes.tsx) and assembly (App.tsx); also a consumer lint target
 src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
@@ -146,8 +146,8 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 16.35 kB | `dist/index.js`, everything exported |
-| Library CSS | 11.5 kB | `dist/styles.css` |
+| Library JS | 24.5 kB | `dist/index.js`, everything exported |
+| Library CSS | 14.5 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
@@ -162,13 +162,14 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 
 | Kind | Parts |
 |---|---|
-| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
+| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. `AssistantPanel`: an assistant in AppShell's `assistant` slot, resizable (drag, arrow keys or Widen), closable to a launcher, a `Drawer` below `size.breakpoint.md`. |
 | Page structure | `PageHeader` (the page's h1, status, description, actions) |
 | Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
 | Actions | `Button`, `Menu`, `SegmentedControl`, `Toggle`, `CopyButton` |
 | Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links) |
 | Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text` |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
+| AI patterns | `ChatThread`, `Message`, `Composer`, `StreamingText` (safe Markdown, sentence-level announcements), `Citation` and `SourcesList`, `AiMarker`, `Suggestion` (ghost text), `ReviewChanges` (diffs, accept or reject, apply, undo), `Feedback`, `Disclosure`, `Accordion`, `Kbd`; the Guides → AI patterns page says which surface to use and the rules they share |
 | Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip`, `HoverCard` |
 | Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame`, `Box`, `Reel`, `Imposter`, `VisuallyHidden` |
 | Formatting | `LocaleProvider` (locale and time zone), `useFormat()` (date, time, relative time, number, percent, compact, money from integer minor units, list, file size), `createFormatter`, `currencyDigits` |
@@ -188,6 +189,10 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 | Dashboard | `src/examples/DashboardPage.tsx` | a date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table |
 | Entity list, record and form | `src/examples/EntityPages.tsx` | schema-driven pages for any entity in `src/app/registries/entities.ts` (accounts, people): columns and properties through the field registry, related records joined by id with rollups, create and edit with a focused error summary, Edit disabled with a reason |
 | The app and its routes | `src/examples/App.tsx`, `routes.tsx` | the route table (path → layout + page + guard), lazy pages, LinkProvider with the app's router link, a 403 page from the guard, the 404 fallback |
+| Assistant beside a page (AI) | `src/examples/RecordCopilot.tsx` | the record page, untouched, with an `AssistantPanel` joined through `WithAssistant`: answers citing record fields and activity, sources that link into the record, tool activity, Stop, Retry, Edit, Feedback, a refusal, rate limit, content filter and dropped connection |
+| Inline AI in a form (AI) | `src/examples/CreateWithAi.tsx` | Suggest beside the field (disabled with a reason per role), ghost text with Tab/Esc, accepted text marked until edited, one Undo |
+| AI-proposed changes (AI) | `src/examples/AiReviewChanges.tsx` | an agent's steps, a proposal limited to what the person could do, `ReviewChanges`, apply and undo through `moveRecord`, partial failure |
+| Chat page (AI) | `src/examples/AssistantChatPage.tsx` | history with the open conversation in the URL, new chat, rename, delete, the composer in the sticky footer, every answer state |
 | Error / 403 / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 and 403 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
 
 `src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
@@ -203,6 +208,7 @@ The design system draws; `src/app` knows. It is consumer code, like the examples
 - **Workspace and session boundaries**: switching workspace cancels the old one's reads and remounts the page; a permission change drops the old scope's partition; sign-out cancels everything and clears the cache.
 - **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`.
 - **Schema-driven pages**: `entityType → fields` config (`src/app/registries/entities.ts`) gives accounts and people their list, record and form pages.
+- **The assistant** (`src/app/api/ai.ts`, `src/app/model/ai.ts`, `src/app/mocks/ai.ts`): answers stream as newline-delimited JSON events, each parsed with zod; the mock is scripted and seeded. It has no permissions of its own: it reads what `canSee` allows in the person's workspace, proposes only what `can` allows, and applies nothing itself (apply and undo go through `moveRecord`). Conversations are server state with named verbs.
 - **Saved views**: named filter, sort, columns and display, persisted per person per workspace; the URL stays the truth.
 - **Validate at the boundary.** Every response is parsed with a zod schema in `src/app/api/client.ts`; a bad payload becomes an error state and never reaches the cache.
 - **Named predicates** (`isOpen`, `canDelete`, the view predicates) drive the filters, tab counts, badges, bulk guards and the mock server. Views are pure projections (`toRow`).
@@ -250,7 +256,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, breakpoints and layout grid, elevation and motion, layers (which units use each z tier, from the token usage map), focus and target size, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, motion, theming and adding a brand, escape hatches, contributing and versioning, testing, and agents (how coding agents use llms.txt and the manifest). |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, motion, theming and adding a brand, escape hatches, contributing and versioning, testing, agents (how coding agents use llms.txt and the manifest), and AI patterns (surfaces, provenance, consent and undo, permissions, honest failure, streaming accessibility). |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.
@@ -317,6 +323,7 @@ Where the facts come from:
 | **Codemods** for breaking changes (jscodeshift/ts-morph) | You ship a breaking change to more than one consumer. |
 | **Adoption scanning** (system vs local components, `UNSAFE_` uses, disable counts per app) | A second team builds on the system and you need system-coverage numbers. |
 | **Phone tab bar** | Phones become a primary surface. Until then the narrow-screen nav opens in a Drawer. |
+| **AI admin controls and an audit log** (turn AI features on or off per role; record what the assistant did, for whom, and who approved it) | Real customer data reaches the assistant, or the first enterprise customer asks. Until then the assistant acts only through the person's own grant and the write path they already have. |
 | **Chart components** | A page needs a trend, not just a number. Until then dashboards use Stat, Meter and tables. The chart colour tokens and their rules already exist (Foundations/Data visualisation), so a chart library or hand-drawn SVG reads `color.chart.*` from day one. |
 | **Multi-brand / tenant token axis** (`data-brand` remapping primitives beside `color-scheme`) | A second brand or tenant arrives. Brand becomes another mode on the semantic tier, and the contrast and visual matrix run per brand × scheme. |
 

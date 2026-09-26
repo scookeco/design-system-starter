@@ -1,0 +1,30 @@
+@layer components {
+  .feedback {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+  }
+
+  .feedback__row,
+  .feedback__buttons,
+  .feedback__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap-xs);
+  }
+
+  .feedback__reason {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+  }
+
+  .feedback__row {
+    align-items: center;
+  }
+
+  .feedback__thanks {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+}

@@ -40,6 +40,20 @@
     block-size: 100%;
   }
 
+  /* With an assistant: a third column at main's inline end, under the header. */
+  .app-shell__frame[data-assistant] {
+    grid-template:
+      "sidebar header header" auto
+      "sidebar main assistant" minmax(0, 1fr)
+      / var(--size-sidebar-md) minmax(0, 1fr) auto;
+  }
+
+  .app-shell__assistant {
+    display: flex;
+    grid-area: assistant;
+    min-block-size: 0;
+  }
+
   .app-shell__sidebar {
     display: flex;
     flex-direction: column;
@@ -152,6 +166,10 @@
       grid-template-columns: var(--size-rail) minmax(0, 1fr);
     }
 
+    .app-shell__frame[data-sidebar="collapsed"][data-assistant] {
+      grid-template-columns: var(--size-rail) minmax(0, 1fr) auto;
+    }
+
     .app-shell__frame[data-sidebar="collapsed"] .app-shell__sidebar {
       align-items: center;
       padding-inline: var(--space-inset-xs);
@@ -189,6 +207,21 @@
 
     .app-shell__header {
       padding-inline: var(--space-inset-md);
+    }
+
+    /* The assistant's launcher joins the header row, at its inline end. */
+    .app-shell__frame[data-assistant] {
+      grid-template:
+        "header assistant" auto
+        "main main" minmax(0, 1fr)
+        / minmax(0, 1fr) auto;
+    }
+
+    .app-shell__assistant {
+      align-items: center;
+      padding-inline-end: var(--space-inset-md);
+      border-block-end: 1px solid var(--color-border-default);
+      background: var(--color-bg-surface);
     }
 
     .app-shell__toggle {

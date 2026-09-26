@@ -10,11 +10,12 @@ import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 import type { Role, Tenant } from '../../src/app/api/schemas';
 import { configureMocks } from '../../src/app/mocks/config';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
+import { aiHandlers } from '../../src/app/mocks/ai';
 import { handlers } from '../../src/app/mocks/handlers';
 import { AppProviders } from '../../src/app/providers';
 import { createMemoryHistory, type MemoryHistory } from '../../src/app/url/history';
 
-export const server = setupServer(...handlers);
+export const server = setupServer(...handlers, ...aiHandlers);
 
 /** Call once at the top of a test file that talks to the mock API. */
 export const setupMockApi = () => {

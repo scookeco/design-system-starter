@@ -6,7 +6,7 @@
  * switches workspace and signs out, both through the session, which keeps the cache boundaries
  * (src/app/session.tsx). Static example pages render outside it and get a fixed menu.
  */
-import type { ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
 import { AppShell, Avatar, Breadcrumbs, Button, Menu, Nav, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
 import { useOptionalAppSession, type AppSession } from '../app/session';
 import { useNavigate } from '../app/url/useUrlState';
@@ -24,6 +24,16 @@ const NAV: readonly NavSection[] = [
   { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: 'settings' }] },
 ];
 
+/**
+ * An assistant beside whatever page renders inside: a page composed with an assistant (the record
+ * copilot) wraps an existing page in this instead of editing it. Nothing provided, no panel.
+ */
+const AssistantSlot = createContext<ReactNode>(null);
+
+export function WithAssistant({ panel, children }: { panel: ReactNode; children: ReactNode }) {
+  return <AssistantSlot value={panel}>{children}</AssistantSlot>;
+}
+
 export interface ExampleShellProps {
   /** href of the primary nav item this page belongs to. */
   current: string;
@@ -31,19 +41,24 @@ export interface ExampleShellProps {
   trail?: { items: readonly BreadcrumbLink[]; current: string };
   /** Sticky page action bar (long forms). */
   footer?: ReactNode;
+  /** An AssistantPanel beside the page. Pages that wrap another page use WithAssistant instead. */
+  assistant?: ReactNode;
   children: ReactNode;
 }
 
 const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />;
 
-export function ExampleShell({ current, trail, footer, children }: ExampleShellProps) {
+export function ExampleShell({ current, trail, footer, assistant, children }: ExampleShellProps) {
   const app = useOptionalAppSession();
+  const injected = useContext(AssistantSlot);
+  const panel = assistant ?? injected;
   return (
     <AppShell
       brand={app ? WORKSPACES[app.tenant].name : 'Acme'}
       nav={<Nav label="Main" sections={NAV} current={current} />}
       breadcrumbs={trail ? <Breadcrumbs items={trail.items} current={trail.current} /> : undefined}
       footer={footer}
+      {...(panel ? { assistant: panel } : {})}
       help={HELP}
       userMenu={app ? <AccountMenu app={app} current={current} /> : <StaticAccountMenu />}
     >

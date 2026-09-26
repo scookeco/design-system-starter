@@ -77,6 +77,38 @@ const ARCHETYPES = [
     shows: 'A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table.',
   },
   {
+    archetype: 'Assistant beside a page (AI)',
+    file: 'src/examples/RecordCopilot.tsx',
+    id: 'examples-record-copilot--answered',
+    example: 'Record copilot',
+    choose: 'People ask questions about the record or page they are on, with it still in view.',
+    shows: 'The existing record page with an AssistantPanel in the shell (WithAssistant): answers that cite fields and activity, sources that link into the record, tool activity, Stop, Retry, Edit, Feedback, a refusal and each failure in its own words.',
+  },
+  {
+    archetype: 'Inline AI in a form (AI)',
+    file: 'src/examples/CreateWithAi.tsx',
+    id: 'examples-create-with-ai--suggestion-ready',
+    example: 'Create with AI',
+    choose: 'A field the AI can draft (a description, a reply), beside writing it by hand.',
+    shows: 'Suggest beside the field, disabled with a reason per role; ghost text (Tab or Accept, Esc or Dismiss); accepted text marked “Drafted with AI” until edited; one Undo back to what was there.',
+  },
+  {
+    archetype: 'AI-proposed changes (AI)',
+    file: 'src/examples/AiReviewChanges.tsx',
+    id: 'examples-ai-bulk-changes--proposed',
+    example: 'AI bulk changes',
+    choose: 'An agent would change data: many records, or any write at all.',
+    shows: 'The agent’s steps, a proposal limited to what the person could do, ReviewChanges (accept or reject each, apply), apply and undo through the named mutation, partial failure, a refusal for a viewer.',
+  },
+  {
+    archetype: 'Chat page (AI)',
+    file: 'src/examples/AssistantChatPage.tsx',
+    id: 'examples-assistant-chat--with-history',
+    example: 'Assistant chat',
+    choose: 'Open-ended, multi-turn questions that span the workspace.',
+    shows: 'History in PageLayout’s nav with the open conversation in the URL, new chat, rename and delete, the composer in the sticky footer, and streaming, stopped, refused, rate-limited and failed answers.',
+  },
+  {
     archetype: 'Error and 404',
     file: 'src/examples/ErrorPages.tsx',
     id: 'examples-error-pages--not-found',
@@ -143,6 +175,10 @@ function PageArchetypes() {
             <>
               Ask <code>can</code> (through <code>useCan</code> or <code>usePermission</code>) before showing an action: disable page and bar
               actions with the reason beside them, hide overflow-menu items and card actions. The mutation and the server refuse as well.
+            </>,
+            <>
+              AI surfaces follow the same rules and add their own (citations, review before any write, undo, the assistant acting only as
+              the person): see the AI patterns guide.
             </>,
             <>A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.</>,
           ]}

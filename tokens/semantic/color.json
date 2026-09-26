@@ -346,6 +346,36 @@
         }
       },
       "$description": "Focus ring. Must meet 3:1 against every surface."
+    },
+    "ai": {
+      "$description": "AI-generated content until a person accepts it: a tint that reinforces a text label (AiMarker), never replaces it.",
+      "fg": {
+        "$value": "{color.violet.700}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.violet.300}"
+          }
+        },
+        "$description": "Text and icons of the AI marker and AI actions."
+      },
+      "bg": {
+        "$value": "{color.violet.50}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.violet.950}"
+          }
+        },
+        "$description": "Background tint of AI-generated content and the AI marker."
+      },
+      "border": {
+        "$value": "{color.violet.300}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.violet.800}"
+          }
+        },
+        "$description": "Border of AI-generated content and the AI marker."
+      }
     }
   }
 }

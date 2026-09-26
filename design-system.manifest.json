@@ -4,7 +4,7 @@
   "name": "Design system starter",
   "summary": "Design system starter where design-system drift fails the build.",
   "entry": "src/index.ts",
-  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  error/404 → ErrorPages. Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.",
+  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  error/404 → ErrorPages. Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.",
   "commands": [
     {
       "command": "npm run dev",
@@ -173,6 +173,12 @@
       "summary": "Coding agents read the system from three files at the repo root, generated from the code. Point an agent at llms.txt first: it holds the rules and links to everything else.",
       "path": "docs/guides/Agents.stories.tsx",
       "story": "guides-agents--agents-guide"
+    },
+    {
+      "title": "AI patterns",
+      "summary": "AI in this system is a set of shared parts, not a separate product: streaming answers, inline suggestions, citations, proposed changes with undo, and one assistant that acts only as the signed-in person. Define them once here so every team doesn’t invent its own.",
+      "path": "docs/guides/AiPatterns.stories.tsx",
+      "story": "guides-ai-patterns--ai-patterns-guide"
     }
   ],
   "foundations": [
@@ -233,6 +239,21 @@
   ],
   "examples": [
     {
+      "title": "AI bulk changes",
+      "summary": "GOLDEN EXAMPLE (AI): an agent that proposes bulk changes, reviewed before anything happens.",
+      "path": "src/examples/AiReviewChanges.tsx",
+      "stories": [
+        "examples-ai-bulk-changes--ready",
+        "examples-ai-bulk-changes--proposing",
+        "examples-ai-bulk-changes--proposed",
+        "examples-ai-bulk-changes--applied",
+        "examples-ai-bulk-changes--partly-failed",
+        "examples-ai-bulk-changes--undone",
+        "examples-ai-bulk-changes--as-viewer",
+        "examples-ai-bulk-changes--as-viewer-refused"
+      ]
+    },
+    {
       "title": "App",
       "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
       "path": "src/examples/App.tsx",
@@ -241,6 +262,28 @@
         "examples-app--record-from-link",
         "examples-app--unknown-path",
         "examples-app--guarded-route"
+      ]
+    },
+    {
+      "title": "Assistant chat",
+      "summary": "GOLDEN EXAMPLE (AI): a full chat page, for questions that span the workspace.",
+      "path": "src/examples/AssistantChatPage.tsx",
+      "stories": [
+        "examples-assistant-chat--with-history",
+        "examples-assistant-chat--new-chat",
+        "examples-assistant-chat--empty-history",
+        "examples-assistant-chat--loading-history",
+        "examples-assistant-chat--tool-activity",
+        "examples-assistant-chat--streaming",
+        "examples-assistant-chat--stopped",
+        "examples-assistant-chat--refusal",
+        "examples-assistant-chat--other-workspace",
+        "examples-assistant-chat--rate-limited",
+        "examples-assistant-chat--content-filtered",
+        "examples-assistant-chat--connection-dropped",
+        "examples-assistant-chat--conversation-gone",
+        "examples-assistant-chat--rename-dialog",
+        "examples-assistant-chat--delete-dialog"
       ]
     },
     {
@@ -256,6 +299,20 @@
         "examples-create-and-edit--create-failed",
         "examples-create-and-edit--quick-create-open",
         "examples-create-and-edit--as-viewer-denied"
+      ]
+    },
+    {
+      "title": "Create with AI",
+      "summary": "GOLDEN EXAMPLE (AI): inline AI in a create form. The description field can be drafted by the assistant, beside writing it by hand, never instead of it.",
+      "path": "src/examples/CreateWithAi.tsx",
+      "stories": [
+        "examples-create-with-ai--default",
+        "examples-create-with-ai--suggesting",
+        "examples-create-with-ai--suggestion-ready",
+        "examples-create-with-ai--accepted",
+        "examples-create-with-ai--rate-limited",
+        "examples-create-with-ai--as-viewer",
+        "examples-create-with-ai--refused"
       ]
     },
     {
@@ -327,6 +384,23 @@
       ]
     },
     {
+      "title": "Record copilot",
+      "summary": "GOLDEN EXAMPLE (AI): a copilot beside a record. The record page is the existing one, untouched; the assistant joins its shell through WithAssistant, as an AssistantPanel in AppShell's assistant slot (a Drawer on narrow screens).",
+      "path": "src/examples/RecordCopilot.tsx",
+      "stories": [
+        "examples-record-copilot--empty",
+        "examples-record-copilot--answered",
+        "examples-record-copilot--summary",
+        "examples-record-copilot--streaming",
+        "examples-record-copilot--stopped",
+        "examples-record-copilot--refusal",
+        "examples-record-copilot--rate-limited",
+        "examples-record-copilot--content-filtered",
+        "examples-record-copilot--connection-dropped",
+        "examples-record-copilot--panel-closed"
+      ]
+    },
+    {
       "title": "Record page",
       "summary": "The record (detail) page archetype.",
       "path": "src/examples/RecordPage.tsx",
@@ -385,6 +459,307 @@
   ],
   "exports": [
     {
+      "name": "Accordion",
+      "kind": "component",
+      "source": "src/components/Accordion/Accordion.tsx",
+      "status": null,
+      "description": "A stack of titled sections that open and close: steps an agent took, FAQ-style details. Each title is a heading wrapping a button with aria-expanded; arrow keys move between titles. From Radix Accordion. `single` (default) keeps one open; `multiple` lets several stay open.",
+      "docs": "docs/usage/Accordion.usage.tsx",
+      "props": [
+        {
+          "name": "items",
+          "type": "readonly AccordionItem[]",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "headingLevel",
+          "type": "2 | 3 | 4 | 5 | 6",
+          "required": false,
+          "default": "3",
+          "description": "Heading level of each item's title, so the outline stays right where it sits.",
+          "values": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "type",
+          "type": "'single'",
+          "required": false,
+          "default": null,
+          "description": null,
+          "values": [
+            "multiple",
+            "single"
+          ]
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "headingLevel": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": [
+          "multiple",
+          "single"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A stack of titled sections where people open one or a few: the steps an agent took, grouped settings help, an FAQ.",
+          "`single` (default) keeps one open; `multiple` lets several stay open. Set `headingLevel` to fit the page outline."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One section of details",
+            "instead": "`Disclosure`"
+          },
+          {
+            "situation": "Sections that are pages of their own",
+            "instead": "`NavTabs`"
+          },
+          {
+            "situation": "A form split into steps",
+            "instead": "the Wizard archetype (`SetupWizard`)"
+          }
+        ],
+        "do": {
+          "caption": "Each title names a step and its status sits beside it.",
+          "code": "<Accordion\n  defaultValue=\"check\"\n  items={[\n    { value: 'search', title: 'Search records', meta: <Badge tone=\"success\">Done</Badge>, content: '12 records matched.' },\n    { value: 'check', title: 'Check permissions', meta: <Badge tone=\"success\">Done</Badge>, content: 'You can move 10 of them.' },\n  ]}\n/>"
+        },
+        "dont": {
+          "caption": "Every section holds one line: show the lines instead.",
+          "code": "<Accordion\n  items={[\n    { value: 'a', title: 'Owner', content: 'Sam Rivera' },\n    { value: 'b', title: 'Status', content: 'Active' },\n  ]}\n/>"
+        },
+        "accessibility": [
+          "Each title is a heading at `headingLevel` wrapping a button with `aria-expanded` (Radix Accordion). Arrow keys move between titles; Home and End jump.",
+          "A disabled item stays in the list and says why in its title or content."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Accordion",
+        "stories": [
+          {
+            "id": "components-accordion--single",
+            "name": "Single"
+          },
+          {
+            "id": "components-accordion--multiple",
+            "name": "Multiple"
+          },
+          {
+            "id": "components-accordion--all-closed",
+            "name": "All Closed"
+          },
+          {
+            "id": "components-accordion--with-disabled-item",
+            "name": "With Disabled Item"
+          }
+        ],
+        "composes": [
+          "Disclosure",
+          "Icon"
+        ],
+        "tokens": [
+          "color.bg.hover",
+          "color.border.default",
+          "color.fg.default",
+          "ease.standard",
+          "icon.stroke",
+          "motion.fast",
+          "radius.control",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.xs",
+          "text.body",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "AccordionItem",
+      "kind": "type-only",
+      "source": "src/components/Accordion/Accordion.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Accordion",
+      "definition": "interface AccordionItem { value: string; title: string; meta?: ReactNode; content: ReactNode; disabled?: boolean; }"
+    },
+    {
+      "name": "AccordionProps",
+      "kind": "type-only",
+      "source": "src/components/Accordion/Accordion.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Accordion",
+      "propsOf": "Accordion"
+    },
+    {
+      "name": "AiMarker",
+      "kind": "component",
+      "source": "src/components/AiMarker/AiMarker.tsx",
+      "status": null,
+      "description": "Marks content the AI wrote and a person hasn't accepted or edited yet: a sparkle and a text label on the AI tint. Never colour alone, and never on content a person wrote.",
+      "docs": "docs/usage/AiMarker.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "string",
+          "required": false,
+          "default": "'AI-generated'",
+          "description": "What the AI did, in words: \"AI-generated\", \"Drafted with AI\", \"Suggested by AI\". The text carries the meaning; the tint only reinforces it."
+        },
+        {
+          "name": "variant",
+          "type": "'badge' | 'inline'",
+          "required": false,
+          "default": "'badge'",
+          "description": "badge: a pill beside a block or a field. inline: a quiet label inside a line of text or a header.",
+          "values": [
+            "badge",
+            "inline"
+          ]
+        }
+      ],
+      "inherits": [
+        "AriaAttributes",
+        "Attributes",
+        "DOMAttributes",
+        "HTMLAttributes",
+        "RefAttributes"
+      ],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "variant": [
+          "badge",
+          "inline"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Content the AI wrote that a person hasn’t accepted or edited yet: a drafted field, a generated summary, a proposed change.",
+          "`badge` beside a block or field; `inline` in a header or a line of text (an assistant turn’s header)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Content a person accepted or edited",
+            "instead": "nothing: remove the mark, or record “edited” in the content’s history"
+          },
+          {
+            "situation": "A button that runs an AI action",
+            "instead": "a `Button` with the sparkle and a verb (“Suggest description”)"
+          },
+          {
+            "situation": "A status",
+            "instead": "`Badge`"
+          }
+        ],
+        "do": {
+          "caption": "The label says what the AI did; the tint and sparkle only reinforce it.",
+          "code": "<Cluster gap=\"sm\">\n  <Text as=\"span\">Summary</Text>\n  <AiMarker>Drafted with AI</AiMarker>\n</Cluster>"
+        },
+        "dont": {
+          "caption": "A sparkle alone: colour and an icon aren’t a label, and it reads as decoration.",
+          "code": "<Cluster gap=\"sm\">\n  <Text as=\"span\">Summary ✦</Text>\n</Cluster>"
+        },
+        "accessibility": [
+          "The text is the meaning (WCAG 1.4.1): it is read with the content, and the tint only reinforces it. The sparkle icon is hidden from assistive technology.",
+          "Keep the label short and specific; it is read every time the content is."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/AiMarker",
+        "stories": [
+          {
+            "id": "components-aimarker--badge",
+            "name": "Badge"
+          },
+          {
+            "id": "components-aimarker--inline",
+            "name": "Inline"
+          },
+          {
+            "id": "components-aimarker--custom-label",
+            "name": "Custom Label"
+          }
+        ],
+        "composes": [
+          "Icon"
+        ],
+        "tokens": [
+          "color.ai.bg",
+          "color.ai.border",
+          "color.ai.fg",
+          "font.weight.strong",
+          "icon.stroke",
+          "radius.pill",
+          "size.icon.md",
+          "size.icon.sm",
+          "space.gap.2xs",
+          "space.inset.2xs",
+          "space.inset.sm",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "AiMarkerProps",
+      "kind": "type-only",
+      "source": "src/components/AiMarker/AiMarker.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "AiMarker",
+      "propsOf": "AiMarker"
+    },
+    {
       "name": "AppShell",
       "kind": "layout",
       "source": "src/layouts/AppShell/AppShell.tsx",
@@ -440,6 +815,13 @@
           "required": true,
           "default": null,
           "description": "The page. Rendered inside <main>, the only region that scrolls."
+        },
+        {
+          "name": "assistant",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "An assistant beside the page: an <AssistantPanel>. Wide, it is a column at main's inline end, under the header, and main keeps scrolling on its own; narrow, it gives way to a launcher in the header that opens the panel in a Drawer. Omit it and the frame is unchanged."
         },
         {
           "name": "footer",
@@ -530,6 +912,7 @@
           "Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.",
           "Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).",
           "Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.",
+          "An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.",
           "People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well."
         ],
         "whenNotToUse": [
@@ -585,6 +968,10 @@
           {
             "id": "layouts-appshell--with-action-bar",
             "name": "With Action Bar"
+          },
+          {
+            "id": "layouts-appshell--with-assistant",
+            "name": "With Assistant"
           },
           {
             "id": "layouts-appshell--user-menu-open",
@@ -700,6 +1087,240 @@
       "description": null,
       "partOf": "AppShell",
       "propsOf": "AppShell"
+    },
+    {
+      "name": "AssistantPanel",
+      "kind": "layout",
+      "source": "src/layouts/AssistantPanel/AssistantPanel.tsx",
+      "status": null,
+      "description": "The assistant beside the page, in AppShell's `assistant` slot. Wide, it is a panel at the inline end that the person resizes (drag the edge, arrow keys on it, or Widen / Narrow) and closes to a launcher; the width is remembered. Narrow, it gives way to a launcher in the header that opens the same content in a Drawer. The content is mounted in one place at a time.",
+      "docs": "docs/usage/AssistantPanel.usage.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The assistant's name: the panel's landmark name and heading, the drawer's title (\"Assistant\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The conversation: a ChatThread over a Composer, laid out to fill the panel."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": "Controlled: the panel is open beside the page (wide) or in its drawer (narrow)."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "true",
+          "description": "Uncontrolled starting state."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "launcherLabel",
+          "type": "string",
+          "required": false,
+          "default": "title",
+          "description": "Label of the button that opens it (a launcher at the edge when wide, in the header when narrow)."
+        },
+        {
+          "name": "actions",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Actions in the panel's header, before Close: New chat, a History menu."
+        },
+        {
+          "name": "storageKey",
+          "type": "string | null",
+          "required": false,
+          "default": "DEFAULT_STORAGE_KEY",
+          "description": "localStorage key under which the width a person chose is remembered across visits. null turns remembering off (gallery and tests)."
+        },
+        {
+          "name": "resizeLabel",
+          "type": "string",
+          "required": false,
+          "default": "`Resize ${title.toLowerCase()} panel`",
+          "description": "Accessible name of the resize handle."
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Close'",
+          "description": null
+        },
+        {
+          "name": "defaultDrawerOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Start with the narrow-screen drawer open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "open",
+        "defaultOpen",
+        "defaultDrawerOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "An assistant that works beside the page it’s about (a record’s copilot): pass it as AppShell’s `assistant`, with a `ChatThread` over a `Composer` as its content.",
+          "People resize it (drag the edge, arrow keys on the edge, or Widen / Narrow) and close it to a launcher; the width is remembered under `storageKey`.",
+          "Below `size.breakpoint.md` it becomes a launcher in the header that opens the same content in a `Drawer`. Keep the conversation’s state in the page, not in the panel: the content moves between the two."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A conversation that is the page",
+            "instead": "a full chat page (the Assistant chat example) inside `AppShell`"
+          },
+          {
+            "situation": "One AI suggestion inside a form",
+            "instead": "`Suggestion` beside the field"
+          },
+          {
+            "situation": "Details or filters for the page",
+            "instead": "`Drawer` or `PageLayout`’s aside"
+          }
+        ],
+        "do": {
+          "caption": "A thread over a composer, filling the panel; the page stays usable beside it.",
+          "code": "<AssistantPanel title=\"Assistant (do example)\" storageKey={null}>\n  <ChatThread label=\"Conversation (do example)\" empty={<Text tone=\"muted\">Ask about this record.</Text>} />\n  <Composer label=\"Ask (do example)\" onSend={() => undefined} />\n</AssistantPanel>"
+        },
+        "dont": {
+          "caption": "A modal drawer for the assistant on a wide screen: it covers the page the answers are about.",
+          "code": "<Drawer title=\"Assistant (don’t example)\" trigger={<Button variant=\"secondary\">Ask AI</Button>} />"
+        },
+        "accessibility": [
+          "The panel is a complementary landmark named by its heading. Opening it moves focus into it; closing it returns focus to the launcher.",
+          "The resize edge is a focusable separator with `aria-valuenow`, `aria-valuemin` and `aria-valuemax` (CSS pixels); arrow keys resize it (Shift for bigger steps), Home and End jump to the limits. Widen / Narrow is the single-pointer alternative to dragging (WCAG 2.5.7).",
+          "Narrow, the Drawer brings its focus trap, Escape and focus return."
+        ]
+      },
+      "unit": {
+        "dir": "src/layouts/AssistantPanel",
+        "stories": [
+          {
+            "id": "layouts-assistantpanel--open",
+            "name": "Open"
+          },
+          {
+            "id": "layouts-assistantpanel--closed",
+            "name": "Closed"
+          },
+          {
+            "id": "layouts-assistantpanel--with-header-actions",
+            "name": "With Header Actions"
+          },
+          {
+            "id": "layouts-assistantpanel--narrow",
+            "name": "Narrow"
+          },
+          {
+            "id": "layouts-assistantpanel--narrow-open",
+            "name": "Narrow Open"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Drawer",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.scrim",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.focus",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "shadow.modal",
+          "size.assistant.default",
+          "size.assistant.max",
+          "size.assistant.min",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.drawer.md",
+          "size.drawer.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "space.scroll-padding.end",
+          "text.body",
+          "text.body-lg",
+          "text.heading-3",
+          "text.heading-4",
+          "text.label",
+          "z.modal",
+          "z.sticky"
+        ]
+      }
+    },
+    {
+      "name": "AssistantPanelProps",
+      "kind": "type-only",
+      "source": "src/layouts/AssistantPanel/AssistantPanel.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "AssistantPanel",
+      "propsOf": "AssistantPanel"
     },
     {
       "name": "AuthLayout",
@@ -1735,6 +2356,7 @@
           "values": [
             "menu",
             "search",
+            "stop",
             "danger",
             "check",
             "success",
@@ -1761,7 +2383,10 @@
             "trend-down",
             "more",
             "eye",
-            "eye-off"
+            "eye-off",
+            "sparkle",
+            "thumbs-up",
+            "thumbs-down"
           ]
         },
         {
@@ -2399,6 +3024,197 @@
       "propsOf": "Center"
     },
     {
+      "name": "ChangeDecision",
+      "kind": "type-only",
+      "source": "src/components/ReviewChanges/ReviewChanges.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ReviewChanges",
+      "definition": "type ChangeDecision = 'accepted' | 'rejected'",
+      "values": [
+        "accepted",
+        "rejected"
+      ]
+    },
+    {
+      "name": "ChangeOutcome",
+      "kind": "type-only",
+      "source": "src/components/ReviewChanges/ReviewChanges.tsx",
+      "status": null,
+      "description": "How each change went once applied: done, or why it failed.",
+      "partOf": "ReviewChanges",
+      "definition": "type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }"
+    },
+    {
+      "name": "ChatThread",
+      "kind": "component",
+      "source": "src/components/ChatThread/ChatThread.tsx",
+      "status": null,
+      "description": "The list of turns in a conversation. It follows new output while the person is at the bottom, stops following when they scroll up (and offers \"Jump to latest\"). Scrolling itself, it is a named, focusable region, so it scrolls from the keyboard. It is deliberately not a live region: each answer's StreamingText announces sentences, so tokens are never read one by one.",
+      "docs": "docs/usage/ChatThread.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible name of the thread (\"Conversation about Master cleaning agreement\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "The turns, oldest first: Message elements (give each a stable key)."
+        },
+        {
+          "name": "empty",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Shown instead of the thread when it has no turns: suggested prompts, not a blank box."
+        },
+        {
+          "name": "jumpLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Jump to latest'",
+          "description": "Label of the button that returns to the newest turn after scrolling up."
+        },
+        {
+          "name": "scroll",
+          "type": "'self' | 'page'",
+          "required": false,
+          "default": "'self'",
+          "description": "self: the thread scrolls in its own region, filling its container (a panel). page: the thread grows and the page's scroll region (AppShell's main) scrolls; it follows the output there (a full chat page, with the Composer in AppShell's footer).",
+          "values": [
+            "self",
+            "page"
+          ]
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "scroll": [
+          "self",
+          "page"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The scrolling list of turns in a conversation with an assistant: in an `AssistantPanel` beside the page, or a full chat page.",
+          "Give it the space to fill (a flex column); it follows new output while the person is at the bottom and offers “Jump to latest” when they scroll up.",
+          "Pass suggested prompts as `empty`, never a blank box.",
+          "On a full chat page set `scroll=\"page\"`: the thread grows, AppShell’s main scrolls (the Composer goes in AppShell’s `footer`), and it follows the output there."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A record’s comments or activity",
+            "instead": "`Timeline`"
+          },
+          {
+            "situation": "Notifications",
+            "instead": "`Toast` or an inbox list"
+          }
+        ],
+        "do": {
+          "caption": "An empty thread offers prompts to start from.",
+          "code": "<ChatThread\n  label=\"Conversation\"\n  empty={<EmptyState reason=\"first-use\" title=\"Ask about this record\" description=\"Answers cite its fields and activity.\" action={<Button variant=\"secondary\">When does it renew?</Button>} />}\n/>"
+        },
+        "dont": {
+          "caption": "Turns stacked as paragraphs: no roles, no authors, nothing to navigate by.",
+          "code": "<div>\n  <Text>When does it renew?</Text>\n  <Text>15 January 2027.</Text>\n</div>"
+        },
+        "accessibility": [
+          "The thread is a named, focusable region (`label`), so it scrolls from the keyboard; turns are a list.",
+          "It is deliberately not a live region (`role=\"log\"` would read every token): each answer’s `StreamingText` announces complete sentences instead.",
+          "Scrolling keeps focus clear of “Jump to latest” (`space.scroll-padding.end`)."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ChatThread",
+        "stories": [
+          {
+            "id": "components-chatthread--conversation",
+            "name": "Conversation"
+          },
+          {
+            "id": "components-chatthread--streaming",
+            "name": "Streaming"
+          },
+          {
+            "id": "components-chatthread--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-chatthread--page-scroll",
+            "name": "Page Scroll"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.subtle",
+          "color.border.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.lg",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.scroll-padding.end",
+          "text.body-lg",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "ChatThreadProps",
+      "kind": "type-only",
+      "source": "src/components/ChatThread/ChatThread.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ChatThread",
+      "propsOf": "ChatThread"
+    },
+    {
       "name": "Checkbox",
       "kind": "component",
       "source": "src/components/Checkbox/Checkbox.tsx",
@@ -2592,6 +3408,131 @@
       "description": null,
       "partOf": "Checkbox",
       "definition": "type CheckedState = boolean | 'indeterminate'"
+    },
+    {
+      "name": "Citation",
+      "kind": "component",
+      "source": "src/components/Citation/Citation.tsx",
+      "status": null,
+      "description": "A numbered inline citation, [1], that follows through to its source in a SourcesList: activating it moves focus to that source. It is a real link, never an inert label.",
+      "docs": "docs/usage/Citation.usage.tsx",
+      "props": [
+        {
+          "name": "number",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "The source's number, as it appears in the SourcesList (1-based)."
+        },
+        {
+          "name": "sources",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The `id` of the SourcesList this cites."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The source's title, for the accessible name (\"Source 1: Renews on\"). Required: a bare number means nothing when heard."
+        },
+        {
+          "name": "onActivate",
+          "type": "(number: number) => void",
+          "required": false,
+          "default": null,
+          "description": "Called when the citation is followed, with its number: highlight the source (and its passage) there."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An AI answer that makes claims: number each claim’s source inline ([1]) and list the sources under the answer, each with where it came from and a link to it.",
+          "Give the `SourcesList` a `useId()` id and pass it to every `Citation` as `sources`; `onActivate` highlights the source (and, in a record, the cited field)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Footnotes in content people wrote",
+            "instead": "a plain list of links"
+          },
+          {
+            "situation": "A link to one page",
+            "instead": "`Link`"
+          }
+        ],
+        "do": {
+          "caption": "Each claim cites a source that says where it came from and links to it.",
+          "code": "<Stack gap=\"sm\">\n  <Text>\n    It renews on 15 January 2027\n    <Citation number={1} sources=\"usage-sources\" title=\"Renews on\" />.\n  </Text>\n  <SourcesList id=\"usage-sources\" sources={[{ title: 'Renews on', origin: 'Record field', excerpt: '15 Jan 2027', href: '#properties', hrefLabel: 'Show in record' }]} />\n</Stack>"
+        },
+        "dont": {
+          "caption": "An inert “[1]”: a citation that can’t be followed is decoration, not provenance.",
+          "code": "<Text>It renews on 15 January 2027 [1].</Text>"
+        },
+        "accessibility": [
+          "A citation is a real link named “Source 1: Renews on”, not the bare number; following it moves focus to the source, which is marked `aria-current`.",
+          "Citations sit inside running text, so the inline exception to the 24px target size applies; don’t use them as standalone controls."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Citation",
+        "stories": [
+          {
+            "id": "components-citation--in-answer",
+            "name": "In Answer"
+          },
+          {
+            "id": "components-citation--active-source",
+            "name": "Active Source"
+          },
+          {
+            "id": "components-citation--sources-only",
+            "name": "Sources Only"
+          }
+        ],
+        "composes": [
+          "Link"
+        ],
+        "tokens": [
+          "color.bg.selected",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.control",
+          "radius.indicator",
+          "size.icon.sm",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.sm",
+          "text.body",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "CitationProps",
+      "kind": "type-only",
+      "source": "src/components/Citation/Citation.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Citation",
+      "propsOf": "Citation"
     },
     {
       "name": "Cluster",
@@ -2944,6 +3885,267 @@
       "description": null,
       "partOf": "CodeBlock",
       "propsOf": "CodeBlock"
+    },
+    {
+      "name": "Composer",
+      "kind": "component",
+      "source": "src/components/Composer/Composer.tsx",
+      "status": null,
+      "description": "Where the person writes to the assistant: a text box that grows with its content, attachment chips, Send (or Stop while an answer arrives) and a keyboard hint. Enter sends and Shift+Enter adds a line, except while an IME composition is open.",
+      "docs": "docs/usage/Composer.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible name of the text box (\"Ask about this record\"). Required; shown only to assistive technology."
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Controlled text. Pair with onValueChange."
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onSend",
+          "type": "(text: string) => void",
+          "required": true,
+          "default": null,
+          "description": "Send the message. Called with the trimmed text; the composer clears itself when uncontrolled."
+        },
+        {
+          "name": "streaming",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "An answer is arriving: Send becomes Stop, and Enter doesn't send. Typing the next question still works."
+        },
+        {
+          "name": "onStop",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Stop the answer that is arriving."
+        },
+        {
+          "name": "maxLength",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "Characters allowed. The count shows from 80% of it; over the limit, Send is disabled with the reason."
+        },
+        {
+          "name": "attachments",
+          "type": "readonly ComposerAttachment[]",
+          "required": false,
+          "default": "[]",
+          "description": "Chips for attached files, each with a Remove button."
+        },
+        {
+          "name": "onRemoveAttachment",
+          "type": "(id: string) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onAttach",
+          "type": "(files: File[]) => void",
+          "required": false,
+          "default": null,
+          "description": "Shows an Attach button that opens the file picker."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "The whole composer is unavailable (no permission, a hard limit reached). Say why in `note`."
+        },
+        {
+          "name": "note",
+          "type": "ReactNode",
+          "required": false,
+          "default": "'AI can make mistakes. Check important info.'",
+          "description": "A quiet line under the box: the disclaimer, or why it's disabled."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "streaming",
+        "disabled"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Where the person writes to an assistant, pinned under a `ChatThread`: Enter sends, Shift+Enter adds a line, and the box grows with its content.",
+          "Set `streaming` while an answer arrives: Send becomes Stop (`onStop`). Typing the next question still works.",
+          "Keep the disclaimer (`note`) unless the surface shows it elsewhere; set `maxLength` when the model has a limit."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A search box",
+            "instead": "`SearchField`"
+          },
+          {
+            "situation": "A comment on a record",
+            "instead": "`Textarea` with a Comment button"
+          }
+        ],
+        "do": {
+          "caption": "Labelled, with the keys and the disclaimer under it.",
+          "code": "<Composer label=\"Ask about this record\" placeholder=\"Ask about this record…\" onSend={() => undefined} />"
+        },
+        "dont": {
+          "caption": "A one-line field with no Send button: multi-line questions are impossible and nothing says Enter sends.",
+          "code": "<TextField label=\"Ask\" />"
+        },
+        "accessibility": [
+          "The text box is labelled (`label`, visually hidden) and described by the key hint; the count joins the description from 80% of `maxLength`.",
+          "Enter never sends during an IME composition. Over the limit, Send is disabled and the count says by how much; paste is never blocked.",
+          "Stop is always reachable while an answer arrives."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Composer",
+        "stories": [
+          {
+            "id": "components-composer--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-composer--with-text",
+            "name": "With Text"
+          },
+          {
+            "id": "components-composer--streaming",
+            "name": "Streaming"
+          },
+          {
+            "id": "components-composer--with-attachments",
+            "name": "With Attachments"
+          },
+          {
+            "id": "components-composer--near-limit",
+            "name": "Near Limit"
+          },
+          {
+            "id": "components-composer--over-limit",
+            "name": "Over Limit"
+          },
+          {
+            "id": "components-composer--disabled",
+            "name": "Disabled"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Icon",
+          "Kbd",
+          "Spinner",
+          "Tag"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.hover",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.indicator",
+          "radius.pill",
+          "radius.surface",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.scroll-region.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.code",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "ComposerAttachment",
+      "kind": "type-only",
+      "source": "src/components/Composer/Composer.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Composer",
+      "definition": "interface ComposerAttachment { id: string; name: string; }"
+    },
+    {
+      "name": "ComposerProps",
+      "kind": "type-only",
+      "source": "src/components/Composer/Composer.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Composer",
+      "propsOf": "Composer"
     },
     {
       "name": "ContentWidthToken",
@@ -3560,6 +4762,148 @@
       "propsOf": "Dialog"
     },
     {
+      "name": "Disclosure",
+      "kind": "component",
+      "source": "src/components/Disclosure/Disclosure.tsx",
+      "status": null,
+      "description": "One section that shows and hides its details: an assistant's tool activity or reasoning, an advanced option. The toggle is a button with aria-expanded; from Radix Collapsible. For a stack of sections where opening one may close another, use Accordion.",
+      "docs": "docs/usage/Disclosure.usage.tsx",
+      "props": [
+        {
+          "name": "summary",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The always-visible summary, and the toggle's accessible name (\"Searched 12 records\"). Required."
+        },
+        {
+          "name": "meta",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Beside the summary: a status Badge (\"Done\"), a count. Not part of the toggle."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "What opens: tool input and output, reasoning steps, details."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Closed by default: details are there when wanted, not in the way."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "open",
+        "defaultOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "One section of details people sometimes want: an assistant’s tool activity (what it searched, what it found), its reasoning, an advanced option.",
+          "Closed by default; the summary says what’s inside (“Searched 12 records”), with a status in `meta`."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Several related sections, one open at a time",
+            "instead": "`Accordion`"
+          },
+          {
+            "situation": "Panels the person switches between",
+            "instead": "`Tabs`"
+          },
+          {
+            "situation": "Content everyone needs",
+            "instead": "show it; don’t hide it behind a toggle"
+          }
+        ],
+        "do": {
+          "caption": "The summary says what happened; the details are one click away.",
+          "code": "<Disclosure summary=\"Searched records matching “overdue”\" meta={<Badge tone=\"success\">Done</Badge>}>\n  <Text>12 records matched. 2 are archived and were left out.</Text>\n</Disclosure>"
+        },
+        "dont": {
+          "caption": "A vague summary: nobody knows whether it’s worth opening.",
+          "code": "<Disclosure summary=\"Details\">\n  <Text>12 records matched.</Text>\n</Disclosure>"
+        },
+        "accessibility": [
+          "The toggle is a button with `aria-expanded` and `aria-controls` (Radix Collapsible); Enter and Space toggle it.",
+          "Content that opens is in the reading order right after the toggle, so nothing is lost when it opens."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Disclosure",
+        "stories": [
+          {
+            "id": "components-disclosure--closed",
+            "name": "Closed"
+          },
+          {
+            "id": "components-disclosure--open",
+            "name": "Open"
+          },
+          {
+            "id": "components-disclosure--with-meta",
+            "name": "With Meta"
+          }
+        ],
+        "composes": [
+          "Icon"
+        ],
+        "tokens": [
+          "color.bg.hover",
+          "color.fg.default",
+          "ease.standard",
+          "icon.stroke",
+          "motion.fast",
+          "radius.control",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "text.body",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "DisclosureProps",
+      "kind": "type-only",
+      "source": "src/components/Disclosure/Disclosure.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Disclosure",
+      "propsOf": "Disclosure"
+    },
+    {
       "name": "Divider",
       "kind": "component",
       "source": "src/components/Divider/Divider.tsx",
@@ -4064,6 +5408,200 @@
       "status": null,
       "description": "The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.",
       "definition": "interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }"
+    },
+    {
+      "name": "Feedback",
+      "kind": "component",
+      "source": "src/components/Feedback/Feedback.tsx",
+      "status": null,
+      "description": "Thumbs up or down on one AI result, with an optional reason after a thumbs down. Both are toggle buttons (aria-pressed) with visible labels; a polite status confirms what was sent.",
+      "docs": "docs/usage/Feedback.usage.tsx",
+      "props": [
+        {
+          "name": "onFeedback",
+          "type": "(feedback: FeedbackValue) => void",
+          "required": true,
+          "default": null,
+          "description": "Called on a thumbs up at once, and on a thumbs down when the reason is sent or skipped."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Rate this answer'",
+          "description": "Names what is being rated, for the group's accessible name (\"Rate this answer\")."
+        },
+        {
+          "name": "reasons",
+          "type": "readonly string[]",
+          "required": false,
+          "default": "REASONS",
+          "description": "Choices offered after a thumbs down. Keep them few and specific."
+        },
+        {
+          "name": "thanks",
+          "type": "string",
+          "required": false,
+          "default": "'Thanks. Feedback helps us check and improve answers.'",
+          "description": "Shown, and announced, once feedback is sent: say what it's for."
+        },
+        {
+          "name": "defaultValue",
+          "type": "FeedbackValue",
+          "required": false,
+          "default": null,
+          "description": "A rating already given (a reloaded conversation)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Under an AI result (an answer, a summary, a suggestion) to learn whether it helped.",
+          "A thumbs down asks for a reason, which the person can skip. Say what feedback is for in `thanks`."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Rating the product or a support conversation",
+            "instead": "a survey, not per-result feedback"
+          },
+          {
+            "situation": "Reporting harmful content",
+            "instead": "a “Report” action that reaches a person"
+          }
+        ],
+        "do": {
+          "caption": "Two labelled toggles; the reason comes only after a thumbs down.",
+          "code": "<Feedback onFeedback={() => undefined} />"
+        },
+        "dont": {
+          "caption": "Unlabelled buttons that don’t say whether anything was sent.",
+          "code": "<Cluster gap=\"xs\">\n  <Button variant=\"ghost\" size=\"sm\">\n    👍\n  </Button>\n  <Button variant=\"ghost\" size=\"sm\">\n    👎\n  </Button>\n</Cluster>"
+        },
+        "accessibility": [
+          "Both are toggle buttons with visible labels (“Helpful”, “Not helpful”) and `aria-pressed`, in a group named by `label`.",
+          "A polite status, present from mount, announces the thanks once feedback is sent."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Feedback",
+        "stories": [
+          {
+            "id": "components-feedback--not-rated",
+            "name": "Not Rated"
+          },
+          {
+            "id": "components-feedback--rated-helpful",
+            "name": "Rated Helpful"
+          },
+          {
+            "id": "components-feedback--rated-not-helpful",
+            "name": "Rated Not Helpful"
+          },
+          {
+            "id": "components-feedback--custom-reasons",
+            "name": "Custom Reasons"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Field",
+          "Icon",
+          "RadioGroup",
+          "Spinner",
+          "Toggle"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.action.primary",
+          "color.bg.hover",
+          "color.bg.selected",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "FeedbackProps",
+      "kind": "type-only",
+      "source": "src/components/Feedback/Feedback.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Feedback",
+      "propsOf": "Feedback"
+    },
+    {
+      "name": "FeedbackRating",
+      "kind": "type-only",
+      "source": "src/components/Feedback/Feedback.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Feedback",
+      "definition": "type FeedbackRating = 'up' | 'down'",
+      "values": [
+        "up",
+        "down"
+      ]
+    },
+    {
+      "name": "FeedbackValue",
+      "kind": "type-only",
+      "source": "src/components/Feedback/Feedback.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Feedback",
+      "definition": "interface FeedbackValue { rating: FeedbackRating; reason?: string; }"
     },
     {
       "name": "FileRejection",
@@ -5154,6 +6692,7 @@
       "values": [
         "menu",
         "search",
+        "stop",
         "danger",
         "check",
         "success",
@@ -5180,7 +6719,10 @@
         "trend-down",
         "more",
         "eye",
-        "eye-off"
+        "eye-off",
+        "sparkle",
+        "thumbs-up",
+        "thumbs-down"
       ]
     },
     {
@@ -5379,6 +6921,98 @@
         "lg",
         "xl"
       ]
+    },
+    {
+      "name": "Kbd",
+      "kind": "component",
+      "source": "src/components/Kbd/Kbd.tsx",
+      "status": null,
+      "description": "A key the person presses, in a key-cap style: keyboard hints (\"Tab to accept\"), shortcut lists.",
+      "docs": "docs/usage/Kbd.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "One key, as printed on it: \"Tab\", \"Esc\", \"Enter\", \"⌘\". For a combination, render one Kbd per key."
+        }
+      ],
+      "inherits": [
+        "AriaAttributes",
+        "Attributes",
+        "DOMAttributes",
+        "HTMLAttributes",
+        "RefAttributes"
+      ],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A key the person presses, named in a hint or a list of shortcuts: “Tab to accept”, “Shift Enter for a new line”.",
+          "One Kbd per key; a combination is several side by side."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Code, a command or a value to copy",
+            "instead": "`CodeBlock`, or inline `<code>`"
+          },
+          {
+            "situation": "A clickable shortcut",
+            "instead": "a `Button` whose label names the action; mention the key beside it"
+          }
+        ],
+        "do": {
+          "caption": "The hint names the keys and what they do.",
+          "code": "<Text>\n  <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss\n</Text>"
+        },
+        "dont": {
+          "caption": "A combination in one cap reads as one strange key.",
+          "code": "<Text>\n  Press <Kbd>Shift+Enter</Kbd>\n</Text>"
+        },
+        "accessibility": [
+          "Renders `<kbd>`, which screen readers read as plain text: the key names must be words people say (“Esc”, “Enter”), with symbols (⌘) only beside a word.",
+          "A hint with keys needs a pointer path too: a visible button for the same action."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Kbd",
+        "stories": [
+          {
+            "id": "components-kbd--single-key",
+            "name": "Single Key"
+          },
+          {
+            "id": "components-kbd--combination",
+            "name": "Combination"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.strong",
+          "color.fg.default",
+          "radius.indicator",
+          "size.icon.sm",
+          "space.inset.2xs",
+          "text.code"
+        ]
+      }
+    },
+    {
+      "name": "KbdProps",
+      "kind": "type-only",
+      "source": "src/components/Kbd/Kbd.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Kbd",
+      "propsOf": "Kbd"
     },
     {
       "name": "LayoutElement",
@@ -5868,6 +7502,288 @@
       "description": null,
       "partOf": "Menu",
       "propsOf": "Menu"
+    },
+    {
+      "name": "Message",
+      "kind": "component",
+      "source": "src/components/Message/Message.tsx",
+      "status": null,
+      "description": "One turn in a ChatThread: a header (who, when, the AI mark), the content, and actions (copy, retry, edit, feedback) once it has finished. User turns are tinted and aligned to the inline end; assistant turns run full width. Tool and system turns are compact notes. Render inside ChatThread.",
+      "docs": "docs/usage/Message.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "MessageRole",
+          "required": true,
+          "default": null,
+          "description": null,
+          "values": [
+            "user",
+            "assistant",
+            "tool",
+            "system"
+          ]
+        },
+        {
+          "name": "author",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Who it's from, shown in the header and naming the message (\"You\", \"Assistant\", \"Search records\")."
+        },
+        {
+          "name": "time",
+          "type": "DateInput",
+          "required": false,
+          "default": null,
+          "description": "When it was sent. Formatted with useFormat(); omit for pending turns."
+        },
+        {
+          "name": "status",
+          "type": "StreamStatus",
+          "required": false,
+          "default": "'complete'",
+          "description": "An assistant turn's state: its actions show once it's no longer pending or streaming.",
+          "values": [
+            "pending",
+            "streaming",
+            "complete",
+            "stopped",
+            "error"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The content: StreamingText for assistant turns, text for user turns, a Disclosure for tool activity."
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Why the turn failed, with the next step (\"Too many requests. Try again in 30 seconds.\")."
+        },
+        {
+          "name": "copyText",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The turn's text for Copy. Shows a Copy action."
+        },
+        {
+          "name": "onRetry",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Shows Retry (assistant: ask again; user: resend a failed message)."
+        },
+        {
+          "name": "onEdit",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Shows Edit on a user turn: puts its text back in the composer."
+        },
+        {
+          "name": "feedback",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A Feedback control for an assistant turn."
+        },
+        {
+          "name": "marker",
+          "type": "ReactNode",
+          "required": false,
+          "default": "role === 'assistant' ? <AiMarker variant=\"inline\" /> : null",
+          "description": "The AI mark on an assistant turn. Defaults to an AiMarker; pass null only where the whole surface is already marked."
+        },
+        {
+          "name": "stoppedLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Stopped before the answer finished.'",
+          "description": "Shown under a stopped turn, so it doesn't read as a finished answer."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "role": [
+          "user",
+          "assistant",
+          "tool",
+          "system"
+        ],
+        "status": [
+          "pending",
+          "streaming",
+          "complete",
+          "stopped",
+          "error"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "One turn inside a `ChatThread`: `user` (tinted, at the inline end), `assistant` (full width, AI-marked), `tool` (what the assistant ran, usually a `Disclosure`) or `system` (a note such as “You stopped the answer”).",
+          "Actions appear once a turn has finished: Copy (`copyText`), Retry, Edit (user turns) and a `Feedback` control."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Comments on a record",
+            "instead": "the record page’s activity list (`Timeline` or the activity feed)"
+          },
+          {
+            "situation": "A one-off AI result inside a form",
+            "instead": "`Suggestion`, or the content with an `AiMarker`"
+          }
+        ],
+        "do": {
+          "caption": "An assistant turn: who, when, the AI mark, the answer, then its actions.",
+          "code": "<Message role=\"assistant\" author=\"Assistant\" time=\"2026-09-14T10:04:05Z\" copyText=\"It renews on 15 January 2027.\" onRetry={() => undefined} feedback={<Feedback onFeedback={() => undefined} />}>\n  <StreamingText text=\"It renews on **15 January 2027**.\" />\n</Message>"
+        },
+        "dont": {
+          "caption": "An answer as plain text with no author, time, mark or actions: it can’t be checked, copied or retried.",
+          "code": "<Text>It renews on 15 January 2027.</Text>"
+        },
+        "accessibility": [
+          "Each turn is an `article` named by its author, so screen-reader users can move turn by turn.",
+          "An error shows as text with an icon (`role=\"alert\"`) and a Retry; never colour alone.",
+          "The assistant avatar is decorative; the author name and the AI marker carry the meaning."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Message",
+        "stories": [
+          {
+            "id": "components-message--user",
+            "name": "User"
+          },
+          {
+            "id": "components-message--assistant",
+            "name": "Assistant"
+          },
+          {
+            "id": "components-message--assistant-streaming",
+            "name": "Assistant Streaming"
+          },
+          {
+            "id": "components-message--assistant-pending",
+            "name": "Assistant Pending"
+          },
+          {
+            "id": "components-message--assistant-stopped",
+            "name": "Assistant Stopped"
+          },
+          {
+            "id": "components-message--assistant-error",
+            "name": "Assistant Error"
+          },
+          {
+            "id": "components-message--tool",
+            "name": "Tool"
+          },
+          {
+            "id": "components-message--system",
+            "name": "System"
+          }
+        ],
+        "composes": [
+          "AiMarker",
+          "Avatar",
+          "Button",
+          "CopyButton",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.ai.bg",
+          "color.ai.border",
+          "color.ai.fg",
+          "color.bg.selected",
+          "color.bg.subtle",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "radius.surface",
+          "size.avatar.lg",
+          "size.avatar.md",
+          "size.avatar.sm",
+          "size.content.sm",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "MessageProps",
+      "kind": "type-only",
+      "source": "src/components/Message/Message.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Message",
+      "propsOf": "Message"
+    },
+    {
+      "name": "MessageRole",
+      "kind": "type-only",
+      "source": "src/components/Message/Message.tsx",
+      "status": null,
+      "description": "Who a turn is from: the person, the assistant, a tool the assistant ran, or the system (a note in the thread).",
+      "partOf": "Message",
+      "definition": "type MessageRole = 'user' | 'assistant' | 'tool' | 'system'",
+      "values": [
+        "user",
+        "assistant",
+        "tool",
+        "system"
+      ]
     },
     {
       "name": "Meter",
@@ -7054,6 +8970,15 @@
       "propsOf": "Progress"
     },
     {
+      "name": "ProposedChange",
+      "kind": "type-only",
+      "source": "src/components/ReviewChanges/ReviewChanges.tsx",
+      "status": null,
+      "description": "One proposed change: a field's old and new value, or a text rewrite shown word by word.",
+      "partOf": "ReviewChanges",
+      "definition": "interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }"
+    },
+    {
       "name": "RadioGroup",
       "kind": "component",
       "source": "src/components/RadioGroup/RadioGroup.tsx",
@@ -7455,6 +9380,265 @@
       "description": null,
       "partOf": "Reel",
       "propsOf": "Reel"
+    },
+    {
+      "name": "ReviewChanges",
+      "kind": "component",
+      "source": "src/components/ReviewChanges/ReviewChanges.tsx",
+      "status": null,
+      "description": "Changes an AI proposes, reviewed before anything happens: each as a diff (a field's before and after, or a text rewrite word by word) with Accept and Reject, plus Accept all and Reject all. Only accepted changes are applied, then each shows its outcome and Undo restores the previous values. A change the person can't make says why instead of offering Accept.",
+      "docs": "docs/usage/ReviewChanges.usage.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Heading of the review (\"Proposed changes to 6 records\")."
+        },
+        {
+          "name": "changes",
+          "type": "readonly ProposedChange[]",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "decisions",
+          "type": "Readonly<Record<string, ChangeDecision>>",
+          "required": false,
+          "default": null,
+          "description": "Controlled decisions. Undecided changes are left out: nothing is applied without a decision."
+        },
+        {
+          "name": "defaultDecisions",
+          "type": "Readonly<Record<string, ChangeDecision>>",
+          "required": false,
+          "default": "{}",
+          "description": null
+        },
+        {
+          "name": "onDecisionsChange",
+          "type": "(decisions: Record<string, ChangeDecision>) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onApply",
+          "type": "(acceptedIds: string[]) => void",
+          "required": true,
+          "default": null,
+          "description": "Apply the accepted changes (ids in list order)."
+        },
+        {
+          "name": "applying",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Applying: the button shows progress and the decisions lock."
+        },
+        {
+          "name": "outcomes",
+          "type": "Readonly<Record<string, ChangeOutcome>>",
+          "required": false,
+          "default": null,
+          "description": "Once applied: each change's outcome by id. Shows the results and Undo."
+        },
+        {
+          "name": "onUndo",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Restore what was there before. Shown once changes are applied."
+        },
+        {
+          "name": "undoing",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "undone",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "The applied changes were undone: says so, and the review is closed."
+        },
+        {
+          "name": "summary",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Extra content under the heading: provenance (\"Based on 42 records matching Overdue\")."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "applying",
+        "undoing",
+        "undone"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Before an AI changes anything: the proposed changes as diffs (a field’s before and after, or a text rewrite word by word), each accepted or rejected, then applied together.",
+          "After applying, pass `outcomes` (each change’s result) and `onUndo`: one Undo restores exactly what was there before.",
+          "Mark a change the person can’t make with `blockedReason` instead of hiding it, so the count adds up."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A single suggestion inside a field",
+            "instead": "`Suggestion`"
+          },
+          {
+            "situation": "Changes a person made by hand",
+            "instead": "the action itself, with a Toast and Undo"
+          }
+        ],
+        "do": {
+          "caption": "Each change shows what it was, what it will be and why; nothing is applied until accepted.",
+          "code": "<ReviewChanges\n  title=\"Proposed changes to 1 record\"\n  changes={[{ id: 'c1', target: 'Master cleaning agreement', field: 'Status', before: 'Overdue', after: 'Pending', reason: 'A signed renewal was added on 12 Sep.' }]}\n  onApply={() => undefined}\n/>"
+        },
+        "dont": {
+          "caption": "An AI action that applies at once with no preview: people can’t see what will change, or undo it.",
+          "code": "<Text>\n  <Button>Fix overdue records with AI</Button>\n</Text>"
+        },
+        "accessibility": [
+          "Removed and added text is struck through and underlined as well as tinted, and each carries a visually hidden “removed”/“added” (or “Was … will be …”), because screen readers don’t announce `del` and `ins`.",
+          "Accept and Reject are toggle buttons (`aria-pressed`) grouped per change and named by it; the count of accepted changes and the result after applying are polite status messages."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ReviewChanges",
+        "stories": [
+          {
+            "id": "components-reviewchanges--reviewing",
+            "name": "Reviewing"
+          },
+          {
+            "id": "components-reviewchanges--partly-decided",
+            "name": "Partly Decided"
+          },
+          {
+            "id": "components-reviewchanges--text-rewrite",
+            "name": "Text Rewrite"
+          },
+          {
+            "id": "components-reviewchanges--with-blocked-change",
+            "name": "With Blocked Change"
+          },
+          {
+            "id": "components-reviewchanges--applying",
+            "name": "Applying"
+          },
+          {
+            "id": "components-reviewchanges--applied",
+            "name": "Applied"
+          },
+          {
+            "id": "components-reviewchanges--partly-failed",
+            "name": "Partly Failed"
+          },
+          {
+            "id": "components-reviewchanges--undone",
+            "name": "Undone"
+          }
+        ],
+        "composes": [
+          "AiMarker",
+          "Badge",
+          "Button",
+          "Icon",
+          "Spinner",
+          "Toggle"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.ai.bg",
+          "color.ai.border",
+          "color.ai.fg",
+          "color.bg.hover",
+          "color.bg.selected",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.bg",
+          "color.status.danger.border",
+          "color.status.danger.fg",
+          "color.status.info.bg",
+          "color.status.info.border",
+          "color.status.info.fg",
+          "color.status.neutral.bg",
+          "color.status.neutral.border",
+          "color.status.neutral.fg",
+          "color.status.success.bg",
+          "color.status.success.border",
+          "color.status.success.fg",
+          "color.status.warning.bg",
+          "color.status.warning.border",
+          "color.status.warning.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.heading-4",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "ReviewChangesProps",
+      "kind": "type-only",
+      "source": "src/components/ReviewChanges/ReviewChanges.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ReviewChanges",
+      "propsOf": "ReviewChanges"
     },
     {
       "name": "ScrollRegionToken",
@@ -8651,6 +10835,79 @@
       ]
     },
     {
+      "name": "Source",
+      "kind": "type-only",
+      "source": "src/components/Citation/Citation.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Citation",
+      "definition": "interface Source { title: string; origin: string; excerpt?: string; href?: string; hrefLabel?: string; }"
+    },
+    {
+      "name": "SourcesList",
+      "kind": "component",
+      "source": "src/components/Citation/Citation.tsx",
+      "status": null,
+      "description": "The numbered sources behind an answer, one card each (title, origin, excerpt, a link to the source). Citations in the text point here; the one followed last is marked with aria-current.",
+      "partOf": "Citation",
+      "docs": "docs/usage/Citation.usage.tsx",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Id that Citations point at (their `sources` prop). Use a useId() value: it must be unique on the page."
+        },
+        {
+          "name": "sources",
+          "type": "readonly Source[]",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Sources'",
+          "description": "Heading above the list."
+        },
+        {
+          "name": "active",
+          "type": "number | undefined",
+          "required": false,
+          "default": null,
+          "description": "The source last followed from a Citation (1-based): marked as current."
+        },
+        {
+          "name": "summary",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Rendered after the heading, before the list (a provenance line: \"Based on 1 record and 3 activity entries\")."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "SourcesListProps",
+      "kind": "type-only",
+      "source": "src/components/Citation/Citation.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Citation",
+      "propsOf": "SourcesList"
+    },
+    {
       "name": "Spinner",
       "kind": "component",
       "source": "src/components/Spinner/Spinner.tsx",
@@ -9266,6 +11523,466 @@
       "description": null,
       "partOf": "Stepper",
       "definition": "interface StepperStep { label: string; }"
+    },
+    {
+      "name": "StreamStatus",
+      "kind": "type-only",
+      "source": "src/components/StreamingText/StreamingText.tsx",
+      "status": null,
+      "description": "Where an answer is: waiting for its first token, arriving, finished, stopped by the person, or failed.",
+      "partOf": "StreamingText",
+      "definition": "type StreamStatus = 'pending' | 'streaming' | 'complete' | 'stopped' | 'error'",
+      "values": [
+        "pending",
+        "streaming",
+        "complete",
+        "stopped",
+        "error"
+      ]
+    },
+    {
+      "name": "StreamingText",
+      "kind": "component",
+      "source": "src/components/StreamingText/StreamingText.tsx",
+      "status": null,
+      "description": "Text that arrives token by token (an AI answer), rendered as safe Markdown with a caret while it streams. It holds no timers: the parent appends to `text`, so a story or test can pin any moment. Screen readers hear it through one polite live region, present from mount: \"Generating…\", then each sentence or paragraph once it is complete (never token by token, and never the whole answer again at the end), then \"Stopped\" if the person stops it. Text already there on mount (history) is not announced.",
+      "docs": "docs/usage/StreamingText.usage.tsx",
+      "props": [
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Everything received so far, as Markdown. The parent appends tokens; this renders what it's given."
+        },
+        {
+          "name": "status",
+          "type": "StreamStatus",
+          "required": false,
+          "default": "'complete'",
+          "description": null,
+          "values": [
+            "pending",
+            "streaming",
+            "complete",
+            "stopped",
+            "error"
+          ]
+        },
+        {
+          "name": "citation",
+          "type": "(number: number) => ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Renders a numbered citation ([1]) found in the text, usually a Citation."
+        },
+        {
+          "name": "pendingLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Generating…'",
+          "description": "Shown, and announced, before the first token arrives."
+        },
+        {
+          "name": "stoppedLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Stopped.'",
+          "description": "Announced when the person stops the answer."
+        },
+        {
+          "name": "codeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Code from the answer'",
+          "description": "Accessible name of code blocks in the answer."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "status": [
+          "pending",
+          "streaming",
+          "complete",
+          "stopped",
+          "error"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An AI answer that arrives token by token: pass everything received so far as `text` and the `status` (pending, streaming, complete, stopped, error).",
+          "Any AI output shown as Markdown, streamed or not: it renders safely (no raw HTML, safe links only, no images)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Text a person wrote",
+            "instead": "`Text`: Markdown rendering belongs to model output"
+          },
+          {
+            "situation": "A wait with no partial result",
+            "instead": "`Spinner` or `Progress`"
+          }
+        ],
+        "do": {
+          "caption": "Partial text with a caret while it arrives; the parent appends, the component renders.",
+          "code": "<StreamingText text=\"It renews on **15 January 2027**, unless either side\" status=\"streaming\" />"
+        },
+        "dont": {
+          "caption": "A spinner that hides the answer until it’s finished: people wait without seeing progress, and can’t stop early.",
+          "code": "<Spinner label=\"Generating answer\" />"
+        },
+        "accessibility": [
+          "One polite live region, present from mount, announces “Generating…”, then each sentence or paragraph once it is complete, then “Stopped” if the person stops it. Never token by token, and never the whole answer again at the end.",
+          "Text already there on mount (history) isn’t announced.",
+          "The caret and the thinking dots are hidden from assistive technology and hold still under reduced motion (`motion.pulse` is 0).",
+          "Model output is untrusted: raw HTML renders as text, links are http(s), mailto or in-app only, images are never loaded, and headings become bold text so an answer can’t change the page outline."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/StreamingText",
+        "stories": [
+          {
+            "id": "components-streamingtext--pending",
+            "name": "Pending"
+          },
+          {
+            "id": "components-streamingtext--streaming",
+            "name": "Streaming"
+          },
+          {
+            "id": "components-streamingtext--streaming-code",
+            "name": "Streaming Code"
+          },
+          {
+            "id": "components-streamingtext--complete",
+            "name": "Complete"
+          },
+          {
+            "id": "components-streamingtext--stopped",
+            "name": "Stopped"
+          },
+          {
+            "id": "components-streamingtext--with-citations",
+            "name": "With Citations"
+          },
+          {
+            "id": "components-streamingtext--unsafe-input",
+            "name": "Unsafe Input"
+          }
+        ],
+        "composes": [
+          "Button",
+          "CodeBlock",
+          "CopyButton",
+          "Icon",
+          "Link",
+          "Markdown",
+          "Spinner"
+        ],
+        "tokens": [
+          "border.width.default",
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.link",
+          "color.fg.muted",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.pulse",
+          "motion.slow",
+          "motion.spin",
+          "radius.control",
+          "radius.indicator",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.code",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "StreamingTextProps",
+      "kind": "type-only",
+      "source": "src/components/StreamingText/StreamingText.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "StreamingText",
+      "propsOf": "StreamingText"
+    },
+    {
+      "name": "Suggestion",
+      "kind": "component",
+      "source": "src/components/Suggestion/Suggestion.tsx",
+      "status": null,
+      "description": "A multi-line text field that can show an inline AI suggestion as ghost text: Tab accepts it, Escape dismisses it, and typing over it ignores it. The suggestion is marked as AI, is never the field's value until accepted, and never moves the caret or focus. Screen readers hear \"Suggestion ready\" once, politely, with the text and the keys; the field's value reads as what was typed.",
+      "docs": "docs/usage/Suggestion.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What the person has written."
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string) => void",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "suggestion",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "The AI's suggested continuation of `value`, shown as muted ghost text after it. It is never part of the value until accepted. Undefined or empty: no suggestion."
+        },
+        {
+          "name": "pending",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "The suggestion is still arriving: shown, but it can't be accepted until it's complete."
+        },
+        {
+          "name": "onAccept",
+          "type": "() => void",
+          "required": true,
+          "default": null,
+          "description": "Tab (or Accept): the caller appends the suggestion to the value."
+        },
+        {
+          "name": "onDismiss",
+          "type": "() => void",
+          "required": true,
+          "default": null,
+          "description": "Escape, Dismiss, or typing over it: the caller drops the suggestion."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Supporting text, linked with aria-describedby."
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "required": false,
+          "default": "4",
+          "description": "Visible rows before it grows."
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Id of the text box, for an error summary link. Generated when omitted."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "pending",
+        "disabled"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A text field where the AI can suggest what comes next (a description, a reply): the suggestion shows as ghost text, Tab accepts, Esc dismisses, typing over it ignores it.",
+          "The caller owns the value and the suggestion: append on `onAccept`, drop on `onDismiss`. Keep what was there before, so one Undo restores it.",
+          "Put the AI action (“Suggest description”) beside the field, never in place of writing it by hand."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A long draft that needs review before it lands",
+            "instead": "a generated block marked with `AiMarker`, or `ReviewChanges` for a rewrite"
+          },
+          {
+            "situation": "A field with no AI",
+            "instead": "`Textarea`"
+          }
+        ],
+        "do": {
+          "caption": "Muted ghost text after what was typed, marked as AI, with the keys and buttons to accept or dismiss.",
+          "code": "<Suggestion\n  label=\"Description\"\n  value=\"Covers facilities maintenance,\"\n  onValueChange={() => undefined}\n  suggestion=\" cleaning and security for both offices.\"\n  onAccept={() => undefined}\n  onDismiss={() => undefined}\n/>"
+        },
+        "dont": {
+          "caption": "AI text written straight into the value: it looks like the person’s own words and nobody accepted it.",
+          "code": "<Textarea label=\"Description\" defaultValue=\"Covers facilities maintenance, cleaning and security for both offices.\" />"
+        },
+        "accessibility": [
+          "The ghost text is never part of the value, so the field reads as what was typed; the suggestion is in the field’s description, and a polite status says “Suggestion ready” once, never character by character.",
+          "Tab accepts only while a complete suggestion shows; otherwise Tab moves focus as usual. Esc dismisses without closing a surrounding dialog.",
+          "Accept and Dismiss buttons give pointer and switch users the same choice; the mark is text (“AI suggestion”), not colour alone."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Suggestion",
+        "stories": [
+          {
+            "id": "components-suggestion--ready",
+            "name": "Ready"
+          },
+          {
+            "id": "components-suggestion--pending",
+            "name": "Pending"
+          },
+          {
+            "id": "components-suggestion--no-suggestion",
+            "name": "No Suggestion"
+          },
+          {
+            "id": "components-suggestion--empty-field",
+            "name": "Empty Field"
+          },
+          {
+            "id": "components-suggestion--with-error",
+            "name": "With Error"
+          },
+          {
+            "id": "components-suggestion--disabled",
+            "name": "Disabled"
+          }
+        ],
+        "composes": [
+          "AiMarker",
+          "Button",
+          "Field",
+          "Icon",
+          "Kbd",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.ai.bg",
+          "color.ai.border",
+          "color.ai.fg",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.indicator",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.code",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "SuggestionProps",
+      "kind": "type-only",
+      "source": "src/components/Suggestion/Suggestion.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Suggestion",
+      "propsOf": "Suggestion"
     },
     {
       "name": "Switch",
@@ -11320,6 +14037,7 @@
           "values": [
             "menu",
             "search",
+            "stop",
             "danger",
             "check",
             "success",
@@ -11346,7 +14064,10 @@
             "trend-down",
             "more",
             "eye",
-            "eye-off"
+            "eye-off",
+            "sparkle",
+            "thumbs-up",
+            "thumbs-down"
           ]
         },
         {
@@ -12050,6 +14771,48 @@
       ],
       "modes": {
         "dark": "#a5b4fc"
+      }
+    },
+    "color.ai.bg": {
+      "cssVar": "--color-ai-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Background tint of AI-generated content and the AI marker.",
+      "value": "#f5f3ff",
+      "chain": [
+        "color.ai.bg",
+        "color.violet.50"
+      ],
+      "modes": {
+        "dark": "#2e1065"
+      }
+    },
+    "color.ai.border": {
+      "cssVar": "--color-ai-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Border of AI-generated content and the AI marker.",
+      "value": "#c4b5fd",
+      "chain": [
+        "color.ai.border",
+        "color.violet.300"
+      ],
+      "modes": {
+        "dark": "#5b21b6"
+      }
+    },
+    "color.ai.fg": {
+      "cssVar": "--color-ai-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Text and icons of the AI marker and AI actions.",
+      "value": "#6d28d9",
+      "chain": [
+        "color.ai.fg",
+        "color.violet.700"
+      ],
+      "modes": {
+        "dark": "#c4b5fd"
       }
     },
     "color.bg.canvas": {
@@ -13094,6 +15857,42 @@
       "value": "0 4px 6px -1px #0206171a, 0 2px 4px -2px #0206171a",
       "chain": [
         "shadow.popover"
+      ],
+      "modes": {}
+    },
+    "size.assistant.default": {
+      "cssVar": "--size-assistant-default",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "24rem",
+      "chain": [
+        "size.assistant.default",
+        "container.sm"
+      ],
+      "modes": {}
+    },
+    "size.assistant.max": {
+      "cssVar": "--size-assistant-max",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "36rem",
+      "chain": [
+        "size.assistant.max",
+        "container.lg"
+      ],
+      "modes": {}
+    },
+    "size.assistant.min": {
+      "cssVar": "--size-assistant-min",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "20rem",
+      "chain": [
+        "size.assistant.min",
+        "container.xs"
       ],
       "modes": {}
     },

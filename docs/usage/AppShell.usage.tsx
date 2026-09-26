@@ -15,6 +15,7 @@ export const usage: UsageDoc = {
     'Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.',
     'Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).',
     'Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.',
+    'An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.',
     'People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well.',
   ],
   whenNotToUse: [

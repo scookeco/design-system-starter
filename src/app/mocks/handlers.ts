@@ -35,7 +35,7 @@ import { WORKSPACES } from '../workspaces';
 
 const API = '*/api/t/:tenant';
 
-const error = (status: number, code: string, message: string, current?: RecordEntity | Account) =>
+export const error = (status: number, code: string, message: string, current?: RecordEntity | Account) =>
   HttpResponse.json({ error: { code, message, ...(current ? { current } : {}) } }, { status });
 
 /** Latency, then the failure roll. */
@@ -53,7 +53,7 @@ const settle = async (): Promise<Response | undefined> => {
  * against the role it holds for the signed-in person, whatever the client did or didn't check.
  * Object-level rules (archived, legal hold) are the handler's, after this.
  */
-const handle =
+export const handle =
   (
     capability: Capability,
     resolver: (args: { tenant: Tenant; grant: Grant; request: Request; params: Record<string, string | readonly string[] | undefined> }) => Response | Promise<Response>,

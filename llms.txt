@@ -43,6 +43,10 @@ UI rules (design system v0)
 - Never add an eslint-disable or stylelint-disable without a reason after "--".
 - Format every number, date, amount and list with useFormat() (LocaleProvider
   sets locale and time zone). Money is integer minor units + currency code.
+- AI: render model output with StreamingText (never raw HTML), cite sources
+  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
+  never let AI write without ReviewChanges (or an explicit accept) and an Undo.
+  The assistant acts only through the person's own can() and named mutations.
 ```
 
 ## Guides
@@ -64,6 +68,7 @@ UI rules (design system v0)
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Anything new starts as a proposal on the decision ladder, lands in…
 - [Testing](docs/guides/Testing.stories.tsx): The gallery is the test fixture.
 - [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
+- [AI patterns](docs/guides/AiPatterns.stories.tsx): AI in this system is a set of shared parts, not a separate product…
 
 ## Foundations
 
@@ -79,24 +84,33 @@ UI rules (design system v0)
 
 ## Components
 
+- [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
+- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
+- [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
 - [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
 - [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
@@ -105,6 +119,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
@@ -113,6 +128,8 @@ UI rules (design system v0)
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
+- [StreamingText](docs/usage/StreamingText.usage.tsx): Text that arrives token by token
+- [Suggestion](docs/usage/Suggestion.usage.tsx): A multi-line text field that can show an inline AI…
 - [Switch](docs/usage/Switch.usage.tsx): An on/off setting that takes effect as a setting, not a form answer
 - [Table](docs/usage/Table.usage.tsx): Data table: native table semantics, sticky header, tabular numbers
 - [Tabs](docs/usage/Tabs.usage.tsx): Tabs: arrow-key roving focus and ARIA wiring come from Radix Tabs
@@ -143,6 +160,7 @@ UI rules (design system v0)
 ## Layouts
 
 - [AppShell](docs/usage/AppShell.usage.tsx): The app frame every signed-in page renders inside
+- [AssistantPanel](docs/usage/AssistantPanel.usage.tsx): The assistant beside the page, in AppShell's `assistant` slot
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
@@ -157,12 +175,16 @@ UI rules (design system v0)
 
 ## Examples
 
+- [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
+- [Assistant chat](src/examples/AssistantChatPage.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
+- [Create with AI](src/examples/CreateWithAi.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
 - [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
 - [List page](src/examples/ListPage.tsx)
+- [Record copilot](src/examples/RecordCopilot.tsx)
 - [Record page](src/examples/RecordPage.tsx)
 - [Settings page](src/examples/SettingsPage.tsx)
 - [Setup wizard](src/examples/SetupWizard.tsx)

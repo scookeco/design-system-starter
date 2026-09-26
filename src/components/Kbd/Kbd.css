@@ -1,0 +1,14 @@
+@layer components {
+  .kbd {
+    display: inline-block;
+    min-inline-size: var(--size-icon-sm);
+    padding-inline: var(--space-inset-2xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-indicator);
+    background: var(--color-bg-surface);
+    color: var(--color-fg-default);
+    font: var(--text-code);
+    text-align: center;
+    white-space: nowrap;
+  }
+}

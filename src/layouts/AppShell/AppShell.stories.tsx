@@ -9,6 +9,7 @@ import { Nav } from '../../components/Nav/Nav';
 import { Text } from '../../components/Text/Text';
 import { Center } from '../../primitives/Center/Center';
 import { Stack } from '../../primitives/Stack/Stack';
+import { AssistantPanel } from '../AssistantPanel/AssistantPanel';
 import { AppShell } from './AppShell';
 
 const nav = (
@@ -87,6 +88,16 @@ export const WithActionBar: Story = {
           <Button>Save changes</Button>
         </Stack>
       </Center>
+    ),
+  },
+};
+/** An assistant beside main: see Layouts/AssistantPanel for its states. */
+export const WithAssistant: Story = {
+  args: {
+    assistant: (
+      <AssistantPanel title="Assistant" storageKey={null}>
+        <Text tone="muted">Ask about this page.</Text>
+      </AssistantPanel>
     ),
   },
 };

@@ -297,6 +297,9 @@
     --color-status-neutral-bg: light-dark(var(--color-gray-100), var(--color-gray-800));
     --color-status-neutral-border: light-dark(var(--color-gray-300), var(--color-gray-600));
     --color-focus: light-dark(var(--color-indigo-600), var(--color-indigo-300));
+    --color-ai-fg: light-dark(var(--color-violet-700), var(--color-violet-300));
+    --color-ai-bg: light-dark(var(--color-violet-50), var(--color-violet-950));
+    --color-ai-border: light-dark(var(--color-violet-300), var(--color-violet-800));
     --space-gap-2xs: var(--space-1);
     --space-gap-xs: var(--space-2);
     --space-gap-sm: var(--space-3);
@@ -335,6 +338,9 @@
     --size-dialog-lg: var(--container-2xl);
     --size-drawer-sm: var(--container-2xs);
     --size-drawer-md: var(--container-md);
+    --size-assistant-min: var(--container-xs);
+    --size-assistant-default: var(--container-sm);
+    --size-assistant-max: var(--container-lg);
     --size-overlay-max: var(--container-sm);
     --size-scroll-region-sm: var(--container-xs);
     --size-scroll-region-md: var(--container-lg);

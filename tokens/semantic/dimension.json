@@ -154,6 +154,18 @@
       },
       "$description": "Drawer widths: sm for navigation, md for details and filters."
     },
+    "assistant": {
+      "$description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "min": {
+        "$value": "{container.xs}"
+      },
+      "default": {
+        "$value": "{container.sm}"
+      },
+      "max": {
+        "$value": "{container.lg}"
+      }
+    },
     "overlay-max": {
       "$value": "{container.sm}",
       "$description": "Max width for tooltips and toasts."

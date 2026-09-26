@@ -1,0 +1,96 @@
+@layer components {
+  /* 1. block */
+  .review-changes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+  }
+
+  /* 2. parts */
+  .review-changes__header,
+  .review-changes__bulk,
+  .review-changes__footer,
+  .review-changes__decide,
+  .review-changes__item-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  .review-changes__header {
+    justify-content: space-between;
+  }
+
+  .review-changes__title {
+    margin: 0;
+    font: var(--text-heading-4);
+  }
+
+  .review-changes__count {
+    flex: 1;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .review-changes__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .review-changes__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-gap-xs);
+    padding: var(--space-inset-sm);
+    border: 1px solid var(--color-border-default);
+    border-inline-start: var(--focus-ring-width) solid var(--color-ai-border);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-surface);
+  }
+
+  .review-changes__target {
+    font: var(--text-label);
+  }
+
+  .review-changes__field,
+  .review-changes__reason {
+    margin: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .review-changes__diff {
+    margin: 0;
+    font: var(--text-body);
+  }
+
+  /* Removed and added text: struck through and underlined as well as tinted, never colour alone. */
+  .review-changes__diff del {
+    background: var(--color-status-danger-bg);
+    color: var(--color-status-danger-fg);
+    text-decoration-line: line-through;
+  }
+
+  .review-changes__diff ins {
+    background: var(--color-status-success-bg);
+    color: var(--color-status-success-fg);
+    text-decoration-line: underline;
+  }
+
+  /* 3. variants: a decided change shows its decision in the edge as well as the pressed button */
+  .review-changes__item[data-decision="accepted"] {
+    border-inline-start-color: var(--color-status-success-fg);
+  }
+
+  .review-changes__item[data-decision="rejected"],
+  .review-changes__item[data-decision="blocked"] {
+    border-inline-start-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+  }
+}

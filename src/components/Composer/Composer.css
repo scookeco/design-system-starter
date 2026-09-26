@@ -1,0 +1,89 @@
+@layer components {
+  /* 1. block */
+  .composer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+  }
+
+  /* 2. parts */
+  .composer__attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .composer__box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+    padding: var(--space-inset-xs);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-surface);
+  }
+
+  /* Grows with its content up to a scroll region's height, then scrolls. */
+  .composer__input {
+    field-sizing: content;
+    inline-size: 100%;
+    min-block-size: var(--size-control-md);
+    max-block-size: var(--size-scroll-region-sm);
+    padding-block: var(--space-inset-xs);
+    padding-inline: var(--space-inset-xs);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-default);
+    font: var(--text-body);
+    resize: none;
+  }
+
+  .composer__input::placeholder {
+    color: var(--color-fg-muted);
+  }
+
+  .composer__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  .composer__spacer {
+    flex: 1;
+  }
+
+  .composer__count {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .composer__note {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  /* 4. states */
+  .composer__count[data-over] {
+    color: var(--color-status-danger-fg);
+  }
+
+  .composer__box:has(.composer__input[aria-invalid="true"]) {
+    border-color: var(--color-status-danger-fg);
+  }
+
+  .composer[data-disabled] .composer__box {
+    border-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+  }
+}

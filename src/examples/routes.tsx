@@ -50,6 +50,15 @@ const PersonRecord = page(async () => {
 });
 const Setup = page(async () => noParams((await import('./SetupWizard')).SetupWizard));
 
+// AI patterns (PR: AI-native patterns). Under /assistant, so no /records/:id pattern shadows them.
+const AssistantChat = page(async () => noParams((await import('./AssistantChatPage')).AssistantChatPage));
+const AiNewRecord = page(async () => noParams((await import('./CreateWithAi')).CreateWithAi));
+const AiTidyOverdue = page(async () => noParams((await import('./AiReviewChanges')).AiReviewChanges));
+const AiRecordCopilot = page(async () => {
+  const { RecordCopilot } = await import('./RecordCopilot');
+  return ({ params }) => <RecordCopilot recordId={params.id ?? ''} />;
+});
+
 export const ROUTES: readonly Route[] = [
   { path: '/', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
   { path: '/home', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
@@ -66,4 +75,10 @@ export const ROUTES: readonly Route[] = [
   { path: '/settings', layout: 'shell', page: Settings, guard: 'workspace:read', nav: '/settings' },
   { path: '/settings/:section', layout: 'shell', page: Settings, guard: 'workspace:read', nav: '/settings' },
   { path: '/setup', layout: 'focused', page: Setup, guard: 'workspace:manage', nav: '' },
+  // --- AI patterns: the assistant runs as the person, so each page is guarded by what it does. ---
+  { path: '/assistant', layout: 'shell', page: AssistantChat, guard: 'record:read', nav: '' },
+  { path: '/assistant/new-record', layout: 'shell', page: AiNewRecord, guard: 'record:create', nav: '/records' },
+  { path: '/assistant/tidy-overdue', layout: 'shell', page: AiTidyOverdue, guard: 'record:move', nav: '/records' },
+  { path: '/assistant/records/:id', layout: 'shell', page: AiRecordCopilot, guard: 'record:read', nav: '/records' },
+  // --- end AI patterns ---
 ];

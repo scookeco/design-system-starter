@@ -1,0 +1,57 @@
+@layer components {
+  /* 1. block */
+  .streaming-text {
+    min-inline-size: 0;
+  }
+
+  /* 2. parts */
+  .streaming-text__pending {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-body);
+  }
+
+  .streaming-text__dots {
+    display: inline-flex;
+    gap: var(--space-gap-2xs);
+  }
+
+  .streaming-text__dots > span,
+  .streaming-text__caret {
+    display: inline-block;
+    animation-name: streaming-text-blink;
+    animation-duration: var(--motion-pulse);
+    animation-timing-function: var(--ease-standard);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  .streaming-text__dots > span {
+    inline-size: var(--space-gap-xs);
+    block-size: var(--space-gap-xs);
+    border-radius: var(--radius-pill);
+    background: currentcolor;
+  }
+
+  .streaming-text__dots > span:nth-child(2) {
+    animation-delay: var(--motion-slow);
+  }
+
+  /* The caret: a bar at the end of the text while it arrives. Reduced motion: motion.pulse is 0, so it holds still. */
+  .streaming-text__caret {
+    inline-size: var(--focus-ring-width);
+    block-size: var(--size-icon-sm);
+    margin-inline-start: var(--space-gap-2xs);
+    background: var(--color-fg-muted);
+    vertical-align: text-bottom;
+  }
+
+  @keyframes streaming-text-blink {
+    to {
+      opacity: 0;
+    }
+  }
+}

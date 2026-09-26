@@ -50,6 +50,12 @@ export interface AppShellProps extends EscapeHatch {
   /** The page. Rendered inside <main>, the only region that scrolls. */
   children: ReactNode;
   /**
+   * An assistant beside the page: an <AssistantPanel>. Wide, it is a column at main's inline end,
+   * under the header, and main keeps scrolling on its own; narrow, it gives way to a launcher in the
+   * header that opens the panel in a Drawer. Omit it and the frame is unchanged.
+   */
+  assistant?: ReactNode;
+  /**
    * Page action bar (a long form's Cancel · Save). Sticks to the bottom of main while the page
    * scrolls. A submit button here reaches its form with the form="<form id>" attribute.
    */
@@ -99,6 +105,7 @@ export function AppShell({
   userMenu,
   children,
   footer,
+  assistant,
   skipLinkLabel = 'Skip to content',
   menuLabel = 'Menu',
   defaultNavOpen = false,
@@ -142,7 +149,7 @@ export function AppShell({
         <a className="app-shell__skip" href={`#${mainId}`} onClick={skipToMain}>
           {skipLinkLabel}
         </a>
-        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
+        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'} data-assistant={assistant ? 'true' : undefined}>
           <div className="app-shell__sidebar" id={sidebarId}>
             <div className="app-shell__brand">{brand}</div>
             <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>
@@ -196,6 +203,7 @@ export function AppShell({
             {children}
             {footer ? <div className="app-shell__footer">{footer}</div> : null}
           </main>
+          {assistant ? <div className="app-shell__assistant">{assistant}</div> : null}
         </div>
       </div>
     </ToastProvider>

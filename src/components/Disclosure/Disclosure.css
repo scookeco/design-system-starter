@@ -1,0 +1,56 @@
+@layer components {
+  /* Shared by Disclosure and Accordion: a full-width toggle with a turning chevron. */
+  .disclosure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+  }
+
+  .disclosure__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-sm);
+  }
+
+  .disclosure__trigger {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    min-block-size: var(--size-target-min);
+    padding-block: 0;
+    padding-inline: var(--space-inset-2xs);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-default);
+    font: var(--text-label);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .disclosure__trigger:hover {
+    background: var(--color-bg-hover);
+  }
+
+  .disclosure__trigger > .icon {
+    flex: none;
+    transition-property: rotate;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  .disclosure__trigger[aria-expanded="true"] > .icon {
+    rotate: 90deg;
+  }
+
+  .disclosure__meta {
+    flex: none;
+  }
+
+  .disclosure__content {
+    padding-inline-start: var(--space-inset-lg);
+    color: var(--color-fg-default);
+    font: var(--text-body);
+  }
+}
