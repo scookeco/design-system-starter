@@ -335,7 +335,12 @@
         "examples-create-and-edit--created",
         "examples-create-and-edit--create-failed",
         "examples-create-and-edit--quick-create-open",
-        "examples-create-and-edit--as-viewer-denied"
+        "examples-create-and-edit--as-viewer-denied",
+        "examples-create-and-edit--edit-record",
+        "examples-create-and-edit--edit-saved",
+        "examples-create-and-edit--edit-merged-with-theirs",
+        "examples-create-and-edit--edit-conflict",
+        "examples-create-and-edit--edit-conflict-per-field"
       ]
     },
     {
@@ -473,6 +478,7 @@
         "examples-record-page--rename-succeeded",
         "examples-record-page--rename-failed-rolled-back",
         "examples-record-page--rename-conflict",
+        "examples-record-page--rename-conflict-with-theirs",
         "examples-record-page--archive-pending",
         "examples-record-page--as-viewer-more-actions",
         "examples-record-page--as-editor-more-actions",

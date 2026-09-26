@@ -20,7 +20,9 @@
  * Writes go through named mutations (src/app/model/mutations.ts), each presented its own way:
  *   Rename   optimistic: the title changes at once ("Saving…"); a failure restores the old name
  *            and says so in a toast that stays; the typed name is kept for another try.
- *            A 409 (someone else changed it) shows a Banner with Reload instead.
+ *            A 409 (someone else changed it) shows the ConflictPanel when the server sent its
+ *            version (yours and theirs; Keep mine or Take theirs), or a Banner with Reload.
+ *   Edit     the edit form (/records/:id/edit), a versioned write with the same conflict panel.
  *   Archive  pessimistic: "Archiving…" on More, the other actions disabled, then the new status.
  *   Delete   pessimistic, confirmed; refused for records on legal hold (the canDelete predicate).
  *
@@ -60,7 +62,7 @@ import { ExampleShell } from './ExampleShell';
 import { DeletedElsewhere } from './Freshness';
 import type { RecordEntity } from '../app/api/schemas';
 import { useDeletedElsewhere } from '../app/model/live';
-import { isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
+import { conflictingRecord, isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
 import { isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
@@ -68,6 +70,8 @@ import { FieldDisplay, isNumericField } from '../app/registries/fields';
 import { RECORD_PROPERTIES } from '../app/registries/recordFields';
 import { usePersonName } from '../app/registries/refs';
 import { useAppSession, useCan } from '../app/session';
+import { useNavigate } from '../app/url/useUrlState';
+import { ConflictPanel } from './ConflictPanel';
 
 interface Activity {
   id: string;
@@ -173,6 +177,9 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const [activity, setActivity] = useState(ACTIVITY);
   const [comment, setComment] = useState('');
   const deletedElsewhere = useDeletedElsewhere(recordId);
+  const navigate = useNavigate();
+  /** The record as it was when the rename was sent: the base a conflict is compared against. */
+  const [renameBase, setRenameBase] = useState<RecordEntity | undefined>();
 
   const addComment = (event: FormEvent) => {
     event.preventDefault();
@@ -184,6 +191,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const submitRename = (name: string) => {
     const record = query.data;
     if (!record) return;
+    setRenameBase(record);
     rename.mutate(
       { name, version: record.version },
       {
@@ -324,11 +332,32 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   }
 
   const record = query.data;
+  const theirs = conflictingRecord(rename.error);
 
   return (
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
-        {isConflict(rename.error) ? (
+        {theirs && renameBase ? (
+          // The server sent its version: compare the name field by field and let the person choose.
+          <ConflictPanel
+            base={renameBase}
+            mine={{ ...renameBase, name: rename.variables?.name ?? renameBase.name }}
+            theirs={theirs}
+            fields={['name']}
+            pending={rename.isPending}
+            onResolve={({ name }) => {
+              if (name === undefined) rename.reset();
+              else {
+                setRenameBase(theirs);
+                rename.mutate({ name, version: theirs.version });
+              }
+            }}
+            onTakeTheirs={() => {
+              rename.reset();
+              void query.refetch();
+            }}
+          />
+        ) : isConflict(rename.error) ? (
           <Banner
             tone="warning"
             title="Someone else changed this record"
@@ -375,6 +404,9 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
                 }
                 // Shown when the person holds the capability; enabled when `can` allows it for this record.
                 items={[
+                  ...(can('record:edit')
+                    ? [{ label: 'Edit', disabled: !can('record:edit', record), onSelect: () => navigate(`/records/${record.id}/edit`) }]
+                    : []),
                   ...(can('record:rename')
                     ? [
                         {

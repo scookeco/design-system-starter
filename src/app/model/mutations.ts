@@ -6,6 +6,9 @@
  *   verb               presents     patches                           invalidates
  *   renameRecord       optimistic   detail + every cached list page   detail, lists   (counts can't change)
  *                                   holding it (then rolls back)
+ *   updateRecord       pessimistic  detail + listed copies (answer)   lists           (versioned, If-Match; a 409
+ *                                   on a 409: detail := theirs                        with no field changed on
+ *                                                                                     both sides is re-based once)
  *   moveRecord         pessimistic  detail + listed copies (answer)   lists, counts   (board column)
  *   archiveRecord      pessimistic  detail + listed copies (answer)   lists, counts
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
@@ -22,12 +25,14 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { deleteView, patchView, postView } from '../api/views';
-import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
+import { patchRecord, postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord, type RecordChanges } from '../api/records';
 import type { Account, Capability, MovableStatus, SavedView, SavedViewConfig, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
+import { applyChanges, compareVersions, realConflicts } from './conflicts';
 import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
+import { confirmRecord } from './writeQueue';
 
 /**
  * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
@@ -65,6 +70,57 @@ export const isForbidden = (error: unknown): error is ApiError => error instance
 
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;
+
+/** The record as the server has it now, from a 409 (theirs), if the server sent it. */
+export const conflictingRecord = (error: unknown): RecordEntity | undefined =>
+  isConflict(error) && error.current && 'status' in error.current ? error.current : undefined;
+
+/** An edit from the form: what changed, and the version of the record it started from. */
+export interface RecordEdit {
+  base: RecordEntity;
+  changes: RecordChanges;
+}
+
+/**
+ * updateRecord: pessimistic and versioned. Sends If-Match with the version the edit started from
+ * (the draft's base), not whatever the cache holds now, so a change someone made while the form
+ * was open is caught, never overwritten.
+ *
+ * On a 409, the server's current record ("theirs") is compared with the base and the edit, field by
+ * field (src/app/model/conflicts.ts). If no field was changed on both sides, the edit is re-based on
+ * their version and sent again, once: both changes stand. If one was, the 409 reaches the page with
+ * `current`, and the person decides (Keep mine, Take theirs, or field by field). Either way the
+ * detail entry takes their version, which is confirmed data.
+ */
+export function useUpdateRecord(id: string) {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const grant = useGrant();
+  const client = useQueryClient();
+  const key = recordKeys.detail(partition, id);
+  return useMutation({
+    mutationKey: [...partition, 'updateRecord', { id }],
+    mutationFn: async ({ base, changes }: RecordEdit) => {
+      refuseUnless(grant, 'record:edit', client.getQueryData<RecordEntity>(key) ?? base);
+      try {
+        return await patchRecord(tenant, id, changes, base.version);
+      } catch (error) {
+        const theirs = conflictingRecord(error);
+        if (!theirs || realConflicts(compareVersions(base, applyChanges(base, changes), theirs)).length > 0) throw error;
+        return patchRecord(tenant, id, changes, theirs.version);
+      }
+    },
+    onSuccess: (updated) => {
+      client.setQueryData(key, updated);
+      patchListedRecord(client, partition, id, () => updated);
+      return client.invalidateQueries({ queryKey: recordKeys.lists(partition) });
+    },
+    onError: (error) => {
+      const theirs = conflictingRecord(error);
+      if (theirs) confirmRecord(client, partition, theirs);
+    },
+  });
+}
 
 /**
  * renameRecord: optimistic. The new name shows at once; a failure puts the previous one back,

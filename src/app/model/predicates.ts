@@ -19,6 +19,8 @@ export const isOnLegalHold = (record: Pick<RecordEntity, 'tags'>) => record.tags
 
 /** Capabilities are predicates too: the button, the bulk guard and the server's refusal share them. */
 export const canRename = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
+/** Editing the other fields: the same rule as renaming (an archived record is read-only). */
+export const canEdit = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canArchive = (record: Pick<RecordEntity, 'status'>) => !isArchived(record);
 export const canDelete = (record: Pick<RecordEntity, 'tags'>) => !isOnLegalHold(record);
 /** Moving between board columns: anything not archived (archive and restore are their own verbs). */

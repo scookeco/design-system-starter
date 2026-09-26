@@ -23,6 +23,8 @@ export const CAPABILITIES = [
   'record:read-drafts',
   'record:create',
   'record:rename',
+  /** Change a record's other fields (owner, account, amount, tags) in the edit form. */
+  'record:edit',
   'record:move',
   'record:archive',
   'record:delete',
@@ -91,7 +93,7 @@ export const RecordSchema = z.object({
   /** A calendar date with no zone. */
   renewsOn: z.iso.date(),
   tags: z.array(z.string()),
-  /** Bumped on every write. Sent back with an edit so the server can refuse a stale one (409). */
+  /** Bumped on every write. Sent back with an edit (If-Match) so the server can refuse a stale one (409). */
   version: z.number().int().nonnegative(),
 });
 export type RecordEntity = z.infer<typeof RecordSchema>;

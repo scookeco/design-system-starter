@@ -1,13 +1,14 @@
 /**
  * The mock API: MSW request handlers over the in-memory database. It behaves like a real server:
  * search, filter, sort and paging happen here, `total` counts every match, writes bump a version,
- * a stale edit gets a 409, a replayed create returns the first result, and bulk deletes can
+ * versioned writes need If-Match and a stale one gets a 409 with the current entity, a replayed create returns the first result, and bulk deletes can
  * partly fail. Latency and failures come from mockConfig, and failures are real HTTP errors.
  *
  * The same handlers serve Storybook (msw/browser via msw-storybook-addon) and Vitest (msw/node).
  */
 import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
 import type { AccountInput } from '../api/accounts';
+import type { RecordChanges } from '../api/records';
 import {
   MOVABLE_STATUSES,
   RECORD_STATUSES,
@@ -26,7 +27,7 @@ import {
   type SortKey,
   type Tenant,
 } from '../api/schemas';
-import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
+import { canArchive, canDelete, canEdit, canMove, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
 import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
 import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
@@ -57,7 +58,8 @@ const settle = async (): Promise<Response | undefined> => {
  */
 export const handle =
   (
-    capability: Capability,
+    /** The capability, or (when the body decides, as a rename vs an edit) a function of the body. */
+    capability: Capability | ((body: unknown) => Capability),
     resolver: (args: { tenant: Tenant; grant: Grant; request: Request; params: Record<string, string | readonly string[] | undefined> }) => Response | Promise<Response>,
   ): HttpResponseResolver =>
   async ({ request, params }) => {
@@ -67,9 +69,31 @@ export const handle =
     const tenant = TenantSchema.safeParse(params.tenant);
     if (!tenant.success) return error(404, 'unknown_tenant', 'No such workspace.');
     const grant = grantFor(tenant.data);
-    if (!can(grant, capability)) return error(403, 'forbidden', DENIAL_REASONS[capability]);
+    const required = typeof capability === 'string' ? capability : capability(await request.clone().json().catch(() => undefined));
+    if (!can(grant, required)) return error(403, 'forbidden', DENIAL_REASONS[required]);
     return resolver({ tenant: tenant.data, grant, request, params });
   };
+
+/**
+ * Versioned writes: the version the client based its change on arrives as If-Match ("3"). Missing:
+ * 428, so a client can't skip the check by leaving the header out. Stale: 409 with the entity as it
+ * is now, so the client can show what changed. Returns the refusal, or undefined to go ahead.
+ */
+const precondition = (request: Request, current: RecordEntity | Account): Response | undefined => {
+  const header = request.headers.get('If-Match');
+  if (header === null) return error(428, 'precondition_required', 'This write needs an If-Match header with the version it was based on.');
+  const version = Number(/^(?:W\/)?"(\d+)"$/.exec(header.trim())?.[1] ?? Number.NaN);
+  if (version !== current.version) return error(409, 'conflict', `Someone else changed this ${'status' in current ? 'record' : 'account'}.`, current);
+  return undefined;
+};
+
+/** An entity with its version as the ETag header, so a client can also read it from there. */
+const withETag = (entity: RecordEntity | Account, init?: ResponseInit) =>
+  HttpResponse.json(entity, { ...init, headers: { ETag: `"${String(entity.version)}"` } });
+
+/** A rename sends only the name; anything more is an edit. */
+const renameOrEdit = (body: unknown): Capability =>
+  typeof body === 'object' && body !== null && Object.keys(body).every((key) => key === 'name') ? 'record:rename' : 'record:edit';
 
 const parseFilter = (url: URL): RecordFilter => {
   const view = RecordViewSchema.safeParse(url.searchParams.get('view') ?? 'all');
@@ -173,7 +197,7 @@ const workspaceHandlers = [
     `${API}/records/:id`,
     handle('record:read', ({ tenant, grant, params }) => {
       const record = db(tenant).records.find((r) => r.id === params.id && canSee(grant, r));
-      return record ? HttpResponse.json(record) : error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
+      return record ? withETag(record) : error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
     }),
   ),
 
@@ -221,18 +245,29 @@ const workspaceHandlers = [
 
   http.patch(
     `${API}/records/:id`,
-    handle('record:rename', async ({ tenant, request, params }) => {
+    handle(renameOrEdit, async ({ tenant, request, params }) => {
       const partition = db(tenant);
       const index = partition.records.findIndex((r) => r.id === params.id);
       const current = partition.records[index];
       if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
-      const body = (await request.json()) as Partial<{ name: string; version: number }>;
-      if (!body.name?.trim()) return error(422, 'invalid', 'Enter a name.');
-      if (!canRename(current)) return error(403, 'forbidden', 'Archived records can’t be renamed.');
-      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this record.', current);
-      const next = touch({ ...current, name: body.name.trim() });
+      const body = (await request.json()) as RecordChanges;
+      if (body.name !== undefined && !body.name.trim()) return error(422, 'invalid', 'Enter a name.');
+      if (body.ownerId !== undefined && !partition.people.some((p) => p.id === body.ownerId)) return error(422, 'invalid', 'Choose someone in this workspace.');
+      if (body.accountId !== undefined && body.accountId !== null && !partition.accounts.some((a) => a.id === body.accountId)) return error(422, 'invalid', 'Choose an account.');
+      if (body.amountMinor !== undefined && (!Number.isInteger(body.amountMinor) || body.amountMinor < 0)) return error(422, 'invalid', 'Enter an amount of 0 or more.');
+      if (!canEdit(current)) return error(403, 'forbidden', 'Archived records can’t be changed.');
+      const refused = precondition(request, current);
+      if (refused) return refused;
+      const { amountMinor, name, ...rest } = body;
+      const next = touch({
+        ...current,
+        ...rest,
+        ...(name === undefined ? {} : { name: name.trim() }),
+        ...(amountMinor === undefined ? {} : { amount: { ...current.amount, minor: amountMinor } }),
+        tags: [...(rest.tags ?? current.tags)],
+      });
       partition.records[index] = next;
-      return HttpResponse.json(next);
+      return withETag(next);
     }),
   ),
 
@@ -257,14 +292,15 @@ const workspaceHandlers = [
       const index = partition.records.findIndex((r) => r.id === params.id);
       const current = partition.records[index];
       if (!current) return error(404, 'not_found', 'This record doesn’t exist, or was deleted.');
-      const body = (await request.json()) as Partial<{ status: string; version: number }>;
+      const body = (await request.json()) as Partial<{ status: string }>;
       const status = MOVABLE_STATUSES.find((s) => s === body.status);
       if (!status) return error(422, 'invalid', 'Choose draft, pending, active or overdue.');
       if (!canMove(current)) return error(409, 'archived', 'Archived records can’t be moved. Restore it first.', current);
-      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this record.', current);
+      const refused = precondition(request, current);
+      if (refused) return refused;
       const next = touch({ ...current, status });
       partition.records[index] = next;
-      return HttpResponse.json(next);
+      return withETag(next);
     }),
   ),
 
@@ -337,14 +373,15 @@ const workspaceHandlers = [
       const index = partition.accounts.findIndex((a) => a.id === params.id);
       const current = partition.accounts[index];
       if (!current) return error(404, 'not_found', 'This account doesn’t exist, or was deleted.');
-      const body = (await request.json()) as Partial<AccountInput> & { version?: number };
+      const body = (await request.json()) as Partial<AccountInput>;
       const input = validAccount(tenant, { name: current.name, domain: current.domain, industry: current.industry, ownerId: current.ownerId, arrMinor: current.arr.minor, customerSince: current.customerSince, ...body });
       if (!input) return error(422, 'invalid', 'Some fields are missing or invalid.');
-      if (body.version !== current.version) return error(409, 'conflict', 'Someone else changed this account.', current);
+      const refused = precondition(request, current);
+      if (refused) return refused;
       const { arrMinor, ...rest } = input;
       const next = bump({ ...current, ...rest, arr: { minor: arrMinor, currency: current.arr.currency } });
       partition.accounts[index] = next;
-      return HttpResponse.json(next);
+      return withETag(next);
     }),
   ),
 ];

@@ -1,9 +1,12 @@
 /**
  * Per-story (and per-test) server behaviours layered over the default handlers: a request held
- * open forever (loading and pending states), a real error response, an empty workspace and a
- * payload that breaks the contract.
+ * open forever (loading and pending states), a real error response, an empty workspace, a
+ * payload that breaks the contract, and someone else saving first (a conflict).
  */
 import { delay, http, HttpResponse } from 'msw';
+import { TenantSchema } from '../api/schemas';
+import { db } from './db';
+import { anotherUser, type RecordChanges } from './live';
 
 type Method = 'get' | 'post' | 'patch' | 'delete';
 const API = '*/api/t/:tenant';
@@ -25,3 +28,19 @@ export const emptyWorkspace = [
 
 /** A 200 whose body breaks the contract: the boundary rejects it and the page shows its error state. */
 export const malformed = (path: string) => http.get(`${API}${path}`, () => HttpResponse.json({ items: [{ id: 42 }], total: 'many' }));
+
+/**
+ * Someone else saves first: the next write to a record applies their change (silently: the live
+ * event is lost), then the real handler answers, now with a 409 and their version. Once per
+ * database, so a retry after the conflict goes through.
+ */
+export const theyEditFirst = (changes: RecordChanges) => {
+  const done = new WeakSet<object>();
+  return http.patch(`${API}/records/:id`, ({ params }) => {
+    const tenant = TenantSchema.parse(params.tenant);
+    if (done.has(db(tenant))) return undefined;
+    done.add(db(tenant));
+    anotherUser(tenant, { kind: 'edit', id: String(params.id), changes, silent: true });
+    return undefined;
+  });
+};

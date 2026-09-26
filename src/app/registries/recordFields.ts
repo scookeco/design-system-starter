@@ -33,3 +33,12 @@ export const CREATE_FIELDS = {
   ],
   terms: [{ type: 'money', id: 'amount', label: 'Amount' }],
 } as const satisfies Record<string, readonly FormFieldDef<string>[]>;
+
+/** The fields the edit form changes: what a conflict is compared on, field by field (src/app/model/conflicts.ts). */
+export const EDIT_FIELDS = [
+  { type: 'text', id: 'name', label: 'Name', get: (r: RecordEntity) => r.name },
+  { type: 'person', id: 'owner', label: 'Owner', get: (r: RecordEntity) => r.ownerId },
+  { type: 'account', id: 'account', label: 'Account', get: (r: RecordEntity) => r.accountId },
+  { type: 'money', id: 'amount', label: 'Amount', get: (r: RecordEntity) => r.amount },
+] as const satisfies readonly FieldDef<RecordEntity>[];
+export type EditFieldId = (typeof EDIT_FIELDS)[number]['id'];

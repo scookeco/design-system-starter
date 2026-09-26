@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fail, hold } from '../app/mocks/overrides';
+import { fail, hold, theyEditFirst } from '../app/mocks/overrides';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { CreateEditFlow } from './CreateEditFlow';
 import { Guard } from './Permission';
@@ -40,3 +40,24 @@ export const AsViewerDenied: Story = {
   ),
 };
 
+
+// Edit: /records/:id/edit. The save is a versioned write (If-Match); theyEditFirst makes someone
+// else save a change first, so the save meets a 409 with their version.
+const edit = { recordId: 'r-1001' } as const;
+export const EditRecord: Story = { args: edit };
+export const EditSaved: Story = { args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true } };
+/** They changed the amount, you changed the name: no field collides, so your edit is re-based on their version and saved. */
+export const EditMergedWithTheirs: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ amountMinor: 9_900_000 })),
+};
+/** You both renamed it: yours and theirs side by side, Keep mine (overwrite) or Take theirs. */
+export const EditConflict: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ name: 'Hardware lease (renegotiated)' })),
+};
+/** You both changed the name and the amount: a choice per field, then Save these choices. */
+export const EditConflictPerField: Story = {
+  args: { ...edit, initialDraft: { name: 'Hardware lease 2027', amount: '15000.00' }, initialSubmitting: true },
+  parameters: mswOverrides(theyEditFirst({ name: 'Hardware lease (renegotiated)', amountMinor: 9_900_000 })),
+};

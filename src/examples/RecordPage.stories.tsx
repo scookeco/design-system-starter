@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fail, hold } from '../app/mocks/overrides';
+import { fail, hold, theyEditFirst } from '../app/mocks/overrides';
 import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { RecordPage } from './RecordPage';
 
@@ -31,6 +31,8 @@ export const RenameConflict: Story = {
   args: rename,
   parameters: mswOverrides(fail('patch', '/records/:id', 409, 'conflict', 'Someone else changed this record.')),
 };
+/** A 409 that carries their version: the conflict panel compares the names, with Keep mine and Take theirs. */
+export const RenameConflictWithTheirs: Story = { args: rename, parameters: mswOverrides(theyEditFirst({ name: 'Master cleaning agreement (renewed)' })) };
 /** Pessimistic archive, in flight: "Archiving…" on More, the other actions disabled. */
 export const ArchivePending: Story = { tags: ['busy'], args: { initialAction: { kind: 'archive' } }, parameters: mswOverrides(hold('post', '/records/:id/archive')) };
 
