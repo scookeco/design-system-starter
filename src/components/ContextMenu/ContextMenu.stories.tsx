@@ -9,7 +9,7 @@ const meta = {
     items: [
       { label: 'Open', shortcut: 'enter' },
       { label: 'Mark as unread', shortcut: 'u' },
-      { label: 'Archive', icon: 'archive', shortcut: 'e' },
+      { label: 'Archive', shortcut: 'e' },
       'separator',
       { label: 'Delete', tone: 'danger' },
     ],

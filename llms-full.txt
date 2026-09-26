@@ -4077,7 +4077,7 @@ component, part of Toolbar. A divider between groups of toolbar controls.
 
 ```tsx
 <Toolbar label="Conversation actions">
-  <ToolbarButton icon="archive" shortcut="e">
+  <ToolbarButton shortcut="e">
     Archive
   </ToolbarButton>
   <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>

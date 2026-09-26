@@ -8,7 +8,7 @@ const meta = {
     label: 'Conversation actions',
     children: (
       <>
-        <ToolbarButton icon="archive" shortcut="e">
+        <ToolbarButton shortcut="e">
           Archive
         </ToolbarButton>
         <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>

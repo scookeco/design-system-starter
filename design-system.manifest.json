@@ -2454,12 +2454,7 @@
             "eye-off",
             "sparkle",
             "thumbs-up",
-            "thumbs-down",
-            "inbox",
-            "archive",
-            "calendar",
-            "edit",
-            "shield"
+            "thumbs-down"
           ]
         },
         {
@@ -7978,12 +7973,7 @@
         "eye-off",
         "sparkle",
         "thumbs-up",
-        "thumbs-down",
-        "inbox",
-        "archive",
-        "calendar",
-        "edit",
-        "shield"
+        "thumbs-down"
       ]
     },
     {
@@ -16596,12 +16586,7 @@
             "eye-off",
             "sparkle",
             "thumbs-up",
-            "thumbs-down",
-            "inbox",
-            "archive",
-            "calendar",
-            "edit",
-            "shield"
+            "thumbs-down"
           ]
         },
         {
@@ -16830,7 +16815,7 @@
         ],
         "do": {
           "caption": "Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.",
-          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton icon=\"archive\" shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n  <ToolbarButton shortcut=\"u\">Mark as unread</ToolbarButton>\n  <ToolbarSeparator />\n  <ToolbarButton icon=\"download\" hideLabel>\n    Export\n  </ToolbarButton>\n</Toolbar>"
+          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n  <ToolbarButton shortcut=\"u\">Mark as unread</ToolbarButton>\n  <ToolbarSeparator />\n  <ToolbarButton icon=\"download\" hideLabel>\n    Export\n  </ToolbarButton>\n</Toolbar>"
         },
         "dont": {
           "caption": "A page’s main actions forced into a toolbar: they belong in the header, as ordinary buttons.",
@@ -16950,12 +16935,7 @@
             "eye-off",
             "sparkle",
             "thumbs-up",
-            "thumbs-down",
-            "inbox",
-            "archive",
-            "calendar",
-            "edit",
-            "shield"
+            "thumbs-down"
           ]
         },
         {

@@ -40,11 +40,6 @@ const PATHS = {
   stop: 'M6 6h8v8H6z',
   'thumbs-up': 'M6.5 9v8h-3V9zM6.5 9l3-6c1.4 0 2 1 2 2.2V8h4a1.5 1.5 0 011.5 1.8l-1.2 5.5a2 2 0 01-2 1.7H6.5',
   'thumbs-down': 'M6.5 11V3h-3v8zM6.5 11l3 6c1.4 0 2-1 2-2.2V12h4a1.5 1.5 0 001.5-1.8l-1.2-5.5a2 2 0 00-2-1.7H6.5',
-  inbox: 'M3 11l2.5-7h9l2.5 7v5.5H3zM3 11h4l1 2h4l1-2h4',
-  archive: 'M3 4h14v3.5H3zM4.5 7.5v9h11v-9M8 11h4',
-  calendar: 'M3.5 5h13v11.5h-13zM3.5 8.5h13M7 3v4M13 3v4',
-  edit: 'M13.5 3.5l3 3L7 16H4v-3zM11.5 5.5l3 3',
-  shield: 'M10 2.5l6 2.5v5c0 3.5-2.5 6-6 7.5-3.5-1.5-6-4-6-7.5V5z',
 } as const;
 
 export type IconName = keyof typeof PATHS;

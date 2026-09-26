@@ -193,7 +193,7 @@ function InboxContent({ initialSelection }: { initialSelection: readonly string[
             <span role="status">{`${format.number(selected.length)} selected`}</span>
           </Text>
           <Toolbar label="Selected conversations">
-            <ToolbarButton icon="archive" shortcut="e" onClick={archiveTargets}>
+            <ToolbarButton shortcut="e" onClick={archiveTargets}>
               {archiveLabel}
             </ToolbarButton>
             <ToolbarButton shortcut="u" onClick={toggleRead}>
@@ -321,7 +321,7 @@ function InboxRow({ item, open, selected, href, archiveLabel, onSelectedChange, 
   const from = usePersonName(item.fromId) ?? '…';
   const actions: MenuEntry[] = [
     { label: item.read ? 'Mark unread' : 'Mark read', shortcut: 'u', onSelect: onToggleRead },
-    { label: archiveLabel, icon: 'archive', shortcut: 'e', onSelect: onArchive },
+    { label: archiveLabel, shortcut: 'e', onSelect: onArchive },
   ];
   return (
     <ContextMenu items={actions} label={item.subject}>
@@ -378,7 +378,7 @@ function Detail({ item, archiveLabel, onArchive, onToggleRead }: { item: InboxIt
         </Cluster>
       </Stack>
       <Toolbar label="Conversation actions">
-        <ToolbarButton icon="archive" shortcut="e" onClick={onArchive}>
+        <ToolbarButton shortcut="e" onClick={onArchive}>
           {archiveLabel}
         </ToolbarButton>
         <ToolbarButton shortcut="u" onClick={onToggleRead}>

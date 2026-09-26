@@ -114,7 +114,7 @@ function Field({ size, error, disabled, calendarLabel, children }: { size: strin
     <Group className="field__control picker__control date-picker__control" data-size={size} data-invalid={error ? true : undefined} data-disabled={disabled || undefined}>
       {children}
       <Button className="picker__button" aria-label={calendarLabel}>
-        <Icon name="calendar" />
+        <Icon name="chevron-down" />
       </Button>
     </Group>
   );

@@ -131,7 +131,6 @@ export function InlineEdit({
           <span className="inline-edit__value" data-empty={value ? undefined : 'true'}>
             {value || placeholder}
           </span>
-          {disabledReason ? null : <Icon name="edit" />}
         </button>
         {disabledReason ? (
           <p className="inline-edit__message" id={`${id}-reason`}>

@@ -17,7 +17,7 @@ const NAV: readonly NavSection[] = [
   {
     items: [
       { label: 'Home', href: '/home', icon: 'home' },
-      { label: 'Inbox', href: '/inbox', icon: 'inbox' },
+      { label: 'Inbox', href: '/inbox', icon: 'download' },
       { label: 'Records', href: '/records', icon: 'file' },
       { label: 'Accounts', href: '/accounts', icon: 'building' },
       { label: 'People', href: '/people', icon: 'users' },
@@ -27,7 +27,7 @@ const NAV: readonly NavSection[] = [
     label: 'Workspace',
     items: [
       { label: 'Settings', href: '/settings', icon: 'settings' },
-      { label: 'Admin', href: '/admin/members', icon: 'shield' },
+      { label: 'Admin', href: '/admin/members', icon: 'eye' },
     ],
   },
 ];

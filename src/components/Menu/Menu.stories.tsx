@@ -31,7 +31,7 @@ export const WithShortcuts: Story = {
     defaultOpen: true,
     items: [
       { label: 'Mark as read', shortcut: 'u' },
-      { label: 'Archive', icon: 'archive', shortcut: 'e' },
+      { label: 'Archive', shortcut: 'e' },
       { label: 'Open command palette', shortcut: 'mod+k' },
       'separator',
       { label: 'Delete conversation', tone: 'danger', shortcut: '#' },

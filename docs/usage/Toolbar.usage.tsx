@@ -12,7 +12,7 @@ export const usage: UsageDoc = {
     caption: 'Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.',
     render: () => (
       <Toolbar label="Conversation actions">
-        <ToolbarButton icon="archive" shortcut="e">
+        <ToolbarButton shortcut="e">
           Archive
         </ToolbarButton>
         <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>

@@ -32,10 +32,6 @@
     cursor: default;
   }
 
-  .inline-edit__view > .icon {
-    color: var(--color-fg-muted);
-  }
-
   .inline-edit__value {
     overflow: hidden;
     text-overflow: ellipsis;

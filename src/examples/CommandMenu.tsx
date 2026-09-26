@@ -48,8 +48,8 @@ const SECTION_ICONS: Readonly<Record<string, IconName>> = {
   '/accounts': 'building',
   '/people': 'users',
   '/settings': 'settings',
-  '/inbox': 'inbox',
-  '/admin': 'shield',
+  '/inbox': 'download',
+  '/admin': 'eye',
 };
 
 interface PaletteAction {
