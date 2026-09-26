@@ -401,6 +401,14 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               becomes the base, and is never overwritten by an old snapshot.
             </>,
             <>
+              The server audits every record write from its write path (created, renamed, edited field by field, tagged, untagged,
+              moved, archived, restored, deleted, each record a bulk job deletes), so the admin console’s audit log shows them.
+            </>,
+            <>
+              A move decided from a snapshot (an assistant’s proposal) passes <code>asRead</code>: it’s sent on the version it was
+              proposed from, so a stale one is still a 409 even after a live update refreshed the cache.
+            </>,
+            <>
               The page says what’s pending (“Saving 2 changes…”; see{' '}
               <StoryLink id="examples-record-page--renames-queued">queued renames</StoryLink>). Sign-out drops what hasn’t been sent.
             </>,

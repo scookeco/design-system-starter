@@ -18,7 +18,7 @@ describe('record writes are audited', () => {
     v = (await patchRecord('acme', r.id, { amountMinor: 4_200, ownerId: r.ownerId === 'acme-p03' ? 'acme-p04' : 'acme-p03' }, v)).version;
     v = (await patchRecord('acme', r.id, { tags: ['priority'] }, v)).version;
     v = (await patchRecord('acme', r.id, { tags: [] }, v)).version;
-    v = (await postStatus('acme', r.id, 'pending', v)).version;
+    await postStatus('acme', r.id, 'pending', v);
     v = (await postArchive('acme', r.id)).version;
     await postRestore('acme', r.id, 'pending', v);
     const events = (await latest(7)).reverse();
