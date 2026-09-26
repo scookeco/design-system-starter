@@ -4,11 +4,12 @@
  */
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { getAccount, listAccounts } from '../api/accounts';
+import { listViews } from '../api/views';
 import { countRecords, getRecord, listPeople, listRecords } from '../api/records';
 import type { Account, RecordFilter, RecordQuery } from '../api/schemas';
 import { usePartition } from '../session';
 import { useTenant } from '../tenant';
-import { accountKeys, recordKeys, type Partition } from './keys';
+import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
 
 /**
  * keepPreviousData, but never across a partition: the previous page may stay on screen while the
@@ -94,3 +95,11 @@ export function useAccount(id: string) {
     initialDataUpdatedAt: () => client.getQueryState(accountKeys.list(partition))?.dataUpdatedAt,
   });
 }
+
+/** The signed-in person's saved views of the list, in this workspace. */
+export function useSavedViews() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  return useQuery({ queryKey: viewKeys.list(partition), queryFn: ({ signal }) => listViews(tenant, signal), select: (data) => data.items });
+}
+

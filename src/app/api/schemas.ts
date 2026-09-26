@@ -178,3 +178,37 @@ export interface RecordQuery {
 
 /** A filter without paging or sort: what "Select all N matching" selects, and what counts count. */
 export type RecordFilter = Pick<RecordQuery, 'q' | 'status' | 'view' | 'account' | 'owner'>;
+
+/** The list's surfaces over one query (see DISPLAYS in src/app/model/projections.ts). */
+export const DISPLAY_MODES = ['table', 'board'] as const;
+export type Display = (typeof DISPLAY_MODES)[number];
+
+/** The list's optional columns (the name is always shown). A saved view says which are visible, in this order. */
+export const RECORD_COLUMNS = ['owner', 'account', 'status', 'updated', 'amount'] as const;
+export const RecordColumnSchema = z.enum(RECORD_COLUMNS);
+export type RecordColumn = z.infer<typeof RecordColumnSchema>;
+
+/**
+ * A saved view is config, not code: the named combination of tab, search, filters, sort, columns
+ * and display that the list's URL already expresses. Stored per person, per workspace.
+ */
+export const SavedViewConfigSchema = z.object({
+  view: RecordViewSchema,
+  q: z.string(),
+  status: z.array(RecordStatusSchema),
+  sort: z.enum(SORT_KEYS),
+  columns: z.array(RecordColumnSchema),
+  display: z.enum(DISPLAY_MODES),
+});
+export type SavedViewConfig = z.infer<typeof SavedViewConfigSchema>;
+
+export const SavedViewSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  config: SavedViewConfigSchema,
+  /** Opens when the list is opened with nothing in its URL. At most one per person per workspace. */
+  isDefault: z.boolean(),
+});
+export type SavedView = z.infer<typeof SavedViewSchema>;
+export const SavedViewsSchema = z.object({ items: z.array(SavedViewSchema) });
+

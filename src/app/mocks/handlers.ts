@@ -14,8 +14,10 @@ import {
   RECORD_VIEWS,
   RecordStatusSchema,
   RecordViewSchema,
+  SavedViewConfigSchema,
   TenantSchema,
   type Account,
+  type SavedView,
   type Capability,
   type RecordEntity,
   type RecordFilter,
@@ -27,7 +29,7 @@ import {
 import { canArchive, canDelete, canMove, canRename, hasStatus, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
 import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
 import { mockConfig } from './config';
-import { bump, currentSession, db, endSession, grantFor, isSignedIn, touch } from './db';
+import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
 import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 
@@ -345,8 +347,72 @@ const workspaceHandlers = [
   ),
 ];
 
+/** Saved views: the signed-in person's, in this workspace. Anyone who can read the list may keep views of it. */
+const myViews = (tenant: Tenant) => {
+  const partition = db(tenant);
+  const mine = partition.views.get(currentUserId()) ?? [];
+  partition.views.set(currentUserId(), mine);
+  return mine;
+};
+
+const viewHandlers = [
+  http.get(
+    `${API}/views`,
+    handle('record:read', ({ tenant }) => HttpResponse.json({ items: myViews(tenant) })),
+  ),
+
+  http.post(
+    `${API}/views`,
+    handle('record:read', async ({ tenant, request }) => {
+      const body = (await request.json()) as Partial<{ name: string; config: unknown }>;
+      const name = body.name?.trim();
+      const config = SavedViewConfigSchema.safeParse(body.config);
+      if (!name || !config.success) return error(422, 'invalid', 'Name the view.');
+      const views = myViews(tenant);
+      if (views.some((v) => v.name.toLowerCase() === name.toLowerCase())) return error(422, 'duplicate', `You already have a view called “${name}”.`);
+      const partition = db(tenant);
+      const view: SavedView = { id: `${tenant}-v${String(partition.nextViewId)}`, name, config: config.data, isDefault: false };
+      partition.nextViewId += 1;
+      views.push(view);
+      return HttpResponse.json(view, { status: 201 });
+    }),
+  ),
+
+  http.patch(
+    `${API}/views/:id`,
+    handle('record:read', async ({ tenant, request, params }) => {
+      const views = myViews(tenant);
+      const index = views.findIndex((v) => v.id === params.id);
+      const current = views[index];
+      if (!current) return error(404, 'not_found', 'This view doesn’t exist, or was deleted.');
+      const body = (await request.json()) as Partial<{ name: string; config: unknown; isDefault: boolean }>;
+      const name = body.name === undefined ? current.name : body.name.trim();
+      const config = body.config === undefined ? { success: true as const, data: current.config } : SavedViewConfigSchema.safeParse(body.config);
+      if (!name || !config.success) return error(422, 'invalid', 'Name the view.');
+      if (views.some((v) => v.id !== current.id && v.name.toLowerCase() === name.toLowerCase())) return error(422, 'duplicate', `You already have a view called “${name}”.`);
+      // One default per person per workspace: setting one unsets the other.
+      if (body.isDefault === true) for (const [i, v] of views.entries()) views[i] = { ...v, isDefault: false };
+      const next: SavedView = { ...current, name, config: config.data, isDefault: body.isDefault ?? current.isDefault };
+      views[index] = next;
+      return HttpResponse.json(next);
+    }),
+  ),
+
+  http.delete(
+    `${API}/views/:id`,
+    handle('record:read', ({ tenant, params }) => {
+      const views = myViews(tenant);
+      const index = views.findIndex((v) => v.id === params.id);
+      if (index === -1) return error(404, 'not_found', 'This view doesn’t exist, or was deleted.');
+      views.splice(index, 1);
+      return HttpResponse.json({ deleted: String(params.id) });
+    }),
+  ),
+];
+
 export const handlers = [
   ...workspaceHandlers,
+  ...viewHandlers,
   // The session: not workspace data, so outside the tenant routes.
   http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
   http.delete('*/api/session', async () => {

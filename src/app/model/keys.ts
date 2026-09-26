@@ -27,3 +27,9 @@ export const accountKeys = {
   list: (p: Partition) => [...p, 'accounts', {}] as const,
   detail: (p: Partition, id: string) => [...p, 'account', { id }] as const,
 };
+
+export const viewKeys = {
+  /** The signed-in person's saved views in this partition. */
+  list: (p: Partition) => [...p, 'views', {}] as const,
+};
+

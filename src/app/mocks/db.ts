@@ -2,9 +2,9 @@
  * The mock server's in-memory database, one partition per tenant. Seeded deterministically and
  * reset before every story and test, so one story's writes never leak into the next.
  */
-import { SessionSchema, TENANTS, type Account, type Person, type RecordEntity, type Role, type Session, type Tenant } from '../api/schemas';
+import { SessionSchema, TENANTS, type Account, type Person, type RecordEntity, type Role, type SavedView, type Session, type Tenant } from '../api/schemas';
 import { ROLE_CAPABILITIES, type Grant } from '../model/permissions';
-import { SEED_EPOCH, seedAccounts, seedPeople, seedRecords } from './seed';
+import { SEED_EPOCH, seedAccounts, seedPeople, seedRecords, seedViews } from './seed';
 
 interface Partition {
   records: RecordEntity[];
@@ -13,11 +13,26 @@ interface Partition {
   /** Idempotency-Key → what that request created. A replayed create returns it again. */
   created: Map<string, RecordEntity | Account>;
   nextId: number;
+  /** Saved views, per person (user id). Nobody sees anyone else's. */
+  views: Map<string, SavedView[]>;
+  nextViewId: number;
 }
+
+/** Who the identity provider says is signed in. */
+const SIGNED_IN = { id: 'u-sam', name: 'Sam Rivera', email: 'sam.rivera@example.com' };
 
 const fresh = (tenant: Tenant): Partition => {
   const records = seedRecords(tenant);
-  return { records, people: seedPeople(tenant), accounts: seedAccounts(tenant), created: new Map(), nextId: 1001 + records.length };
+  const views = seedViews(tenant);
+  return {
+    records,
+    people: seedPeople(tenant),
+    accounts: seedAccounts(tenant),
+    created: new Map(),
+    nextId: 1001 + records.length,
+    views: new Map([[SIGNED_IN.id, views]]),
+    nextViewId: views.length + 1,
+  };
 };
 
 let partitions = new Map<Tenant, Partition>();
@@ -28,7 +43,6 @@ let writes = 0;
  * the role from here on every request (never from the request itself), so a client that skips its
  * own checks still gets a 403.
  */
-const SIGNED_IN = { id: 'u-sam', name: 'Sam Rivera', email: 'sam.rivera@example.com' };
 const ADMIN_EVERYWHERE = Object.fromEntries(TENANTS.map((t) => [t, 'admin'])) as Record<Tenant, Role>;
 let roles: Record<Tenant, Role> = { ...ADMIN_EVERYWHERE };
 let signedIn = true;
@@ -45,6 +59,9 @@ export const endSession = () => {
   signedIn = false;
 };
 export const isSignedIn = () => signedIn;
+
+/** The signed-in person's id: saved views are stored under it. */
+export const currentUserId = () => SIGNED_IN.id;
 
 /** Set the signed-in person's role: one for every workspace, or per workspace. Stories and tests use this. */
 export const setRoles = (next: Role | Partial<Record<Tenant, Role>>) => {

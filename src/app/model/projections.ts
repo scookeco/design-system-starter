@@ -2,7 +2,7 @@
  * Views are pure projections of cached entities: store → view, no copies. Each derived item keeps
  * the id it came from, and every "what counts as X" goes through a named predicate.
  */
-import type { Capability, RecordEntity, RecordStatus, RecordView } from '../api/schemas';
+import type { Capability, Display, RecordColumn, RecordEntity, RecordStatus, RecordView } from '../api/schemas';
 import { canDelete, canMove, hasStatus, isOnLegalHold, VIEW_PREDICATES } from './predicates';
 import { STATUS } from './status';
 
@@ -46,8 +46,17 @@ export const toRow = (record: RecordEntity): RecordRow => ({
 export const DISPLAYS = [
   { value: 'table', label: 'Table' },
   { value: 'board', label: 'Board' },
-] as const;
-export type Display = (typeof DISPLAYS)[number]['value'];
+] as const satisfies readonly { value: Display; label: string }[];
+export type { Display };
+
+/** The table's optional columns, in their order, with their headers. The name column is always there. */
+export const COLUMNS: readonly { id: RecordColumn; label: string }[] = [
+  { id: 'owner', label: 'Owner' },
+  { id: 'account', label: 'Account' },
+  { id: 'status', label: 'Status' },
+  { id: 'updated', label: 'Updated' },
+  { id: 'amount', label: 'Amount' },
+];
 
 /** A board column: a status, its label and tone, and the rows its predicate lets through. */
 export interface BoardColumn {

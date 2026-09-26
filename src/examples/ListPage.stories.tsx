@@ -55,3 +55,11 @@ export const AsViewerBoard: Story = { parameters: mockApi({ role: 'viewer', url:
 /** Editor: can create and move, but only admins delete. The bulk bar's Delete says so. */
 export const AsEditorWithSelection: Story = { args: { initialSelection: 'page' }, parameters: mockApi({ role: 'editor' }) };
 
+/** A saved view, chosen: its config is in the URL (saved=acme-v1), and the Select names it. */
+export const SavedViewChosen: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount&saved=acme-v1' }) };
+/** The URL has moved on from the saved view (a column hidden): "Modified", with Save changes in View options. */
+export const SavedViewModified: Story = { parameters: mockApi({ url: '/records?view=open&q=lease&sort=-amount&columns=owner,status,updated,amount&saved=acme-v1' }) };
+export const SaveViewDialog: Story = { tags: ['modal-open'], args: { initialViewDialog: 'save' }, parameters: mockApi({ url: '/records?view=open&status=overdue' }) };
+/** Fewer columns, from the Columns popover: part of the URL, so part of a saved view. */
+export const ColumnsChosen: Story = { parameters: mockApi({ url: '/records?columns=owner,status,amount' }) };
+

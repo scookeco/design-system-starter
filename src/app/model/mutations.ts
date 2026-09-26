@@ -14,16 +14,20 @@
  *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key)
  *   updateAccount      pessimistic  directory entry, detail      nothing else: records hold the id, so
  *                                                               every join re-renders from the directory
+ *   saveView           pessimistic  views (appends)                  views
+ *   updateView         pessimistic  views (the entry; default moves) views     (rename, save changes, default)
+ *   deleteView         pessimistic  views (removes)                  views
  */
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
+import { deleteView, patchView, postView } from '../api/views';
 import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
-import type { Account, Capability, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
+import type { Account, Capability, MovableStatus, SavedView, SavedViewConfig, Person, RecordEntity, RecordFilter, RecordPage } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
-import { accountKeys, recordKeys, type Partition } from './keys';
+import { accountKeys, recordKeys, viewKeys, type Partition } from './keys';
 
 /**
  * The query-cache trap, handled. A query cache doesn't normalize: a record lives in its detail
@@ -287,3 +291,53 @@ export function useUpdateAccount(id: string) {
     },
   });
 }
+
+type Views = { items: SavedView[] };
+
+/** saveView: pessimistic. A new named view of the list; appended once the server has it. */
+export function useSaveView() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'saveView'],
+    mutationFn: (view: { name: string; config: SavedViewConfig }) => postView(tenant, view),
+    onSuccess: (saved) => {
+      client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: [...current.items, saved] } : current));
+      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
+    },
+  });
+}
+
+/** updateView: pessimistic. Rename, save the current state into it, or make it the default (one per person). */
+export function useUpdateView() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'updateView'],
+    mutationFn: ({ id, changes }: { id: string; changes: Partial<{ name: string; config: SavedViewConfig; isDefault: boolean }> }) => patchView(tenant, id, changes),
+    onSuccess: (updated) => {
+      client.setQueryData<Views>(viewKeys.list(partition), (current) =>
+        current ? { items: current.items.map((v) => (v.id === updated.id ? updated : updated.isDefault ? { ...v, isDefault: false } : v)) } : current,
+      );
+      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
+    },
+  });
+}
+
+/** deleteView: pessimistic, confirmed by the caller. */
+export function useDeleteView() {
+  const tenant = useTenant();
+  const partition = usePartition();
+  const client = useQueryClient();
+  return useMutation({
+    mutationKey: [...partition, 'deleteView'],
+    mutationFn: (id: string) => deleteView(tenant, id),
+    onSuccess: ({ deleted }) => {
+      client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: current.items.filter((v) => v.id !== deleted) } : current));
+      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
+    },
+  });
+}
+

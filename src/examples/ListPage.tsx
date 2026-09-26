@@ -10,9 +10,11 @@
  * landmarks, navigation and the toast region; the page fills main.
  *
  * Anatomy:
- *   header   PageHeader: title + description | page actions
+ *   header   PageHeader: title + description | page actions (New record disabled with its reason for viewers)
+ *   saved    SavedViewsBar: the person's saved views, "Modified", View options (save as, save changes,
+ *            rename, open by default, delete); the default opens when the URL is bare
  *   views    NavTabs (All · Open · Drafts · Archived) with server counts; each view is a predicate
- *   toolbar  SearchField · Filters Popover (status checkboxes)   (role="search") | Display: Table · Board
+ *   toolbar  SearchField · Filters Popover (status checkboxes) · Columns Popover   (role="search") | Display: Table · Board
  *   chips    one removable Tag per active filter; removing one moves focus to the next chip, or to Filters
  *   content  one of: skeleton rows (loading) · table or board · empty state (first use | no results | error)
  *            The table and the board are two surfaces over ONE query and ONE projection: the same
@@ -30,8 +32,8 @@
  * Data: the rows are one page of a server-side query (search, filter, sort, page) read from the
  * cache with useRecordList; the tab counts come from useRecordCounts. Neither is copied into state.
  *
- * URL: the view, search, filters, sort and page live in the query string (useUrlState), so any
- * view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
+ * URL: the view, search, filters, sort, page, display, columns and saved view live in the query
+ * string (useUrlState), so any view is a link and Back works. A tab or a page is navigation (push); a filter, a sort or the
  * debounced search is a refinement (replace). The half-typed search stays out of the URL.
  *
  * Selection belongs to one filter: change the search, a filter or the view and it clears.
@@ -70,7 +72,7 @@ import {
 } from '../index';
 import type { BulkDeleteResult, MovableStatus, RecordStatus, SortKey } from '../app/api/schemas';
 import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, type BulkSelection } from '../app/model/mutations';
-import { DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
+import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
   EMPTY_SELECTION,
@@ -93,11 +95,11 @@ import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
 import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
+import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
 const PAGE_SIZE = 10;
 const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e'];
-const COLUMNS = 7;
 
 type SortColumn = 'name' | 'amount' | 'updated';
 const sortOf = (sort: SortKey): { column: SortColumn; direction: 'ascending' | 'descending' } => ({
@@ -116,6 +118,8 @@ export interface ListPageProps {
   initialSelection?: 'page' | 'matching';
   /** With a selection: open the delete confirmation, or confirm it straight away (gallery and tests). */
   initialBulkDelete?: 'confirm' | 'submit';
+  /** Open a saved-view dialog on first render (gallery and tests). */
+  initialViewDialog?: SavedViewDialog;
 }
 
 /**
@@ -164,6 +168,7 @@ function ListPageContent({
   initialDialogOpen = false,
   initialFiltersOpen = false,
   initialSelection,
+  initialViewDialog,
   selection,
   onSelectionChange,
   result,
@@ -193,6 +198,9 @@ function ListPageContent({
   const [nameError, setNameError] = useState<string | undefined>();
 
   const statusOptions = statusOptionsFor(query.view);
+  const shown = new Set(url.columns);
+  // The default saved view applies only when the list opened with nothing in its URL.
+  const [openedBare] = useState(() => listCodec.serialise(url) === '');
   const rows = (list.data?.items ?? []).map(toRow);
   const total = list.data?.total ?? 0;
   const filtered = query.q.trim() !== '' || query.status.length > 0;
@@ -329,6 +337,7 @@ function ListPageContent({
       <Stack gap="lg">
         {header}
         <PermissionNote permission={createPermission} />
+        <SavedViewsBar url={url} nav={nav} openedBare={openedBare} initialDialog={initialViewDialog} />
 
         {firstUse ? (
           <EmptyState
@@ -381,6 +390,27 @@ function ListPageContent({
                       <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
                     ))}
                   </Popover>
+                  {url.display === 'table' ? (
+                    <Popover
+                      label="Columns"
+                      trigger={
+                        <Button variant="secondary">{url.columns.length < COLUMNS.length ? `Columns (${format.number(url.columns.length)})` : 'Columns'}</Button>
+                      }
+                    >
+                      <Text size="caption" tone="muted">
+                        Show columns
+                      </Text>
+                      {COLUMNS.map(({ id, label }) => (
+                        <Checkbox
+                          key={id}
+                          label={label}
+                          checked={shown.has(id)}
+                          // A refinement: replace. The order is the table's, whatever order they're ticked in.
+                          onCheckedChange={(checked) => nav.replace({ columns: COLUMNS.map((c) => c.id).filter((c) => (c === id ? checked === true : shown.has(c))) })}
+                        />
+                      ))}
+                    </Popover>
+                  ) : null}
                 </Cluster>
                 {/* Two surfaces, one query: switching is navigation (push), so Back returns to the other one. */}
                 <SegmentedControl
@@ -461,16 +491,16 @@ function ListPageContent({
                         </Text>
                       </TableHeaderCell>
                       <TableHeaderCell>Name</TableHeaderCell>
-                      <TableHeaderCell>Owner</TableHeaderCell>
-                      <TableHeaderCell>Account</TableHeaderCell>
-                      <TableHeaderCell>Status</TableHeaderCell>
-                      <TableHeaderCell>Updated</TableHeaderCell>
-                      <TableHeaderCell numeric>Amount</TableHeaderCell>
+                      {COLUMNS.filter((c) => shown.has(c.id)).map((c) => (
+                        <TableHeaderCell key={c.id} numeric={c.id === 'amount'}>
+                          {c.label}
+                        </TableHeaderCell>
+                      ))}
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {SKELETON_ROWS.map((key) => (
-                      <Skeleton key={key} shape="table-row" columns={COLUMNS} />
+                      <Skeleton key={key} shape="table-row" columns={2 + shown.size} />
                     ))}
                   </TableBody>
                 </Table>
@@ -517,15 +547,20 @@ function ListPageContent({
                     <TableHeaderCell sort={sort.column === 'name' ? sort.direction : undefined} onSort={() => toggleSort('name')}>
                       Name
                     </TableHeaderCell>
-                    <TableHeaderCell>Owner</TableHeaderCell>
-                    <TableHeaderCell>Account</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell sort={sort.column === 'updated' ? sort.direction : undefined} onSort={() => toggleSort('updated')}>
-                      Updated
-                    </TableHeaderCell>
-                    <TableHeaderCell numeric sort={sort.column === 'amount' ? sort.direction : undefined} onSort={() => toggleSort('amount')}>
-                      Amount
-                    </TableHeaderCell>
+                    {/* The visible columns are URL state (and so part of a saved view), in their fixed order. */}
+                    {shown.has('owner') ? <TableHeaderCell>Owner</TableHeaderCell> : null}
+                    {shown.has('account') ? <TableHeaderCell>Account</TableHeaderCell> : null}
+                    {shown.has('status') ? <TableHeaderCell>Status</TableHeaderCell> : null}
+                    {shown.has('updated') ? (
+                      <TableHeaderCell sort={sort.column === 'updated' ? sort.direction : undefined} onSort={() => toggleSort('updated')}>
+                        Updated
+                      </TableHeaderCell>
+                    ) : null}
+                    {shown.has('amount') ? (
+                      <TableHeaderCell numeric sort={sort.column === 'amount' ? sort.direction : undefined} onSort={() => toggleSort('amount')}>
+                        Amount
+                      </TableHeaderCell>
+                    ) : null}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -543,20 +578,26 @@ function ListPageContent({
                         <Link href={`/records/${row.id}`}>{row.name}</Link>
                       </TableCell>
                       {/* Joined by id at render: the row holds ids, the people and account caches hold the names. */}
-                      <TableCell>
-                        <PersonRef id={row.ownerId} plain />
-                      </TableCell>
-                      <TableCell>
-                        <AccountRef id={row.accountId} />
-                      </TableCell>
-                      <TableCell>
-                        <Cluster gap="2xs">
-                          <Badge tone={row.status.tone}>{row.status.label}</Badge>
-                          {row.legalHold ? <Badge tone="warning">Legal hold</Badge> : null}
-                        </Cluster>
-                      </TableCell>
-                      <TableCell>{format.date(row.updatedAt)}</TableCell>
-                      <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell>
+                      {shown.has('owner') ? (
+                        <TableCell>
+                          <PersonRef id={row.ownerId} plain />
+                        </TableCell>
+                      ) : null}
+                      {shown.has('account') ? (
+                        <TableCell>
+                          <AccountRef id={row.accountId} />
+                        </TableCell>
+                      ) : null}
+                      {shown.has('status') ? (
+                        <TableCell>
+                          <Cluster gap="2xs">
+                            <Badge tone={row.status.tone}>{row.status.label}</Badge>
+                            {row.legalHold ? <Badge tone="warning">Legal hold</Badge> : null}
+                          </Cluster>
+                        </TableCell>
+                      ) : null}
+                      {shown.has('updated') ? <TableCell>{format.date(row.updatedAt)}</TableCell> : null}
+                      {shown.has('amount') ? <TableCell numeric>{format.money(row.amount.minor, row.amount.currency)}</TableCell> : null}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -633,7 +674,8 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
       <Cluster justify="between" align="center">
         <Cluster gap="sm" align="center">
           <Text aria-live="polite">{`${format.number(count)} selected`}</Text>
-          {skipped > 0 ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
+          {/* Why Delete is unavailable, once: the role, if that's the reason; otherwise any records on legal hold. */}
+          {skipped > 0 && deletePermission.allowed ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
           <PermissionNote permission={deletePermission} />
         </Cluster>
         <Cluster gap="sm">

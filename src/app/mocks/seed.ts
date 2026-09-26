@@ -3,7 +3,7 @@
  * A seeded PRNG stands in for randomness, and every date is computed from SEED_EPOCH, never from
  * the clock. (The visual suite freezes the page clock at the same instant, so "3 days ago" holds.)
  */
-import type { Account, Person, RecordEntity, RecordStatus, Tenant } from '../api/schemas';
+import { RECORD_COLUMNS, type Account, type Person, type RecordEntity, type RecordStatus, type SavedView, type Tenant } from '../api/schemas';
 import { WORKSPACES } from '../workspaces';
 
 /** The "today" the data was generated for. Matches the visual harness's frozen clock. */
@@ -155,3 +155,13 @@ export const seedRecords = (tenant: Tenant): RecordEntity[] => {
     };
   });
 };
+
+/** A couple of saved views per workspace for the signed-in person, so the views menu isn't empty. */
+export const seedViews = (tenant: Tenant): SavedView[] =>
+  tenant === 'acme'
+    ? [
+        { id: 'acme-v1', name: 'Open leases', config: { view: 'open', q: 'lease', status: [], sort: '-amount', columns: [...RECORD_COLUMNS], display: 'table' }, isDefault: false },
+        { id: 'acme-v2', name: 'Pipeline board', config: { view: 'all', q: '', status: [], sort: '-updated', columns: [...RECORD_COLUMNS], display: 'board' }, isDefault: false },
+      ]
+    : [{ id: 'globex-v1', name: 'Overdue first', config: { view: 'open', q: '', status: ['overdue'], sort: '-amount', columns: ['owner', 'status', 'amount'], display: 'table' }, isDefault: false }];
+

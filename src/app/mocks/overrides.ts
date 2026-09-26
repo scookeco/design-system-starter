@@ -5,7 +5,7 @@
  */
 import { delay, http, HttpResponse } from 'msw';
 
-type Method = 'get' | 'post' | 'patch';
+type Method = 'get' | 'post' | 'patch' | 'delete';
 const API = '*/api/t/:tenant';
 
 /** Never answers: the page stays in its loading or pending state. Tag the story `busy`. */
