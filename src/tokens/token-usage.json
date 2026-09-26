@@ -1270,6 +1270,618 @@
         }
       ]
     },
+    "AssistantPanel": {
+      "kind": "layout",
+      "dir": "src/layouts/AssistantPanel",
+      "exports": [
+        "AssistantPanel"
+      ],
+      "stylesheets": [
+        "src/layouts/AssistantPanel/AssistantPanel.css"
+      ],
+      "composes": [
+        "Button",
+        "Drawer"
+      ],
+      "composesAll": [
+        "Button",
+        "Drawer",
+        "Icon",
+        "Spinner"
+      ],
+      "tokens": [
+        {
+          "token": "button.danger.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.danger.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.ghost.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.primary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.bg-hover",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.border",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "button.secondary.fg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.elevated",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.hover",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.scrim",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.disabled",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.linear",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.standard",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.spin",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.modal",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.assistant.default",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.assistant.max",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.assistant.min",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.sm",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.drawer.md",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.drawer.sm",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            },
+            {
+              "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.modal",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.sticky",
+          "readBy": [
+            {
+              "unit": "AssistantPanel",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "AuthLayout": {
       "kind": "layout",
       "dir": "src/layouts/AuthLayout",
@@ -18526,6 +19138,42 @@
       "value": "0 4px 6px -1px #0206171a, 0 2px 4px -2px #0206171a",
       "chain": [
         "shadow.popover"
+      ],
+      "modes": {}
+    },
+    "size.assistant.default": {
+      "cssVar": "--size-assistant-default",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "24rem",
+      "chain": [
+        "size.assistant.default",
+        "container.sm"
+      ],
+      "modes": {}
+    },
+    "size.assistant.max": {
+      "cssVar": "--size-assistant-max",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "36rem",
+      "chain": [
+        "size.assistant.max",
+        "container.lg"
+      ],
+      "modes": {}
+    },
+    "size.assistant.min": {
+      "cssVar": "--size-assistant-min",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "AssistantPanel widths: the resize range and the width it opens at.",
+      "value": "20rem",
+      "chain": [
+        "size.assistant.min",
+        "container.xs"
       ],
       "modes": {}
     },

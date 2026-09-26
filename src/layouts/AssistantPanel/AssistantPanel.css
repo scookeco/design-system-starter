@@ -1,0 +1,114 @@
+@layer layouts {
+  /* 1. block: fills AppShell's assistant slot, the full height of main */
+  .assistant-panel {
+    display: flex;
+    min-block-size: 0;
+  }
+
+  /* 2. parts */
+  .assistant-panel__dock {
+    /* The width a person chose, set inline while resizing; the default until then. */
+    --assistant-panel-width: var(--size-assistant-default);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    inline-size: clamp(var(--size-assistant-min), var(--assistant-panel-width), var(--size-assistant-max));
+    min-block-size: 0;
+    border-inline-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Focus lands here when the panel opens; it is not in the tab order, so no ring. */
+  .assistant-panel__dock:focus {
+    outline: none;
+  }
+
+  /* The resize handle: the panel's inline-start edge, widened to a comfortable target. */
+  .assistant-panel__handle {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--size-target-min) / -2);
+    z-index: var(--z-sticky);
+    inline-size: var(--size-target-min);
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .assistant-panel__handle::after {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    inline-size: var(--focus-ring-width);
+    background: transparent;
+    content: "";
+  }
+
+  .assistant-panel__handle:hover::after,
+  .assistant-panel__handle:focus-visible::after {
+    background: var(--color-focus);
+  }
+
+  .assistant-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-gap-xs);
+    padding-block: var(--space-inset-xs);
+    padding-inline: var(--space-inset-md) var(--space-inset-xs);
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .assistant-panel__title {
+    margin: 0;
+    font: var(--text-heading-4);
+  }
+
+  .assistant-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+  }
+
+  /* The content fills the rest: a ChatThread (flex: 1) over a Composer. */
+  .assistant-panel__body,
+  .assistant-panel__drawer-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    min-block-size: 0;
+  }
+
+  .assistant-panel__body {
+    padding: var(--space-inset-sm);
+  }
+
+  .assistant-panel__drawer-body {
+    block-size: 100%;
+  }
+
+  .assistant-panel__rail {
+    padding: var(--space-inset-sm);
+    border-inline-start: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .assistant-panel__narrow {
+    display: none;
+  }
+
+  /* 4. responsive: below the breakpoint token the panel gives way to a launcher that opens a Drawer */
+  @container app-shell (inline-size < 48rem) {
+    .assistant-panel__dock,
+    .assistant-panel__rail {
+      display: none;
+    }
+
+    .assistant-panel__narrow {
+      display: flex;
+    }
+  }
+}

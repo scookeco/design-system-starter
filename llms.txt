@@ -155,6 +155,7 @@ UI rules (design system v0)
 ## Layouts
 
 - [AppShell](docs/usage/AppShell.usage.tsx): The app frame every signed-in page renders inside
+- [AssistantPanel](docs/usage/AssistantPanel.usage.tsx): The assistant beside the page, in AppShell's `assistant` slot
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader

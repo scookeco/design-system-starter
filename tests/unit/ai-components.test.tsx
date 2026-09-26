@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { parseBlocks, safeHref } from '../../src/components/Markdown/Markdown';
 import { diffWords } from '../../src/components/ReviewChanges/ReviewChanges';
 import { lastBoundary } from '../../src/components/StreamingText/StreamingText';
-import { Citation, Composer, ReviewChanges, SourcesList, StreamingText, Suggestion } from '../../src/index';
+import { AssistantPanel, Citation, Composer, ReviewChanges, SourcesList, StreamingText, Suggestion } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -215,5 +215,33 @@ describe('ReviewChanges', () => {
     expect(screen.getByText('1 applied, 1 not applied.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
     expect(onUndo).toHaveBeenCalled();
+  });
+});
+
+describe('AssistantPanel', () => {
+  it('resizes from the keyboard within its token range, remembers the width, and closes to a launcher that gets focus back', () => {
+    window.localStorage.removeItem('test.assistant');
+    render(
+      <AssistantPanel title="Assistant" storageKey="test.assistant">
+        <p>Conversation</p>
+      </AssistantPanel>,
+    );
+    const handle = screen.getByRole('separator', { name: 'Resize assistant panel' });
+    const start = Number(handle.getAttribute('aria-valuenow'));
+    fireEvent.keyDown(handle, { key: 'ArrowLeft' });
+    expect(Number(handle.getAttribute('aria-valuenow'))).toBe(start + 16);
+    fireEvent.keyDown(handle, { key: 'End' });
+    expect(handle.getAttribute('aria-valuenow')).toBe(handle.getAttribute('aria-valuemax'));
+    expect(window.localStorage.getItem('test.assistant')).toBe(handle.getAttribute('aria-valuemax'));
+    // The single-pointer alternative to dragging.
+    fireEvent.click(screen.getByRole('button', { name: 'Narrow' }));
+    expect(Number(handle.getAttribute('aria-valuenow'))).toBe(start);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('complementary', { name: 'Assistant' })).toBeNull();
+    const launchers = screen.getAllByRole('button', { name: 'Assistant' });
+    expect(launchers).toContain(document.activeElement);
+    fireEvent.click(document.activeElement as HTMLElement);
+    expect(document.activeElement).toBe(screen.getByRole('complementary', { name: 'Assistant' }));
   });
 });

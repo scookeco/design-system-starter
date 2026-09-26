@@ -155,6 +155,7 @@ UI rules (design system v0)
 ## Layouts
 
 - [AppShell](docs/usage/AppShell.usage.tsx): The app frame every signed-in page renders inside
+- [AssistantPanel](docs/usage/AssistantPanel.usage.tsx): The assistant beside the page, in AppShell's `assistant` slot
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
@@ -4301,6 +4302,7 @@ Props:
 - `help?: ReactNode`: Help, in the same place on every page (WCAG 2.2 SC 3.2.6 Consistent Help): a Help menu with self-help and a way to contact a person. Rendered in the header, after the global actions and right before the account menu. Pass it from the app's one shell composition, never per page.
 - `userMenu?: ReactNode`: Account menu, anchored at the header's inline end: <Menu trigger={…Avatar…}>.
 - `children: ReactNode`: The page. Rendered inside <main>, the only region that scrolls.
+- `assistant?: ReactNode`: An assistant beside the page: an <AssistantPanel>. Wide, it is a column at main's inline end, under the header, and main keeps scrolling on its own; narrow, it gives way to a launcher in the header that opens the panel in a Drawer. Omit it and the frame is unchanged.
 - `footer?: ReactNode`: Page action bar (a long form's Cancel · Save). Sticks to the bottom of main while the page scrolls. A submit button here reaches its form with the form="<form id>" attribute.
 - `skipLinkLabel?: string` = `'Skip to content'`: First focusable element; jumps past the sidebar and header to main.
 - `menuLabel?: string` = `'Menu'`: Label of the button that opens the navigation drawer when the shell is too narrow to show the sidebar; also the drawer's name.
@@ -4320,6 +4322,7 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 - Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.
 - Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).
 - Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.
+- An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.
 - People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well.
 
 **When not to use**
@@ -4362,9 +4365,68 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 - The `help` slot always renders after the global actions and right before the account menu, the same relative order on every page (WCAG 2.2 SC 3.2.6 Consistent Help). The WCAG 2.2 checks fail an example page that renders the shell without it.
 - A sticky `footer` reserves `space.scroll-padding.end` in main, so a field that gets focus scrolls clear of the bar instead of under it (SC 2.4.11).
 
-Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
+Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
 Composes: Button, Drawer, Icon, Link, Nav, Spinner, Toast, Tooltip.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
+
+### AssistantPanel
+
+layout · `src/layouts/AssistantPanel/AssistantPanel.tsx` · usage: `docs/usage/AssistantPanel.usage.tsx`
+
+The assistant beside the page, in AppShell's `assistant` slot. Wide, it is a panel at the inline end that the person resizes (drag the edge, arrow keys on it, or Widen / Narrow) and closes to a launcher; the width is remembered. Narrow, it gives way to a launcher in the header that opens the same content in a Drawer. The content is mounted in one place at a time.
+
+Props:
+- `title: string`: The assistant's name: the panel's landmark name and heading, the drawer's title ("Assistant"). Required.
+- `children: ReactNode`: The conversation: a ChatThread over a Composer, laid out to fill the panel.
+- `open?: boolean`: Controlled: the panel is open beside the page (wide) or in its drawer (narrow).
+- `defaultOpen?: boolean` = `true`: Uncontrolled starting state.
+- `onOpenChange?: (open: boolean) => void`
+- `launcherLabel?: string` = `title`: Label of the button that opens it (a launcher at the edge when wide, in the header when narrow).
+- `actions?: ReactNode`: Actions in the panel's header, before Close: New chat, a History menu.
+- `storageKey?: string | null` = `DEFAULT_STORAGE_KEY`: localStorage key under which the width a person chose is remembered across visits. null turns remembering off (gallery and tests).
+- `resizeLabel?: string` = `'Resize ${title.toLowerCase()} panel'`: Accessible name of the resize handle.
+- `closeLabel?: string` = `'Close'`
+- `defaultDrawerOpen?: boolean` = `false`: Start with the narrow-screen drawer open (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: open, defaultOpen, defaultDrawerOpen.
+
+**When to use**
+
+- An assistant that works beside the page it’s about (a record’s copilot): pass it as AppShell’s `assistant`, with a `ChatThread` over a `Composer` as its content.
+- People resize it (drag the edge, arrow keys on the edge, or Widen / Narrow) and close it to a launcher; the width is remembered under `storageKey`.
+- Below `size.breakpoint.md` it becomes a launcher in the header that opens the same content in a `Drawer`. Keep the conversation’s state in the page, not in the panel: the content moves between the two.
+
+**When not to use**
+
+- A conversation that is the page → a full chat page (the Assistant chat example) inside `AppShell`
+- One AI suggestion inside a form → `Suggestion` beside the field
+- Details or filters for the page → `Drawer` or `PageLayout`’s aside
+
+**Do:** A thread over a composer, filling the panel; the page stays usable beside it.
+
+```tsx
+<AssistantPanel title="Assistant (do example)" storageKey={null}>
+  <ChatThread label="Conversation (do example)" empty={<Text tone="muted">Ask about this record.</Text>} />
+  <Composer label="Ask (do example)" onSend={() => undefined} />
+</AssistantPanel>
+```
+
+**Don't:** A modal drawer for the assistant on a wide screen: it covers the page the answers are about.
+
+```tsx
+<Drawer title="Assistant (don’t example)" trigger={<Button variant="secondary">Ask AI</Button>} />
+```
+
+**Accessibility**
+
+- The panel is a complementary landmark named by its heading. Opening it moves focus into it; closing it returns focus to the launcher.
+- The resize edge is a focusable separator with `aria-valuenow`, `aria-valuemin` and `aria-valuemax` (CSS pixels); arrow keys resize it (Shift for bigger steps), Home and End jump to the limits. Widen / Narrow is the single-pointer alternative to dragging (WCAG 2.5.7).
+- Narrow, the Drawer brings its focus trap, Escape and focus return.
+
+Stories: `layouts-assistantpanel--open`, `layouts-assistantpanel--closed`, `layouts-assistantpanel--with-header-actions`, `layouts-assistantpanel--narrow`, `layouts-assistantpanel--narrow-open`.
+Composes: Button, Drawer, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.focus`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `shadow.modal`, `size.assistant.default`, `size.assistant.max`, `size.assistant.min`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.sticky`.
 
 ### AuthLayout
 

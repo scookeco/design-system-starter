@@ -743,6 +743,13 @@
           "description": "The page. Rendered inside <main>, the only region that scrolls."
         },
         {
+          "name": "assistant",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "An assistant beside the page: an <AssistantPanel>. Wide, it is a column at main's inline end, under the header, and main keeps scrolling on its own; narrow, it gives way to a launcher in the header that opens the panel in a Drawer. Omit it and the frame is unchanged."
+        },
+        {
           "name": "footer",
           "type": "ReactNode",
           "required": false,
@@ -831,6 +838,7 @@
           "Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.",
           "Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).",
           "Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.",
+          "An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.",
           "People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well."
         ],
         "whenNotToUse": [
@@ -886,6 +894,10 @@
           {
             "id": "layouts-appshell--with-action-bar",
             "name": "With Action Bar"
+          },
+          {
+            "id": "layouts-appshell--with-assistant",
+            "name": "With Assistant"
           },
           {
             "id": "layouts-appshell--user-menu-open",
@@ -1001,6 +1013,240 @@
       "description": null,
       "partOf": "AppShell",
       "propsOf": "AppShell"
+    },
+    {
+      "name": "AssistantPanel",
+      "kind": "layout",
+      "source": "src/layouts/AssistantPanel/AssistantPanel.tsx",
+      "status": null,
+      "description": "The assistant beside the page, in AppShell's `assistant` slot. Wide, it is a panel at the inline end that the person resizes (drag the edge, arrow keys on it, or Widen / Narrow) and closes to a launcher; the width is remembered. Narrow, it gives way to a launcher in the header that opens the same content in a Drawer. The content is mounted in one place at a time.",
+      "docs": "docs/usage/AssistantPanel.usage.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The assistant's name: the panel's landmark name and heading, the drawer's title (\"Assistant\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The conversation: a ChatThread over a Composer, laid out to fill the panel."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": "Controlled: the panel is open beside the page (wide) or in its drawer (narrow)."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "true",
+          "description": "Uncontrolled starting state."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "launcherLabel",
+          "type": "string",
+          "required": false,
+          "default": "title",
+          "description": "Label of the button that opens it (a launcher at the edge when wide, in the header when narrow)."
+        },
+        {
+          "name": "actions",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Actions in the panel's header, before Close: New chat, a History menu."
+        },
+        {
+          "name": "storageKey",
+          "type": "string | null",
+          "required": false,
+          "default": "DEFAULT_STORAGE_KEY",
+          "description": "localStorage key under which the width a person chose is remembered across visits. null turns remembering off (gallery and tests)."
+        },
+        {
+          "name": "resizeLabel",
+          "type": "string",
+          "required": false,
+          "default": "`Resize ${title.toLowerCase()} panel`",
+          "description": "Accessible name of the resize handle."
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Close'",
+          "description": null
+        },
+        {
+          "name": "defaultDrawerOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Start with the narrow-screen drawer open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "open",
+        "defaultOpen",
+        "defaultDrawerOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "An assistant that works beside the page it’s about (a record’s copilot): pass it as AppShell’s `assistant`, with a `ChatThread` over a `Composer` as its content.",
+          "People resize it (drag the edge, arrow keys on the edge, or Widen / Narrow) and close it to a launcher; the width is remembered under `storageKey`.",
+          "Below `size.breakpoint.md` it becomes a launcher in the header that opens the same content in a `Drawer`. Keep the conversation’s state in the page, not in the panel: the content moves between the two."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A conversation that is the page",
+            "instead": "a full chat page (the Assistant chat example) inside `AppShell`"
+          },
+          {
+            "situation": "One AI suggestion inside a form",
+            "instead": "`Suggestion` beside the field"
+          },
+          {
+            "situation": "Details or filters for the page",
+            "instead": "`Drawer` or `PageLayout`’s aside"
+          }
+        ],
+        "do": {
+          "caption": "A thread over a composer, filling the panel; the page stays usable beside it.",
+          "code": "<AssistantPanel title=\"Assistant (do example)\" storageKey={null}>\n  <ChatThread label=\"Conversation (do example)\" empty={<Text tone=\"muted\">Ask about this record.</Text>} />\n  <Composer label=\"Ask (do example)\" onSend={() => undefined} />\n</AssistantPanel>"
+        },
+        "dont": {
+          "caption": "A modal drawer for the assistant on a wide screen: it covers the page the answers are about.",
+          "code": "<Drawer title=\"Assistant (don’t example)\" trigger={<Button variant=\"secondary\">Ask AI</Button>} />"
+        },
+        "accessibility": [
+          "The panel is a complementary landmark named by its heading. Opening it moves focus into it; closing it returns focus to the launcher.",
+          "The resize edge is a focusable separator with `aria-valuenow`, `aria-valuemin` and `aria-valuemax` (CSS pixels); arrow keys resize it (Shift for bigger steps), Home and End jump to the limits. Widen / Narrow is the single-pointer alternative to dragging (WCAG 2.5.7).",
+          "Narrow, the Drawer brings its focus trap, Escape and focus return."
+        ]
+      },
+      "unit": {
+        "dir": "src/layouts/AssistantPanel",
+        "stories": [
+          {
+            "id": "layouts-assistantpanel--open",
+            "name": "Open"
+          },
+          {
+            "id": "layouts-assistantpanel--closed",
+            "name": "Closed"
+          },
+          {
+            "id": "layouts-assistantpanel--with-header-actions",
+            "name": "With Header Actions"
+          },
+          {
+            "id": "layouts-assistantpanel--narrow",
+            "name": "Narrow"
+          },
+          {
+            "id": "layouts-assistantpanel--narrow-open",
+            "name": "Narrow Open"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Drawer",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.scrim",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.focus",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "shadow.modal",
+          "size.assistant.default",
+          "size.assistant.max",
+          "size.assistant.min",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.drawer.md",
+          "size.drawer.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "space.scroll-padding.end",
+          "text.body",
+          "text.body-lg",
+          "text.heading-3",
+          "text.heading-4",
+          "text.label",
+          "z.modal",
+          "z.sticky"
+        ]
+      }
+    },
+    {
+      "name": "AssistantPanelProps",
+      "kind": "type-only",
+      "source": "src/layouts/AssistantPanel/AssistantPanel.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "AssistantPanel",
+      "propsOf": "AssistantPanel"
     },
     {
       "name": "AuthLayout",
