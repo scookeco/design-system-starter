@@ -24,7 +24,8 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  error/404 → ErrorPages. Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
+  Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
@@ -48,6 +49,10 @@ UI rules (design system v0)
   with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
   never let AI write without ReviewChanges (or an explicit accept) and an Undo.
   The assistant acts only through the person's own can() and named mutations.
+- Keyboard shortcuts go through useShortcut (never a bare keydown listener):
+  every shortcut mirrors a visible control and shows its keys there (Tooltip
+  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
+  reported; single-key shortcuts can be turned off in the ? overlay.
 ```
 
 ## Guides
@@ -63,6 +68,7 @@ UI rules (design system v0)
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
 - [Forms](docs/guides/Forms.stories.tsx): Forms are among the most settled patterns in software, and breaking…
+- [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): People who use a product all day stop reaching for the mouse.
 - [Motion](docs/guides/Motion.stories.tsx): Motion gives feedback and shows where something came from.
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Every alternate look (dark mode, a rebrand, a customer’s colours) is…
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…

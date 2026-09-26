@@ -20,12 +20,14 @@ const MUTATIONS = [
   { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory', failure: 'The form stays, with a banner' },
   { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'Nothing else: records hold its id, so every row re-renders from the directory', failure: 'A banner; a 409 says someone else changed it' },
   { verb: 'saveView · updateView · deleteView', presents: 'Pessimistic', patches: 'The person’s views (the default moves on update)', invalidates: 'Views', failure: 'The dialog stays open with the server’s reason' },
+  { verb: 'markRead · markUnread · archive · unarchive (inbox)', presents: 'Optimistic: a person’s own frequent triage', patches: 'The items in every cached inbox view, and the counts', invalidates: 'Inbox views', failure: 'Every view put back as it was; a toast that stays' },
+  { verb: 'inviteMember · changeRole · removeMember', presents: 'Pessimistic: it changes what someone else can do', patches: 'Members (the answer)', invalidates: 'Members, the audit log', failure: 'The dialog stays open with the server’s reason (last admin, your own role, already a member)' },
 ] as const;
 
 const ROLES = [
   { role: 'Viewer', holds: 'workspace:read, record:read, account:read', sees: 'Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive' },
   { role: 'Editor', holds: 'Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create', sees: 'Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled' },
-  { role: 'Admin', holds: 'Editor’s, plus workspace:manage, record:delete, account:edit', sees: 'Everything' },
+  { role: 'Admin', holds: 'Editor’s, plus workspace:manage, record:delete, account:edit, members:manage, audit:read', sees: 'Everything, including the audit log; invites, changes and removes members' },
 ] as const;
 
 function DataPage() {
@@ -431,13 +433,38 @@ export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=
 `}</Code>
       </DocSection>
 
+      <DocSection title="The audit log">
+        <Rules
+          items={[
+            <>
+              Every admin write emits an audit event where it’s written (the mock server’s member handlers), denied attempts included: the log
+              is a projection of the mutations, not something each page remembers. Actions are <code>resource.verb</code> (
+              <code>member.role_changed</code>), one per named mutation.
+            </>,
+            <>
+              An event is a snapshot, not a join: it records the actor’s and target’s names as they were. People leave and records are deleted;
+              the log must still say who did what. It is the one place names are copied.
+            </>,
+            <>
+              A date filter is calendar dates in the URL and instants on the wire: <code>dayRangeToInstants</code> turns “Sep 1 – Sep 25” into
+              the start of the first day and the start of the day after the last in the reader’s time zone (from <code>useFormat()</code>),
+              daylight-saving changes included. Never UTC midnight.
+            </>,
+            <>Record writes don’t emit events yet (their handlers are shared with other work); the seeded history includes them.</>,
+          ]}
+        />
+      </DocSection>
       <DocSection title="Adding an entity">
         <Rules
           items={[
             <>Its schema in <code>src/app/api/schemas.ts</code>, and its endpoints (the tenant first) in their own file in <code>api/</code>.</>,
             <>References to other entities as ids, displayed through a ref component or a ref field type: never a copied name.</>,
             <>Its predicates in <code>src/app/model</code>; its projections for lists.</>,
-            <>Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its capability.</>,
+            <>
+              Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its
+              capability. A domain added beside the records (the inbox, the admin console) keeps them together in its own module (
+              <code>src/app/model/inbox.ts</code>, <code>admin.ts</code>), with its contract beside its endpoints in <code>src/app/api</code>.
+            </>,
             <>Its capabilities in <code>CAPABILITIES</code>, their roles in <code>ROLE_CAPABILITIES</code>, and the same capability on its mock routes.</>,
             <>Its entry in <code>entities.ts</code> (fields, related records, form) and its rows in the route table, each with a guard.</>,
             <>Mock handlers and seed data (from its own PRNG stream) so its stories and tests run.</>,

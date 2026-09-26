@@ -8,10 +8,15 @@ const CONTROLS = [
   { name: 'Textarea', id: 'components-textarea--default', choose: 'Free text over a line: a description, a comment.', avoid: 'A single value.' },
   { name: 'SearchField', id: 'components-searchfield--empty', choose: 'Filtering a list on the page as you type, with a clear button.', avoid: 'A form answer (TextField).' },
   { name: 'Select', id: 'components-select--placeholder', choose: 'One value from a long or unfamiliar list (six or more).', avoid: 'Two to five options people should compare at a glance (RadioGroup).' },
+  { name: 'Combobox', id: 'components-combobox--empty', choose: 'One value from a list too long to scan: type to narrow it (an owner, an account).', avoid: 'A short fixed list (Select).' },
+  { name: 'MultiSelect', id: 'components-multiselect--empty', choose: 'Several values from a longer list, shown as removable chips: event types, tags.', avoid: 'A handful of independent options (Checkboxes).' },
+  { name: 'DatePicker', id: 'components-datepicker--empty', choose: 'A calendar date, typed in the reader’s order or picked; ISO in and out.', avoid: 'A moment in time with an hour (a date and a time, stored as an instant).' },
+  { name: 'DateRangePicker', id: 'components-daterangepicker--empty', choose: 'A start and an end date in one field and one calendar.', avoid: 'Preset periods (SegmentedControl).' },
+  { name: 'NumberField', id: 'components-numberfield--empty', choose: 'Quantities, amounts (integer minor units with a currency) and percentages, in the reader’s format.', avoid: 'Numbers that aren’t quantities: phone numbers, ids (TextField).' },
   { name: 'RadioGroup', id: 'components-radiogroup--unselected', choose: 'One value from a few options that are all worth reading.', avoid: 'A view switch that applies at once (SegmentedControl).' },
   { name: 'Checkbox', id: 'components-checkbox--unchecked', choose: 'A yes/no answer, or several independent options, saved with the form.', avoid: 'A setting that takes effect immediately (Switch).' },
   { name: 'Switch', id: 'components-switch--off', choose: 'A setting that takes effect the moment it is flipped.', avoid: 'A form answer submitted later (Checkbox).' },
-  { name: 'Slider', id: 'components-slider--single', choose: 'A position on a scale, or a range, where the exact number matters less: volume, a price filter.', avoid: 'An exact figure (TextField type="number").' },
+  { name: 'Slider', id: 'components-slider--single', choose: 'A position on a scale, or a range, where the exact number matters less: volume, a price filter.', avoid: 'An exact figure (NumberField).' },
   { name: 'FileUpload', id: 'components-fileupload--empty', choose: 'Attaching files, with the limits shown before anyone picks.', avoid: 'Importing rows of data (a dedicated import wizard).' },
 ] as const;
 

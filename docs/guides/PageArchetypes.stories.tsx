@@ -45,6 +45,22 @@ const ARCHETYPES = [
     shows: 'The route table (path → layout + page + guard), lazy pages, LinkProvider with the app’s router link, a 403 page from the guard and the 404 fallback.',
   },
   {
+    archetype: 'Inbox / queue',
+    file: 'src/examples/InboxPage.tsx',
+    id: 'examples-inbox--conversation-open',
+    example: 'Inbox',
+    choose: 'Working through items one at a time: an inbox, a review queue, approvals, support tickets.',
+    shows: 'A SplitView of the list and the open item (one pane on a narrow screen), the tab and open item in the URL, keyboard triage from the shortcut registry (j/k, e, u, x, o) mirrored by a toolbar, a row context menu and a bulk toolbar; unread state; optimistic triage with rollback; loading, empty and error states.',
+  },
+  {
+    archetype: 'Admin console',
+    file: 'src/examples/AdminConsole.tsx',
+    id: 'examples-admin-console--members',
+    example: 'Admin console',
+    choose: 'Workspace administration: members and roles, the audit log, and the enterprise controls that grow around them.',
+    shows: 'Members (invite, change role with a review of the capabilities it adds and removes, remove; your own role and the last admin protected) and a filterable audit log (actor Combobox, event MultiSelect, DateRangePicker in the reader’s time zone, expandable rows, CSV export of the current filter); actions disabled with a reason or hidden by capability; the audit tab hidden and its route guarded.',
+  },
+  {
     archetype: 'Settings',
     file: 'src/examples/SettingsPage.tsx',
     id: 'examples-settings-page--personal-profile',

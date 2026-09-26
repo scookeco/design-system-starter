@@ -24,7 +24,8 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  error/404 → ErrorPages. Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
+  Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
@@ -48,6 +49,10 @@ UI rules (design system v0)
   with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
   never let AI write without ReviewChanges (or an explicit accept) and an Undo.
   The assistant acts only through the person's own can() and named mutations.
+- Keyboard shortcuts go through useShortcut (never a bare keydown listener):
+  every shortcut mirrors a visible control and shows its keys there (Tooltip
+  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
+  reported; single-key shortcuts can be turned off in the ? overlay.
 ```
 
 ## Guides
@@ -63,6 +68,7 @@ UI rules (design system v0)
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
 - [Forms](docs/guides/Forms.stories.tsx): Forms are among the most settled patterns in software, and breaking…
+- [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): People who use a product all day stop reaching for the mouse.
 - [Motion](docs/guides/Motion.stories.tsx): Motion gives feedback and shows where something came from.
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Every alternate look (dark mode, a rebrand, a customer’s colours) is…
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
@@ -5678,6 +5684,8 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 | Create and edit | Someone fills in a record: a full page for heavy records, a quick-create dialog for light ones. | [Create and edit](src/examples/CreateEditFlow.tsx)`src/examples/CreateEditFlow.tsx` | Errors on blur and submit, a focused error summary linking to fields, registry-rendered fields, a pending submit in the sticky action bar, a create that is safe to retry (idempotency key). |
 | Entity list, record and form (schema-driven) | A second or third entity (accounts, people, vendors) whose pages fit the list, record and form archetypes: write its config, not its pages. | [Entity pages](src/examples/EntityPages.tsx)`src/examples/EntityPages.tsx` | List, record and form rendered from an entity config (src/app/registries/entities.ts) through the field registry: a properties rail, the records that point at it by id with rollups, Edit disabled with a reason, create and edit with a focused error summary. |
 | The app and its routes | Wiring pages together: which page a URL opens, who may open it, and what an unknown URL shows. | [App](src/examples/App.tsx)`src/examples/App.tsx` | The route table (path → layout + page + guard), lazy pages, LinkProvider with the app’s router link, a 403 page from the guard and the 404 fallback. |
+| Inbox / queue | Working through items one at a time: an inbox, a review queue, approvals, support tickets. | [Inbox](src/examples/InboxPage.tsx)`src/examples/InboxPage.tsx` | A SplitView of the list and the open item (one pane on a narrow screen), the tab and open item in the URL, keyboard triage from the shortcut registry (j/k, e, u, x, o) mirrored by a toolbar, a row context menu and a bulk toolbar; unread state; optimistic triage with rollback; loading, empty and error states. |
+| Admin console | Workspace administration: members and roles, the audit log, and the enterprise controls that grow around them. | [Admin console](src/examples/AdminConsole.tsx)`src/examples/AdminConsole.tsx` | Members (invite, change role with a review of the capabilities it adds and removes, remove; your own role and the last admin protected) and a filterable audit log (actor Combobox, event MultiSelect, DateRangePicker in the reader’s time zone, expandable rows, CSV export of the current filter); actions disabled with a reason or hidden by capability; the audit tab hidden and its route guarded. |
 | Settings | Personal or workspace preferences, grouped by category. | [Settings page](src/examples/SettingsPage.tsx)`src/examples/SettingsPage.tsx` | A grouped sub-nav in PageLayout’s nav slot, one card per category with its own Save, a success banner. |
 | Sign-in (signed out) | Any signed-out page: sign-in, sign-up, password reset, a verification code. | [Sign in](src/examples/SignInPage.tsx)`src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step. |
 | Wizard | A task whose later steps depend on earlier ones: first-run setup, a multi-step create. | [Setup wizard](src/examples/SetupWizard.tsx)`src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit. |
@@ -5765,7 +5773,7 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
 |---|---|---|
 | Viewer | workspace:read, record:read, account:read | Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive |
 | Editor | Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create | Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled |
-| Admin | Editor’s, plus workspace:manage, record:delete, account:edit | Everything |
+| Admin | Editor’s, plus workspace:manage, record:delete, account:edit, members:manage, audit:read | Everything, including the audit log; invites, changes and removes members |
 
 - Capabilities are `resource:action` strings. Roles map to them in exactly one place, and the session carries each membership’s capabilities as the server derived them. The client never decides anything from a role name.
 - `can` checks the capability, then the object rule for the thing acted on (an archived record can’t be renamed; one on legal hold can’t be deleted), from the same named predicates as everything else.
@@ -5817,6 +5825,8 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 | `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory | The form stays, with a banner |
 | `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | Nothing else: records hold its id, so every row re-renders from the directory | A banner; a 409 says someone else changed it |
 | `saveView · updateView · deleteView` | Pessimistic | The person’s views (the default moves on update) | Views | The dialog stays open with the server’s reason |
+| `markRead · markUnread · archive · unarchive (inbox)` | Optimistic: a person’s own frequent triage | The items in every cached inbox view, and the counts | Inbox views | Every view put back as it was; a toast that stays |
+| `inviteMember · changeRole · removeMember` | Pessimistic: it changes what someone else can do | Members (the answer) | Members, the audit log | The dialog stays open with the server’s reason (last admin, your own role, already a member) |
 
 - An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
 - Edits send the version they were based on. The server answers `409` if someone changed the record since, and the page says so instead of silently overwriting their change.
@@ -5864,12 +5874,19 @@ export const Loading: Story = { tags: ['busy'], parameters: mswOverrides(hold('g
 export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=lease' }) };
 ```
 
+#### The audit log
+
+- Every admin write emits an audit event where it’s written (the mock server’s member handlers), denied attempts included: the log is a projection of the mutations, not something each page remembers. Actions are `resource.verb` (`member.role_changed`), one per named mutation.
+- An event is a snapshot, not a join: it records the actor’s and target’s names as they were. People leave and records are deleted; the log must still say who did what. It is the one place names are copied.
+- A date filter is calendar dates in the URL and instants on the wire: `dayRangeToInstants` turns “Sep 1 – Sep 25” into the start of the first day and the start of the day after the last in the reader’s time zone (from `useFormat()`), daylight-saving changes included. Never UTC midnight.
+- Record writes don’t emit events yet (their handlers are shared with other work); the seeded history includes them.
+
 #### Adding an entity
 
 - Its schema in `src/app/api/schemas.ts`, and its endpoints (the tenant first) in their own file in `api/`.
 - References to other entities as ids, displayed through a ref component or a ref field type: never a copied name.
 - Its predicates in `src/app/model`; its projections for lists.
-- Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its capability.
+- Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its capability. A domain added beside the records (the inbox, the admin console) keeps them together in its own module (`src/app/model/inbox.ts`, `admin.ts`), with its contract beside its endpoints in `src/app/api`.
 - Its capabilities in `CAPABILITIES`, their roles in `ROLE_CAPABILITIES`, and the same capability on its mock routes.
 - Its entry in `entities.ts` (fields, related records, form) and its rows in the route table, each with a guard.
 - Mock handlers and seed data (from its own PRNG stream) so its stories and tests run.
@@ -6102,10 +6119,15 @@ TextField, Textarea, Select, RadioGroup, Slider and FileUpload render the same p
 | [Textarea](src/components/Textarea/Textarea.stories.tsx) | Free text over a line: a description, a comment. | A single value. |
 | [SearchField](src/components/SearchField/SearchField.stories.tsx) | Filtering a list on the page as you type, with a clear button. | A form answer (TextField). |
 | [Select](src/components/Select/Select.stories.tsx) | One value from a long or unfamiliar list (six or more). | Two to five options people should compare at a glance (RadioGroup). |
+| [Combobox](src/components/Combobox/Combobox.stories.tsx) | One value from a list too long to scan: type to narrow it (an owner, an account). | A short fixed list (Select). |
+| [MultiSelect](src/components/MultiSelect/MultiSelect.stories.tsx) | Several values from a longer list, shown as removable chips: event types, tags. | A handful of independent options (Checkboxes). |
+| [DatePicker](src/components/DatePicker/DatePicker.stories.tsx) | A calendar date, typed in the reader’s order or picked; ISO in and out. | A moment in time with an hour (a date and a time, stored as an instant). |
+| [DateRangePicker](src/components/DatePicker/DateRangePicker.stories.tsx) | A start and an end date in one field and one calendar. | Preset periods (SegmentedControl). |
+| [NumberField](src/components/NumberField/NumberField.stories.tsx) | Quantities, amounts (integer minor units with a currency) and percentages, in the reader’s format. | Numbers that aren’t quantities: phone numbers, ids (TextField). |
 | [RadioGroup](src/components/RadioGroup/RadioGroup.stories.tsx) | One value from a few options that are all worth reading. | A view switch that applies at once (SegmentedControl). |
 | [Checkbox](src/components/Checkbox/Checkbox.stories.tsx) | A yes/no answer, or several independent options, saved with the form. | A setting that takes effect immediately (Switch). |
 | [Switch](src/components/Switch/Switch.stories.tsx) | A setting that takes effect the moment it is flipped. | A form answer submitted later (Checkbox). |
-| [Slider](src/components/Slider/Slider.stories.tsx) | A position on a scale, or a range, where the exact number matters less: volume, a price filter. | An exact figure (TextField type="number"). |
+| [Slider](src/components/Slider/Slider.stories.tsx) | A position on a scale, or a range, where the exact number matters less: volume, a price filter. | An exact figure (NumberField). |
 | [FileUpload](src/components/FileUpload/FileUpload.stories.tsx) | Attaching files, with the limits shown before anyone picks. | Importing rows of data (a dedicated import wizard). |
 
 #### Layout
@@ -6142,6 +6164,77 @@ A Banner with the problems as links. It isn’t also announced, because focus mo
 ```
 
 The working version, with every state, is the [create-and-edit example](src/examples/CreateEditFlow.tsx).
+
+<!-- docs/guides/KeyboardPowerUsers.stories.tsx -->
+
+### Keyboard and power users
+
+People who use a product all day stop reaching for the mouse. The system gives them a command palette, one registry for every shortcut, and pickers built for the keyboard, without taking anything away from people who find their way by looking.
+
+#### The test
+
+- An expert can run the core loop without the mouse; a newcomer can still find everything by looking. A shortcut is an accelerator for a visible control, never the only way.
+- Every shortcut shows where people will learn it: in the control’s tooltip (`Tooltip shortcut`), its menu item (`MenuItem.shortcut`), its command palette row, and the ? overlay. The same notation everywhere: `mod+k` is ⌘CommandK on a Mac and CtrlK elsewhere.
+
+#### The command palette
+
+⌘K / Ctrl+K from anywhere, or the Search button in the header that shows the keys.
+
+- `CommandPalette` is UI only: a modal dialog with the ARIA combobox pattern (the input keeps focus, ↑ ↓ move, ↵ runs, Esc closes and focus returns), grouped results, forgiving ranking, and the result count announced. The app decides what’s in it.
+- The app’s composition (`src/examples/CommandMenu.tsx`) fills it from what already exists, so nobody maintains a list: pages from the route table (every page without params, named by its `title`), records from the list’s own server search, accounts and people from their directories, actions that mirror buttons, and recent items.
+- **Only what this person may do.** Every page row asks `can(route.guard)`, the route guard’s own check; every action asks the capability its button asks; records come from the server’s query, so a viewer never finds a draft. A command then does exactly what its button does (the same route, the same session function), so it can’t get past a guard or a mutation’s own refusal. See the [admin](src/examples/CommandMenu.tsx) and [viewer](src/examples/CommandMenu.tsx) palettes for the same query.
+- Recent items are kept in the cache partition (`src/app/model/recent.ts`), as ids: they follow the workspace switch, drop with a permission change, clear on sign-out, and show current names.
+
+#### The shortcut registry
+
+One document listener, one list of every active shortcut, one set of rules.
+
+```
+useShortcut({
+  id: 'inbox.archive',             // stable: conflict reports name it
+  keys: 'e',                       // mod+k · shift+? · g i (a sequence) · e
+  description: 'Archive',          // verb first: shown in the ? overlay
+  scope: 'Inbox',                  // its group in the overlay (default Global)
+  handler: archive,                // may change every render
+  enabled: targets.length > 0,     // registered, but only fires when it makes sense
+});
+```
+
+- A shortcut lives as long as the component that registers it: page shortcuts come and go with the page, and the overlay lists what’s active now.
+- **Conflicts.** Two active shortcuts with the same keys on this platform (`mod+k` and `ctrl+k` collide on Windows, not on a Mac), or a single key that starts a sequence: the first registration keeps the keys, the second never fires, and the conflict is reported (`console.error`, naming both ids). `findShortcutConflicts` is the same check as a pure function, for a test over a whole app’s shortcuts.
+- **Reserved keys are refused** and never prevented: copy, paste, cut, undo, select all, find, address bar, tabs, windows, reload, print, zoom, history (Alt+←/→), Tab, Enter, Space, Escape, arrows, Home/End, Page Up/Down, F-keys, and any Control+Option (VoiceOver) or Control+Alt chord (screen readers). `isReservedShortcut` answers for any keys.
+- **Nothing fires** while typing in a field (unless `allowInInputs`, for ⌘ chords only), from inside a dialog (unless `allowInDialogs`), during IME composition, or after another handler took the key.
+
+**Kinds of shortcut**
+
+| Kind | Use it for | Rule |
+|---|---|---|
+| ⌘ / Ctrl chords (mod+k) | App-wide commands people use from anywhere, including while typing. | Never a chord the browser owns (copy, paste, find, new tab, zoom…): the registry refuses them. |
+| Sequences (g then i) | Jumps: two letters, the first a verb ("go"). Many jumps, one prefix. | A single key that starts a sequence conflicts with it (g alone would always fire first). |
+| Single keys (j, k, e, ?) | Repeated actions in a queue, where speed matters most. | Can be turned off in the ? overlay (WCAG 2.2 SC 2.1.4); never fire in a text field or a dialog. |
+| Keys inside a widget (arrows, Enter, Space, Escape) | The widget’s own model: a listbox, a menu, a grid, a toolbar. | Not for the registry: they are reserved, so page shortcuts can’t steal them. |
+
+#### The app’s shortcuts
+
+**Shortcuts in the example app**
+
+| Keys | Does | Where |
+|---|---|---|
+| ⌘CommandK | Open or close the command palette | Everywhere, even in a text field (allowInInputs) |
+| ? | Show every shortcut active on this page | Everywhere outside a text field |
+| GthenH | Go to Home (g r Records, g a Accounts, g p People, g i Inbox, g m Members, g s Settings) | Everywhere; only pages this role may open |
+| J | Next item (k: previous) | Lists worked one item at a time: the inbox |
+| E | Archive the open item, or the selection | The inbox |
+| U | Mark read or unread | The inbox |
+| X | Select the open item for bulk triage | The inbox |
+
+- The [inbox](src/examples/InboxPage.tsx) is the reference: j/k move and focus follows, e archives and opens the next, and each key mirrors a toolbar button, a row’s context menu and the bulk toolbar. See [its ? overlay](src/examples/InboxPage.tsx).
+
+#### Keyboard-first components
+
+- `Combobox` and `MultiSelect` (type to narrow, ↑ ↓ ↵), `DatePicker` and `DateRangePicker` (type each segment or use ↑ ↓; the calendar is a grid), `NumberField` (↑ ↓ step, Page Up/Down by ten): React Aria behind the system’s closed API. Dates and numbers follow `LocaleProvider`, the same locale and time zone as `useFormat()`; values stay ISO dates and integer minor units.
+- Inside a Dialog their popovers portal into the dialog, and Esc closes only the popover.
+- `Toolbar` is one tab stop with arrow keys between its buttons; `ContextMenu` opens with Shift+F10 on the focused row and repeats actions that are visible elsewhere; `InlineEdit` edits one value in place with Enter and Esc; `SplitView`’s divider resizes with the arrow keys.
 
 <!-- docs/guides/Motion.stories.tsx -->
 
@@ -6461,7 +6554,8 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  error/404 → ErrorPages. Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
+  Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
@@ -6485,6 +6579,10 @@ UI rules (design system v0)
   with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
   never let AI write without ReviewChanges (or an explicit accept) and an Undo.
   The assistant acts only through the person's own can() and named mutations.
+- Keyboard shortcuts go through useShortcut (never a bare keydown listener):
+  every shortcut mirrors a visible control and shows its keys there (Tooltip
+  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
+  reported; single-key shortcuts can be turned off in the ? overlay.
 ```
 
 #### Keeping them current
