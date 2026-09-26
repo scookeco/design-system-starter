@@ -7,9 +7,13 @@ import './Kbd.css';
  */
 export type KeyPlatform = 'mac' | 'other';
 
-/** The platform this browser runs on. Server rendering and tests without a navigator get "other". */
+/**
+ * The platform this browser runs on. Anything without a browser window gets "other": server
+ * rendering and generated docs must not depend on the machine they run on (Node 21+ has a global
+ * navigator whose platform is the host OS).
+ */
 export const detectPlatform = (): KeyPlatform => {
-  if (typeof navigator === 'undefined') return 'other';
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return 'other';
   const agent = navigator as Navigator & { userAgentData?: { platform?: string } };
   const name = agent.userAgentData?.platform ?? navigator.platform;
   return /mac|iphone|ipad/i.test(name) ? 'mac' : 'other';

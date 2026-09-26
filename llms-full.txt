@@ -6220,7 +6220,7 @@ useShortcut({
 
 | Keys | Does | Where |
 |---|---|---|
-| ⌘CommandK | Open or close the command palette | Everywhere, even in a text field (allowInInputs) |
+| CtrlK | Open or close the command palette | Everywhere, even in a text field (allowInInputs) |
 | ? | Show every shortcut active on this page | Everywhere outside a text field |
 | GthenH | Go to Home (g r Records, g a Accounts, g p People, g i Inbox, g m Members, g s Settings) | Everywhere; only pages this role may open |
 | J | Next item (k: previous) | Lists worked one item at a time: the inbox |
