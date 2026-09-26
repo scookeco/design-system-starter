@@ -15,9 +15,9 @@
 import type { Capability, RecordEntity, Role } from '../api/schemas';
 import { canArchive, canDelete, canMove, canRename, isDraft } from './predicates';
 
-const VIEWER = ['record:read', 'account:read'] as const satisfies readonly Capability[];
+const VIEWER = ['workspace:read', 'record:read', 'account:read'] as const satisfies readonly Capability[];
 const EDITOR = [...VIEWER, 'record:read-drafts', 'record:create', 'record:rename', 'record:move', 'record:archive', 'account:create', 'people:create'] as const satisfies readonly Capability[];
-const ADMIN = [...EDITOR, 'record:delete', 'account:edit'] as const satisfies readonly Capability[];
+const ADMIN = [...EDITOR, 'workspace:manage', 'record:delete', 'account:edit'] as const satisfies readonly Capability[];
 
 /** The ONE place roles map to capabilities. A new role, or a capability moving between roles, is an edit here. */
 export const ROLE_CAPABILITIES: Record<Role, readonly Capability[]> = { viewer: VIEWER, editor: EDITOR, admin: ADMIN };
@@ -48,6 +48,8 @@ export const canSee = (grant: Grant, record: Pick<RecordEntity, 'status'>) => !i
 
 /** What a person is told when a capability is missing: what they can't do, and who can change that. */
 export const DENIAL_REASONS: Record<Capability, string> = {
+  'workspace:read': 'You’re not a member of this workspace. Ask a workspace admin for an invitation.',
+  'workspace:manage': 'Only workspace admins can set up the workspace.',
   'record:read': 'You don’t have access to records in this workspace. Ask a workspace admin.',
   'record:read-drafts': 'Drafts are visible to editors. Ask a workspace admin for editor access.',
   'record:create': 'You have view-only access, so you can’t create records. Ask a workspace admin for editor access.',

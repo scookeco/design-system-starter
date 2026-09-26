@@ -14,6 +14,10 @@ export type Tenant = z.infer<typeof TenantSchema>;
  * which is decided in exactly one place (ROLE_CAPABILITIES in src/app/model/permissions.ts).
  */
 export const CAPABILITIES = [
+  /** Be a member: open the workspace's home and personal settings. */
+  'workspace:read',
+  /** Set the workspace up and change how it works. */
+  'workspace:manage',
   'record:read',
   /** See drafts. Viewers get a narrower projection of the same records: drafts are work in progress. */
   'record:read-drafts',
