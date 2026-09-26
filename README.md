@@ -58,11 +58,12 @@ src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, 
 src/components/         the components; the only place (with primitives) Radix is imported, and the only place React Aria is
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks), AssistantPanel (an assistant beside the page), SplitView (list + detail)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
-src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
-                        predicates, projections, mutations, selection, permissions), session.tsx (memberships, workspace
-                        switch, sign-out), routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState),
-                        registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the inbox, members
-                        and the audit log)
+src/app/                the app layer the examples use (not the system): api/ (client, zod schemas, live events, jobs),
+                        model/ (keys, queries, predicates, projections, mutations, selection, permissions, live, write
+                        queues, conflicts, drafts, undo, jobs), session.tsx (memberships, workspace switch, sign-out),
+                        routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState, navigation guard,
+                        restoration), registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the
+                        inbox, members and the audit log; live.ts the live channel; jobs.ts the job runner)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (and four AI examples), the schema-driven entity pages, and the app's route table
                         (routes.tsx) and assembly (App.tsx); also a consumer lint target
@@ -182,9 +183,9 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 
 | Archetype | Copy | It shows |
 |---|---|---|
-| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, saved views (save, rename, default, delete, "Modified"), view tabs with server counts, SearchField, a Filters popover with removable chips and a Columns popover, a sortable table or a keyboard-operable board over the same query (`RecordBoard.tsx`, Move to… with drag as the alternative), pagination, all server-side and in the URL; row selection, "Select all N matching", a bulk bar and bulk delete with partial failure; actions disabled with a reason per role; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
-| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside rendered from the field registry; optimistic rename with rollback and a 409 conflict banner, pessimistic archive and delete; loading and error with the shell up |
-| Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record (fields from the field registry), quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar, a create that is safe to retry (idempotency key) |
+| List / index | `src/examples/ListPage.tsx` | PageHeader with one primary action, saved views (save, rename, default, delete, "Modified"), view tabs with server counts, SearchField, a Filters popover with removable chips and a Columns popover, a sortable table or a keyboard-operable board over the same query (`RecordBoard.tsx`, Move to… with drag as the alternative), pagination, all server-side and in the URL; row selection, "Select all N matching", a bulk bar and bulk delete with partial failure ("all matching" as a job with truthful progress); live updates ("Show 3 new", rows never reorder under the cursor); a board move with Undo; Back restores scroll and focus to the row; actions disabled with a reason per role; loading (skeleton rows), first use, no results and load error; quick-create dialog, toast |
+| Record / detail | `src/examples/RecordPage.tsx` | breadcrumb, PageHeader with status and a "More" menu, NavTabs (Overview · Activity · Files, previews in a Frame), properties aside rendered from the field registry; optimistic rename through the record's write queue ("Saving 2 changes…") with a field-level conflict panel; archive and tag removal with Undo instead of a confirmation; confirmed delete; changes and deletes by someone else, live; loading and error with the shell up |
+| Create and edit | `src/examples/CreateEditFlow.tsx` | full-page form for a heavy record (fields from the field registry), quick-create dialog for a light one, errors on blur and submit, a focused error summary linking to fields, pending submit in a sticky action bar, a create that is safe to retry (idempotency key); edit (`/records/:id/edit`) as a versioned write with a conflict panel (Keep mine, Take theirs, per field); drafts owned by the form, autosaved and restored, an unsaved-changes guard, a warning when the record changes underneath |
 | Settings | `src/examples/SettingsPage.tsx` | Personal and Workspace tiers in a grouped sub-nav (PageLayout's nav slot), one card per category with its own Save, a success banner |
 | Sign-in | `src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed sign-in link, a password as the secondary route; a failed-sign-in banner; a verification-code step |
 | Wizard | `src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step, focus to each step's h1; a review step with Edit |
@@ -217,9 +218,13 @@ The design system draws; `src/app` knows. It is consumer code, like the examples
 - **Validate at the boundary.** Every response is parsed with a zod schema in `src/app/api/client.ts`; a bad payload becomes an error state and never reaches the cache.
 - **Named predicates** (`isOpen`, `canDelete`, the view predicates) drive the filters, tab counts, badges, bulk guards and the mock server. Views are pure projections (`toRow`).
 - **URL state** (`useUrlState`) for view, search, filters, sort and page: push for navigation, replace for refinements, debounced search.
-- **One named mutation per verb** (`renameRecord` optimistic with rollback and 409 handling; `archiveRecord`, `createRecord` with an idempotency key, and `bulkDeleteRecords` pessimistic), each documenting what it patches and invalidates.
+- **One named mutation per verb** (`renameRecord` optimistic; `updateRecord` versioned; `archiveRecord` and `untagRecord` undoable; `createRecord` with an idempotency key; `bulkDeleteRecords` and `startBulkDelete` for listed ids and "all matching"), each documenting what it patches and invalidates.
+- **Freshness**: a 30 s staleTime with refetch on focus and reconnect, plus live events reconciled by one handler (patch in place, count new rows behind "Show N new", never reorder under the cursor), filtered by grant and idempotent by version.
+- **Concurrency**: versioned writes (`If-Match`, 409 with theirs, 428 without) compared field by field, re-based on their own when nothing collides, a conflict panel when something does; per-record write queues that serialise writes, show what's pending and rebase on failure.
+- **Drafts, undo and jobs**: drafts owned by the form (autosaved, restored, guarded on navigation, cleared on sign-out); Undo instead of "Are you sure?" for what can be undone (a held write or a compensating one), confirmation kept for deletes; bulk work as jobs with truthful status (queued, n of N, partial failure, failed, cancelled) visible on every page.
+- **History**: push to open, replace to refine; Back restores a list's scroll and focus to the row that was opened.
 - **A typed field registry** renders record properties and form fields; exhaustive at compile time, with a runtime fallback that reports and never throws.
-- **A mock API** (MSW) over a seeded database: 240 and 120 records, 12 and 8 accounts for two tenants. The gallery's Latency, Failures and Role toolbars change its behaviour, and failures are real 500 (or 403) responses. The same handlers serve Vitest (`msw/node`).
+- **A mock API** (MSW) over a seeded database: 240 and 120 records, 12 and 8 accounts for two tenants. The gallery's Latency, Failures and Role toolbars change its behaviour, and failures are real 500 (or 403) responses; the Another user… toolbar pushes a colleague's edit, add or delete through the live channel. The same handlers serve Vitest (`msw/node`).
 
 ## Adding a component: walk the decision ladder
 
