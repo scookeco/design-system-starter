@@ -1,8 +1,8 @@
-import { Button, findShortcutConflicts, isReservedShortcut, RESERVED_SHORTCUTS, ShortcutHelp, useActiveShortcuts, useCharacterKeyShortcuts, useShortcut } from '../../src/index';
+import { Button, findShortcutConflicts, isReservedShortcut, ShortcutHelp, useActiveShortcuts, useCharacterKeyShortcuts, useShortcut } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
-  covers: [ShortcutHelp, useShortcut, useActiveShortcuts, useCharacterKeyShortcuts, findShortcutConflicts, isReservedShortcut, RESERVED_SHORTCUTS],
+  covers: [ShortcutHelp, useShortcut, useActiveShortcuts, useCharacterKeyShortcuts, findShortcutConflicts, isReservedShortcut],
   whenToUse: [
     '`useShortcut` for every keyboard shortcut: global ones in the app’s shell composition, page ones in the page, so they register and unregister with it.',
     '`ShortcutHelp` once, in the shell composition: `?` opens it, and it lists every shortcut active right now, by scope.',

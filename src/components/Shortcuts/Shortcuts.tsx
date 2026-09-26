@@ -7,7 +7,7 @@ import { shortcutRegistry, type ActiveShortcut, type ShortcutDefinition } from '
 import './Shortcuts.css';
 
 export type { ActiveShortcut, ShortcutConflict, ShortcutDefinition } from './registry';
-export { findShortcutConflicts, isReservedShortcut, RESERVED_SHORTCUTS } from './registry';
+export { findShortcutConflicts, isReservedShortcut } from './registry';
 
 /**
  * Register a keyboard shortcut while the component is mounted. The handler may change on every

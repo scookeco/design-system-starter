@@ -1,0 +1,7 @@
+@layer components {
+  /* Opened at the pointer, anywhere on screen: scroll inside rather than run off the edge. */
+  .context-menu {
+    max-block-size: var(--radix-context-menu-content-available-height);
+    overflow-y: auto;
+  }
+}

@@ -97,9 +97,12 @@ UI rules (design system v0)
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
 - [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
+- [ContextMenu](docs/usage/ContextMenu.usage.tsx): Actions on a thing, where the pointer or focus is: right-click
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
+- [DatePicker](docs/usage/DatePicker.usage.tsx): A calendar date
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
@@ -109,13 +112,16 @@ UI rules (design system v0)
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
+- [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
+- [MultiSelect](docs/usage/MultiSelect.usage.tsx): Choosing several values from a list that narrows as you type
 - [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
 - [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
+- [NumberField](docs/usage/NumberField.usage.tsx): A number typed in the reader's own format
 - [PageHeader](docs/usage/PageHeader.usage.tsx): The top of every page
 - [Pagination](docs/usage/Pagination.usage.tsx): Moves through a long, server-paged list
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
@@ -142,6 +148,7 @@ UI rules (design system v0)
 - [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
+- [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
 
 ## Primitives
@@ -888,6 +895,76 @@ Stories: `components-codeblock--default`, `components-codeblock--multi-line`, `c
 Composes: Button, CopyButton, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
 
+### Combobox
+
+component · `src/components/Combobox/Combobox.tsx` · usage: `docs/usage/Combobox.usage.tsx`
+
+A text field with a list of options that narrows as you type: choosing one value from many (an owner from 200 people, an account). Typing filters by a locale-aware "contains"; ↑ ↓ move, ↵ chooses, Esc closes. Behaviour, ARIA and focus come from React Aria's ComboBox.
+
+Props:
+- `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean`
+- `options: readonly ComboboxOption[]`
+- `value?: string | null`: The chosen option's value, or null for none.
+- `defaultValue?: string | null`
+- `onValueChange?: (value: string | null) => void`
+- `placeholder?: string`
+- `description?: string`
+- `error?: string`
+- `size?: 'sm' | 'md' | 'lg'` = `'md'`
+- `disabled?: boolean`
+- `required?: boolean`
+- `name?: string`: Form field name: the chosen value is submitted.
+- `emptyMessage?: string` = `'No matches'`: Shown in the list when nothing matches what was typed.
+- `showOptionsLabel?: string` = `'Show options'`: Accessible name of the button that opens the list.
+- `defaultOpen?: boolean` = `false`: Render the list open (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: size (sm | md | lg).
+States: hideLabel, disabled, required, defaultOpen.
+
+**When to use**
+
+- Choosing one value from a list too long to scan (people, accounts, countries): type to narrow it.
+- A filter that picks one actor or one owner.
+
+**When not to use**
+
+- A short, fixed list (about 5–15 options) → `Select`
+- Several values → `MultiSelect`
+- Free text with suggestions, or jumping around the app → `SearchField`, or the `CommandPalette`
+
+**Do:** A long list with a second line that tells similar names apart.
+
+```tsx
+<Combobox label="Owner" options={PEOPLE} defaultValue="p02" />
+```
+
+**Don't:** Three options behind typing: a Select (or radios) shows them at once.
+
+```tsx
+<Select
+  label="Plan"
+  options={[
+    { value: 'free', label: 'Free' },
+    { value: 'team', label: 'Team' },
+    { value: 'enterprise', label: 'Enterprise' },
+  ]}
+/>
+```
+
+**Accessibility**
+
+- React Aria’s combobox pattern: the input keeps focus, ↑ ↓ move through the list (announced), ↵ chooses, Esc closes; the button opens the list for pointer users.
+- Label, description and error are wired by React Aria’s slots and laid out like every other field.
+- Inside a Dialog the list portals into the dialog and Esc closes only the list.
+- Typing matches with a locale-aware “contains”, so accents and case don’t get in the way.
+
+Stories: `components-combobox--empty`, `components-combobox--with-value`, `components-combobox--with-description`, `components-combobox--with-error`, `components-combobox--disabled`, `components-combobox--small`, `components-combobox--large`, `components-combobox--open`, `components-combobox--in-dialog`.
+Composes: Field, Icon, Picker.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+
 ### CommandPalette
 
 component · `src/components/CommandPalette/CommandPalette.tsx` · usage: `docs/usage/CommandPalette.usage.tsx`
@@ -1008,6 +1085,59 @@ Stories: `components-composer--empty`, `components-composer--with-text`, `compon
 Composes: Button, Icon, Kbd, Spinner, Tag.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
 
+### ContextMenu
+
+component · `src/components/ContextMenu/ContextMenu.tsx` · usage: `docs/usage/ContextMenu.usage.tsx`
+
+Actions on a thing, where the pointer or focus is: right-click (or Shift+F10 on the focused element). A shortcut to actions that are also visible somewhere (a ⋯ Menu, a toolbar): nobody discovers a context menu, so it must never be the only way. Items look and read like Menu's. Behaviour from Radix ContextMenu.
+
+Props:
+- `children: ReactElement`: The region it belongs to: one focusable element (a row, a card). Right-click, a long press, Shift+F10 or the Menu key on it opens the menu.
+- `items: readonly MenuEntry[]`: The same entries as Menu: items (with an optional shortcut) and 'separator'.
+- `label?: string`: Optional non-interactive heading (what the menu acts on).
+- `onOpenChange?: (open: boolean) => void`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- A shortcut to the actions on a row, card or list item that are also available elsewhere (a ⋯ menu, a toolbar).
+
+**When not to use**
+
+- The only way to reach an action → a visible `Menu` on the thing: nobody discovers a context menu
+- Overriding the browser’s menu on text, links or images → leave the browser’s menu alone there
+
+**Do:** The same items as the visible ⋯ menu, on a focusable region.
+
+```tsx
+<ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>
+  <div tabIndex={0} role="group" aria-label="Northwind renewal">
+    Northwind renewal <Menu trigger={<Button variant="ghost" icon="more" aria-label="More actions">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />
+  </div>
+</ContextMenu>
+```
+
+**Don't:** Actions that exist only on right-click: invisible to most people, and to keyboard users who don’t know Shift+F10.
+
+```tsx
+<ContextMenu items={[{ label: 'Delete', tone: 'danger' }]}>
+  <div tabIndex={0} role="group" aria-label="Report">
+    Report (no other way to delete it)
+  </div>
+</ContextMenu>
+```
+
+**Accessibility**
+
+- Radix ContextMenu: opens on right-click, a long press, or Shift+F10 / the Menu key on the focused region; arrows, typeahead, Esc and focus return as in `Menu`.
+- The region must be focusable and named, so keyboard users can reach it.
+- Items look and read exactly like Menu’s, shortcuts included (`aria-keyshortcuts`).
+
+Stories: `components-contextmenu--default`.
+Composes: Icon, Kbd, Menu.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
+
 ### CopyButton
 
 component · `src/components/CopyButton/CopyButton.tsx` · usage: `docs/usage/CopyButton.usage.tsx`
@@ -1066,6 +1196,95 @@ Variants: variant (secondary | ghost); size (sm | md | lg).
 Stories: `components-copybutton--secondary`, `components-copybutton--ghost`, `components-copybutton--medium`, `components-copybutton--custom-labels`.
 Composes: Button, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.label`.
+
+### DatePicker
+
+component · `src/components/DatePicker/DatePicker.tsx` · usage: `docs/usage/DatePicker.usage.tsx`
+
+A calendar date: typed segment by segment in the reader's locale order (from LocaleProvider), or picked from a calendar. Values are ISO strings ("2026-09-25"), calendar dates with no zone. Behaviour, ARIA and focus come from React Aria's DatePicker.
+
+Props:
+- `value?: IsoDate | null`
+- `defaultValue?: IsoDate | null`
+- `onValueChange?: (value: IsoDate | null) => void`
+- `name?: string`: Form field name: the ISO date is submitted.
+- `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean`
+- `min?: IsoDate`: Earliest date that can be chosen (ISO).
+- `max?: IsoDate`: Latest date that can be chosen (ISO).
+- `description?: string`
+- `error?: string`
+- `size?: 'sm' | 'md' | 'lg'` = `'md'`
+- `disabled?: boolean`
+- `required?: boolean`
+- `calendarLabel?: string` = `'Choose a date'`: Accessible name of the button that opens the calendar.
+- `previousMonthLabel?: string` = `'Previous month'`: Previous and next month buttons.
+- `nextMonthLabel?: string` = `'Next month'`
+- `defaultOpen?: boolean` = `false`: Render the calendar open (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: size (sm | md | lg).
+States: hideLabel, disabled, required, defaultOpen.
+
+#### DateRangePicker
+
+component, part of DatePicker. A range of calendar dates, start to end: typed or picked in one calendar. Values are ISO strings. To filter instants (an audit log's "from" and "to"), turn the range into the start of the first day and the end of the last in the reader's time zone, never UTC midnight.
+
+Props:
+- `value?: DateRange | null`
+- `defaultValue?: DateRange | null`
+- `onValueChange?: (value: DateRange | null) => void`
+- `startName?: string`: Form field names for the two ends.
+- `endName?: string`
+- `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean`
+- `min?: IsoDate`: Earliest date that can be chosen (ISO).
+- `max?: IsoDate`: Latest date that can be chosen (ISO).
+- `description?: string`
+- `error?: string`
+- `size?: 'sm' | 'md' | 'lg'` = `'md'`
+- `disabled?: boolean`
+- `required?: boolean`
+- `calendarLabel?: string` = `'Choose dates'`: Accessible name of the button that opens the calendar.
+- `previousMonthLabel?: string` = `'Previous month'`: Previous and next month buttons.
+- `nextMonthLabel?: string` = `'Next month'`
+- `defaultOpen?: boolean` = `false`: Render the calendar open (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- A calendar date: a renewal, a due date, a birthday. Typed in the reader’s own order, or picked.
+- Values that are ISO calendar dates (“2026-09-25”), which is how the app passes them.
+
+**When not to use**
+
+- A start and an end → `DateRangePicker`
+- A moment in time (with an hour) → a date and a time, stored as an instant; show it with `useFormat().dateTime`
+- Showing a date → `useFormat().date(iso)`
+
+**Do:** Segments in the reader’s locale order (LocaleProvider), with the earliest allowed date set.
+
+```tsx
+<DatePicker label="Renews on" defaultValue="2026-10-14" min="2026-09-25" />
+```
+
+**Don't:** A free-text date: ambiguous (is 03/04 March or April?) and parsed by hand.
+
+```tsx
+<TextField label="Renews on" placeholder="MM/DD/YYYY" />
+```
+
+**Accessibility**
+
+- Each segment (day, month, year) is a spin button: type digits or use ↑ ↓; the calendar button opens a grid navigable with the arrow keys, Page Up/Down for months.
+- The locale comes from LocaleProvider, the same one `useFormat()` uses, so typed and displayed dates agree; the calendar opens on today in the provider’s time zone.
+- Inside a Dialog the calendar portals into it and Esc closes only the calendar.
+
+Stories: `components-datepicker--empty`, `components-datepicker--with-value`, `components-datepicker--with-description`, `components-datepicker--with-error`, `components-datepicker--disabled`, `components-datepicker--small`, `components-datepicker--open`, `components-datepicker--german`, `components-datepicker--in-dialog`.
+Composes: Field, Icon, Picker.
+Tokens read: `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### Dialog
 
@@ -1613,6 +1832,62 @@ States: open, defaultOpen.
 Stories: `components-hovercard--closed`, `components-hovercard--open`, `components-hovercard--open-top`.
 Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `space.gap.xs`, `space.inset.md`, `text.body`, `z.dropdown`.
 
+### InlineEdit
+
+component · `src/components/InlineEdit/InlineEdit.tsx` · usage: `docs/usage/InlineEdit.usage.tsx`
+
+A value you can change where it's shown: view → edit → save or cancel. Enter saves, Escape cancels, and focus returns to the value either way. Validation and the server's answer show under the field without losing what was typed. For one value at a time (a name, a title); a form with several fields is a form.
+
+Props:
+- `label: string`: What the value is ("Name"). The field's label and the edit button's name ("Edit Name"). Required.
+- `value: string`
+- `onSave: (value: string) => unknown`: Save the new value. Return (or resolve to) an error message string to stay in edit mode with it; anything else means saved. While a returned promise is pending, Save shows its pending state; a rejected promise keeps edit mode with `failedMessage`.
+- `validate?: (value: string) => string | undefined`: Check before saving: a message when the value can't be saved.
+- `placeholder?: string` = `'Empty'`: Shown in view mode when the value is empty.
+- `disabledReason?: string`: View only, with the reason as the edit button's description (no permission, archived…).
+- `editLabel?: string` = `'Edit ${label}'`: Accessible names of the actions.
+- `saveLabel?: string` = `'Save'`
+- `cancelLabel?: string` = `'Cancel'`
+- `failedMessage?: string` = `'Couldn’t save. Try again.'`: Shown when `onSave` throws or rejects.
+- `defaultEditing?: boolean` = `false`: Start in edit mode (gallery and tests).
+- `defaultDraft?: string`: Start in edit mode with this draft and its error (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: defaultEditing.
+
+**When to use**
+
+- Changing one value where it’s shown: a record’s name in its header, a label in a table cell.
+- Frequent small edits by people who own the thing.
+
+**When not to use**
+
+- Several fields that belong together → a form (`CreateEditFlow`), or a Dialog
+- A value that needs a long explanation or a review step → a form with its description and a Save button
+
+**Do:** The value is the edit button; Enter saves, Escape cancels, focus comes back to the value.
+
+```tsx
+<InlineEdit label="Name" value="Northwind renewal" onSave={noop} />
+```
+
+**Don't:** An always-open field for a value people rarely change: it looks like a form waiting to be filled.
+
+```tsx
+<TextField label="Name" defaultValue="Northwind renewal" />
+```
+
+**Accessibility**
+
+- View mode is a button named “Edit <label>: <value>”; edit mode is a labelled input with Save and Cancel buttons, so it works without the keys too.
+- Errors (from `validate` or returned by `onSave`) sit under the field, linked with aria-describedby; the draft is kept.
+- While `onSave`’s promise is pending, Save shows its pending state and Cancel is disabled.
+- `disabledReason` keeps the value visible and focusable, with the reason as its description.
+
+Stories: `components-inlineedit--viewing`, `components-inlineedit--empty-value`, `components-inlineedit--editing`, `components-inlineedit--invalid`, `components-inlineedit--disabled`.
+Composes: Button, Field, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.sidebar.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
 ### Kbd
 
 component · `src/components/Kbd/Kbd.tsx` · usage: `docs/usage/Kbd.usage.tsx`
@@ -1907,6 +2182,71 @@ Stories: `components-meter--within-limit`, `components-meter--warning`, `compone
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.fg.default`, `color.fg.muted`, `color.status.danger.fg`, `color.status.warning.fg`, `font.weight.strong`, `icon.stroke`, `radius.pill`, `size.bar`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `text.caption`, `text.label`.
 
+### MultiSelect
+
+component · `src/components/MultiSelect/MultiSelect.tsx` · usage: `docs/usage/MultiSelect.usage.tsx`
+
+Choosing several values from a list that narrows as you type: tags, teams, event types in a filter. Chosen values show as removable chips in the field; the list stays open while you pick. Behaviour, ARIA and focus come from React Aria's ComboBox in multiple-selection mode.
+
+Props:
+- `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean`
+- `options: readonly MultiSelectOption[]`
+- `value?: readonly string[]`: The chosen values, in the order they were chosen.
+- `defaultValue?: readonly string[]`
+- `onValueChange?: (value: string[]) => void`
+- `placeholder?: string`
+- `description?: string`
+- `error?: string`
+- `size?: 'sm' | 'md' | 'lg'` = `'md'`
+- `disabled?: boolean`
+- `required?: boolean`
+- `name?: string`: Form field name: one value per chosen option is submitted.
+- `emptyMessage?: string` = `'No matches'`
+- `showOptionsLabel?: string` = `'Show options'`
+- `removeLabel?: (label: string) => string` = `(text) => 'Remove ${text}'`: Accessible name of each chip's remove button: `(label) => 'Remove Legal'`.
+- `defaultOpen?: boolean` = `false`: Render the list open (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: size (sm | md | lg).
+States: hideLabel, disabled, required, defaultOpen.
+
+**When to use**
+
+- Choosing several values from a longer list: event types in a filter, tags, teams.
+- When the chosen values should stay visible (as chips) while more are added.
+
+**When not to use**
+
+- A handful of options that fit on screen → a group of `Checkbox`es
+- One value → `Combobox` or `Select`
+
+**Do:** Chosen values as chips, each with its own remove button; the list narrows as you type.
+
+```tsx
+<MultiSelect label="Events" options={EVENTS} defaultValue={['member.role_changed']} />
+```
+
+**Don't:** Two independent yes/no settings squeezed into a multi-select: checkboxes are clearer.
+
+```tsx
+<Stack gap="xs">
+  <Checkbox label="Email me" />
+  <Checkbox label="Notify me in the app" />
+</Stack>
+```
+
+**Accessibility**
+
+- React Aria’s combobox in multiple-selection mode: options announce whether they’re selected, and the list stays open while you choose.
+- Each chip’s remove button is named after its value (`removeLabel`); removing one returns focus to the input.
+- The field wraps onto more lines rather than hiding chosen values behind a count.
+
+Stories: `components-multiselect--empty`, `components-multiselect--with-values`, `components-multiselect--wrapping`, `components-multiselect--with-error`, `components-multiselect--disabled`, `components-multiselect--open`.
+Composes: Field, Icon, Picker, Tag.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+
 ### Nav
 
 component · `src/components/Nav/Nav.tsx` · usage: `docs/usage/Nav.usage.tsx`
@@ -2024,6 +2364,71 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 Stories: `components-navtabs--first-current`, `components-navtabs--later-current`, `components-navtabs--many-sections-narrow`.
 Composes: Link.
 Tokens read: `color.action.primary`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `size.control.md`, `space.gap.xs`, `space.inset.sm`, `text.label`.
+
+### NumberField
+
+component · `src/components/NumberField/NumberField.tsx` · usage: `docs/usage/NumberField.usage.tsx`
+
+A number typed in the reader's own format ("1.234,5" in German), parsed back to a number: amounts, quantities, percentages. ↑ ↓ step, Page Up/Down step by ten, Home/End go to min/max. Built on React Aria's NumberField (not a native number input, which takes "e", ignores the locale's grouping and changes on scroll). Formatting follows LocaleProvider, like useFormat().
+
+Props:
+- `label: string`: Visible label and accessible name. Required.
+- `hideLabel?: boolean`
+- `value?: number | null`: The number. With `currency`, integer minor units (cents), like every amount in the system: 125050 with "USD" shows $1,250.50. null is empty.
+- `defaultValue?: number | null`
+- `onValueChange?: (value: number | null) => void`
+- `format?: 'number' | 'percent'` = `'number'`: How it reads: a plain number, a percentage (0.25 shows 25%), or money when `currency` is set.
+- `currency?: string`: ISO 4217 code: the field shows and parses money, and `value` is in minor units.
+- `min?: number`
+- `max?: number`
+- `step?: number`: Arrow keys and the stepper buttons move by this (in the value's units). Default 1.
+- `maximumFractionDigits?: number`
+- `description?: string`
+- `error?: string`
+- `size?: 'sm' | 'md' | 'lg'` = `'md'`
+- `disabled?: boolean`
+- `required?: boolean`
+- `name?: string`
+- `hideStepper?: boolean` = `false`: Hide the − and + buttons (arrow keys still step).
+- `incrementLabel?: string` = `'Increase'`
+- `decrementLabel?: string` = `'Decrease'`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: format (number | percent); size (sm | md | lg).
+States: hideLabel, disabled, required, hideStepper.
+
+**When to use**
+
+- Quantities, amounts and percentages people type: seats, a price, a discount.
+- Money: pass `currency`, and the value is integer minor units, like every amount in the system.
+
+**When not to use**
+
+- Numbers that aren’t quantities (a phone number, a postcode, an id) → `TextField` with the right `inputMode`
+- A value from a small range, dragged → `Slider`
+
+**Do:** An amount in the reader’s format, stored as minor units.
+
+```tsx
+<NumberField label="Amount" currency="USD" defaultValue={125050} min={0} />
+```
+
+**Don't:** A text field for an amount: “1.250,50” and “1,250.50” can’t both be parsed, and nothing stops “12e3”.
+
+```tsx
+<TextField label="Amount" type="number" />
+```
+
+**Accessibility**
+
+- Why React Aria and not `<input type="number">`: the native input accepts “e”, ignores the locale’s grouping and decimal marks, changes on scroll, and its spinners are tiny targets.
+- Typing and display follow LocaleProvider (the same locale as `useFormat()`); ↑ ↓ step, Page Up/Down step by ten, Home/End jump to min/max.
+- The − and + buttons are 24px targets with names (`decrementLabel`, `incrementLabel`); they’re removed from the tab order, since the arrow keys do the same.
+
+Stories: `components-numberfield--empty`, `components-numberfield--with-value`, `components-numberfield--currency`, `components-numberfield--percent`, `components-numberfield--german-currency`, `components-numberfield--with-error`, `components-numberfield--disabled`, `components-numberfield--without-stepper`.
+Composes: Field, Icon, Picker.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### PageHeader
 
@@ -3613,6 +4018,85 @@ Stories: `components-toggle--unpressed`, `components-toggle--pressed`, `componen
 Composes: Icon.
 Tokens read: `color.bg.hover`, `color.bg.selected`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.standard`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `radius.control`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.xs`, `space.inset.sm`, `text.label`.
 
+### Toolbar
+
+component · `src/components/Toolbar/Toolbar.tsx` · usage: `docs/usage/Toolbar.usage.tsx`
+
+A row of related controls that is one tab stop: Tab enters it, ← → (↑ ↓ vertical) move between its buttons, Home and End jump, Tab leaves. For an editor's formatting bar or a selection's actions; not for page navigation. Behaviour from Radix Toolbar (roving tabindex).
+
+Props:
+- `label: string`: Accessible name: what the controls act on ("Conversation actions"). Required.
+- `orientation?: 'horizontal' | 'vertical'` = `'horizontal'`
+- `children: ReactNode`: ToolbarButton and ToolbarSeparator.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: orientation (horizontal | vertical).
+
+#### ToolbarButton
+
+component, part of Toolbar. One control in a Toolbar. A hidden label or a shortcut shows in a tooltip on hover and focus.
+
+Props:
+- `children: string`: Verb-first label. Also the accessible name when the label is hidden. Required.
+- `icon?: IconName`
+- `hideLabel?: boolean` = `false`: Show only the icon; the label moves into a tooltip and the accessible name. Needs `icon`.
+- `onClick?: () => void`
+- `disabled?: boolean`
+- `pressed?: boolean`: A toggle (Bold, Unread only): its state as aria-pressed.
+- `shortcut?: string`: Its keyboard shortcut, shown in the tooltip (register it with useShortcut).
+- `tone?: 'default' | 'danger'` = `'default'`
+
+Closed styling API: no `className`/`style`.
+
+#### ToolbarSeparator
+
+component, part of Toolbar. A divider between groups of toolbar controls.
+
+
+**When to use**
+
+- A group of actions on one thing that people use repeatedly: a selection’s bulk actions, an editor’s formatting, a reading pane’s triage.
+- Where one tab stop for the group saves keyboard users a dozen Tabs.
+
+**When not to use**
+
+- A page’s one or two primary actions → `Button`s in the `PageHeader`
+- Navigation between pages or sections → `NavTabs` or `Nav`
+
+**Do:** Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.
+
+```tsx
+<Toolbar label="Conversation actions">
+  <ToolbarButton icon="archive" shortcut="e">
+    Archive
+  </ToolbarButton>
+  <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>
+  <ToolbarSeparator />
+  <ToolbarButton icon="download" hideLabel>
+    Export
+  </ToolbarButton>
+</Toolbar>
+```
+
+**Don't:** A page’s main actions forced into a toolbar: they belong in the header, as ordinary buttons.
+
+```tsx
+<Cluster>
+  <Button>New record</Button>
+</Cluster>
+```
+
+**Accessibility**
+
+- Radix Toolbar: Tab enters and leaves; ← → (↑ ↓ vertical) move between controls with a roving tabindex, wrapping; Home and End jump.
+- Icon-only buttons (`hideLabel`) keep their label as the accessible name and show it in a tooltip on hover and focus.
+- `pressed` makes a toggle (aria-pressed); `shortcut` shows in the tooltip and sets aria-keyshortcuts.
+
+Stories: `components-toolbar--default`, `components-toolbar--toggles`, `components-toolbar--vertical`.
+Composes: Icon, Kbd, Tooltip.
+Tokens read: `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
+
 ### Tooltip
 
 component · `src/components/Tooltip/Tooltip.tsx` · usage: `docs/usage/Tooltip.usage.tsx`
@@ -4826,11 +5310,13 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ChangeDecision` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeDecision = 'accepted' | 'rejected'`
 - `ChangeOutcome` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }` How each change went once applied: done, or why it failed.
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
+- `ComboboxOption` (`src/components/Combobox/Combobox.tsx`): `interface ComboboxOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `CommandGroup` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandGroup { id: string; label: string; items: readonly CommandItem[]; filter?: 'local' | 'none'; }`
 - `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconName; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
 - `ComposerAttachment` (`src/components/Composer/Composer.tsx`): `interface ComposerAttachment { id: string; name: string; }`
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
+- `DateRange` (`src/components/DatePicker/DatePicker.tsx`): `interface DateRange { start: IsoDate; end: IsoDate; }`
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long'`
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
@@ -4844,6 +5330,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
 - `IconName` (`src/components/Icon/Icon.tsx`): `type IconName = keyof typeof PATHS`
 - `InsetToken` (`src/tokens/tokens.ts`): `type InsetToken = keyof typeof vars.space.inset`
+- `IsoDate` (`src/components/DatePicker/DatePicker.tsx`): `type IsoDate = string` A calendar date as the system passes it: ISO "2026-09-25", no time, no zone.
 - `KeyPlatform` (`src/components/Kbd/Kbd.tsx`): `type KeyPlatform = 'mac' | 'other'` Where a shortcut is shown: Apple keyboards name modifiers with symbols (⌘ ⇧ ⌥ ⌃), everyone else with words (Ctrl, Shift, Alt). `mod` is the platform's command key: ⌘ on a Mac, Ctrl elsewhere.
 - `LayoutElement` (`src/primitives/types.ts`): `type LayoutElement = 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav' | 'form' | 'fieldset' | 'ul' | 'ol' | 'li' | 'dl'` Elements a layout primitive may render as. Closed on purpose: layout, not widgets.
 - `LinkComponent` (`src/components/Link/Link.tsx`): `type LinkComponent = ComponentType<LinkComponentProps>` An app's router link, adapted to take `href`: React Router's `<Link to>`, Next's `<Link href>`.
@@ -4853,6 +5340,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }`
 - `MessageRole` (`src/components/Message/Message.tsx`): `type MessageRole = 'user' | 'assistant' | 'tool' | 'system'` Who a turn is from: the person, the assistant, a tool the assistant ran, or the system (a note in the thread).
 - `MeterStatus` (`src/components/Meter/Meter.tsx`): `type MeterStatus = 'ok' | 'warning' | 'danger'`
+- `MultiSelectOption` (`src/components/MultiSelect/MultiSelect.tsx`): `type MultiSelectOption = PickerOptionData`
 - `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconName; }`
 - `NavSection` (`src/components/Nav/Nav.tsx`): `interface NavSection { label?: string; items: readonly NavItem[]; }`
 - `NavTab` (`src/components/NavTabs/NavTabs.tsx`): `interface NavTab { label: string; href: string; }`

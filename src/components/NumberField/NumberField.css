@@ -1,0 +1,6 @@
+@layer components {
+  .number-field__input {
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+}

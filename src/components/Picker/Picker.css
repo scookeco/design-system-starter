@@ -1,0 +1,141 @@
+@layer components {
+  /* The pickers' field chrome: an input and a trailing button inside .field__control. */
+  .picker__control {
+    padding-inline-end: var(--space-inset-2xs);
+  }
+
+  .picker__control:focus-within {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .picker__control[data-invalid] {
+    border-color: var(--color-status-danger-fg);
+  }
+
+  .picker__control[data-disabled] {
+    border-color: var(--color-border-default);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-disabled);
+  }
+
+  .picker__input {
+    flex: 1;
+    min-inline-size: 0;
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .picker__input:focus-visible {
+    outline: none;
+  }
+
+  .picker__input::placeholder {
+    color: var(--color-fg-muted);
+  }
+
+  .picker__button {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    cursor: pointer;
+  }
+
+  .picker__button[data-hovered] {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
+  .picker__button[data-focus-visible] {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+  }
+
+  .picker__button[data-disabled] {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  .picker__popover {
+    z-index: var(--z-dropdown);
+    overflow: auto;
+    min-inline-size: var(--trigger-width);
+    max-inline-size: var(--size-overlay-max);
+    padding: var(--space-inset-xs);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-surface);
+    background: var(--color-bg-elevated);
+    color: var(--color-fg-default);
+    box-shadow: var(--shadow-popover);
+  }
+
+  /* A calendar is as wide as its grid, not as its field. */
+  .picker__popover[data-kind="calendar"] {
+    min-inline-size: 0;
+  }
+
+  .picker__listbox {
+    display: flex;
+    flex-direction: column;
+    outline: none;
+  }
+
+  .picker__option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-sm);
+    min-block-size: var(--size-control-sm);
+    padding-block: var(--space-inset-2xs);
+    padding-inline: var(--space-inset-sm);
+    border-radius: var(--radius-control);
+    font: var(--text-body);
+    cursor: pointer;
+  }
+
+  .picker__option[data-focused] {
+    outline: none;
+    background: var(--color-bg-hover);
+  }
+
+  .picker__option[data-selected] {
+    font: var(--text-label);
+  }
+
+  .picker__option[data-disabled] {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  .picker__option-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .picker__option-description {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .picker__check {
+    display: flex;
+    color: var(--color-fg-link);
+  }
+
+  .picker__empty {
+    padding: var(--space-inset-sm);
+    color: var(--color-fg-muted);
+    font: var(--text-body);
+  }
+}

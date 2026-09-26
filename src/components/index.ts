@@ -55,6 +55,13 @@ export { CodeBlock, type CodeBlockProps } from './CodeBlock/CodeBlock';
 export { Divider, type DividerProps } from './Divider/Divider';
 export { Toggle, type ToggleProps } from './Toggle/Toggle';
 export { HoverCard, type HoverCardProps } from './HoverCard/HoverCard';
+export { Combobox, type ComboboxProps, type ComboboxOption } from './Combobox/Combobox';
+export { MultiSelect, type MultiSelectProps, type MultiSelectOption } from './MultiSelect/MultiSelect';
+export { DatePicker, DateRangePicker, type DatePickerProps, type DateRangePickerProps, type DateRange, type IsoDate } from './DatePicker/DatePicker';
+export { NumberField, type NumberFieldProps } from './NumberField/NumberField';
+export { Toolbar, ToolbarButton, ToolbarSeparator, type ToolbarProps, type ToolbarButtonProps } from './Toolbar/Toolbar';
+export { ContextMenu, type ContextMenuProps } from './ContextMenu/ContextMenu';
+export { InlineEdit, type InlineEditProps } from './InlineEdit/InlineEdit';
 // AI patterns
 export { AiMarker, type AiMarkerProps } from './AiMarker/AiMarker';
 export { StreamingText, type StreamingTextProps, type StreamStatus } from './StreamingText/StreamingText';
@@ -77,7 +84,6 @@ export {
   useCharacterKeyShortcuts,
   findShortcutConflicts,
   isReservedShortcut,
-  RESERVED_SHORTCUTS,
   type ShortcutHelpProps,
   type ShortcutDefinition,
   type ActiveShortcut,

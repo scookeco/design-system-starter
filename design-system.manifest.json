@@ -3918,6 +3918,290 @@
       "propsOf": "CodeBlock"
     },
     {
+      "name": "Combobox",
+      "kind": "component",
+      "source": "src/components/Combobox/Combobox.tsx",
+      "status": null,
+      "description": "A text field with a list of options that narrows as you type: choosing one value from many (an owner from 200 people, an account). Typing filters by a locale-aware \"contains\"; ↑ ↓ move, ↵ chooses, Esc closes. Behaviour, ARIA and focus come from React Aria's ComboBox.",
+      "docs": "docs/usage/Combobox.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "options",
+          "type": "readonly ComboboxOption[]",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "value",
+          "type": "string | null",
+          "required": false,
+          "default": null,
+          "description": "The chosen option's value, or null for none."
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string | null) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "'md'",
+          "description": null,
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Form field name: the chosen value is submitted."
+        },
+        {
+          "name": "emptyMessage",
+          "type": "string",
+          "required": false,
+          "default": "'No matches'",
+          "description": "Shown in the list when nothing matches what was typed."
+        },
+        {
+          "name": "showOptionsLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Show options'",
+          "description": "Accessible name of the button that opens the list."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Render the list open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "required",
+        "defaultOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Choosing one value from a list too long to scan (people, accounts, countries): type to narrow it.",
+          "A filter that picks one actor or one owner."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A short, fixed list (about 5–15 options)",
+            "instead": "`Select`"
+          },
+          {
+            "situation": "Several values",
+            "instead": "`MultiSelect`"
+          },
+          {
+            "situation": "Free text with suggestions, or jumping around the app",
+            "instead": "`SearchField`, or the `CommandPalette`"
+          }
+        ],
+        "do": {
+          "caption": "A long list with a second line that tells similar names apart.",
+          "code": "<Combobox label=\"Owner\" options={PEOPLE} defaultValue=\"p02\" />"
+        },
+        "dont": {
+          "caption": "Three options behind typing: a Select (or radios) shows them at once.",
+          "code": "<Select\n  label=\"Plan\"\n  options={[\n    { value: 'free', label: 'Free' },\n    { value: 'team', label: 'Team' },\n    { value: 'enterprise', label: 'Enterprise' },\n  ]}\n/>"
+        },
+        "accessibility": [
+          "React Aria’s combobox pattern: the input keeps focus, ↑ ↓ move through the list (announced), ↵ chooses, Esc closes; the button opens the list for pointer users.",
+          "Label, description and error are wired by React Aria’s slots and laid out like every other field.",
+          "Inside a Dialog the list portals into the dialog and Esc closes only the list.",
+          "Typing matches with a locale-aware “contains”, so accents and case don’t get in the way."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Combobox",
+        "stories": [
+          {
+            "id": "components-combobox--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-combobox--with-value",
+            "name": "With Value"
+          },
+          {
+            "id": "components-combobox--with-description",
+            "name": "With Description"
+          },
+          {
+            "id": "components-combobox--with-error",
+            "name": "With Error"
+          },
+          {
+            "id": "components-combobox--disabled",
+            "name": "Disabled"
+          },
+          {
+            "id": "components-combobox--small",
+            "name": "Small"
+          },
+          {
+            "id": "components-combobox--large",
+            "name": "Large"
+          },
+          {
+            "id": "components-combobox--open",
+            "name": "Open"
+          },
+          {
+            "id": "components-combobox--in-dialog",
+            "name": "In Dialog"
+          }
+        ],
+        "composes": [
+          "Field",
+          "Icon",
+          "Picker"
+        ],
+        "tokens": [
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.control",
+          "radius.surface",
+          "shadow.popover",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label",
+          "z.dropdown"
+        ]
+      }
+    },
+    {
+      "name": "ComboboxOption",
+      "kind": "type-only",
+      "source": "src/components/Combobox/Combobox.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Combobox",
+      "definition": "interface ComboboxOption { value: string; label: string; description?: string; disabled?: boolean; }"
+    },
+    {
+      "name": "ComboboxProps",
+      "kind": "type-only",
+      "source": "src/components/Combobox/Combobox.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Combobox",
+      "propsOf": "Combobox"
+    },
+    {
       "name": "CommandGroup",
       "kind": "type-only",
       "source": "src/components/CommandPalette/CommandPalette.tsx",
@@ -4448,6 +4732,136 @@
       ]
     },
     {
+      "name": "ContextMenu",
+      "kind": "component",
+      "source": "src/components/ContextMenu/ContextMenu.tsx",
+      "status": null,
+      "description": "Actions on a thing, where the pointer or focus is: right-click (or Shift+F10 on the focused element). A shortcut to actions that are also visible somewhere (a ⋯ Menu, a toolbar): nobody discovers a context menu, so it must never be the only way. Items look and read like Menu's. Behaviour from Radix ContextMenu.",
+      "docs": "docs/usage/ContextMenu.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactElement",
+          "required": true,
+          "default": null,
+          "description": "The region it belongs to: one focusable element (a row, a card). Right-click, a long press, Shift+F10 or the Menu key on it opens the menu."
+        },
+        {
+          "name": "items",
+          "type": "readonly MenuEntry[]",
+          "required": true,
+          "default": null,
+          "description": "The same entries as Menu: items (with an optional shortcut) and 'separator'."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Optional non-interactive heading (what the menu acts on)."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A shortcut to the actions on a row, card or list item that are also available elsewhere (a ⋯ menu, a toolbar)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The only way to reach an action",
+            "instead": "a visible `Menu` on the thing: nobody discovers a context menu"
+          },
+          {
+            "situation": "Overriding the browser’s menu on text, links or images",
+            "instead": "leave the browser’s menu alone there"
+          }
+        ],
+        "do": {
+          "caption": "The same items as the visible ⋯ menu, on a focusable region.",
+          "code": "<ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>\n  <div tabIndex={0} role=\"group\" aria-label=\"Northwind renewal\">\n    Northwind renewal <Menu trigger={<Button variant=\"ghost\" icon=\"more\" aria-label=\"More actions\">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />\n  </div>\n</ContextMenu>"
+        },
+        "dont": {
+          "caption": "Actions that exist only on right-click: invisible to most people, and to keyboard users who don’t know Shift+F10.",
+          "code": "<ContextMenu items={[{ label: 'Delete', tone: 'danger' }]}>\n  <div tabIndex={0} role=\"group\" aria-label=\"Report\">\n    Report (no other way to delete it)\n  </div>\n</ContextMenu>"
+        },
+        "accessibility": [
+          "Radix ContextMenu: opens on right-click, a long press, or Shift+F10 / the Menu key on the focused region; arrows, typeahead, Esc and focus return as in `Menu`.",
+          "The region must be focusable and named, so keyboard users can reach it.",
+          "Items look and read exactly like Menu’s, shortcuts included (`aria-keyshortcuts`)."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ContextMenu",
+        "stories": [
+          {
+            "id": "components-contextmenu--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Icon",
+          "Kbd",
+          "Menu"
+        ],
+        "tokens": [
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.bg",
+          "color.status.danger.fg",
+          "icon.stroke",
+          "radius.control",
+          "radius.indicator",
+          "radius.surface",
+          "shadow.popover",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "size.sidebar.sm",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.caption",
+          "text.code",
+          "z.dropdown"
+        ]
+      }
+    },
+    {
+      "name": "ContextMenuProps",
+      "kind": "type-only",
+      "source": "src/components/ContextMenu/ContextMenu.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ContextMenu",
+      "propsOf": "ContextMenu"
+    },
+    {
       "name": "CopyButton",
       "kind": "component",
       "source": "src/components/CopyButton/CopyButton.tsx",
@@ -4834,6 +5248,520 @@
       "status": null,
       "description": "An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone (\"2026-09-30\").",
       "definition": "type DateInput = string | number | Date"
+    },
+    {
+      "name": "DatePicker",
+      "kind": "component",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": "A calendar date: typed segment by segment in the reader's locale order (from LocaleProvider), or picked from a calendar. Values are ISO strings (\"2026-09-25\"), calendar dates with no zone. Behaviour, ARIA and focus come from React Aria's DatePicker.",
+      "docs": "docs/usage/DatePicker.usage.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "IsoDate | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "IsoDate | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: IsoDate | null) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Form field name: the ISO date is submitted."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "min",
+          "type": "IsoDate",
+          "required": false,
+          "default": null,
+          "description": "Earliest date that can be chosen (ISO)."
+        },
+        {
+          "name": "max",
+          "type": "IsoDate",
+          "required": false,
+          "default": null,
+          "description": "Latest date that can be chosen (ISO)."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "'md'",
+          "description": null,
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "calendarLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Choose a date'",
+          "description": "Accessible name of the button that opens the calendar."
+        },
+        {
+          "name": "previousMonthLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Previous month'",
+          "description": "Previous and next month buttons."
+        },
+        {
+          "name": "nextMonthLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Next month'",
+          "description": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Render the calendar open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "required",
+        "defaultOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A calendar date: a renewal, a due date, a birthday. Typed in the reader’s own order, or picked.",
+          "Values that are ISO calendar dates (“2026-09-25”), which is how the app passes them."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A start and an end",
+            "instead": "`DateRangePicker`"
+          },
+          {
+            "situation": "A moment in time (with an hour)",
+            "instead": "a date and a time, stored as an instant; show it with `useFormat().dateTime`"
+          },
+          {
+            "situation": "Showing a date",
+            "instead": "`useFormat().date(iso)`"
+          }
+        ],
+        "do": {
+          "caption": "Segments in the reader’s locale order (LocaleProvider), with the earliest allowed date set.",
+          "code": "<DatePicker label=\"Renews on\" defaultValue=\"2026-10-14\" min=\"2026-09-25\" />"
+        },
+        "dont": {
+          "caption": "A free-text date: ambiguous (is 03/04 March or April?) and parsed by hand.",
+          "code": "<TextField label=\"Renews on\" placeholder=\"MM/DD/YYYY\" />"
+        },
+        "accessibility": [
+          "Each segment (day, month, year) is a spin button: type digits or use ↑ ↓; the calendar button opens a grid navigable with the arrow keys, Page Up/Down for months.",
+          "The locale comes from LocaleProvider, the same one `useFormat()` uses, so typed and displayed dates agree; the calendar opens on today in the provider’s time zone.",
+          "Inside a Dialog the calendar portals into it and Esc closes only the calendar."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DatePicker",
+        "stories": [
+          {
+            "id": "components-datepicker--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-datepicker--with-value",
+            "name": "With Value"
+          },
+          {
+            "id": "components-datepicker--with-description",
+            "name": "With Description"
+          },
+          {
+            "id": "components-datepicker--with-error",
+            "name": "With Error"
+          },
+          {
+            "id": "components-datepicker--disabled",
+            "name": "Disabled"
+          },
+          {
+            "id": "components-datepicker--small",
+            "name": "Small"
+          },
+          {
+            "id": "components-datepicker--open",
+            "name": "Open"
+          },
+          {
+            "id": "components-datepicker--german",
+            "name": "German"
+          },
+          {
+            "id": "components-datepicker--in-dialog",
+            "name": "In Dialog"
+          }
+        ],
+        "composes": [
+          "Field",
+          "Icon",
+          "Picker"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.selected",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.fg.on-action",
+          "color.focus",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.control",
+          "radius.indicator",
+          "radius.surface",
+          "shadow.popover",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label",
+          "z.dropdown"
+        ]
+      }
+    },
+    {
+      "name": "DatePickerProps",
+      "kind": "type-only",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DatePicker",
+      "propsOf": "DatePicker"
+    },
+    {
+      "name": "DateRange",
+      "kind": "type-only",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DatePicker",
+      "definition": "interface DateRange { start: IsoDate; end: IsoDate; }"
+    },
+    {
+      "name": "DateRangePicker",
+      "kind": "component",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": "A range of calendar dates, start to end: typed or picked in one calendar. Values are ISO strings. To filter instants (an audit log's \"from\" and \"to\"), turn the range into the start of the first day and the end of the last in the reader's time zone, never UTC midnight.",
+      "partOf": "DatePicker",
+      "docs": "docs/usage/DateRangePicker.usage.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "DateRange | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "DateRange | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: DateRange | null) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "startName",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Form field names for the two ends."
+        },
+        {
+          "name": "endName",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "min",
+          "type": "IsoDate",
+          "required": false,
+          "default": null,
+          "description": "Earliest date that can be chosen (ISO)."
+        },
+        {
+          "name": "max",
+          "type": "IsoDate",
+          "required": false,
+          "default": null,
+          "description": "Latest date that can be chosen (ISO)."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "'md'",
+          "description": null,
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "calendarLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Choose dates'",
+          "description": "Accessible name of the button that opens the calendar."
+        },
+        {
+          "name": "previousMonthLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Previous month'",
+          "description": "Previous and next month buttons."
+        },
+        {
+          "name": "nextMonthLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Next month'",
+          "description": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Render the calendar open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "required",
+        "defaultOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A range of days: a report period, an audit log’s date filter, a leave request."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One date",
+            "instead": "`DatePicker`"
+          },
+          {
+            "situation": "A preset period (last 7, 30, 90 days)",
+            "instead": "`SegmentedControl` or `Select`, with a custom range as an option"
+          }
+        ],
+        "do": {
+          "caption": "One field, one calendar: the two ends can’t be chosen out of order.",
+          "code": "<DateRangePicker label=\"Date range\" defaultValue={{ start: '2026-09-01', end: '2026-09-25' }} />"
+        },
+        "dont": {
+          "caption": "Two separate pickers: nothing stops an end before the start, and the range isn’t visible as one.",
+          "code": "<Stack gap=\"sm\">\n  <DatePicker label=\"From\" defaultValue=\"2026-09-25\" />\n  <DatePicker label=\"To\" defaultValue=\"2026-09-01\" />\n</Stack>"
+        },
+        "accessibility": [
+          "Start and end are separate groups of segments with their own names; the calendar marks both ends and the days between.",
+          "Values are calendar dates. To filter instants, convert the range to the start of the first day and the end of the last in the reader’s time zone (as the audit log does), never UTC midnight."
+        ]
+      },
+      "stories": [
+        {
+          "id": "components-daterangepicker--empty",
+          "name": "Empty"
+        },
+        {
+          "id": "components-daterangepicker--with-value",
+          "name": "With Value"
+        },
+        {
+          "id": "components-daterangepicker--with-error",
+          "name": "With Error"
+        },
+        {
+          "id": "components-daterangepicker--disabled",
+          "name": "Disabled"
+        },
+        {
+          "id": "components-daterangepicker--open",
+          "name": "Open"
+        }
+      ]
+    },
+    {
+      "name": "DateRangePickerProps",
+      "kind": "type-only",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DatePicker",
+      "propsOf": "DateRangePicker"
     },
     {
       "name": "DateStyle",
@@ -7198,6 +8126,228 @@
       "propsOf": "Imposter"
     },
     {
+      "name": "InlineEdit",
+      "kind": "component",
+      "source": "src/components/InlineEdit/InlineEdit.tsx",
+      "status": null,
+      "description": "A value you can change where it's shown: view → edit → save or cancel. Enter saves, Escape cancels, and focus returns to the value either way. Validation and the server's answer show under the field without losing what was typed. For one value at a time (a name, a title); a form with several fields is a form.",
+      "docs": "docs/usage/InlineEdit.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What the value is (\"Name\"). The field's label and the edit button's name (\"Edit Name\"). Required."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onSave",
+          "type": "(value: string) => unknown",
+          "required": true,
+          "default": null,
+          "description": "Save the new value. Return (or resolve to) an error message string to stay in edit mode with it; anything else means saved. While a returned promise is pending, Save shows its pending state; a rejected promise keeps edit mode with `failedMessage`."
+        },
+        {
+          "name": "validate",
+          "type": "(value: string) => string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Check before saving: a message when the value can't be saved."
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": "'Empty'",
+          "description": "Shown in view mode when the value is empty."
+        },
+        {
+          "name": "disabledReason",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "View only, with the reason as the edit button's description (no permission, archived…)."
+        },
+        {
+          "name": "editLabel",
+          "type": "string",
+          "required": false,
+          "default": "`Edit ${label}`",
+          "description": "Accessible names of the actions."
+        },
+        {
+          "name": "saveLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Save'",
+          "description": null
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Cancel'",
+          "description": null
+        },
+        {
+          "name": "failedMessage",
+          "type": "string",
+          "required": false,
+          "default": "'Couldn’t save. Try again.'",
+          "description": "Shown when `onSave` throws or rejects."
+        },
+        {
+          "name": "defaultEditing",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Start in edit mode (gallery and tests)."
+        },
+        {
+          "name": "defaultDraft",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Start in edit mode with this draft and its error (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {},
+      "states": [
+        "defaultEditing"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Changing one value where it’s shown: a record’s name in its header, a label in a table cell.",
+          "Frequent small edits by people who own the thing."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Several fields that belong together",
+            "instead": "a form (`CreateEditFlow`), or a Dialog"
+          },
+          {
+            "situation": "A value that needs a long explanation or a review step",
+            "instead": "a form with its description and a Save button"
+          }
+        ],
+        "do": {
+          "caption": "The value is the edit button; Enter saves, Escape cancels, focus comes back to the value.",
+          "code": "<InlineEdit label=\"Name\" value=\"Northwind renewal\" onSave={noop} />"
+        },
+        "dont": {
+          "caption": "An always-open field for a value people rarely change: it looks like a form waiting to be filled.",
+          "code": "<TextField label=\"Name\" defaultValue=\"Northwind renewal\" />"
+        },
+        "accessibility": [
+          "View mode is a button named “Edit <label>: <value>”; edit mode is a labelled input with Save and Cancel buttons, so it works without the keys too.",
+          "Errors (from `validate` or returned by `onSave`) sit under the field, linked with aria-describedby; the draft is kept.",
+          "While `onSave`’s promise is pending, Save shows its pending state and Cancel is disabled.",
+          "`disabledReason` keeps the value visible and focusable, with the reason as its description."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/InlineEdit",
+        "stories": [
+          {
+            "id": "components-inlineedit--viewing",
+            "name": "Viewing"
+          },
+          {
+            "id": "components-inlineedit--empty-value",
+            "name": "Empty Value"
+          },
+          {
+            "id": "components-inlineedit--editing",
+            "name": "Editing"
+          },
+          {
+            "id": "components-inlineedit--invalid",
+            "name": "Invalid"
+          },
+          {
+            "id": "components-inlineedit--disabled",
+            "name": "Disabled"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Field",
+          "Icon",
+          "Spinner"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "color.status.danger.fg",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.sidebar.sm",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "InlineEditProps",
+      "kind": "type-only",
+      "source": "src/components/InlineEdit/InlineEdit.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "InlineEdit",
+      "propsOf": "InlineEdit"
+    },
+    {
       "name": "InsetToken",
       "kind": "type-only",
       "source": "src/tokens/tokens.ts",
@@ -7212,6 +8362,15 @@
         "lg",
         "xl"
       ]
+    },
+    {
+      "name": "IsoDate",
+      "kind": "type-only",
+      "source": "src/components/DatePicker/DatePicker.tsx",
+      "status": null,
+      "description": "A calendar date as the system passes it: ISO \"2026-09-25\", no time, no zone.",
+      "partOf": "DatePicker",
+      "definition": "type IsoDate = string"
     },
     {
       "name": "Kbd",
@@ -8322,6 +9481,283 @@
       ]
     },
     {
+      "name": "MultiSelect",
+      "kind": "component",
+      "source": "src/components/MultiSelect/MultiSelect.tsx",
+      "status": null,
+      "description": "Choosing several values from a list that narrows as you type: tags, teams, event types in a filter. Chosen values show as removable chips in the field; the list stays open while you pick. Behaviour, ARIA and focus come from React Aria's ComboBox in multiple-selection mode.",
+      "docs": "docs/usage/MultiSelect.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "options",
+          "type": "readonly MultiSelectOption[]",
+          "required": true,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "value",
+          "type": "readonly string[]",
+          "required": false,
+          "default": null,
+          "description": "The chosen values, in the order they were chosen."
+        },
+        {
+          "name": "defaultValue",
+          "type": "readonly string[]",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: string[]) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "'md'",
+          "description": null,
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Form field name: one value per chosen option is submitted."
+        },
+        {
+          "name": "emptyMessage",
+          "type": "string",
+          "required": false,
+          "default": "'No matches'",
+          "description": null
+        },
+        {
+          "name": "showOptionsLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Show options'",
+          "description": null
+        },
+        {
+          "name": "removeLabel",
+          "type": "(label: string) => string",
+          "required": false,
+          "default": "(text) => `Remove ${text}`",
+          "description": "Accessible name of each chip's remove button: `(label) => 'Remove Legal'`."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Render the list open (gallery and tests)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "required",
+        "defaultOpen"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Choosing several values from a longer list: event types in a filter, tags, teams.",
+          "When the chosen values should stay visible (as chips) while more are added."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A handful of options that fit on screen",
+            "instead": "a group of `Checkbox`es"
+          },
+          {
+            "situation": "One value",
+            "instead": "`Combobox` or `Select`"
+          }
+        ],
+        "do": {
+          "caption": "Chosen values as chips, each with its own remove button; the list narrows as you type.",
+          "code": "<MultiSelect label=\"Events\" options={EVENTS} defaultValue={['member.role_changed']} />"
+        },
+        "dont": {
+          "caption": "Two independent yes/no settings squeezed into a multi-select: checkboxes are clearer.",
+          "code": "<Stack gap=\"xs\">\n  <Checkbox label=\"Email me\" />\n  <Checkbox label=\"Notify me in the app\" />\n</Stack>"
+        },
+        "accessibility": [
+          "React Aria’s combobox in multiple-selection mode: options announce whether they’re selected, and the list stays open while you choose.",
+          "Each chip’s remove button is named after its value (`removeLabel`); removing one returns focus to the input.",
+          "The field wraps onto more lines rather than hiding chosen values behind a count."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/MultiSelect",
+        "stories": [
+          {
+            "id": "components-multiselect--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-multiselect--with-values",
+            "name": "With Values"
+          },
+          {
+            "id": "components-multiselect--wrapping",
+            "name": "Wrapping"
+          },
+          {
+            "id": "components-multiselect--with-error",
+            "name": "With Error"
+          },
+          {
+            "id": "components-multiselect--disabled",
+            "name": "Disabled"
+          },
+          {
+            "id": "components-multiselect--open",
+            "name": "Open"
+          }
+        ],
+        "composes": [
+          "Field",
+          "Icon",
+          "Picker",
+          "Tag"
+        ],
+        "tokens": [
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "icon.stroke",
+          "radius.control",
+          "radius.pill",
+          "radius.surface",
+          "shadow.popover",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label",
+          "z.dropdown"
+        ]
+      }
+    },
+    {
+      "name": "MultiSelectOption",
+      "kind": "type-only",
+      "source": "src/components/MultiSelect/MultiSelect.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "MultiSelect",
+      "definition": "type MultiSelectOption = PickerOptionData"
+    },
+    {
+      "name": "MultiSelectProps",
+      "kind": "type-only",
+      "source": "src/components/MultiSelect/MultiSelect.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "MultiSelect",
+      "propsOf": "MultiSelect"
+    },
+    {
       "name": "Nav",
       "kind": "component",
       "source": "src/components/Nav/Nav.tsx",
@@ -8621,6 +10057,308 @@
       "description": null,
       "partOf": "NavTabs",
       "propsOf": "NavTabs"
+    },
+    {
+      "name": "NumberField",
+      "kind": "component",
+      "source": "src/components/NumberField/NumberField.tsx",
+      "status": null,
+      "description": "A number typed in the reader's own format (\"1.234,5\" in German), parsed back to a number: amounts, quantities, percentages. ↑ ↓ step, Page Up/Down step by ten, Home/End go to min/max. Built on React Aria's NumberField (not a native number input, which takes \"e\", ignores the locale's grouping and changes on scroll). Formatting follows LocaleProvider, like useFormat().",
+      "docs": "docs/usage/NumberField.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Visible label and accessible name. Required."
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "value",
+          "type": "number | null",
+          "required": false,
+          "default": null,
+          "description": "The number. With `currency`, integer minor units (cents), like every amount in the system: 125050 with \"USD\" shows $1,250.50. null is empty."
+        },
+        {
+          "name": "defaultValue",
+          "type": "number | null",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "onValueChange",
+          "type": "(value: number | null) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "format",
+          "type": "'number' | 'percent'",
+          "required": false,
+          "default": "'number'",
+          "description": "How it reads: a plain number, a percentage (0.25 shows 25%), or money when `currency` is set.",
+          "values": [
+            "number",
+            "percent"
+          ]
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "ISO 4217 code: the field shows and parses money, and `value` is in minor units."
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "Arrow keys and the stepper buttons move by this (in the value's units). Default 1."
+        },
+        {
+          "name": "maximumFractionDigits",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "'md'",
+          "description": null,
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "hideStepper",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Hide the − and + buttons (arrow keys still step)."
+        },
+        {
+          "name": "incrementLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Increase'",
+          "description": null
+        },
+        {
+          "name": "decrementLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Decrease'",
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "format": [
+          "number",
+          "percent"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "required",
+        "hideStepper"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Quantities, amounts and percentages people type: seats, a price, a discount.",
+          "Money: pass `currency`, and the value is integer minor units, like every amount in the system."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Numbers that aren’t quantities (a phone number, a postcode, an id)",
+            "instead": "`TextField` with the right `inputMode`"
+          },
+          {
+            "situation": "A value from a small range, dragged",
+            "instead": "`Slider`"
+          }
+        ],
+        "do": {
+          "caption": "An amount in the reader’s format, stored as minor units.",
+          "code": "<NumberField label=\"Amount\" currency=\"USD\" defaultValue={125050} min={0} />"
+        },
+        "dont": {
+          "caption": "A text field for an amount: “1.250,50” and “1,250.50” can’t both be parsed, and nothing stops “12e3”.",
+          "code": "<TextField label=\"Amount\" type=\"number\" />"
+        },
+        "accessibility": [
+          "Why React Aria and not `<input type=\"number\">`: the native input accepts “e”, ignores the locale’s grouping and decimal marks, changes on scroll, and its spinners are tiny targets.",
+          "Typing and display follow LocaleProvider (the same locale as `useFormat()`); ↑ ↓ step, Page Up/Down step by ten, Home/End jump to min/max.",
+          "The − and + buttons are 24px targets with names (`decrementLabel`, `incrementLabel`); they’re removed from the tab order, since the arrow keys do the same."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/NumberField",
+        "stories": [
+          {
+            "id": "components-numberfield--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-numberfield--with-value",
+            "name": "With Value"
+          },
+          {
+            "id": "components-numberfield--currency",
+            "name": "Currency"
+          },
+          {
+            "id": "components-numberfield--percent",
+            "name": "Percent"
+          },
+          {
+            "id": "components-numberfield--german-currency",
+            "name": "German Currency"
+          },
+          {
+            "id": "components-numberfield--with-error",
+            "name": "With Error"
+          },
+          {
+            "id": "components-numberfield--disabled",
+            "name": "Disabled"
+          },
+          {
+            "id": "components-numberfield--without-stepper",
+            "name": "Without Stepper"
+          }
+        ],
+        "composes": [
+          "Field",
+          "Icon",
+          "Picker"
+        ],
+        "tokens": [
+          "color.bg.elevated",
+          "color.bg.hover",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.control",
+          "radius.surface",
+          "shadow.popover",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label",
+          "z.dropdown"
+        ]
+      }
+    },
+    {
+      "name": "NumberFieldProps",
+      "kind": "type-only",
+      "source": "src/components/NumberField/NumberField.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "NumberField",
+      "propsOf": "NumberField"
     },
     {
       "name": "PageHeader",
@@ -9354,15 +11092,6 @@
       "description": "One proposed change: a field's old and new value, or a text rewrite shown word by word.",
       "partOf": "ReviewChanges",
       "definition": "interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }"
-    },
-    {
-      "name": "RESERVED_SHORTCUTS",
-      "kind": "utility",
-      "source": "src/components/Shortcuts/registry.ts",
-      "status": null,
-      "description": "Keys the registry never takes. They belong to the browser (copy, paste, find, tabs, zoom, history), to moving and activating focus (Tab, Enter, Space, arrows, Home/End, Page Up/Down, Escape, which dialogs and menus own), or to screen readers (anything with Control+Option on a Mac, or Control+Alt elsewhere; F-keys).",
-      "partOf": "Shortcuts",
-      "docs": "docs/usage/ShortcutHelp.usage.tsx"
     },
     {
       "name": "RadioGroup",
@@ -14778,6 +16507,296 @@
       "description": null,
       "partOf": "Toggle",
       "propsOf": "Toggle"
+    },
+    {
+      "name": "Toolbar",
+      "kind": "component",
+      "source": "src/components/Toolbar/Toolbar.tsx",
+      "status": null,
+      "description": "A row of related controls that is one tab stop: Tab enters it, ← → (↑ ↓ vertical) move between its buttons, Home and End jump, Tab leaves. For an editor's formatting bar or a selection's actions; not for page navigation. Behaviour from Radix Toolbar (roving tabindex).",
+      "docs": "docs/usage/Toolbar.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible name: what the controls act on (\"Conversation actions\"). Required."
+        },
+        {
+          "name": "orientation",
+          "type": "'horizontal' | 'vertical'",
+          "required": false,
+          "default": "'horizontal'",
+          "description": null,
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "ToolbarButton and ToolbarSeparator."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A group of actions on one thing that people use repeatedly: a selection’s bulk actions, an editor’s formatting, a reading pane’s triage.",
+          "Where one tab stop for the group saves keyboard users a dozen Tabs."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A page’s one or two primary actions",
+            "instead": "`Button`s in the `PageHeader`"
+          },
+          {
+            "situation": "Navigation between pages or sections",
+            "instead": "`NavTabs` or `Nav`"
+          }
+        ],
+        "do": {
+          "caption": "Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.",
+          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton icon=\"archive\" shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n  <ToolbarButton shortcut=\"u\">Mark as unread</ToolbarButton>\n  <ToolbarSeparator />\n  <ToolbarButton icon=\"download\" hideLabel>\n    Export\n  </ToolbarButton>\n</Toolbar>"
+        },
+        "dont": {
+          "caption": "A page’s main actions forced into a toolbar: they belong in the header, as ordinary buttons.",
+          "code": "<Cluster>\n  <Button>New record</Button>\n</Cluster>"
+        },
+        "accessibility": [
+          "Radix Toolbar: Tab enters and leaves; ← → (↑ ↓ vertical) move between controls with a roving tabindex, wrapping; Home and End jump.",
+          "Icon-only buttons (`hideLabel`) keep their label as the accessible name and show it in a tooltip on hover and focus.",
+          "`pressed` makes a toggle (aria-pressed); `shortcut` shows in the tooltip and sets aria-keyshortcuts."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Toolbar",
+        "stories": [
+          {
+            "id": "components-toolbar--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-toolbar--toggles",
+            "name": "Toggles"
+          },
+          {
+            "id": "components-toolbar--vertical",
+            "name": "Vertical"
+          }
+        ],
+        "composes": [
+          "Icon",
+          "Kbd",
+          "Tooltip"
+        ],
+        "tokens": [
+          "color.bg.hover",
+          "color.bg.inverse",
+          "color.bg.selected",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.inverse",
+          "color.status.danger.fg",
+          "icon.stroke",
+          "radius.control",
+          "radius.indicator",
+          "shadow.popover",
+          "size.control.sm",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.overlay-max",
+          "space.gap.2xs",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.sm",
+          "space.inset.xs",
+          "text.caption",
+          "text.code",
+          "text.label",
+          "z.tooltip"
+        ]
+      }
+    },
+    {
+      "name": "ToolbarButton",
+      "kind": "component",
+      "source": "src/components/Toolbar/Toolbar.tsx",
+      "status": null,
+      "description": "One control in a Toolbar. A hidden label or a shortcut shows in a tooltip on hover and focus.",
+      "partOf": "Toolbar",
+      "docs": "docs/usage/Toolbar.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Verb-first label. Also the accessible name when the label is hidden. Required."
+        },
+        {
+          "name": "icon",
+          "type": "IconName",
+          "required": false,
+          "default": null,
+          "description": null,
+          "values": [
+            "menu",
+            "search",
+            "stop",
+            "danger",
+            "check",
+            "success",
+            "warning",
+            "info",
+            "close",
+            "chevron-down",
+            "sort-ascending",
+            "sort-descending",
+            "sort-none",
+            "plus",
+            "minus",
+            "download",
+            "upload",
+            "copy",
+            "chevron-right",
+            "chevron-left",
+            "home",
+            "file",
+            "users",
+            "building",
+            "settings",
+            "trend-up",
+            "trend-down",
+            "more",
+            "eye",
+            "eye-off",
+            "sparkle",
+            "thumbs-up",
+            "thumbs-down",
+            "inbox",
+            "archive",
+            "calendar",
+            "edit",
+            "shield"
+          ]
+        },
+        {
+          "name": "hideLabel",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Show only the icon; the label moves into a tooltip and the accessible name. Needs `icon`."
+        },
+        {
+          "name": "onClick",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": null
+        },
+        {
+          "name": "pressed",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": "A toggle (Bold, Unread only): its state as aria-pressed."
+        },
+        {
+          "name": "shortcut",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Its keyboard shortcut, shown in the tooltip (register it with useShortcut)."
+        },
+        {
+          "name": "tone",
+          "type": "'default' | 'danger'",
+          "required": false,
+          "default": "'default'",
+          "description": null,
+          "values": [
+            "default",
+            "danger"
+          ]
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "tone": [
+          "default",
+          "danger"
+        ]
+      },
+      "states": [
+        "hideLabel",
+        "disabled",
+        "pressed"
+      ]
+    },
+    {
+      "name": "ToolbarButtonProps",
+      "kind": "type-only",
+      "source": "src/components/Toolbar/Toolbar.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Toolbar",
+      "propsOf": "ToolbarButton"
+    },
+    {
+      "name": "ToolbarProps",
+      "kind": "type-only",
+      "source": "src/components/Toolbar/Toolbar.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Toolbar",
+      "propsOf": "Toolbar"
+    },
+    {
+      "name": "ToolbarSeparator",
+      "kind": "component",
+      "source": "src/components/Toolbar/Toolbar.tsx",
+      "status": null,
+      "description": "A divider between groups of toolbar controls.",
+      "partOf": "Toolbar",
+      "docs": "docs/usage/Toolbar.usage.tsx",
+      "props": [],
+      "inherits": [],
+      "variants": {},
+      "states": []
     },
     {
       "name": "Tooltip",
