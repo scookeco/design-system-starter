@@ -32,7 +32,21 @@ export interface Route {
   guard: Capability;
   /** The primary nav item the page belongs under (for the shell's current item). */
   nav: string;
+  /**
+   * The page's name where the app lists pages (the command palette's "Jump to"). Without one, the
+   * name comes from the path (/records/new → Records › New); a path with params isn't listed.
+   */
+  title?: string;
 }
+
+/** A page's name for lists of pages: its title, or its path in words ("/records/new" → "Records › New"). */
+export const routeTitle = (route: Pick<Route, 'path' | 'title'>) =>
+  route.title ??
+  route.path
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).replaceAll('-', ' '))
+    .join(' › ');
 
 /** Match one pattern against a path: the params, or undefined. Trailing slashes are ignored. */
 export const matchPath = (pattern: string, pathname: string): Record<string, string> | undefined => {

@@ -2,7 +2,7 @@
 
 A small, working design system in which **drift fails the build**. Tokens, components, layout primitives, page layouts (app shell, page regions, signed-out and focused-task frames), a gallery and a golden example page per archetype. Every link from the token source to the rendered pixel is either generated from the link before it or checked by a machine. Nothing in the chain depends on someone remembering to review it.
 
-Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour, plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
+Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so Intl locale data can't drift between runs), Vite 8, React 19, TypeScript 6 (strict), Radix primitives for behaviour (React Aria Components for comboboxes, date pickers and number fields), plain CSS with cascade layers over CSS custom properties, Style Dictionary 5, Storybook 10, Vitest, Playwright + axe, ESLint (flat config) and Stylelint. The examples' app layer adds TanStack Query, zod and MSW, as devDependencies only: the design system itself stays UI-only.
 
 ## Quick start
 
@@ -55,13 +55,14 @@ src/styles/             index.css (layer order) · reset · generated tokens.css
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
 src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden
-src/components/         the components; the only place (with primitives) Radix is imported
-src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks), AssistantPanel (an assistant beside the page)
+src/components/         the components; the only place (with primitives) Radix is imported, and the only place React Aria is
+src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks), AssistantPanel (an assistant beside the page), SplitView (list + detail)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
 src/app/                the app layer the examples use (not the system): api/ (client, zod schemas), model/ (keys, queries,
                         predicates, projections, mutations, selection, permissions), session.tsx (memberships, workspace
                         switch, sign-out), routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState),
-                        registries/ (field registry, entityType → fields), mocks/ (MSW)
+                        registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the inbox, members
+                        and the audit log)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (and four AI examples), the schema-driven entity pages, and the app's route table
                         (routes.tsx) and assembly (App.tsx); also a consumer lint target
@@ -94,7 +95,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Vendor UI only inside the system; consumers use the public entry | `no-restricted-imports` (ESLint) | `eslint.config.js` |
 | Layers import downward only (see the layer table below) | `no-restricted-imports` per layer; `test:rules` needs a fixture for every direction | `eslint.config.js`, `scripts/test-rules.ts` |
 | Media and container queries use breakpoint tokens (queries can't read `var()`, and Stylelint only checks declarations) | Vitest: every query length equals a `size.breakpoint.*` value | `tests/unit/css.test.ts` |
-| The system is UI-only: runtime `dependencies` are exactly react, react-dom and radix-ui | Vitest | `tests/unit/dependencies.test.ts` |
+| The system is UI-only: runtime `dependencies` are exactly react, react-dom, radix-ui, react-aria-components and @internationalized/date | Vitest | `tests/unit/dependencies.test.ts` |
 | Data libraries (msw, TanStack Query, zod) and `src/app` never enter the system | `no-restricted-imports` in the components, primitives and layouts blocks; a fixture per boundary | `eslint.config.js`, `fixtures/violations/eslint-*-imports-data.tsx` |
 | Only trusted data enters the cache: every API response is parsed with its zod schema | Vitest: an invalid payload becomes an error and the cache stays empty | `src/app/api/client.ts`, `tests/unit/api.test.ts` |
 | Every field type has a registry entry; unknown types fall back and never throw | TypeScript (registry keyed on the union, proved with `@ts-expect-error`) and Vitest | `src/app/registries/fields.tsx`, `tests/unit/registry.test.tsx` |
@@ -123,8 +124,8 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 | Examples (consumer code) | `src/examples/` | the public entry `src/index.ts` and `src/app`; no vendor UI, no `className`/`style` | none: no CSS |
 | App layer (consumer code) | `src/app/` | the public entry, the data libraries (TanStack Query, zod, MSW); no vendor UI, no `className`/`style` | none: no CSS |
 | Layouts | `src/layouts/` | components, primitives, tokens; no vendor UI, no examples, no `src/app`, no data libraries | `layouts` |
-| Components | `src/components/` | other components, primitives, tokens, `src/format`, Radix; no layouts, no examples, no `src/app`, no data libraries | `components` |
-| Formatting | `src/format/` | `Intl` only; no components, no data libraries | none: no CSS |
+| Components | `src/components/` | other components, primitives, tokens, `src/format`, Radix, React Aria Components; no layouts, no examples, no `src/app`, no data libraries | `components` |
+| Formatting | `src/format/` | `Intl` only; no components, no React Aria, no data libraries | none: no CSS |
 | Primitives | `src/primitives/` | other primitives, tokens; no components, no layouts, no data libraries | `primitives` |
 | Tokens | `tokens/` → `src/styles/tokens.css`, `src/tokens/tokens.ts` | nothing | `tokens` |
 
@@ -142,12 +143,12 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 ## Bundle size budgets
 
-`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom` and `radix-ui` left out as the consumer's own dependencies:
+`npm run size` (the last step of `npm run check`, so CI enforces it) measures the built library with [size-limit](https://github.com/ai/size-limit), minified and gzipped, with `react`, `react-dom`, `radix-ui`, `react-aria-components` and `@internationalized/date` left out as the consumer's own dependencies:
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 24.5 kB | `dist/index.js`, everything exported |
-| Library CSS | 14.5 kB | `dist/styles.css` |
+| Library JS | 34.5 kB | `dist/index.js`, everything exported |
+| Library CSS | 16.2 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
@@ -162,11 +163,12 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 
 | Kind | Parts |
 |---|---|
-| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. `AssistantPanel`: an assistant in AppShell's `assistant` slot, resizable (drag, arrow keys or Widen), closable to a launcher, a `Drawer` below `size.breakpoint.md`. |
+| Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. `AssistantPanel`: an assistant in AppShell's `assistant` slot, resizable (drag, arrow keys or Widen), closable to a launcher, a `Drawer` below `size.breakpoint.md`. `SplitView`: a list and the selected item side by side, resizable (drag, arrow keys, or a click through preset widths), one pane below `size.breakpoint.sm`. |
 | Page structure | `PageHeader` (the page's h1, status, description, actions) |
-| Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
-| Actions | `Button`, `Menu`, `SegmentedControl`, `Toggle`, `CopyButton` |
-| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu`, `CommandPalette` (⌘K: grouped, ranked, announced) |
+| Actions | `Button`, `Menu`, `ContextMenu`, `Toolbar` (one tab stop, roving focus), `SegmentedControl`, `Toggle`, `CopyButton` |
+| Keyboard | `useShortcut` (one registry: reserved keys refused, conflicts reported, silent in fields and dialogs, single keys can be turned off), `ShortcutHelp` (the ? overlay), `Kbd`, `formatShortcut`, `ariaKeyShortcuts`; `Tooltip` and `MenuItem` take a `shortcut` |
+| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links); `Combobox`, `MultiSelect`, `DatePicker`, `DateRangePicker`, `NumberField` (React Aria, locale and time zone from `LocaleProvider`, ISO dates and minor units in and out); `InlineEdit` |
 | Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text` |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
 | AI patterns | `ChatThread`, `Message`, `Composer`, `StreamingText` (safe Markdown, sentence-level announcements), `Citation` and `SourcesList`, `AiMarker`, `Suggestion` (ghost text), `ReviewChanges` (diffs, accept or reject, apply, undo), `Feedback`, `Disclosure`, `Accordion`, `Kbd`; the Guides → AI patterns page says which surface to use and the rules they share |
@@ -189,13 +191,15 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 | Dashboard | `src/examples/DashboardPage.tsx` | a date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table |
 | Entity list, record and form | `src/examples/EntityPages.tsx` | schema-driven pages for any entity in `src/app/registries/entities.ts` (accounts, people): columns and properties through the field registry, related records joined by id with rollups, create and edit with a focused error summary, Edit disabled with a reason |
 | The app and its routes | `src/examples/App.tsx`, `routes.tsx` | the route table (path → layout + page + guard), lazy pages, LinkProvider with the app's router link, a 403 page from the guard, the 404 fallback |
+| Inbox / queue | `src/examples/InboxPage.tsx` | a SplitView of the list and the open item, the tab and open item in the URL, keyboard triage (j/k, e, u, x, o) from the shortcut registry mirrored by a toolbar, a row context menu and a bulk toolbar, unread state, optimistic triage with rollback |
+| Admin console | `src/examples/AdminConsole.tsx` | members (invite, change role with a review of the capabilities it changes, remove; your own role and the last admin protected) and a filterable audit log (actor, events, a date range in the reader's time zone, expandable rows, CSV export); disabled-with-reason and hidden actions by capability; every member write audited |
 | Assistant beside a page (AI) | `src/examples/RecordCopilot.tsx` | the record page, untouched, with an `AssistantPanel` joined through `WithAssistant`: answers citing record fields and activity, sources that link into the record, tool activity, Stop, Retry, Edit, Feedback, a refusal, rate limit, content filter and dropped connection |
 | Inline AI in a form (AI) | `src/examples/CreateWithAi.tsx` | Suggest beside the field (disabled with a reason per role), ghost text with Tab/Esc, accepted text marked until edited, one Undo |
 | AI-proposed changes (AI) | `src/examples/AiReviewChanges.tsx` | an agent's steps, a proposal limited to what the person could do, `ReviewChanges`, apply and undo through `moveRecord`, partial failure |
 | Chat page (AI) | `src/examples/AssistantChatPage.tsx` | history with the open conversation in the URL, new chat, rename, delete, the composer in the sticky footer, every answer state |
 | Error / 403 / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 and 403 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
 
-`src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
+`src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu, and inside the app the command palette and the ? overlay from `CommandMenu.tsx`) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
 
 ## Data: the app layer
 
@@ -256,7 +260,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, breakpoints and layout grid, elevation and motion, layers (which units use each z tier, from the token usage map), focus and target size, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, motion, theming and adding a brand, escape hatches, contributing and versioning, testing, agents (how coding agents use llms.txt and the manifest), and AI patterns (surfaces, provenance, consent and undo, permissions, honest failure, streaming accessibility). |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, keyboard and power users (the command palette, the shortcut registry and its conventions), motion, theming and adding a brand, escape hatches, contributing and versioning, testing, agents (how coding agents use llms.txt and the manifest), and AI patterns (surfaces, provenance, consent and undo, permissions, honest failure, streaming accessibility). |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.

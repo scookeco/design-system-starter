@@ -6,22 +6,30 @@
  * switches workspace and signs out, both through the session, which keeps the cache boundaries
  * (src/app/session.tsx). Static example pages render outside it and get a fixed menu.
  */
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { AppShell, Avatar, Breadcrumbs, Button, Menu, Nav, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
 import { useOptionalAppSession, type AppSession } from '../app/session';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
+import { CommandMenu } from './CommandMenu';
 
 const NAV: readonly NavSection[] = [
   {
     items: [
       { label: 'Home', href: '/home', icon: 'home' },
+      { label: 'Inbox', href: '/inbox', icon: 'download' },
       { label: 'Records', href: '/records', icon: 'file' },
       { label: 'Accounts', href: '/accounts', icon: 'building' },
       { label: 'People', href: '/people', icon: 'users' },
     ],
   },
-  { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: 'settings' }] },
+  {
+    label: 'Workspace',
+    items: [
+      { label: 'Settings', href: '/settings', icon: 'settings' },
+      { label: 'Admin', href: '/admin/members', icon: 'eye' },
+    ],
+  },
 ];
 
 /**
@@ -43,15 +51,22 @@ export interface ExampleShellProps {
   footer?: ReactNode;
   /** An AssistantPanel beside the page. Pages that wrap another page use WithAssistant instead. */
   assistant?: ReactNode;
+  /** Open the command palette with this query (gallery and tests). */
+  initialPaletteQuery?: string;
+  /** Open the shortcuts overlay (gallery and tests). */
+  initialShortcutsOpen?: boolean;
   children: ReactNode;
 }
 
-const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />;
+const HELP_ITEMS: readonly MenuEntry[] = [{ label: 'Help centre' }, { label: 'Contact support' }];
+const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={HELP_ITEMS} />;
 
-export function ExampleShell({ current, trail, footer, assistant, children }: ExampleShellProps) {
+export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, children }: ExampleShellProps) {
   const app = useOptionalAppSession();
   const injected = useContext(AssistantSlot);
   const panel = assistant ?? injected;
+  // Inside the app: the command palette (⌘K) and the shortcuts overlay (?), which the Help menu opens too.
+  const [shortcutsOpen, setShortcutsOpen] = useState(initialShortcutsOpen);
   return (
     <AppShell
       brand={app ? WORKSPACES[app.tenant].name : 'Acme'}
@@ -59,7 +74,16 @@ export function ExampleShell({ current, trail, footer, assistant, children }: Ex
       breadcrumbs={trail ? <Breadcrumbs items={trail.items} current={trail.current} /> : undefined}
       footer={footer}
       {...(panel ? { assistant: panel } : {})}
-      help={HELP}
+      actions={
+        app ? (
+          <CommandMenu
+            helpOpen={shortcutsOpen}
+            onHelpOpenChange={setShortcutsOpen}
+            {...(initialPaletteQuery === undefined ? {} : { defaultOpen: true, initialQuery: initialPaletteQuery })}
+          />
+        ) : undefined
+      }
+      help={app ? <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[...HELP_ITEMS, { label: 'Keyboard shortcuts', shortcut: '?', onSelect: () => setShortcutsOpen(true) }]} /> : HELP}
       userMenu={app ? <AccountMenu app={app} current={current} /> : <StaticAccountMenu />}
     >
       {children}

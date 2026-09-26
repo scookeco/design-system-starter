@@ -1,0 +1,11 @@
+@layer components {
+  /* Chips and the input wrap inside the field; the field grows a line at a time. */
+  .multi-select__control {
+    flex-wrap: wrap;
+    padding-block: var(--space-inset-2xs);
+  }
+
+  .multi-select__input {
+    min-inline-size: var(--size-control-lg);
+  }
+}

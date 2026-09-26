@@ -40,6 +40,12 @@
     user-select: none;
   }
 
+  .menu__shortcut {
+    margin-inline-start: auto;
+    padding-inline-start: var(--space-gap-md);
+    color: var(--color-fg-muted);
+  }
+
   .menu__item[data-tone="danger"] {
     color: var(--color-status-danger-fg);
   }

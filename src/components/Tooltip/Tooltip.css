@@ -10,4 +10,10 @@
     font: var(--text-caption);
     box-shadow: var(--shadow-popover);
   }
+
+  .tooltip__with-shortcut {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-sm);
+  }
 }

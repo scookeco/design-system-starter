@@ -9,14 +9,24 @@ const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, '../../package.
 };
 
 /**
- * The design system ships UI only. Its runtime dependencies are React and Radix, nothing else:
- * data fetching, caching, mocking and validation are the app's choice, so they stay
+ * The design system ships UI only. Its runtime dependencies are React, Radix and React Aria, nothing
+ * else: data fetching, caching, mocking and validation are the app's choice, so they stay
  * devDependencies used by src/app and the examples (ESLint keeps them out of the system's code).
+ *
+ * React Aria (react-aria-components) is there for Combobox, MultiSelect, DatePicker,
+ * DateRangePicker and NumberField only, wrapped like the Radix parts. @internationalized/date is
+ * its own date library (already one of its dependencies, at the same range, so it dedupes): the
+ * pickers need it to turn ISO date strings into its date values, and it is not re-exported.
  */
 describe('package dependencies', () => {
-  it('are exactly react, react-dom and radix-ui at runtime', () => {
-    expect(Object.keys(pkg.dependencies ?? {}).sort()).toEqual(['radix-ui', 'react', 'react-dom']);
+  it('are exactly react, react-dom, radix-ui and react-aria-components (with its date library) at runtime', () => {
+    expect(Object.keys(pkg.dependencies ?? {}).sort()).toEqual(['@internationalized/date', 'radix-ui', 'react', 'react-aria-components', 'react-dom']);
     expect(pkg.peerDependencies).toBeUndefined();
+  });
+
+  it('pin the date library to the range react-aria-components itself asks for, so it dedupes', () => {
+    const rac = JSON.parse(readFileSync(resolve(import.meta.dirname, '../../node_modules/react-aria-components/package.json'), 'utf8')) as { dependencies: Record<string, string> };
+    expect(pkg.dependencies?.['@internationalized/date']).toBe(rac.dependencies['@internationalized/date']);
   });
 
   it('keep the app layer’s data libraries in devDependencies', () => {

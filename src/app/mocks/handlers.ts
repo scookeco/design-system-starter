@@ -32,6 +32,8 @@ import { mockConfig } from './config';
 import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
 import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
+// B2B power features: the inbox and the admin console (members, audit log).
+import { b2bHandlers } from './b2b';
 
 const API = '*/api/t/:tenant';
 
@@ -413,6 +415,7 @@ const viewHandlers = [
 export const handlers = [
   ...workspaceHandlers,
   ...viewHandlers,
+  ...b2bHandlers,
   // The session: not workspace data, so outside the tenant routes.
   http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
   http.delete('*/api/session', async () => {

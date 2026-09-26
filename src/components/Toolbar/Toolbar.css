@@ -1,0 +1,69 @@
+@layer components {
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    padding: var(--space-inset-2xs);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-surface);
+  }
+
+  .toolbar[data-orientation="vertical"] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    min-block-size: var(--size-control-sm);
+    padding-block: 0;
+    padding-inline: var(--space-inset-sm);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-default);
+    font: var(--text-label);
+    cursor: pointer;
+  }
+
+  .toolbar__button[data-icon-only="true"] {
+    justify-content: center;
+    min-inline-size: var(--size-control-sm);
+    padding-inline: 0;
+  }
+
+  .toolbar__button[data-tone="danger"] {
+    color: var(--color-status-danger-fg);
+  }
+
+  .toolbar__button:hover {
+    background: var(--color-bg-hover);
+  }
+
+  .toolbar__button[aria-pressed="true"] {
+    background: var(--color-bg-selected);
+  }
+
+  .toolbar__button:disabled {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  .toolbar__separator {
+    align-self: stretch;
+    inline-size: 1px;
+    margin-inline: var(--space-inset-2xs);
+    background: var(--color-border-default);
+  }
+
+  .toolbar[data-orientation="vertical"] .toolbar__separator {
+    inline-size: auto;
+    block-size: 1px;
+    margin-block: var(--space-inset-2xs);
+    margin-inline: 0;
+  }
+}

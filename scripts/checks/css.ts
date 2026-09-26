@@ -6,8 +6,8 @@ const VAR_DECL = /(?:^|[;{\s])(--[\w-]+)\s*:/g;
 export const usedCustomProperties = (css: string): Set<string> => new Set([...css.matchAll(VAR_USE)].map((m) => m[1] as string));
 export const declaredCustomProperties = (css: string): Set<string> => new Set([...css.matchAll(VAR_DECL)].map((m) => m[1] as string));
 
-/** Custom properties provided at runtime by a vendor primitive, not by our tokens. */
-export const RUNTIME_PREFIXES = ['--radix-'];
+/** Custom properties provided at runtime by a vendor primitive, not by our tokens: Radix, and React Aria's popover width. */
+export const RUNTIME_PREFIXES = ['--radix-', '--trigger-width'];
 
 /**
  * Every var(--x) used must be declared somewhere: in the generated tokens or as a

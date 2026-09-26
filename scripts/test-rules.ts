@@ -71,6 +71,12 @@ const BOUNDARIES = [
   { direction: 'components → data libraries', from: 'src/components/', message: /UI-only: data libraries/ },
   { direction: 'primitives → data libraries', from: 'src/primitives/', message: /UI-only: data libraries/ },
   { direction: 'layouts → data libraries', from: 'src/layouts/', message: /UI-only: data libraries/ },
+  { direction: 'examples → React Aria', from: 'src/examples/', message: /React Aria is wrapped by system components/ },
+  { direction: 'app layer → React Aria dates', from: 'src/app/', message: /React Aria is wrapped by system components/ },
+  { direction: 'primitives → React Aria', from: 'src/primitives/', message: /primitives are layout, not behaviour/ },
+  { direction: 'layouts → React Aria', from: 'src/layouts/', message: /wrap React Aria in src\/components first/ },
+  { direction: 'format → React Aria', from: 'src/format/', message: /src\/format is the one formatting system/ },
+  { direction: 'components → React Aria internals', from: 'src/components/', message: /Transitive React Aria packages/ },
 ] as const;
 
 interface Fixture {

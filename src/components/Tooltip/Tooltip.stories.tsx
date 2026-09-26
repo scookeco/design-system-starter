@@ -19,3 +19,7 @@ type Story = StoryObj<typeof meta>;
 export const Closed: Story = {};
 export const Open: Story = { args: { defaultOpen: true } };
 export const OpenBottom: Story = { args: { defaultOpen: true, side: 'bottom' } };
+/** The control's shortcut after the hint, as key caps (⌘ on a Mac, Ctrl elsewhere); the trigger gets aria-keyshortcuts. */
+export const WithShortcut: Story = {
+  args: { defaultOpen: true, content: 'Archive', shortcut: 'e', children: <Button variant="secondary">Archive</Button> },
+};

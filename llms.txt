@@ -9,7 +9,8 @@ UI rules (design system v0)
 - Style only with semantic tokens. No hex, rgb, px, ms or other raw values;
   allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.
 - Compose system components and layout primitives, imported from src/index.ts.
-  Never import radix-ui outside src/components or src/primitives.
+  Never import radix-ui outside src/components or src/primitives, or
+  react-aria-components and @internationalized/* outside src/components.
 - Never restyle a system component with className or style. Need a new look?
   Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need
   a lint disable with a reason, an owner and a removal condition.
@@ -23,7 +24,8 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  error/404 → ErrorPages. Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
+  Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
@@ -47,6 +49,10 @@ UI rules (design system v0)
   with Citation + SourcesList, mark unaccepted AI content with AiMarker, and
   never let AI write without ReviewChanges (or an explicit accept) and an Undo.
   The assistant acts only through the person's own can() and named mutations.
+- Keyboard shortcuts go through useShortcut (never a bare keydown listener):
+  every shortcut mirrors a visible control and shows its keys there (Tooltip
+  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
+  reported; single-key shortcuts can be turned off in the ? overlay.
 ```
 
 ## Guides
@@ -62,6 +68,7 @@ UI rules (design system v0)
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
 - [Forms](docs/guides/Forms.stories.tsx): Forms are among the most settled patterns in software, and breaking…
+- [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): People who use a product all day stop reaching for the mouse.
 - [Motion](docs/guides/Motion.stories.tsx): Motion gives feedback and shows where something came from.
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Every alternate look (dark mode, a rebrand, a customer’s colours) is…
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
@@ -96,8 +103,12 @@ UI rules (design system v0)
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
+- [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
 - [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
+- [ContextMenu](docs/usage/ContextMenu.usage.tsx): Actions on a thing, where the pointer or focus is: right-click
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
+- [DatePicker](docs/usage/DatePicker.usage.tsx): A calendar date
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
@@ -107,13 +118,16 @@ UI rules (design system v0)
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
-- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
+- [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
+- [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
+- [MultiSelect](docs/usage/MultiSelect.usage.tsx): Choosing several values from a list that narrows as you type
 - [Nav](docs/usage/Nav.usage.tsx): Vertical navigation: the app's primary sidebar or a section sub-nav
 - [NavTabs](docs/usage/NavTabs.usage.tsx): Section navigation that looks like tabs but is links
+- [NumberField](docs/usage/NumberField.usage.tsx): A number typed in the reader's own format
 - [PageHeader](docs/usage/PageHeader.usage.tsx): The top of every page
 - [Pagination](docs/usage/Pagination.usage.tsx): Moves through a long, server-paged list
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
@@ -140,6 +154,7 @@ UI rules (design system v0)
 - [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
+- [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
 
 ## Primitives
@@ -164,6 +179,7 @@ UI rules (design system v0)
 - [AuthLayout](docs/usage/AuthLayout.usage.tsx): The frame for signed-out pages
 - [FocusedLayout](docs/usage/FocusedLayout.usage.tsx): The frame for a focused, multi-step task
 - [PageLayout](docs/usage/PageLayout.usage.tsx): The regions of a page's body, below its PageHeader
+- [SplitView](docs/usage/SplitView.usage.tsx): A list and the selected item side by side
 
 ## Utilities
 
@@ -175,14 +191,17 @@ UI rules (design system v0)
 
 ## Examples
 
+- [Admin console](src/examples/AdminConsole.tsx)
 - [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
 - [Assistant chat](src/examples/AssistantChatPage.tsx)
+- [Command palette](src/examples/CommandMenu.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
 - [Create with AI](src/examples/CreateWithAi.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
 - [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
+- [Inbox](src/examples/InboxPage.tsx)
 - [List page](src/examples/ListPage.tsx)
 - [Record copilot](src/examples/RecordCopilot.tsx)
 - [Record page](src/examples/RecordPage.tsx)

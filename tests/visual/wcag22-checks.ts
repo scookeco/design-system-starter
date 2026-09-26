@@ -67,8 +67,9 @@ export function targetSizeViolations(): string[] {
     if (el.matches(':disabled') || el.closest('[inert]')) return false;
     if (getComputedStyle(el).pointerEvents === 'none') return false;
     if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
-    // Visually hidden until focused (the skip link): not a pointer target while hidden.
-    if (getComputedStyle(el).clipPath === 'inset(50%)') return false;
+    // Visually hidden until focused (the skip link), or inside something visually hidden (React
+    // Aria's screen-reader-only Dismiss buttons in a popover): not a pointer target while hidden.
+    for (let node: Element | null = el; node; node = node.parentElement) if (getComputedStyle(node).clipPath === 'inset(50%)') return false;
     const r = el.getBoundingClientRect();
     return r.width > 1 && r.height > 1;
   });
@@ -174,8 +175,13 @@ export function focusObscuredViolation(): { key: string | null; violations: stri
  * can be filled by a password manager (autocomplete current-password or new-password) and has a
  * show-password control (a button whose aria-controls names it); no text entry field blocks paste;
  * no CAPTCHA-style cognitive test is on the page.
+ *
+ * "Blocks paste" means the pasted text never arrives: the paste is cancelled and the field's value
+ * doesn't change. A field that cancels the browser's paste to insert the text itself (a number
+ * field that formats what was pasted) takes the paste, so it passes. The probe is a digit, which
+ * every text entry field accepts.
  */
-export function accessibleAuthenticationViolations(): string[] {
+export async function accessibleAuthenticationViolations(): Promise<string[]> {
   const violations: string[] = [];
   const describe = (node: Element) => {
     const label = node.id ? document.querySelector(`label[for="${CSS.escape(node.id)}"]`)?.textContent?.trim() : undefined;
@@ -197,9 +203,15 @@ export function accessibleAuthenticationViolations(): string[] {
   );
   for (const field of entries) {
     if (field.closest('#storybook-docs')) continue;
-    const paste = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() });
+    const data = new DataTransfer();
+    data.setData('text/plain', '1');
+    const before = (field as HTMLInputElement).value;
+    const paste = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data });
     field.dispatchEvent(paste);
-    if (paste.defaultPrevented) violations.push(`${describe(field)} blocks paste (SC 3.3.8)`);
+    if (!paste.defaultPrevented) continue;
+    // Give a field that handles the paste itself a frame to render what it inserted.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if ((field as HTMLInputElement).value === before) violations.push(`${describe(field)} blocks paste (SC 3.3.8)`);
   }
 
   const captcha = document.querySelector('iframe[src*="captcha" i], iframe[title*="captcha" i], [class*="captcha" i], [id*="captcha" i], [aria-label*="captcha" i]');
