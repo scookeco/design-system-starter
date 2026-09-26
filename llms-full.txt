@@ -50,14 +50,19 @@ UI rules (design system v0)
 - [Getting started](docs/guides/GettingStarted.stories.tsx): Five steps: bring the system in, load its styles once, render every…
 - [Principles](docs/guides/Principles.stories.tsx): Three rules the whole system is built around.
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Before building anything new, walk the ladder from the top and stop…
-- [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eight layout primitives arrange everything…
+- [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eleven layout primitives arrange…
 - [Page archetypes](docs/guides/PageArchetypes.stories.tsx): Most pages are one of a few archetypes.
 - [Data](docs/guides/Data.stories.tsx): The design system draws; the app layer knows.
 - [Accessibility](docs/guides/Accessibility.stories.tsx): The target is WCAG 2.2 AA.
 - [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx): What the build checks against WCAG 2.2 AA, what it can’t, and how to…
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
+- [Forms](docs/guides/Forms.stories.tsx): Forms are among the most settled patterns in software, and breaking…
+- [Motion](docs/guides/Motion.stories.tsx): Motion gives feedback and shows where something came from.
+- [Theming and adding a brand](docs/guides/Theming.stories.tsx): Every alternate look (dark mode, a rebrand, a customer’s colours) is…
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
+- [Contributing and versioning](docs/guides/Contributing.stories.tsx): Anything new starts as a proposal on the decision ladder, lands in…
+- [Testing](docs/guides/Testing.stories.tsx): The gallery is the test fixture.
 - [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
 
 ## Foundations
@@ -66,7 +71,10 @@ UI rules (design system v0)
 - [Data visualisation](docs/foundations/DataVisualisation.stories.tsx): Colours for chart marks: a categorical palette for series, a…
 - [Typography](docs/foundations/Typography.stories.tsx): Named text styles, each a complete font shorthand.
 - [Spacing, sizing and radius](docs/foundations/SpacingSizingRadius.stories.tsx): Every length in the system comes from these scales.
+- [Breakpoints and layout grid](docs/foundations/BreakpointsLayoutGrid.stories.tsx): Layouts respond to the space they are given, not to the device.
 - [Elevation and motion](docs/foundations/ElevationMotion.stories.tsx): Shadows say how far a surface floats; stacking tokens say what sits…
+- [Layers](docs/foundations/Layers.stories.tsx): Seven stacking tiers, lowest first.
+- [Focus and target size](docs/foundations/FocusTargetSize.stories.tsx): Keyboard users need to see where they are; pointer and touch users…
 - [Icons](docs/foundations/Icons.stories.tsx): A small, closed set drawn on one 20-unit grid with one stroke token.
 
 ## Components
@@ -78,10 +86,15 @@ UI rules (design system v0)
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
@@ -96,6 +109,7 @@ UI rules (design system v0)
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
+- [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
@@ -106,19 +120,25 @@ UI rules (design system v0)
 - [Text](docs/usage/Text.usage.tsx): Running text, descriptions and metadata
 - [TextField](docs/usage/TextField.usage.tsx): Short free text: names, emails, amounts, search, passwords
 - [Textarea](docs/usage/Textarea.usage.tsx): Multi-line text
+- [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
+- [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
 
 ## Primitives
 
+- [Box](docs/usage/Box.usage.tsx): Padding around content, from the inset scale
 - [Center](docs/usage/Center.usage.tsx): Horizontally centred column with a bounded measure
 - [Cluster](docs/usage/Cluster.usage.tsx): Horizontal group that wraps gracefully
 - [Cover](docs/usage/Cover.usage.tsx): Vertically centres its content in the available block size
 - [Frame](docs/usage/Frame.usage.tsx): Holds media to a fixed aspect ratio and crops it to fill
 - [Grid](docs/usage/Grid.usage.tsx): Auto-fit card grid
+- [Imposter](docs/usage/Imposter.usage.tsx): Positions an overlay over the centre of its container
+- [Reel](docs/usage/Reel.usage.tsx): A single row that scrolls sideways
 - [Sidebar](docs/usage/Sidebar.usage.tsx): Side region beside main content
 - [Stack](docs/usage/Stack.usage.tsx): Vertical flow with consistent spacing
 - [Switcher](docs/usage/Switcher.usage.tsx): A row of equal items that becomes a column, all at once
+- [VisuallyHidden](docs/usage/VisuallyHidden.usage.tsx): Content that screen readers announce but the screen doesn't…
 
 ## Layouts
 
@@ -561,6 +581,111 @@ Stories: `components-checkbox--unchecked`, `components-checkbox--checked`, `comp
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.fg.on-action`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.xs`, `text.body`, `text.caption`.
 
+### CodeBlock
+
+component · `src/components/CodeBlock/CodeBlock.tsx` · usage: `docs/usage/CodeBlock.usage.tsx`
+
+Monospaced code in a keyboard-scrollable region: long lines scroll sideways instead of wrapping, so what is copied is what is shown. An optional language label and a CopyButton sit above it.
+
+Props:
+- `code: string`: The code, shown exactly as given (leading and trailing blank lines are trimmed).
+- `label: string`: Accessible name of the scrollable region and context for the copy button ("Install command"). Required.
+- `language?: string`: Language shown in the header ("bash", "tsx"). A label only: there is no syntax highlighting.
+- `copyable?: boolean` = `true`: Show a Copy button.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: copyable.
+
+**When to use**
+
+- Code, commands, config or payloads that people read or copy: API docs, setup steps, a webhook sample.
+- `label` names the region and the copy button (“Install command” → “Copy install command”). `language` is a label only; there is no syntax highlighting.
+
+**When not to use**
+
+- A short value inline in a sentence → `<code>` inside `Text`, with a `CopyButton` if it gets pasted
+- Logs that stream or grow → a dedicated log viewer
+
+**Do:** A labelled block: long lines scroll sideways, and copy takes exactly what is shown.
+
+```tsx
+<CodeBlock label="Install command" language="bash" code="npm install @acme/design-system" />
+```
+
+**Don't:** Code set in body text: it wraps, loses its spacing, and pasting it breaks.
+
+```tsx
+<Text>npm install @acme/design-system</Text>
+```
+
+**Accessibility**
+
+- The code sits in a focusable `region` named by `label`, so keyboard users can scroll a long line (axe `scrollable-region-focusable`).
+- The copy button is a `CopyButton`: it announces “Copied” politely.
+
+Stories: `components-codeblock--default`, `components-codeblock--multi-line`, `components-codeblock--no-language`, `components-codeblock--not-copyable`.
+Composes: Button, CopyButton, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
+
+### CopyButton
+
+component · `src/components/CopyButton/CopyButton.tsx` · usage: `docs/usage/CopyButton.usage.tsx`
+
+Copies a value to the clipboard, confirms with "Copied" in place and a polite announcement, then reverts. If the browser blocks the clipboard it says so and asks the user to copy by hand.
+
+Props:
+- `text: string`: The text put on the clipboard.
+- `label?: string` = `'Copy'`: Visible label.
+- `accessibleName?: string`: Accessible name when the label alone is ambiguous, starting with the label so speech input still matches it ("Copy API key"). Defaults to the label.
+- `copiedLabel?: string` = `'Copied'`: Label shown, and announced, after a successful copy.
+- `failedMessage?: string` = `'Couldn’t copy. Select the text and copy it instead.'`: Announced when the browser refuses the copy.
+- `revertAfter?: number` = `2000`: How long "Copied" shows before the button reverts, in milliseconds.
+- `variant?: 'secondary' | 'ghost'` = `'secondary'`
+- `size?: ButtonSize` = `'sm'`
+- `onCopy?: () => void`: Called after a successful copy.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: variant (secondary | ghost); size (sm | md | lg).
+
+**When to use**
+
+- A value people paste elsewhere: an API key, an invite link, an ID, a command.
+- Set `accessibleName` when several copy buttons sit on one page (“Copy API key”); it starts with the visible label so voice control still matches.
+
+**When not to use**
+
+- Code or a command → `CodeBlock`, which includes one
+- Sharing through the platform (email, Slack) → a `Button` that opens the share flow
+
+**Do:** The value is visible, with a copy button beside it.
+
+```tsx
+<Cluster gap="sm">
+  <Text as="span">
+    <code>wsk_3f9a1c7e20b4</code>
+  </Text>
+  <CopyButton text="wsk_3f9a1c7e20b4" accessibleName="Copy API key" />
+</Cluster>
+```
+
+**Don't:** A generic button that copies silently: nobody knows whether it worked.
+
+```tsx
+<Button variant="secondary" size="sm">
+  Copy
+</Button>
+```
+
+**Accessibility**
+
+- On success the label reads “Copied” and a polite live region, present from mount, announces it; it reverts after `revertAfter` ms.
+- If the browser blocks the clipboard, it announces `failedMessage`, so keep the value visible and selectable.
+
+Stories: `components-copybutton--secondary`, `components-copybutton--ghost`, `components-copybutton--medium`, `components-copybutton--custom-labels`.
+Composes: Button, Icon, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.label`.
+
 ### Dialog
 
 component · `src/components/Dialog/Dialog.tsx` · usage: `docs/usage/Dialog.usage.tsx`
@@ -640,6 +765,60 @@ States: open, defaultOpen.
 Stories: `components-dialog--closed`, `components-dialog--open`, `components-dialog--small`, `components-dialog--large`, `components-dialog--without-description`.
 Composes: Icon.
 Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.modal`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `text.body`, `text.heading-3`, `z.modal`.
+
+### Divider
+
+component · `src/components/Divider/Divider.tsx` · usage: `docs/usage/Divider.usage.tsx`
+
+A hairline between blocks or inline groups. Prefer space (the gap of a Stack or Cluster) and headings to separate content; a line is for when space alone doesn't read as a boundary. Behaviour from Radix Separator.
+
+Props:
+- `orientation?: 'horizontal' | 'vertical'` = `'horizontal'`
+- `decorative?: boolean` = `true`: true (the default): a visual line only, hidden from assistive technology. false: role="separator", for a line that divides groups of content people navigate between, such as groups of toolbar controls.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: orientation (horizontal | vertical).
+States: decorative.
+
+**When to use**
+
+- A boundary that space alone doesn’t make clear: between a form and its danger zone, between groups of toolbar controls.
+- `decorative` (the default) hides it from assistive technology. Set `decorative={false}` only when it divides groups people navigate between; it becomes a `separator`.
+
+**When not to use**
+
+- Separating every item in a list or form → the gap of a `Stack`, and headings for sections
+- Framing a group → `Card`
+
+**Do:** One line where the content changes kind.
+
+```tsx
+<Stack gap="md">
+  <Text>Billing contact and invoices.</Text>
+  <Divider />
+  <Text>Danger zone: delete this workspace.</Text>
+</Stack>
+```
+
+**Don't:** A line between every paragraph: the page turns into stripes and nothing stands out.
+
+```tsx
+<Stack gap="xs">
+  <Text>Name</Text>
+  <Divider />
+  <Text>Email</Text>
+  <Divider />
+  <Text>Phone</Text>
+</Stack>
+```
+
+**Accessibility**
+
+- Decorative dividers are hidden; semantic ones are `role="separator"` with their orientation. From Radix Separator.
+
+Stories: `components-divider--horizontal`, `components-divider--vertical`, `components-divider--semantic`.
+Tokens read: `color.border.default`.
 
 ### Drawer
 
@@ -764,6 +943,76 @@ Stories: `components-emptystate--first-use`, `components-emptystate--no-results`
 Composes: Heading, Icon, Text.
 Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.inset.lg`, `space.inset.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
+### FileUpload
+
+component · `src/components/FileUpload/FileUpload.tsx` · usage: `docs/usage/FileUpload.usage.tsx`
+
+Picks files with a button (the primary path) and, as an enhancement, accepts files dropped on its area. Shows the accepted types and size limit up front, then each file with its progress, its own error and a remove button. It validates type and size; the caller uploads.
+
+Props:
+- `label: string`: Visible label and the group's accessible name ("Attachments"). Required.
+- `description?: string`: Supporting text above the limits.
+- `error?: string`: Error for the field as a whole ("Add at least one file"). Errors about one file go on that file.
+- `id?: string`: Id of the Choose files button, for an error summary link. Generated when omitted.
+- `accept?: readonly string[]`: Accepted types: extensions (".pdf") and MIME types ("image/png", "image/*"). Checked on pick and on drop.
+- `acceptText?: string`: The accepted types in words, shown to everyone before they pick ("PDF, PNG or JPG").
+- `maxSize?: number`: Largest file allowed, in bytes. Shown with the types.
+- `multiple?: boolean` = `true`: Allow more than one file per pick.
+- `files: readonly FileUploadItem[]`: Files picked so far, with their progress and errors.
+- `onFilesAdded: (accepted: File[], rejected: FileRejection[]) => void`: Called with the files that passed the limits and the ones that didn't.
+- `onRemove: (id: string) => void`: Remove (or cancel) one file. Focus moves to the next file, or back to Choose files.
+- `browseLabel?: string` = `'Choose files'`: Label of the button that opens the file picker: the primary way in.
+- `dropText?: string` = `'or drop them here'`: Text beside the button, for people who can drag.
+- `disabled?: boolean` = `false`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: multiple, disabled.
+
+**When to use**
+
+- Attaching files to a record or a form: contracts, receipts, images.
+- Say the limits before anyone picks: `acceptText` (“PDF, PNG or JPG”) and `maxSize`. Pass the same types as `accept`; the component checks type and size on pick and on drop, and hands you the accepted files and the rejections with ready-made messages.
+- You own the list: add accepted files to `files`, set `progress` while each uploads, set `error` on the one that failed, and remove on `onRemove`. Focus moves to the next file, or back to Choose files.
+
+**When not to use**
+
+- Importing a spreadsheet of records → a dedicated import flow (a `FocusedLayout` wizard) that maps columns and previews rows
+- A person’s photo → the same component with `multiple={false}` and an image `accept`, previewed in a `Frame`
+
+**Do:** The limits are visible up front; each file shows its own progress or its own error.
+
+```tsx
+<FileUpload
+  label="Attachments"
+  accept={['.pdf', 'image/png', 'image/jpeg']}
+  acceptText="PDF, PNG or JPG"
+  maxSize={10 * MB}
+  files={[
+    { id: '1', name: 'Signed contract.pdf', size: 2.4 * MB, progress: 40 },
+    { id: '2', name: 'Survey scan.png', size: 14 * MB, error: 'Larger than 10 MB. Choose a smaller file.' },
+  ]}
+  onFilesAdded={noop}
+  onRemove={noop}
+/>
+```
+
+**Don't:** No limits until after the upload fails, and one error for the whole batch that doesn’t say which file.
+
+```tsx
+<FileUpload label="Attachments" error="Some files could not be uploaded." files={[]} onFilesAdded={noop} onRemove={noop} />
+```
+
+**Accessibility**
+
+- The Choose files button is the primary path; dropping files on the area is an enhancement, declared with `data-drag-alternative` (WCAG 2.2 SC 2.5.7).
+- A group named by the label. The button is described by the label, the limits and any error; `id` lands on it for an error summary link.
+- Adding files is announced politely (“2 files added, 1 file not added”). Each upload is a `Progress` named by the file.
+- Remove buttons are named per file (“Remove Signed contract.pdf”, “Cancel …” while uploading) and meet the 24px target size.
+
+Stories: `components-fileupload--empty`, `components-fileupload--with-description`, `components-fileupload--uploading`, `components-fileupload--uploaded`, `components-fileupload--file-errors`, `components-fileupload--field-error`, `components-fileupload--disabled`, `components-fileupload--single-file`, `components-fileupload--interactive`.
+Composes: Button, Field, Icon, Progress, Spinner.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `size.bar`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
 ### Heading
 
 component · `src/components/Heading/Heading.tsx` · usage: `docs/usage/Heading.usage.tsx`
@@ -816,6 +1065,66 @@ Variants: level (1 | 2 | 3 | 4); size (1 | 2 | 3 | 4).
 
 Stories: `components-heading--level-1`, `components-heading--level-2`, `components-heading--level-3`, `components-heading--level-4`, `components-heading--level-2-at-size-4`.
 Tokens read: `color.fg.default`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### HoverCard
+
+component · `src/components/HoverCard/HoverCard.tsx` · usage: `docs/usage/HoverCard.usage.tsx`
+
+A supplementary preview of a link's destination, shown on hover and focus. Supplementary only: screen readers and touch never get it, so everything in it must also be at the destination. Behaviour from Radix HoverCard.
+
+Props:
+- `trigger: ReactElement`: A link (or other focusable element) that already leads to the full content. The card opens on hover and on keyboard focus; it never opens on touch, so the trigger must work without it.
+- `children: ReactNode`: A preview of what the trigger leads to: a person's role, a record's status. Nothing interactive.
+- `side?: 'top' | 'right' | 'bottom' | 'left'` = `'bottom'`
+- `align?: 'start' | 'center' | 'end'` = `'start'`
+- `open?: boolean`
+- `defaultOpen?: boolean`
+- `onOpenChange?: (open: boolean) => void`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: side (top | right | bottom | left); align (start | center | end).
+States: open, defaultOpen.
+
+**When to use**
+
+- A preview of where a link goes: a person’s role and team behind their name, a record’s status behind its ID.
+- Supplementary only. It opens on hover and keyboard focus, never on touch, and screen readers don’t reach its content, so everything in it must also be on the page the trigger leads to.
+
+**When not to use**
+
+- Anything people need to finish the task → show it on the page
+- Buttons, links or fields → `Popover` (opens on click and takes focus)
+- Naming an icon button → `Tooltip`
+
+**Do:** The trigger is a link to the full profile; the card previews it.
+
+```tsx
+<HoverCard trigger={<Link href="#people/priya">Priya Shah</Link>}>
+  <Stack gap="2xs">
+    <Text>Priya Shah</Text>
+    <Text size="caption" tone="muted">
+      Finance lead
+    </Text>
+  </Stack>
+</HoverCard>
+```
+
+**Don't:** A trigger that goes nowhere, with the only copy of the approver’s decision in the card.
+
+```tsx
+<HoverCard trigger={<Link href="#">Approval</Link>}>
+  <Text>Rejected: the amount exceeds the budget.</Text>
+</HoverCard>
+```
+
+**Accessibility**
+
+- The trigger must be focusable (a `Link`); the card opens on focus and closes on blur and Escape.
+- The content isn’t focusable and isn’t announced. Keep it non-interactive and duplicated at the destination.
+
+Stories: `components-hovercard--closed`, `components-hovercard--open`, `components-hovercard--open-top`.
+Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `space.gap.xs`, `space.inset.md`, `text.body`, `z.dropdown`.
 
 ### Link
 
@@ -1621,6 +1930,67 @@ Variants: shape (text | block | table-row).
 Stories: `components-skeleton--text`, `components-skeleton--single-line`, `components-skeleton--block`, `components-skeleton--table-rows`.
 Tokens read: `color.bg.placeholder`, `color.border.default`, `ease.standard`, `motion.pulse`, `radius.indicator`, `radius.surface`, `size.icon.sm`, `size.skeleton.block`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`.
 
+### Slider
+
+component · `src/components/Slider/Slider.tsx` · usage: `docs/usage/Slider.usage.tsx`
+
+Picks a number, or a range, on a continuous scale where the exact value matters less than the position: volume, a price filter. Every thumb is keyboard operable (arrows, Page Up/Down, Home/End) and says its value in words; a click on the track moves the nearest thumb, so no drag is needed. For an exact number use a TextField. Behaviour from Radix Slider.
+
+Props:
+- `label: string`: Visible label and accessible name: what the value is ("Price", "Volume"). Required.
+- `description?: string`
+- `error?: string`
+- `id?: string`: Id of the first thumb, for an error summary link. Generated when omitted.
+- `value?: number[]`: One value for a single slider, two for a range.
+- `defaultValue?: number[]` = `[0]`
+- `onValueChange?: (value: number[]) => void`
+- `onValueCommit?: (value: number[]) => void`: Called once when the user lets go or finishes a key press: the moment to save or refetch.
+- `min?: number`
+- `max?: number`
+- `step?: number`
+- `minStepsBetweenThumbs?: number`: Least number of steps between the two thumbs of a range.
+- `formatValue?: (value: number) => string` = `String`: A value in words ("£40", "40%"). Shown beside the track and read out as aria-valuetext.
+- `thumbLabels?: [string, string]` = `['minimum', 'maximum']`: Range only: the names of the two thumbs, appended to the label ("Price, minimum").
+- `disabled?: boolean`
+- `name?: string`: Submits each thumb's value as a hidden input with this name.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+States: disabled.
+
+**When to use**
+
+- A value on a continuous scale where position matters more than the exact number: volume, a price filter, a threshold.
+- A range: pass two values in `defaultValue` (or `value`), and name the thumbs with `thumbLabels`.
+- Say the value in words with `formatValue` (“£40”, “40%”); it is shown beside the track and read out for each thumb.
+- Refetch or save on `onValueCommit` (once, when the user lets go), not on every `onValueChange`.
+
+**When not to use**
+
+- An exact number (a quantity, an amount) → `TextField type="number"`
+- A few named levels → `SegmentedControl` or `RadioGroup`
+
+**Do:** A labelled range with its value in words; every thumb works with arrow keys.
+
+```tsx
+<Slider label="Price" defaultValue={[20, 80]} max={200} step={5} formatValue={(v) => `£${String(v)}`} />
+```
+
+**Don't:** A slider for an exact figure: hitting 1,250 by dragging is tedious. Use a field.
+
+```tsx
+<Slider label="Invoice amount" defaultValue={[1250]} max={10000} />
+```
+
+**Accessibility**
+
+- Each thumb is a `slider` with `aria-valuetext` from `formatValue`; in a range each is named “label, minimum” and “label, maximum”.
+- Keyboard: arrows move one step, Page Up/Down ten, Home/End to the ends. A click on the track moves the nearest thumb, so no drag is needed (WCAG 2.2 SC 2.5.7).
+- Thumbs are `size.target-min` (24px). `description` and `error` use the shared field anatomy; `id` lands on the first thumb.
+
+Stories: `components-slider--single`, `components-slider--with-description`, `components-slider--range`, `components-slider--stepped`, `components-slider--with-error`, `components-slider--disabled`.
+Composes: Field, Icon.
+Tokens read: `color.action.primary`, `color.action.primary-hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.pill`, `shadow.card`, `size.bar`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
 ### Spinner
 
 component · `src/components/Spinner/Spinner.tsx` · usage: `docs/usage/Spinner.usage.tsx`
@@ -2269,6 +2639,59 @@ Stories: `components-textarea--default`, `components-textarea--filled`, `compone
 Composes: Field, Icon.
 Tokens read: `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
+### Timeline
+
+component · `src/components/Timeline/Timeline.tsx` · usage: `docs/usage/Timeline.usage.tsx`
+
+A dated list of events (actor, verb, target, time): a record's activity, an audit trail, a feed. An ordered list of <time>-stamped sentences, so it reads the same with or without the rail.
+
+Props:
+- `label: string`: Accessible name of the list ("Activity on INV-2041"). Required.
+- `events: readonly TimelineEvent[]`: Events in the order to show them, newest first by convention.
+- `emptyText?: string` = `'No activity yet.'`: Shown when there are no events.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+**When to use**
+
+- A record’s activity, an audit trail, a feed of changes: dated events, each a sentence of actor, verb and target.
+- Format `time` for people (“2 hours ago”, “12 Mar 2026, 14:05”) and pass the ISO `dateTime` beside it; the component doesn’t format dates.
+- Pass a `Link` as `target` when the thing changed has its own page. Put a comment or a before-and-after in `detail`.
+
+**When not to use**
+
+- The steps of a task still to do → `Stepper`
+- Rows to sort, filter or act on → `Table`
+
+**Do:** Each event is one sentence with who, what and when.
+
+```tsx
+<Timeline
+  label="Activity on INV-2041"
+  events={[
+    { id: '2', actor: 'Priya Shah', verb: 'marked the invoice as', target: 'Paid', time: '12 Mar 2026, 14:05', dateTime: '2026-03-12T14:05:00Z' },
+    { id: '1', actor: 'Priya Shah', verb: 'created the invoice', time: '1 Mar 2026, 16:22', dateTime: '2026-03-01T16:22:00Z' },
+  ]}
+/>
+```
+
+**Don't:** Bare field changes without who or when: nobody can tell what happened.
+
+```tsx
+<Stack gap="xs">
+  <Text>status → Paid</Text>
+  <Text>created</Text>
+</Stack>
+```
+
+**Accessibility**
+
+- An ordered list named by `label`; each event is a sentence with a `<time datetime>`, so it reads the same without the rail and markers (which are hidden).
+- An empty list renders `emptyText` instead of an empty list.
+
+Stories: `components-timeline--default`, `components-timeline--with-linked-targets`, `components-timeline--single-event`, `components-timeline--empty`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `font.weight.strong`, `radius.pill`, `size.icon.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.caption`.
+
 ### Toast
 
 component · `src/components/Toast/Toast.tsx` · usage: `docs/usage/Toast.usage.tsx`
@@ -2340,6 +2763,66 @@ Stories: `components-toast--success`, `components-toast--warning`, `components-t
 Composes: Icon.
 Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `text.body`, `text.label`, `z.toast`.
 
+### Toggle
+
+component · `src/components/Toggle/Toggle.tsx` · usage: `docs/usage/Toggle.usage.tsx`
+
+A button that stays pressed: a view option or formatting mode that applies immediately (Bold, Show archived). aria-pressed carries the state; pressed also changes fill, border and weight, never colour alone. For a setting use Switch; for one of several options use SegmentedControl. Behaviour from Radix Toggle.
+
+Props:
+- `label: string`: What it turns on ("Bold", "Show archived"). Constant: aria-pressed carries the state. Required.
+- `icon?: IconName`: Leading icon from the system set.
+- `hideLabel?: boolean` = `false`: Icon only; the label becomes the accessible name. Needs an icon, and pair it with a Tooltip showing the label.
+- `pressed?: boolean`
+- `defaultPressed?: boolean`
+- `onPressedChange?: (pressed: boolean) => void`
+- `size?: 'sm' | 'md'` = `'md'`
+- `disabled?: boolean`
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: size (sm | md).
+States: hideLabel, pressed, defaultPressed, disabled.
+
+**When to use**
+
+- A button that stays on: a view option or mode that applies immediately (Show archived, Bold, Preview).
+- Icon only (`hideLabel` with an `icon`) in a dense toolbar, wrapped in a `Tooltip` that shows the same label.
+
+**When not to use**
+
+- A setting saved to the account → `Switch`
+- One of several options → `SegmentedControl`
+- An action that happens once → `Button`
+
+**Do:** The label names what it turns on and never changes; pressed shows in fill, border and weight.
+
+```tsx
+<Cluster gap="sm">
+  <Toggle label="Show archived" defaultPressed />
+  <Tooltip content="Compact rows">
+    <Toggle label="Compact rows" icon="menu" hideLabel />
+  </Tooltip>
+</Cluster>
+```
+
+**Don't:** A plain button that swaps its label between “Show archived” and “Hide archived”: the state is only in the words, and the name keeps changing.
+
+```tsx
+<Button variant="secondary" size="sm">
+  Hide archived
+</Button>
+```
+
+**Accessibility**
+
+- A button with `aria-pressed`; Space and Enter toggle it. The label is the accessible name and stays constant.
+- At least `size.control-sm` (32px), above the 24px target minimum.
+
+Stories: `components-toggle--unpressed`, `components-toggle--pressed`, `components-toggle--with-icon`, `components-toggle--small`, `components-toggle--icon-only`, `components-toggle--disabled`.
+Composes: Icon.
+Tokens read: `color.bg.hover`, `color.bg.selected`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.standard`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `radius.control`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.xs`, `space.inset.sm`, `text.label`.
+
 ### Tooltip
 
 component · `src/components/Tooltip/Tooltip.tsx` · usage: `docs/usage/Tooltip.usage.tsx`
@@ -2400,6 +2883,65 @@ Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-t
 Tokens read: `color.bg.inverse`, `color.fg.inverse`, `radius.control`, `shadow.popover`, `size.overlay-max`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `z.tooltip`.
 
 ## Primitives reference
+
+### Box
+
+primitive · `src/primitives/Box/Box.tsx` · usage: `docs/usage/Box.usage.tsx`
+
+Padding around content, from the inset scale: the box inside a region that has no component of its own (a toolbar strip, a panel's body). A surface with a border and a heading is a Card.
+
+Props:
+- `children?: ReactNode`
+- `as?: LayoutElement` = `'div'`: Semantic element to render. Defaults to div.
+- `padding?: InsetToken` = `'md'`: Padding on every side. Token-typed: raw values are not accepted.
+- `paddingBlock?: InsetToken`: Overrides `padding` on the block axis (top and bottom in horizontal writing).
+- `paddingInline?: InsetToken`: Overrides `padding` on the inline axis (start and end).
+- …plus the native attributes of `AriaAttributes`, `DOMAttributes`, `HTMLAttributes`.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: padding (2xs | xs | sm | md | lg | xl); paddingBlock (2xs | xs | sm | md | lg | xl); paddingInline (2xs | xs | sm | md | lg | xl).
+
+**When to use**
+
+- Padding inside a region that has no component of its own: a toolbar strip, a panel’s body, the inside of a custom slot.
+- `padding` is an inset token; `paddingBlock` and `paddingInline` override one axis.
+
+**When not to use**
+
+- A surface with a border, a heading or actions → `Card` (its body already has padding)
+- Space between siblings → the `gap` of a `Stack`, `Cluster` or `Grid`: the parent owns the space between
+- Page gutters → `Center` with `gutters`
+
+**Do:** A toolbar strip padded from the inset scale.
+
+```tsx
+<Box paddingBlock="xs" paddingInline="md">
+  <Cluster gap="sm">
+    <Text size="caption">3 selected</Text>
+  </Cluster>
+</Box>
+```
+
+**Don't:** A Box wrapped around a Card’s body: the padding doubles up.
+
+```tsx
+<Card>
+  <CardHeader title="Billing" />
+  <CardBody>
+    <Box padding="lg">
+      <Text>Next invoice on 1 April.</Text>
+    </Box>
+  </CardBody>
+</Card>
+```
+
+**Accessibility**
+
+- Layout only: no role. Choose `as` for the semantics (`section`, `aside`) and name it when it is a landmark.
+
+Stories: `primitives-box--default`, `primitives-box--small`, `primitives-box--extra-large`, `primitives-box--axis-overrides`.
+Tokens read: `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`.
 
 ### Center
 
@@ -2694,6 +3236,129 @@ Variants: min (sm | md | lg); gap (2xs | xs | sm | md | lg | xl | 2xl).
 Stories: `primitives-grid--default`, `primitives-grid--small-items`, `primitives-grid--large-items`.
 Tokens read: `size.grid-item.lg`, `size.grid-item.md`, `size.grid-item.sm`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`.
 
+### Imposter
+
+primitive · `src/primitives/Imposter/Imposter.tsx` · usage: `docs/usage/Imposter.usage.tsx`
+
+Positions an overlay over the centre of its container, not the viewport: a notice over a chart with no data, a prompt over a locked panel. The container is the Imposter itself, so no positioning CSS is needed. For anything that must take focus and block the page, use Dialog.
+
+Props:
+- `children?: ReactNode`: The content underneath: what the overlay sits over.
+- `as?: LayoutElement` = `'div'`: Semantic element to render. Defaults to div.
+- `overlay?: ReactNode`: What sits over the centre of the content: a notice, an upgrade prompt, a loading message.
+- `contain?: boolean` = `true`: Keep the overlay inside the container, scrolling it if it is taller. Defaults to true.
+- `overlayLabel?: string`: Names the overlay as a region and puts it in the tab order, so keyboard users can scroll it. Set it when a contained overlay can be taller than its container.
+- `margin?: GapToken` = `'md'`: Least space between the overlay and the container's edges.
+- `inertContent?: boolean` = `false`: Makes the content underneath inert (not focusable, hidden from assistive technology) while the overlay covers it. Set it whenever the overlay hides what is underneath.
+- …plus the native attributes of `AriaAttributes`, `DOMAttributes`, `HTMLAttributes`.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: margin (2xs | xs | sm | md | lg | xl | 2xl).
+States: contain, inertContent.
+
+**When to use**
+
+- An overlay that belongs to one region, not the page: a notice over a chart with no data, an upgrade prompt over a locked panel, “Loading…” over stale content.
+- The Imposter is the container, so no positioning CSS is needed. `margin` keeps the overlay off the edges; `contain` (the default) keeps it inside and scrolls it if it is taller.
+- Set `inertContent` whenever the overlay hides what is underneath, so focus and screen readers skip it.
+
+**When not to use**
+
+- Something that must take focus and block the page → `Dialog`
+- A message that doesn’t cover anything → `Banner` above the region, or `EmptyState` in place of it
+
+**Do:** The locked panel is inert under the prompt, so nobody tabs into controls they can’t see.
+
+```tsx
+<Imposter inertContent overlay={<Banner tone="info" announce={false}>Usage history is on the Business plan.</Banner>}>
+  {usageRows}
+</Imposter>
+```
+
+**Don't:** An overlay without `inertContent`: the meters underneath are still read out and focusable.
+
+```tsx
+<Card>
+  <CardHeader title="Usage" level={3} />
+  <CardBody>
+    <Imposter overlay={<Text>Upgrade to see usage.</Text>}>{usageRows}</Imposter>
+  </CardBody>
+</Card>
+```
+
+**Accessibility**
+
+- The overlay follows the content in DOM order and reading order.
+- `inertContent` sets `inert` on the content underneath while an overlay is shown.
+- A contained overlay that can be taller than its container needs `overlayLabel`: it becomes a named, focusable region so the keyboard can scroll it.
+
+Stories: `primitives-imposter--default`, `primitives-imposter--wide-margin`, `primitives-imposter--contained`, `primitives-imposter--no-overlay`.
+Tokens read: `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `z.overlay`.
+
+### Reel
+
+primitive · `src/primitives/Reel/Reel.tsx` · usage: `docs/usage/Reel.usage.tsx`
+
+A single row that scrolls sideways, snapping to the start of each item: a strip of cards, thumbnails or suggestions that would otherwise wrap. The row is a named region in the tab order, so it scrolls with the arrow keys even when its items aren't focusable.
+
+Props:
+- `children?: ReactNode`
+- `label: string`: Accessible name of the scrolling region ("Recent files"). Required: the region takes keyboard focus.
+- `gap?: GapToken` = `'md'`: Space between items.
+- `itemWidth?: GridItemToken | 'auto'` = `'md'`: Width of each item. `auto` lets each item size itself.
+- …plus the native attributes of `AriaAttributes`, `DOMAttributes`, `HTMLAttributes`.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: gap (2xs | xs | sm | md | lg | xl | 2xl); itemWidth (sm | md | lg | auto).
+
+**When to use**
+
+- A row of like items that is fine to scroll sideways: recent files, suggested templates, image thumbnails.
+- `itemWidth` takes a grid-item token (or `auto`); items snap to their start as the row scrolls.
+- `label` names the row: it is a region in the tab order, so arrow keys scroll it even when the items aren’t focusable.
+
+**When not to use**
+
+- Items people compare or must all see → `Grid`, which wraps
+- Tabular data wider than the screen → `Table` (its own scroll region, with a sticky header)
+- Primary navigation → `Nav` or `NavTabs`
+
+**Do:** A named row of recent files; the cut-off card at the edge shows there is more.
+
+```tsx
+<Reel label="Recent files" itemWidth="sm">
+  {files.map((name) => (
+    <Card key={name}>
+      <CardHeader title={name} level={3} />
+    </Card>
+  ))}
+</Reel>
+```
+
+**Don't:** Every file in a grid when only the latest few matter: the page grows with the folder.
+
+```tsx
+<Grid min="sm" gap="sm">
+  {files.map((name) => (
+    <Card key={name}>
+      <CardBody>
+        <Text>{name}</Text>
+      </CardBody>
+    </Card>
+  ))}
+</Grid>
+```
+
+**Accessibility**
+
+- A `region` named by `label` with `tabIndex=0`: keyboard users can focus it and scroll with the arrow keys (axe `scrollable-region-focusable`).
+- Items are read in DOM order; snapping is `proximity`, never `mandatory`, so it never traps a scroll position.
+
+Stories: `primitives-reel--default`, `primitives-reel--small-items`, `primitives-reel--large-items`, `primitives-reel--auto-width`, `primitives-reel--fits-without-scrolling`.
+Tokens read: `size.grid-item.lg`, `size.grid-item.md`, `size.grid-item.sm`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.xs`.
+
 ### Sidebar
 
 primitive · `src/primitives/Sidebar/Sidebar.tsx` · usage: `docs/usage/Sidebar.usage.tsx`
@@ -2883,6 +3548,56 @@ Variants: threshold (xs | sm | md | lg); gap (2xs | xs | sm | md | lg | xl | 2xl
 
 Stories: `primitives-switcher--row`, `primitives-switcher--column-when-narrow`, `primitives-switcher--low-threshold-stays-a-row`.
 Tokens read: `size.content.lg`, `size.content.md`, `size.content.sm`, `size.content.xs`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`.
+
+### VisuallyHidden
+
+primitive · `src/primitives/VisuallyHidden/VisuallyHidden.tsx` · usage: `docs/usage/VisuallyHidden.usage.tsx`
+
+Content that screen readers announce but the screen doesn't show: a heading for a region whose purpose is visually obvious, the words behind a symbol. Clipped, not display:none, so it stays in the accessibility tree. It has no escape hatch: there is nothing on it to style.
+
+Props:
+- `children: ReactNode`: Text for assistive technology only.
+- `as?: 'span' | 'div'` = `'span'`: span (the default) inside inline content; div around block content such as a heading.
+- `id?: string`
+
+Closed styling API: no `className`/`style`.
+
+Variants: as (span | div).
+
+**When to use**
+
+- Words a screen reader needs that sighted people get from layout: a heading for a region whose purpose is visually obvious, “up” behind a ▲.
+- Use `as="div"` around block content such as a heading; the default `span` sits inside text.
+
+**When not to use**
+
+- Naming a control → its own `label` or `aria-label` (every system control takes one)
+- Hiding content from everyone → don’t render it, or use the `hidden` attribute
+- Anything sighted users also need → visible text
+
+**Do:** The arrow is hidden from screen readers and the word is hidden from the screen, so both read “up 12%”.
+
+```tsx
+<Text>
+  <span aria-hidden="true">▲</span> <VisuallyHidden>up</VisuallyHidden> 12%
+</Text>
+```
+
+**Don't:** Instructions only screen readers get: sighted keyboard users miss them too.
+
+```tsx
+<Text>
+  Reference <VisuallyHidden>use the format AB-1234</VisuallyHidden>
+</Text>
+```
+
+**Accessibility**
+
+- Clipped to 1px rather than `display: none`, so it stays in the accessibility tree and is announced.
+- Not focusable. For a skip link, use AppShell’s, which shows on focus.
+
+Stories: `primitives-visuallyhidden--inline-text`, `primitives-visuallyhidden--block-heading`.
+Tokens read: none.
 
 ## Layouts reference
 
@@ -3259,6 +3974,8 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long'`
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
+- `FileRejection` (`src/components/FileUpload/FileUpload.tsx`): `interface FileRejection { file: File; reason: 'type' | 'size'; message: string; }` A picked or dropped file that broke a limit, with a message ready to show.
+- `FileUploadItem` (`src/components/FileUpload/FileUpload.tsx`): `interface FileUploadItem { id: string; name: string; size: number; progress?: number; error?: string; }` A file in the list. The caller owns the list: it adds accepted files, reports progress and removes them.
 - `Formatter` (`src/format/format.ts`): `interface Formatter extends LocaleSettings { date: (value: DateInput, style?: DateStyle) => string; time: (value: DateInput) => string; dateTime: (value: DateInput, options?: { withZone?: boolean; }) => string; relative: (value: DateInput, now?: DateInput) => string; number: (value: number, options?: { maximumFractionDigits?: number; }) => string; percent: (value: number, options?: { maximumFractionDigits?: number; }) => string; compact: (value: number) => string; money: (minor: number, currency: string, options?: { compact?: boolean; }) => string; list: (items: readonly string[], type?: 'conjunction' | 'disjunction') => string; fileSize: (bytes: number) => string; }`
 - `GapToken` (`src/tokens/tokens.ts`): `type GapToken = keyof typeof vars.space.gap`
 - `GridItemToken` (`src/tokens/tokens.ts`): `type GridItemToken = keyof typeof vars.size['grid-item']`
@@ -3288,6 +4005,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `StatDirection` (`src/components/Stat/Stat.tsx`): `type StatDirection = 'up' | 'down' | 'flat'`
 - `StatTone` (`src/components/Stat/Stat.tsx`): `type StatTone = 'positive' | 'negative' | 'neutral'` Whether the change is good news. Separate from direction: fewer overdue records is down and positive.
 - `StepperStep` (`src/components/Stepper/Stepper.tsx`): `interface StepperStep { label: string; }`
+- `TimelineEvent` (`src/components/Timeline/Timeline.tsx`): `interface TimelineEvent { id: string; actor: string; verb: string; target?: ReactNode; time: string; dateTime: string; detail?: string; }` One thing that happened: who did what to which, and when.
 - `ToastTone` (`src/components/Toast/Toast.tsx`): `type ToastTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 
 ## Guides in full
@@ -3462,7 +4180,7 @@ Before building anything new, walk the ladder from the top and stop at the first
 
 ### Layout
 
-Four layouts frame a page; eight layout primitives arrange everything inside it. They take gaps, widths and ratios as tokens, so a layout can’t drift off the scale, and they hold no domain knowledge.
+Four layouts frame a page; eleven layout primitives arrange everything inside it. They take gaps, widths and ratios as tokens, so a layout can’t drift off the scale, and they hold no domain knowledge.
 
 #### Which layout
 
@@ -3490,6 +4208,9 @@ Pick the frame first. Each page starts from a PageHeader inside it.
 | [Sidebar](src/primitives/Sidebar/Sidebar.stories.tsx) | A narrow region beside a wider one inside a card, panel or dialog, stacking when space runs out. | A page’s properties rail or sub-nav (PageLayout), or the app’s navigation (AppShell). |
 | [Center](src/primitives/Center/Center.stories.tsx) | The page column inside AppShell’s main, with a bounded measure and gutters; empty states (intrinsic). | Centring a single control in a row (Cluster justify="center"). |
 | [Cover](src/primitives/Cover/Cover.stories.tsx) | One block centred vertically in the available height, with a header and footer pinned to the edges. | A signed-out page: AuthLayout already composes it. |
+| [Box](src/primitives/Box/Box.stories.tsx) | Padding from the inset scale inside a region with no component of its own: a toolbar strip, a panel body. | A titled surface (Card), or space between siblings (the parent’s gap). |
+| [Reel](src/primitives/Reel/Reel.stories.tsx) | One row of like items that scrolls sideways with snapping: recent files, thumbnails, suggestions. | Items people compare or must all see (Grid), or wide data (Table). |
+| [Imposter](src/primitives/Imposter/Imposter.stories.tsx) | An overlay centred over one region, not the page: a notice over an empty chart, a prompt over a locked panel. | Anything that takes focus and blocks the page (Dialog). |
 | [Frame](src/primitives/Frame/Frame.stories.tsx) | Media held to a ratio token and cropped to fill: file previews, covers, video. | A person’s picture (Avatar), or a box that holds text. |
 
 #### Composing into AppShell
@@ -3685,7 +4406,7 @@ The target is WCAG 2.2 AA. The system guarantees what can be decided once; produ
 - WCAG 2.2 checks axe doesn’t make, on every story: target size, focus not obscured, accessible authentication, consistent help. Plus a lint rule for dragging and unit audits for sign-in and redundant entry.
 - Component behaviour (names, states, keyboard): component tests.
 - Automated checks find about a third of issues. Before shipping a new flow, use it with the keyboard only and with a screen reader.
-- What each check covers, what needs a person and how to run them: Accessibility conformance.
+- What each check covers, what needs a person and how to run them: [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx).
 
 <!-- docs/guides/AccessibilityConformance.stories.tsx -->
 
@@ -3750,7 +4471,7 @@ PLAYWRIGHT_PORT=6107 npm run test:wcag22
 #### Claiming conformance
 
 - Publish an accessibility statement: the standard and level, what was tested and how, known limitations with dates to fix them, and a way to report a problem.
-- Start from the Accessibility statement template.
+- Start from the [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx) template.
 - Procurement often asks for a VPAT (the ACR format): fill it from the same manual audit, criterion by criterion. Don’t mark a criterion Supports on the strength of an automated check alone.
 
 <!-- docs/guides/AccessibilityStatement.stories.tsx -->
@@ -3762,7 +4483,7 @@ A template for the statement a product publishes about its accessibility. Copy i
 #### Before you publish
 
 - Base the conformance status and known limitations on a manual audit, not on a green build alone.
-- List what the build checks and what it can’t: see Accessibility conformance.
+- List what the build checks and what it can’t: see [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx).
 - Every known limitation gets an owner and a date. Review the statement at least once a year and after every major release.
 - Link it from the app’s help menu and footer, so it sits in the same place on every page.
 
@@ -3859,6 +4580,195 @@ Plain, specific and calm. The words are part of the interface: a vague label or 
 | Success toast | Record saved | Your record has been saved successfully! |
 | Link | View billing history | Click here |
 
+<!-- docs/guides/Forms.stories.tsx -->
+
+### Forms
+
+Forms are among the most settled patterns in software, and breaking the conventions costs completions. Every control in the system shares one field anatomy, and the create-and-edit example shows the whole flow: validation on blur, an error summary on submit, a pending submit.
+
+#### The field anatomy
+
+TextField, Textarea, Select, RadioGroup, Slider and FileUpload render the same parts in the same order; Checkbox and Switch put the label beside the control.
+
+- **Label**, always visible and required: it is the accessible name. `hideLabel` only where the context says it (a search box in a toolbar).
+- **Description** under the control for format hints and consequences (“Shown on invoices”), linked with `aria-describedby`. Never put required information in a placeholder or a Tooltip.
+- **Error** under the description, with an icon and text, never colour alone. It sets `aria-invalid` and is read with the field.
+- **id**: every control takes one, so an error summary can link to it.
+- Mark the rare optional field “(optional)” in its label rather than starring every required one.
+
+#### Which control
+
+**Form controls**
+
+| Control | Choose when | Avoid when |
+|---|---|---|
+| [TextField](src/components/TextField/TextField.stories.tsx) | Short free text, email, numbers, a password (with its show-password toggle). | More than a line (Textarea), or a value from a known list (Select, RadioGroup). |
+| [Textarea](src/components/Textarea/Textarea.stories.tsx) | Free text over a line: a description, a comment. | A single value. |
+| [SearchField](src/components/SearchField/SearchField.stories.tsx) | Filtering a list on the page as you type, with a clear button. | A form answer (TextField). |
+| [Select](src/components/Select/Select.stories.tsx) | One value from a long or unfamiliar list (six or more). | Two to five options people should compare at a glance (RadioGroup). |
+| [RadioGroup](src/components/RadioGroup/RadioGroup.stories.tsx) | One value from a few options that are all worth reading. | A view switch that applies at once (SegmentedControl). |
+| [Checkbox](src/components/Checkbox/Checkbox.stories.tsx) | A yes/no answer, or several independent options, saved with the form. | A setting that takes effect immediately (Switch). |
+| [Switch](src/components/Switch/Switch.stories.tsx) | A setting that takes effect the moment it is flipped. | A form answer submitted later (Checkbox). |
+| [Slider](src/components/Slider/Slider.stories.tsx) | A position on a scale, or a range, where the exact number matters less: volume, a price filter. | An exact figure (TextField type="number"). |
+| [FileUpload](src/components/FileUpload/FileUpload.stories.tsx) | Attaching files, with the limits shown before anyone picks. | Importing rows of data (a dedicated import wizard). |
+
+#### Layout
+
+- One column, in a `Stack`. Short related fields (city and postcode) may share a row in a `Switcher`.
+- Group related fields under a heading, or in a `Stack as="fieldset"` with a legend. One `Card` per group on a settings page, each with its own Save.
+- The primary action goes last. A long form puts it in a sticky action bar: AppShell’s `footer` slot, or FocusedLayout’s for a wizard. Focus scrolls clear of the bar.
+
+#### When to validate
+
+- On blur, not while someone is still typing into a field for the first time.
+- Once a field shows an error, check it on every change, so the error clears the moment it is fixed.
+- On submit, check everything. If anything fails, show an error summary above the form, move focus to it, and link each entry to its field. Keep the submit button enabled: a disabled button can’t say what’s missing.
+- While submitting, put `loading` on the submit Button: it keeps its label and focus and blocks a second submit.
+- Never clear the form on an error. Keep everything the person typed.
+- Error copy says what is wrong and how to fix it: “Enter an amount of at least £1”, not “Invalid input”. See Guides/Content.
+
+#### The error summary
+
+A Banner with the problems as links. It isn’t also announced, because focus moving to it already reads it.
+
+```
+{problems.length > 0 ? (
+  <Banner ref={summaryRef} tabIndex={-1} tone="danger" announce={false}
+    title={`There are ${problems.length} problems with this record`}>
+    <Stack as="ul" gap="2xs">
+      {problems.map((p) => (
+        <li key={p.field}><a href={`#${p.id}`} onClick={focusField(p.id)}>{p.message}</a></li>
+      ))}
+    </Stack>
+  </Banner>
+) : null}
+// After a failed submit: summaryRef.current?.focus()
+```
+
+The working version, with every state, is the [create-and-edit example](src/examples/CreateEditFlow.tsx).
+
+<!-- docs/guides/Motion.stories.tsx -->
+
+### Motion
+
+Motion gives feedback and shows where something came from. It is short, eased, built from tokens, and it gives way to the reduced-motion preference: nothing in the product depends on seeing it move.
+
+#### Durations
+
+From the token source. The reduced-motion column is what each token becomes under prefers-reduced-motion: reduce.
+
+**Motion durations**
+
+| Token | Value | Reduced motion | Use for |
+|---|---|---|---|
+| `--motion-fast` | `100ms` | 0ms | Hover and press feedback, colour changes. |
+| `--motion-base` | `200ms` | 0ms | Small moves: menus and popovers opening. |
+| `--motion-slow` | `300ms` | 0ms | Larger moves: dialogs, drawers, toasts entering. |
+| `--motion-spin` | `1000ms` | Unchanged | One revolution of a loading spinner. Not reduced: the spinner is the only progress cue. |
+| `--motion-pulse` | `1000ms` | 0ms | One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading. |
+
+#### Easings
+
+**Easing tokens**
+
+| Token | Use for |
+|---|---|
+| `--ease-standard` | Movement within the page. |
+| `--ease-enter` | Things arriving: decelerates into place. |
+| `--ease-exit` | Things leaving: accelerates away. |
+| `--ease-linear` | Continuous loops only: spinners, pulses. |
+
+Curves and values are drawn on [Foundations/Elevation and motion](docs/foundations/ElevationMotion.stories.tsx). Things arriving decelerate; things leaving accelerate, and leave a little faster than they came.
+
+#### Writing a transition
+
+Longhands, with a duration and an easing token. The shorthand and literal durations fail lint, and a literal would not collapse under reduced motion.
+
+```
+.toggle {
+  transition-property: background-color, border-color, color;
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-standard);
+}
+```
+
+#### What moves, and what never does
+
+- Hover and press feedback, colour changes: `motion.fast`. Menus and popovers opening: `motion.base`. Dialogs, drawers and toasts entering: `motion.slow`.
+- Animate `opacity`, `transform` and colours. Never animate layout (width, height, top, margins): it jitters the page and costs a layout on every frame.
+- Never animate the focus ring, text people are reading, or a value changing in a table or a Stat: show the new value at once.
+- No parallax, no scroll-jacking, nothing that plays on its own for more than five seconds without a way to pause it.
+- Never make motion the only signal. The end state must make sense on its own, and async changes are announced with a live region (a Toast, a status).
+
+#### Reduced motion
+
+- The token build writes a `prefers-reduced-motion: reduce` block into tokens.css, so every transition built from tokens collapses to zero without a media query in the component.
+- The skeleton pulse stops; the spinner keeps turning, because it is the only sign that work is in progress.
+- State still changes instantly: only the movement goes.
+- The visual suite runs with reduced motion and animations disabled, so screenshots never catch a frame mid-transition.
+
+<!-- docs/guides/Theming.stories.tsx -->
+
+### Theming and adding a brand
+
+Every alternate look (dark mode, a rebrand, a customer’s colours) is a remap of the semantic token tier. Components read only semantic tokens, so a new theme is a list of values, never a change to a component.
+
+#### How the tiers make it a remap
+
+- **Primitive** tokens are raw values with no meaning: `color.indigo.600`. Nothing in the system reads them directly; a test fails if a stylesheet does.
+- **Semantic** tokens say what a value is for: `color.action.primary`, `color.focus`. They alias a primitive, once for light and once for dark.
+- **Component** tokens are per-part override hooks (`button.primary.bg`) that alias semantic tokens.
+- So a theme changes which primitive each semantic token points at, and everything downstream follows.
+
+#### Dark mode, as built
+
+Each semantic colour holds both values; the scheme picks one.
+
+```
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+--color-action-primary: light-dark(var(--color-indigo-600), var(--color-indigo-400));
+```
+
+- Components contain no theme rules. Contrast is tested per pair in both schemes, and the gallery captures every story in both.
+- Dark depth comes from lighter surfaces, not darker shadows; status and brand colours get their own dark values.
+
+#### What carries the brand today
+
+The semantic colours whose light or dark value comes from the brand ramp. Rebranding means remapping these, and only these.
+
+**Brand-carrying semantic colours**
+
+| Token | Light | Dark |
+|---|---|---|
+| `color.action.primary` | `color.indigo.600` | `color.indigo.400` |
+| `color.action.primary-hover` | `color.indigo.700` | `color.indigo.300` |
+| `color.bg.selected` | `color.indigo.50` | `color.indigo.950` |
+| `color.fg.link` | `color.indigo.700` | `color.indigo.300` |
+| `color.focus` | `color.indigo.600` | `color.indigo.300` |
+
+#### Changing the brand, step by step
+
+For a rebrand of the one product: the house colours change for everyone.
+
+1. Add the new ramp to `tokens/primitive/color.json`, all eleven steps (50 to 950), so light and dark each have room to pick a passing shade.
+2. In `tokens/semantic/color.json`, point each brand-carrying token above at the new ramp: the light `$value` and the dark value under `$extensions.starter.modes.dark`.
+3. Run `npm run tokens`. It regenerates tokens.css, tokens.ts and the token usage map.
+4. Run `npm test`. The contrast test checks every pair in both schemes: link text at 4.5:1 on every surface, the primary fill and the focus ring at 3:1, the label on the primary fill at 4.5:1. A failing pair means a darker (or, in dark mode, lighter) step.
+5. Run the visual suite, review the changed screenshots, and regenerate the Linux baselines on the branch.
+6. Nothing under src/components, src/primitives or src/layouts changes. If something must, it read a primitive: fix that instead.
+
+#### A second brand beside the first
+
+Not built yet. It arrives with the second brand or tenant, and this is the plan.
+
+- Brand becomes another mode on the semantic tier, beside the scheme: `data-brand` on the root selects a brand’s primitive mapping, `color-scheme` still selects light or dark, and the build writes every brand × scheme combination.
+- The contrast test and the visual suite run per brand × scheme, not only for the house brand in light.
+- One component set for every brand. Radius, type family and density can be brand tokens; structure can’t. A brand that seems to need different markup is asking for a variant.
+- A customer’s colour is untrusted input: check it for contrast when it is saved, and derive or reject the text-on-brand roles rather than shipping a pale primary that fails 3:1.
+
+Until then, the README’s “Deliberately not included yet” table tracks it.
+
 <!-- docs/guides/EscapeHatches.stories.tsx -->
 
 ### Escape hatches
@@ -3887,6 +4797,110 @@ Consumer code can’t use an `UNSAFE_` prop without an ESLint disable, and the d
 - Count the disables. A rising count is drift made visible; review it like any other health metric.
 - The same override twice is a missing variant. Propose it and remove both overrides when it lands.
 - When the removal condition is met, the escape hatch goes in the same pull request as its replacement.
+
+<!-- docs/guides/Contributing.stories.tsx -->
+
+### Contributing and versioning
+
+Anything new starts as a proposal on the decision ladder, lands in one pull request with its stories, docs and tests, and leaves the old way through a deprecation, never a silent removal.
+
+#### 1. Propose
+
+- Walk the [decision ladder](docs/guides/DecisionLadder.stories.tsx) and stop at the first yes: template, variant, component, primitive. Most needs stop at a template or a variant.
+- Write a short proposal in the issue or the pull request: the use cases (at least two real ones), the props, an owner, and which existing screens would move to it.
+- A second use is the signal to review a local block for promotion; three distinct uses usually confirm the abstraction.
+- A repeated escape hatch is a proposal waiting to be written: two screens with the same UNSAFE_ override are asking for a variant.
+
+#### 2. What a pull request must include
+
+- A story for every variant, size and state (open overlays tagged as the Testing guide says), so the visual and axe suites cover it.
+- A usage doc in `docs/usage/<Name>.usage.tsx` for every new export: when to use, when not (and what instead), a do, a don’t, and accessibility. The docs test fails without it.
+- Tokens and system CSS regenerated with `npm run tokens`, and the token usage map committed.
+- `npm run check` green: tokens, types, lint, unit tests, lint-rule fixtures, build, bundle budgets and tree-shaking.
+- A new lint rule comes with a violation fixture registered in the rule test.
+- A raised bundle budget goes in its own commit, with the old and new limits and what grew.
+- The README and the agent rules updated when the parts list or a rule changes.
+- In the description: which existing stories render differently on purpose, so their baselines are regenerated and reviewed.
+
+#### 3. Deprecate before removing
+
+- Keep the old name working as an alias of the new one, and mark it in its type so editors strike it through.
+- Say what replaces it, and when it goes, in the pull request and the changelog.
+- Remove it in a later pull request, after every call site has moved. Grep for it; the build fails on any that remain.
+
+```
+/** @deprecated Use Divider. Removed after every screen has moved. */
+export const Separator = Divider;
+```
+
+A semantic token deprecates the same way: keep the old token as an alias of the new one for the deprecation window.
+
+#### 4. Versioning
+
+Today the system is one folder in one repository, released with the app. Semantic versioning starts when a second app consumes it; the table says how each change will be released then.
+
+**Kinds of change**
+
+| Change | Kind | Today | Once published |
+|---|---|---|---|
+| A new component, primitive, variant, token or export | Additive | Merge when the checklist is green. | Minor release |
+| A bug fix or a visual correction with the same API | Fix | Merge; say which screenshots changed and why. | Patch release |
+| Renaming or removing an export, a prop, a variant value or a semantic token | Breaking | Deprecate first (below); remove in a later pull request. | Major release, with a migration note and, for many call sites, a codemod |
+| Changing what a token means (not just its value) | Breaking | Add a new token and deprecate the old one; never repurpose a name. | Major release |
+
+Package publishing, a changelog tool and codemods are listed in the README under “Deliberately not included yet”, each with the moment to add it. Until then the pull request history is the changelog.
+
+<!-- docs/guides/Testing.stories.tsx -->
+
+### Testing
+
+The gallery is the test fixture. Every state gets a story, and every story is screenshotted in both themes, checked by axe and by the WCAG 2.2 checks, so a new state is covered the moment it has a story.
+
+#### The suites
+
+**Test suites**
+
+| Suite | Covers | Run |
+|---|---|---|
+| Unit (Vitest) | Token source and aliases, contrast in light and dark, CSS structure, the token usage map, component behaviour (names, roles, keyboard, focus), the examples, docs coverage. | `npm test` |
+| Lint rules | Every ESLint and Stylelint rule fires on its violation fixture, every import boundary is proved, and the clean controls pass. | `npm run test:rules` |
+| Visual | A full-page screenshot of every story in light and dark, against Linux baselines. | `npm run test:visual` |
+| axe | WCAG 2.2 A and AA rules on every story in both themes, and on every Docs tab. | `npm run test:visual` |
+| WCAG 2.2 checks | Target size, focus not obscured, accessible authentication and consistent help on every story; each check proved by a fixture story that must fail it. | `npm run test:wcag22` |
+| Budgets | Library JS and CSS size, one component’s cost, and that one import pulls in only what it composes. | `npm run size` (inside `npm run check`) |
+
+```
+npm run check                      # tokens, types, lint, unit, rules, build, budgets
+npm run build-storybook
+PLAYWRIGHT_PORT=6107 npx playwright test --grep "Components/Slider"   # your stories while iterating
+PLAYWRIGHT_PORT=6107 npx playwright test                              # everything, once at the end
+```
+
+#### A story for every state
+
+- One story per variant, size and state: empty, filled, error, disabled, loading, open. The suites find new stories on their own.
+- Stories use fixed data: fixed dates, names and numbers, never `Date.now()` or random values, so screenshots are stable.
+- An open modal (Dialog, Drawer, Select, Menu) is tagged `['modal-open', '!autodocs']`. That relaxes only axe’s `aria-hidden-focus`, which can’t see the focus trap. An open non-modal overlay (Popover, HoverCard) takes only `'!autodocs'`.
+- Write the tags as a literal array: Storybook reads them statically, and a spread is ignored.
+- Behaviour a screenshot can’t show (focus moving, an announcement, a callback) gets a unit test with Testing Library, queried by role and name.
+
+#### Baselines
+
+- Linux baselines are committed and are the source of truth. They come only from the Update visual baselines workflow on the CI image; never edit or delete them by hand.
+- Local baselines (darwin, win32) are gitignored. `npm run test:visual:update` rewrites yours, so you can diff your own change before pushing.
+- After an intended visual change: run the workflow on your branch, re-run CI, and review every changed image in the pull request. Say in the description which existing stories changed and why.
+
+#### The draft workflow
+
+- Open pull requests as drafts while iterating: they run the check job only, which is fast.
+- Mark it ready for review to build the gallery and run the visual, axe and WCAG 2.2 shards. Merge only once that run is green.
+- A new push cancels the run it replaces. The gate job, not the shards, is the required check.
+
+#### WCAG checks and rule tests
+
+- What each automated check covers and what still needs a person is on [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx).
+- A new WCAG check comes with a fixture story (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`) that the check must fail.
+- A new lint rule comes with a violation fixture in `fixtures/violations/`, registered in the rule test; `npm run test:rules` fails if a rule has none or its fixture stops failing.
 
 <!-- docs/guides/Agents.stories.tsx -->
 
@@ -4124,10 +5138,10 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `text.heading-3` `var(--text-heading-3)`: `600 1.25rem/1.375 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Subsections.
 - `text.heading-4` `var(--text-heading-4)`: `600 1.125rem/1.375 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Small groups, card headers.
 - `text.label` `var(--text-label)`: `500 0.875rem/1.25 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Form labels, buttons, tabs and navigation.
-- `z.base` `var(--z-base)`: `0`. Stacking order. Never write a raw z-index.
-- `z.dropdown` `var(--z-dropdown)`: `200`. Stacking order. Never write a raw z-index.
-- `z.modal` `var(--z-modal)`: `400`. Stacking order. Never write a raw z-index.
-- `z.overlay` `var(--z-overlay)`: `300`. Stacking order. Never write a raw z-index.
-- `z.sticky` `var(--z-sticky)`: `100`. Stacking order. Never write a raw z-index.
-- `z.toast` `var(--z-toast)`: `500`. Stacking order. Never write a raw z-index.
-- `z.tooltip` `var(--z-tooltip)`: `600`. Stacking order. Never write a raw z-index.
+- `z.base` `var(--z-base)`: `0`. Content in normal flow.
+- `z.dropdown` `var(--z-dropdown)`: `200`. Panels anchored to a trigger that close on their own: menus, selects, popovers, hover cards.
+- `z.modal` `var(--z-modal)`: `400`. Modal dialogs and drawers with their scrim. Everything below is inert while one is open.
+- `z.overlay` `var(--z-overlay)`: `300`. Layers over part of the page that aren’t modal: the skip link as it appears, an Imposter’s overlay (inside the Imposter’s own stacking context).
+- `z.sticky` `var(--z-sticky)`: `100`. Sticky parts of a scroll container: table header rows, action bars. Above content, below anything that floats.
+- `z.toast` `var(--z-toast)`: `500`. Toasts, above modals, so a confirmation sent from inside a dialog stays visible.
+- `z.tooltip` `var(--z-tooltip)`: `600`. Tooltips, above everything: they label whatever has focus or the pointer, wherever it is.
