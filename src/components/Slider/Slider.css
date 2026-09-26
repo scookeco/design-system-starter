@@ -1,0 +1,79 @@
+@layer components {
+  /* 1. block */
+  .slider {
+    min-inline-size: 0;
+  }
+
+  /* 2. parts */
+  .slider__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-md);
+  }
+
+  .slider__root {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-inline-size: 0;
+    block-size: var(--size-target-min);
+    touch-action: none;
+    user-select: none;
+  }
+
+  .slider__track {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    block-size: var(--size-bar);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-subtle);
+  }
+
+  .slider__range {
+    position: absolute;
+    block-size: 100%;
+    background: var(--color-action-primary);
+  }
+
+  /* The thumb is the target: at least size.target-min, with a surface halo that keeps it distinct from the range. */
+  .slider__thumb {
+    display: block;
+    inline-size: var(--size-target-min);
+    block-size: var(--size-target-min);
+    border: 1px solid var(--color-bg-surface);
+    border-radius: var(--radius-pill);
+    background: var(--color-action-primary);
+    box-shadow: var(--shadow-card);
+    cursor: grab;
+  }
+
+  .slider__thumb:hover {
+    background: var(--color-action-primary-hover);
+  }
+
+  .slider__value {
+    flex: none;
+    color: var(--color-fg-default);
+    font: var(--text-label);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 3. states */
+  .slider__thumb[aria-invalid="true"] {
+    border-color: var(--color-status-danger-fg);
+  }
+
+  .slider__root[data-disabled] .slider__range,
+  .slider__root[data-disabled] .slider__thumb {
+    background: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  /* The value stays readable when disabled (it is text, and axe checks its contrast); muted, not disabled grey. */
+  .slider__root[data-disabled] ~ .slider__value {
+    color: var(--color-fg-muted);
+  }
+}

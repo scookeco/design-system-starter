@@ -20,6 +20,8 @@ const PATHS = {
   search: 'M9 15a6 6 0 100-12 6 6 0 000 12zM13.5 13.5L17 17',
   minus: 'M4 10h12',
   download: 'M10 3v10M5.5 8.5L10 13l4.5-4.5M4 16h12',
+  upload: 'M10 13V3M5.5 7.5L10 3l4.5 4.5M4 16h12',
+  copy: 'M7 7h9.5v9.5H7zM13 7V3.5H3.5V13H7',
   'chevron-right': 'M8 5l5 5-5 5',
   'chevron-left': 'M12 5l-5 5 5 5',
   home: 'M3 9.5L10 3l7 6.5M5 8v9h10V8M8.5 17v-5h3v5',

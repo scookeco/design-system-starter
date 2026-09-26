@@ -66,7 +66,7 @@ function AccessibilityStatement() {
           items={[
             'Base the conformance status and known limitations on a manual audit, not on a green build alone.',
             <>
-              List what the build checks and what it can’t: see <StoryLink id="guides-accessibility-conformance--accessibility-conformance">Accessibility conformance</StoryLink>.
+              List what the build checks and what it can’t: see <StoryLink id="guides-accessibility-conformance--accessibility-conformance-guide">Accessibility conformance</StoryLink>.
             </>,
             'Every known limitation gets an owner and a date. Review the statement at least once a year and after every major release.',
             'Link it from the app’s help menu and footer, so it sits in the same place on every page.',

@@ -1,0 +1,11 @@
+@layer primitives {
+  /* The same clip as the internal .visually-hidden utility, under the primitive's own block name. */
+  .screen-reader-only {
+    position: absolute;
+    overflow: hidden;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    block-size: 1px;
+    white-space: nowrap;
+  }
+}

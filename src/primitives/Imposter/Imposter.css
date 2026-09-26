@@ -1,0 +1,32 @@
+@layer primitives {
+  /* The container: a positioning and stacking context, so the layer never escapes it. */
+  .imposter {
+    --imposter-margin: var(--space-gap-md);
+
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+
+  /* The layer covers the container and centres the overlay; it lets pointer events through to its edges. */
+  .imposter__layer {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: grid;
+    place-items: center;
+    padding: var(--imposter-margin);
+    pointer-events: none;
+  }
+
+  .imposter__overlay {
+    min-inline-size: 0;
+    pointer-events: auto;
+  }
+
+  .imposter__layer[data-contain="true"] .imposter__overlay {
+    overflow: auto;
+    max-inline-size: 100%;
+    max-block-size: 100%;
+  }
+}

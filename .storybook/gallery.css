@@ -40,3 +40,11 @@
     max-inline-size: var(--size-breakpoint-md);
   }
 }
+
+@layer components {
+  /* Box stories: shows the padding a Box adds around its content. */
+  .demo-outline {
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-control);
+  }
+}

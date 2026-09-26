@@ -125,7 +125,7 @@ PLAYWRIGHT_PORT=6107 npm run test:wcag22
           items={[
             'Publish an accessibility statement: the standard and level, what was tested and how, known limitations with dates to fix them, and a way to report a problem.',
             <>
-              Start from the <StoryLink id="guides-accessibility-statement--accessibility-statement">Accessibility statement</StoryLink> template.
+              Start from the <StoryLink id="guides-accessibility-statement--accessibility-statement-guide">Accessibility statement</StoryLink> template.
             </>,
             'Procurement often asks for a VPAT (the ACR format): fill it from the same manual audit, criterion by criterion. Don’t mark a criterion Supports on the strength of an automated check alone.',
           ]}

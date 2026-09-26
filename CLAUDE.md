@@ -21,7 +21,7 @@ Work on a branch. Never commit to `main` directly.
 - `tokens/`: DTCG source (primitive → semantic → component). The only place values live.
 - `src/tokens/token-usage.json`: **generated** map of the tokens each component, primitive and layout reads (directly, through props, or through what it composes). Shown in the gallery's Tokens panel. Changing any system CSS or a token means `npm run tokens`, or the unit test and `tokens:check` fail.
 - `src/styles/`: layer order (`index.css`), reset, base, utilities, and the **generated** `tokens.css`. Never edit the generated file.
-- `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame (token-typed props).
+- `src/primitives/`: Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden (token-typed props).
 - `src/components/`: system components. With `src/primitives/`, the only code allowed to import `radix-ui`.
 - `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks). Import components and primitives; nothing below imports them.
 - `src/format/`: locale formatting over Intl (`LocaleProvider`, `useFormat`). Part of the system; exported from `src/index.ts`.
@@ -46,7 +46,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Escape hatches, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Motion, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 

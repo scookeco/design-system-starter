@@ -1,0 +1,39 @@
+@layer components {
+  /* 1. block */
+  .code-block {
+    overflow: hidden;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-default);
+  }
+
+  /* 2. parts */
+  .code-block__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-gap-sm);
+    padding-block: var(--space-inset-2xs);
+    padding-inline: var(--space-inset-md) var(--space-inset-2xs);
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .code-block__language {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .code-block__pre {
+    overflow-x: auto;
+    margin: 0;
+    padding: var(--space-inset-md);
+    font: var(--text-code);
+    white-space: pre;
+  }
+
+  /* The region's focus ring sits inside, so the block's clipped corners don't cut it off. */
+  .code-block__pre:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}

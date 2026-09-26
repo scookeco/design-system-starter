@@ -1,0 +1,53 @@
+@layer components {
+  /* 1. block */
+  .toggle {
+    --toggle-height: var(--size-control-md);
+
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-gap-xs);
+    min-block-size: var(--toggle-height);
+    min-inline-size: var(--toggle-height);
+    padding-block: 0;
+    padding-inline: var(--space-inset-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-fg-muted);
+    font: var(--text-label);
+    white-space: nowrap;
+    cursor: pointer;
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  /* 2. variants */
+  .toggle[data-size="sm"] {
+    --toggle-height: var(--size-control-sm);
+  }
+
+  .toggle[data-icon-only="true"] {
+    padding-inline: 0;
+  }
+
+  /* 3. states. Pressed: filled, strong border and heavier text, not colour alone. */
+  .toggle:disabled {
+    color: var(--color-fg-disabled);
+    cursor: not-allowed;
+  }
+
+  .toggle:hover:not(:disabled) {
+    background: var(--color-bg-hover);
+    color: var(--color-fg-default);
+  }
+
+  .toggle[aria-pressed="true"] {
+    border-color: var(--color-border-strong);
+    background: var(--color-bg-selected);
+    color: var(--color-fg-default);
+    font-weight: var(--font-weight-strong);
+  }
+}

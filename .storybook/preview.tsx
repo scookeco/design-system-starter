@@ -182,9 +182,9 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundations',
-          ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Elevation and motion', 'Icons'],
+          ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Breakpoints and layout grid', 'Elevation and motion', 'Layers', 'Focus and target size', 'Icons'],
           'Guides',
-          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Data', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Escape hatches', 'Agents'],
+          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Data', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Forms', 'Motion', 'Theming and adding a brand', 'Escape hatches', 'Contributing and versioning', 'Testing', 'Agents'],
           'Components',
           'Primitives',
           'Layouts',

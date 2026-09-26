@@ -54,7 +54,7 @@ scripts/eslint/         local ESLint rules (drag-needs-alternative)
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
 src/tokens/token-usage.json  generated: tokens read by each component, primitive and layout (schema beside it)
-src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame
+src/primitives/         Stack, Cluster, Grid, Center, Sidebar, Switcher, Cover, Frame, Box, Reel, Imposter, VisuallyHidden
 src/components/         the components; the only place (with primitives) Radix is imported
 src/layouts/            AppShell (every signed-in page), PageLayout (a page's nav · main · aside), AuthLayout (signed out), FocusedLayout (multi-step tasks)
 src/format/             locale formatting over Intl: LocaleProvider, useFormat (part of the system; no dependencies)
@@ -105,6 +105,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Sign-in works with a password manager and paste; wizards never ask twice (3.3.8, 3.3.7) | Vitest audits on the sign-in and wizard examples, with negative controls | `tests/unit/wcag22.test.tsx` |
 | Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
+| Links in the docs lead somewhere: every `StoryLink` and story id in `docs/` names a story or Docs tab that exists | Vitest: ids computed from every CSF file with Storybook's csf-tools, with negative controls | `tests/unit/story-links.test.ts`, `scripts/checks/story-links.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
 | The library stays small, and one import doesn't pull in the rest | size-limit budgets; tree-shaking check per exported unit | `.size-limit.json`, `scripts/check-tree-shaking.ts` |
 | Agents know the rules | UI rules block, extracted between markers into `llms.txt` and the manifest | `CLAUDE.md` |
@@ -142,7 +143,7 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 13.25 kB | `dist/index.js`, everything exported |
+| Library JS | 16.35 kB | `dist/index.js`, everything exported |
 | Library CSS | 11.5 kB | `dist/styles.css` |
 | One component | 1.5 kB | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
@@ -161,12 +162,12 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 | Layouts | `AppShell`: skip link, sidebar (brand + `Nav`) that collapses to a remembered icon rail, header (breadcrumbs, actions, help in the same place on every page, account menu), `main` as the only scrolling region, optional sticky action bar (focus scrolls clear of it), toast region; below `size.breakpoint.md` the nav opens in a `Drawer`. `PageLayout`: a page's section nav, main column and named aside, stacking below `size.breakpoint.sm`. `AuthLayout`: brand, one centred card and a footer for signed-out pages. `FocusedLayout`: a task header with an exit, one column and a sticky action bar for wizards. |
 | Page structure | `PageHeader` (the page's h1, status, description, actions) |
 | Navigation | `Nav` (grouped, `aria-current`, icon rail), `NavTabs` (sections as routes), `Breadcrumbs`, `Tabs` (panels in place), `Link` and `LinkProvider` (router adapter), `Pagination`, `Stepper`, `Menu` |
-| Actions | `Button`, `Menu`, `SegmentedControl` |
-| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch` (all share the `Field` anatomy and take an `id` for error-summary links) |
-| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Heading`, `Text` |
+| Actions | `Button`, `Menu`, `SegmentedControl`, `Toggle`, `CopyButton` |
+| Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links) |
+| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text` |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
-| Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip` |
-| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame` |
+| Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip`, `HoverCard` |
+| Layout primitives | `Stack`, `Cluster`, `Grid`, `Center`, `Sidebar`, `Switcher`, `Cover`, `Frame`, `Box`, `Reel`, `Imposter`, `VisuallyHidden` |
 | Formatting | `LocaleProvider` (locale and time zone), `useFormat()` (date, time, relative time, number, percent, compact, money from integer minor units, list, file size), `createFormatter`, `currencyDigits` |
 
 ## Which example to copy
@@ -235,8 +236,8 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 
 | Section | Where | What |
 |---|---|---|
-| **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, elevation and motion, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, escape hatches, agents (how coding agents use the generated files). |
+| **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, breakpoints and layout grid, elevation and motion, layers (which units use each z tier, from the token usage map), focus and target size, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
+| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, motion, theming and adding a brand, escape hatches, contributing and versioning, testing, and agents (how coding agents use llms.txt and the manifest). |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.

@@ -81,7 +81,7 @@ function Accessibility() {
             <>Component behaviour (names, states, keyboard): component tests.</>,
             <>Automated checks find about a third of issues. Before shipping a new flow, use it with the keyboard only and with a screen reader.</>,
             <>
-              What each check covers, what needs a person and how to run them: <StoryLink id="guides-accessibility-conformance--accessibility-conformance">Accessibility conformance</StoryLink>.
+              What each check covers, what needs a person and how to run them: <StoryLink id="guides-accessibility-conformance--accessibility-conformance-guide">Accessibility conformance</StoryLink>.
             </>,
           ]}
         />

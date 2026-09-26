@@ -50,14 +50,19 @@ UI rules (design system v0)
 - [Getting started](docs/guides/GettingStarted.stories.tsx): Five steps: bring the system in, load its styles once, render every…
 - [Principles](docs/guides/Principles.stories.tsx): Three rules the whole system is built around.
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Before building anything new, walk the ladder from the top and stop…
-- [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eight layout primitives arrange everything…
+- [Layout](docs/guides/Layout.stories.tsx): Four layouts frame a page; eleven layout primitives arrange…
 - [Page archetypes](docs/guides/PageArchetypes.stories.tsx): Most pages are one of a few archetypes.
 - [Data](docs/guides/Data.stories.tsx): The design system draws; the app layer knows.
 - [Accessibility](docs/guides/Accessibility.stories.tsx): The target is WCAG 2.2 AA.
 - [Accessibility conformance](docs/guides/AccessibilityConformance.stories.tsx): What the build checks against WCAG 2.2 AA, what it can’t, and how to…
 - [Accessibility statement](docs/guides/AccessibilityStatement.stories.tsx): A template for the statement a product publishes about its…
 - [Content](docs/guides/Content.stories.tsx): Plain, specific and calm.
+- [Forms](docs/guides/Forms.stories.tsx): Forms are among the most settled patterns in software, and breaking…
+- [Motion](docs/guides/Motion.stories.tsx): Motion gives feedback and shows where something came from.
+- [Theming and adding a brand](docs/guides/Theming.stories.tsx): Every alternate look (dark mode, a rebrand, a customer’s colours) is…
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): Every system component and primitive takes UNSAFE_className and…
+- [Contributing and versioning](docs/guides/Contributing.stories.tsx): Anything new starts as a proposal on the decision ladder, lands in…
+- [Testing](docs/guides/Testing.stories.tsx): The gallery is the test fixture.
 - [Agents](docs/guides/Agents.stories.tsx): Coding agents read the system from three files at the repo root…
 
 ## Foundations
@@ -66,7 +71,10 @@ UI rules (design system v0)
 - [Data visualisation](docs/foundations/DataVisualisation.stories.tsx): Colours for chart marks: a categorical palette for series, a…
 - [Typography](docs/foundations/Typography.stories.tsx): Named text styles, each a complete font shorthand.
 - [Spacing, sizing and radius](docs/foundations/SpacingSizingRadius.stories.tsx): Every length in the system comes from these scales.
+- [Breakpoints and layout grid](docs/foundations/BreakpointsLayoutGrid.stories.tsx): Layouts respond to the space they are given, not to the device.
 - [Elevation and motion](docs/foundations/ElevationMotion.stories.tsx): Shadows say how far a surface floats; stacking tokens say what sits…
+- [Layers](docs/foundations/Layers.stories.tsx): Seven stacking tiers, lowest first.
+- [Focus and target size](docs/foundations/FocusTargetSize.stories.tsx): Keyboard users need to see where they are; pointer and touch users…
 - [Icons](docs/foundations/Icons.stories.tsx): A small, closed set drawn on one 20-unit grid with one stroke token.
 
 ## Components
@@ -78,10 +86,15 @@ UI rules (design system v0)
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
+- [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
+- [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
@@ -96,6 +109,7 @@ UI rules (design system v0)
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
+- [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
@@ -106,19 +120,25 @@ UI rules (design system v0)
 - [Text](docs/usage/Text.usage.tsx): Running text, descriptions and metadata
 - [TextField](docs/usage/TextField.usage.tsx): Short free text: names, emails, amounts, search, passwords
 - [Textarea](docs/usage/Textarea.usage.tsx): Multi-line text
+- [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
+- [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
 
 ## Primitives
 
+- [Box](docs/usage/Box.usage.tsx): Padding around content, from the inset scale
 - [Center](docs/usage/Center.usage.tsx): Horizontally centred column with a bounded measure
 - [Cluster](docs/usage/Cluster.usage.tsx): Horizontal group that wraps gracefully
 - [Cover](docs/usage/Cover.usage.tsx): Vertically centres its content in the available block size
 - [Frame](docs/usage/Frame.usage.tsx): Holds media to a fixed aspect ratio and crops it to fill
 - [Grid](docs/usage/Grid.usage.tsx): Auto-fit card grid
+- [Imposter](docs/usage/Imposter.usage.tsx): Positions an overlay over the centre of its container
+- [Reel](docs/usage/Reel.usage.tsx): A single row that scrolls sideways
 - [Sidebar](docs/usage/Sidebar.usage.tsx): Side region beside main content
 - [Stack](docs/usage/Stack.usage.tsx): Vertical flow with consistent spacing
 - [Switcher](docs/usage/Switcher.usage.tsx): A row of equal items that becomes a column, all at once
+- [VisuallyHidden](docs/usage/VisuallyHidden.usage.tsx): Content that screen readers announce but the screen doesn't…
 
 ## Layouts
 

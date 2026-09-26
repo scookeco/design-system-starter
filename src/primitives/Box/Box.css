@@ -1,0 +1,10 @@
+@layer primitives {
+  .box {
+    --box-padding-block: var(--space-inset-md);
+    --box-padding-inline: var(--space-inset-md);
+
+    min-inline-size: 0;
+    padding-block: var(--box-padding-block);
+    padding-inline: var(--box-padding-inline);
+  }
+}
