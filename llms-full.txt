@@ -1964,7 +1964,7 @@ Signature: `(keys: string, platform?: KeyPlatform) => string`
 - Showing a shortcut isn’t announcing it: `Tooltip shortcut` and `MenuItem.shortcut` also set `aria-keyshortcuts` on the control.
 - A hint with keys needs a pointer path too: a visible button for the same action. Single-key shortcuts can be turned off (WCAG 2.2 SC 2.1.4) in the shortcuts overlay.
 
-Stories: `components-kbd--mac`, `components-kbd--windows-and-linux`, `components-kbd--shift-chord`, `components-kbd--single-key`, `components-kbd--sequence`, `components-kbd--named-keys`, `components-kbd--key-by-name`, `components-kbd--combination`.
+Stories: `components-kbd--mac`, `components-kbd--windows-and-linux`, `components-kbd--shift-chord`, `components-kbd--single-key`, `components-kbd--single-key-shortcut`, `components-kbd--sequence`, `components-kbd--named-keys`, `components-kbd--combination`, `components-kbd--combination-in-notation`.
 Tokens read: `color.bg.surface`, `color.border.strong`, `color.fg.default`, `radius.indicator`, `size.icon.sm`, `space.gap.2xs`, `space.inset.2xs`, `text.caption`, `text.code`.
 
 ### Link

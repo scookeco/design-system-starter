@@ -8513,6 +8513,10 @@
             "name": "Single Key"
           },
           {
+            "id": "components-kbd--single-key-shortcut",
+            "name": "Single Key Shortcut"
+          },
+          {
             "id": "components-kbd--sequence",
             "name": "Sequence"
           },
@@ -8521,12 +8525,12 @@
             "name": "Named Keys"
           },
           {
-            "id": "components-kbd--key-by-name",
-            "name": "Key By Name"
-          },
-          {
             "id": "components-kbd--combination",
             "name": "Combination"
+          },
+          {
+            "id": "components-kbd--combination-in-notation",
+            "name": "Combination In Notation"
           }
         ],
         "composes": [],
