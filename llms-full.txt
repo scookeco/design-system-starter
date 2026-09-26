@@ -157,8 +157,10 @@ UI rules (design system v0)
 
 ## Examples
 
+- [App](src/examples/App.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
+- [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
 - [List page](src/examples/ListPage.tsx)
 - [Record page](src/examples/RecordPage.tsx)
@@ -4251,14 +4253,16 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 
 | Archetype | Choose when | Copy | It shows |
 |---|---|---|---|
-| List / index | Users come to find, compare or act on many records: records, people, invoices, an audit log. | [List page](src/examples/ListPage.tsx)`src/examples/ListPage.tsx` | PageHeader with one primary action, view tabs with server counts, SearchField and a Filters popover with removable chips, a sortable table, Pagination; view, search, filters, sort and page in the URL; row selection with “Select all N matching” and a bulk bar; loading, first use, no results and load error states. |
+| List / index | Users come to find, compare or act on many records: records, people, invoices, an audit log. | [List page](src/examples/ListPage.tsx)`src/examples/ListPage.tsx` | PageHeader with one primary action, saved views (save, rename, default, delete; “Modified”), view tabs with server counts, SearchField, a Filters popover with removable chips and a Columns popover, a Table · Board switch over one query (the board keyboard-operable, with a Move to… menu), Pagination; everything in the URL; row selection with “Select all N matching” and a bulk bar; actions disabled with a reason per role; loading, first use, no results and load error states. |
 | Record / detail | One record is the subject: its status, properties, activity and the actions on it. | [Record page](src/examples/RecordPage.tsx)`src/examples/RecordPage.tsx` | Breadcrumb, PageHeader with status and a “More” menu, NavTabs for Overview · Activity · Files, a properties aside rendered from the field registry; an optimistic rename with rollback and a conflict banner, a pessimistic archive. |
 | Create and edit | Someone fills in a record: a full page for heavy records, a quick-create dialog for light ones. | [Create and edit](src/examples/CreateEditFlow.tsx)`src/examples/CreateEditFlow.tsx` | Errors on blur and submit, a focused error summary linking to fields, registry-rendered fields, a pending submit in the sticky action bar, a create that is safe to retry (idempotency key). |
+| Entity list, record and form (schema-driven) | A second or third entity (accounts, people, vendors) whose pages fit the list, record and form archetypes: write its config, not its pages. | [Entity pages](src/examples/EntityPages.tsx)`src/examples/EntityPages.tsx` | List, record and form rendered from an entity config (src/app/registries/entities.ts) through the field registry: a properties rail, the records that point at it by id with rollups, Edit disabled with a reason, create and edit with a focused error summary. |
+| The app and its routes | Wiring pages together: which page a URL opens, who may open it, and what an unknown URL shows. | [App](src/examples/App.tsx)`src/examples/App.tsx` | The route table (path → layout + page + guard), lazy pages, LinkProvider with the app’s router link, a 403 page from the guard and the 404 fallback. |
 | Settings | Personal or workspace preferences, grouped by category. | [Settings page](src/examples/SettingsPage.tsx)`src/examples/SettingsPage.tsx` | A grouped sub-nav in PageLayout’s nav slot, one card per category with its own Save, a success banner. |
 | Sign-in (signed out) | Any signed-out page: sign-in, sign-up, password reset, a verification code. | [Sign in](src/examples/SignInPage.tsx)`src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step. |
 | Wizard | A task whose later steps depend on earlier ones: first-run setup, a multi-step create. | [Setup wizard](src/examples/SetupWizard.tsx)`src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit. |
 | Dashboard | A home or overview page: how things are, and what needs attention. | [Dashboard](src/examples/DashboardPage.tsx)`src/examples/DashboardPage.tsx` | A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table. |
-| Error and 404 | A page that doesn’t exist (inside the shell), or a failure before the app can load (in AuthLayout). | [Error pages](src/examples/ErrorPages.tsx)`src/examples/ErrorPages.tsx` | EmptyState as the h1, plain words, Try again and a way home. |
+| Error and 404 | A page that doesn’t exist (inside the shell), or a failure before the app can load (in AuthLayout). | [Error pages](src/examples/ErrorPages.tsx)`src/examples/ErrorPages.tsx` | EmptyState as the h1, plain words, Try again and a way home; a 403 page for a route the role can’t open, saying who can change that. |
 
 #### How to copy one
 
@@ -4267,6 +4271,8 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 - Read and write through the app layer, as the list, record and create examples do: queries and named mutations from `src/app/model`, never a fetch in a page. See the Data guide.
 - Map domain statuses to badge tones in one place (`src/app/model/status.ts`), and define each “what counts as X” as one named predicate.
 - Format every number, date and amount with `useFormat()`; never by hand.
+- A new page is a row in the route table (`src/examples/routes.tsx`) with the capability that guards it. A new entity that fits the list, record and form archetypes is an entry in `src/app/registries/entities.ts`, not three new pages.
+- Ask `can` (through `useCan` or `usePermission`) before showing an action: disable page and bar actions with the reason beside them, hide overflow-menu items and card actions. The mutation and the server refuse as well.
 - A page that fits no archetype is rare. Check the list again, then raise it: it may need a new golden example, not a one-off.
 
 <!-- docs/guides/Data.stories.tsx -->
@@ -4286,9 +4292,12 @@ The design system draws; the app layer knows. Everything about fetching, caching
 tokens → primitives → components → layouts        the design system (src/index.ts)
                                          ↑
 src/app   api/        the client and zod schemas: every response is parsed at the boundary
-          model/      cache keys, queries, named predicates, projections, mutations, selection
+          model/      cache keys, queries, named predicates, projections, mutations, selection,
+                      permissions (the role → capability mapping and the one predicate, can)
+          session.tsx the session: memberships, the active workspace, switch, sign out
+          routing/    the route entry type, the matcher, RouteView and AppLink
           url/        useUrlState and the list page's URL codec
-          registries/ the field registry and which fields a record has
+          registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
                                          ↑
 src/examples          golden pages: compose the system, read and write through src/app
@@ -4297,10 +4306,59 @@ src/examples          golden pages: compose the system, read and write through s
 #### The cache model
 
 - One server cache (TanStack Query), chosen on purpose: this is server-driven CRUD with server-side search, filter, sort and paging. A normalized store would earn its cost only if many views edited the same entities at once.
-- Keys are `[tenant, resource, params]`: `['acme', 'records', { view, q, status, sort, page }]`, `['acme', 'record', { id }]`. The tenant leads every key and every request path, so one workspace’s data can never answer for another’s, and invalidation can be as narrow as one resource in one tenant.
-- A query cache doesn’t normalize: patching a record doesn’t update a list that contains it. That’s why each mutation says which lists and counts it invalidates (below).
+- Keys are `[tenant, scope, resource, params]`: `['acme', 'admin', 'records', { view, q, status, sort, page }]`, `['acme', 'admin', 'record', { id }]`. The partition (the workspace, then the permission scope the server answered for) leads every key, so one workspace’s data can never answer for another’s, a viewer never reads what an admin cached, and invalidation can be as narrow as one resource in one partition.
+- A query cache doesn’t normalize: a record also lives inside every cached list page that holds it. So a record write patches the detail *and* every listed copy (`patchListedRecord`, one `setQueriesData` over the lists prefix), then invalidates what the patch can’t know (membership, order, totals). A test holds every list request open and still sees the edit in the mounted list and in an unmounted page of another tab.
 - Only trusted data enters the cache. Every response is parsed with a zod schema in `src/app/api/client.ts`. A payload that breaks the contract is reported and becomes the page’s error state; it never reaches the cache (see [the invalid payload story](src/examples/ListPage.tsx)).
 - Views are projections, never copies: rows are `toRow(record)`. “What counts as open” is one predicate, `isOpen`. The Open tab, its count, the filter options, the badges, the bulk-delete guard (`canDelete`) and the mock server all call the same functions, so they can’t disagree.
+
+#### Entities and joins
+
+- Three entities: records, accounts and people. A record holds `ownerId` and `accountId`, never a copy of a name. Accounts and people are reference data, loaded whole into one directory query each.
+- Every name on screen is joined by id at render: `PersonRef` and `AccountRef` (and the registry’s `person` and `account` field types) read the directory. Rename an account once and every row, card and property that shows it changes, with no list touched.
+- The server joins too: search matches the owner’s name, looked up by id before the one `matchesSearch` predicate runs, so client and server still agree about what matches.
+- A related-entity section is a join projection: an account’s page lists `useRecordList({ account: id })`, through the same `toRow`, with rollups from the same counts as the tabs. Navigation goes both ways by id.
+
+#### One projection, many surfaces
+
+- The list’s table and board are two surfaces over one query and one projection. The board groups the same rows by per-status predicates (`toBoard`, `hasStatus`); its columns are the statuses the tab’s predicate lets through, narrowed by the status filter; its column totals are per-status counts the server returns beside the tab counts.
+- The display is URL state (`display=board`), pushed so Back returns to the table. A new surface (a calendar, a timeline) is a new entry in `DISPLAYS` and a component, never a page with its own store.
+- Every card has a Move to… menu, so the board works from the keyboard. Dragging a card onto a column does the same, and declares the menu as its alternative (`data-drag-alternative`, enforced by ESLint).
+
+#### Permissions
+
+```
+role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabilities ──▶ can(grant, capability, subject?)
+                                                                              ├─ control: shown / disabled with the reason
+                                                                              ├─ route guard: page / 403 page
+                                                                              ├─ mutation: sends / refuses (403) without a request
+                                                                              └─ mock server: 200 / 403, whatever the client did
+```
+
+**Roles**
+
+| Role | Holds | In the examples |
+|---|---|---|
+| Viewer | workspace:read, record:read, account:read | Records minus drafts (filtered in the query); no New record, no Move to…, no Rename or Archive |
+| Editor | Viewer’s, plus record:read-drafts, record:create, rename, move, archive, account:create, people:create | Everything; Delete disabled (“Only workspace admins can delete records.”), account Edit disabled |
+| Admin | Editor’s, plus workspace:manage, record:delete, account:edit | Everything |
+
+- Capabilities are `resource:action` strings. Roles map to them in exactly one place, and the session carries each membership’s capabilities as the server derived them. The client never decides anything from a role name.
+- `can` checks the capability, then the object rule for the thing acted on (an archived record can’t be renamed; one on legal hold can’t be deleted), from the same named predicates as everything else.
+- One rule per context: page and bar actions are disabled, with the reason as visible text they point at (`aria-describedby`); overflow-menu items and card actions are hidden; a route the role can’t open renders the 403 page. Never a silent redirect.
+- Roles shape projections too: a viewer’s lists have no drafts, filtered by the server in the query, so pages and totals stay honest. The Drafts tab needs `record:read-drafts`.
+- The gallery’s **Role** toolbar switches between viewer, editor and admin (default admin). A story that sets `mockApi({ role })` wins, and the visual suite pins `role:admin`. See [the viewer’s list](src/examples/ListPage.tsx) and [a forced 403](src/examples/RecordPage.tsx).
+
+#### Workspace and session boundaries
+
+- **Switch workspace** (the account menu): in-flight reads of the old workspace are cancelled, its confirmed data stays under its own keys, and the page remounts, so selections and drafts stay behind. A late answer never reaches the new screen.
+- **Permission change** (a new session, or `refreshSession` after a 403): the old scope’s partition is dropped, and a list never keeps the previous page on screen across partitions (`keepPreviousData` would otherwise show an admin’s rows to a viewer until the viewer’s arrived).
+- **Sign out**: every query and mutation is cancelled and the whole cache cleared before the signed-out screen renders. The server ends the session; every later request is a 401.
+
+#### Routes
+
+- The route table is the master registry: `path → layout + page + guard` (`src/examples/routes.tsx`). A route without a capability doesn’t compile, and a test checks every route has one.
+- Pages are lazy, one chunk per route. The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
+- An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (`LinkProvider` with `AppLink`), so every Link, Nav, NavTabs and Breadcrumbs routes in place.
 
 #### Where state lives
 
@@ -4325,11 +4383,15 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 
 | Mutation | Presents | Patches | Invalidates | On failure |
 |---|---|---|---|---|
-| `renameRecord` | Optimistic | The record, at once; rolled back on failure unless a newer write landed | The record, every list (counts can’t change) | Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload |
-| `archiveRecord` | Pessimistic | The record, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
+| `renameRecord` | Optimistic | The record and every cached list page holding it, at once; both rolled back on failure unless a newer write landed | The record, every list (counts can’t change) | Old name back, a toast that stays, the typed name kept; a 409 shows a Banner with Reload; a 403 refreshes the session |
+| `moveRecord` | Pessimistic | The record and every listed copy, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
+| `archiveRecord` | Pessimistic | The record and every listed copy, with the server’s answer | Every list and count | Nothing changed; a toast that stays |
 | `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count | The draft stays; a retry sends the same key, so no duplicate |
 | `bulkDeleteRecords` | Pessimistic, confirmed | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
 | `addPerson` | Pessimistic | Appends to people | People | The dialog stays open with an error |
+| `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory | The form stays, with a banner |
+| `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | Nothing else: records hold its id, so every row re-renders from the directory | A banner; a 409 says someone else changed it |
+| `saveView · updateView · deleteView` | Pessimistic | The person’s views (the default moves on update) | Views | The dialog stays open with the server’s reason |
 
 - An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
 - Edits send the version they were based on. The server answers `409` if someone changed the record since, and the page says so instead of silently overwriting their change.
@@ -4346,9 +4408,16 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 
 #### Registries: fields as config
 
+- `src/app/registries/entities.ts` maps each entity type to its fields: list columns, record properties, related records, and its create and edit form. Generic list, record and form pages (`src/examples/EntityPages.tsx`) render any entry, so accounts and people have no hand-built pages.
 - `src/app/registries/fields.tsx` maps each field type (`text`, `money`, `date`, `status`, `person`, `tags`) to how it displays and how it edits. `RECORD_PROPERTIES` drives the record page’s properties; `CREATE_FIELDS` drives the create form. One registry, two surfaces.
 - A new field is one line of config. A new field type is one registry entry: the registry is keyed on the type union, so a missing entry fails to compile.
 - Data can still be newer than the code. A field whose type has no entry renders “Not available” and is reported once. It never throws.
+
+#### Saved views
+
+- A saved view is config: the tab, search, status filter, sort, visible columns and display, the same state the URL already holds. The mock API stores views per person per workspace, with one default each.
+- The URL stays the truth. Choosing a view pushes its config and `saved=<id>`; changing anything after that shows “Modified” until it’s saved into the view or saved as a new one.
+- The default view applies only when the list opens with nothing in its URL, with replace: a shared link always wins, and Back never returns to the bare URL.
 
 #### The mock API and the gallery
 
@@ -4372,11 +4441,13 @@ export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=
 
 #### Adding an entity
 
-- Its schema in `src/app/api/schemas.ts`, and its endpoints (the tenant first) beside the record ones.
-- Its predicates and status map in `src/app/model`; its projections for lists.
-- Its keys, queries and named mutations, each mutation with its row in the matrix above.
-- Its field definitions for the record page and the form; registry entries only for genuinely new field types.
-- Its URL codec if it has a list; mock handlers and seed data so its stories and tests run.
+- Its schema in `src/app/api/schemas.ts`, and its endpoints (the tenant first) in their own file in `api/`.
+- References to other entities as ids, displayed through a ref component or a ref field type: never a copied name.
+- Its predicates in `src/app/model`; its projections for lists.
+- Its keys (under the partition), queries and named mutations, each mutation with its row in the matrix above, refusing without its capability.
+- Its capabilities in `CAPABILITIES`, their roles in `ROLE_CAPABILITIES`, and the same capability on its mock routes.
+- Its entry in `entities.ts` (fields, related records, form) and its rows in the route table, each with a guard.
+- Mock handlers and seed data (from its own PRNG stream) so its stories and tests run.
 
 <!-- docs/guides/Accessibility.stories.tsx -->
 

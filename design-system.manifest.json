@@ -233,6 +233,17 @@
   ],
   "examples": [
     {
+      "title": "App",
+      "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
+      "path": "src/examples/App.tsx",
+      "stories": [
+        "examples-app--records",
+        "examples-app--record-from-link",
+        "examples-app--unknown-path",
+        "examples-app--guarded-route"
+      ]
+    },
+    {
       "title": "Create and edit",
       "summary": "The create & edit archetype, both rungs of the friction ladder.",
       "path": "src/examples/CreateEditFlow.tsx",
@@ -243,7 +254,8 @@
         "examples-create-and-edit--submitting",
         "examples-create-and-edit--created",
         "examples-create-and-edit--create-failed",
-        "examples-create-and-edit--quick-create-open"
+        "examples-create-and-edit--quick-create-open",
+        "examples-create-and-edit--as-viewer-denied"
       ]
     },
     {
@@ -257,12 +269,28 @@
       ]
     },
     {
+      "title": "Entity pages",
+      "summary": "Schema-driven list, record and form pages. One page per archetype for EVERY entity in src/app/registries/entities.ts: the config says which fields exist, the field registry says how each one displays and edits, and these pages only arrange them. Accounts and people get all their pages this way; a new entity that fits them is config, not a new page.",
+      "path": "src/examples/EntityPages.tsx",
+      "stories": [
+        "examples-entity-pages--accounts-list",
+        "examples-entity-pages--account-record",
+        "examples-entity-pages--account-record-as-editor",
+        "examples-entity-pages--new-account",
+        "examples-entity-pages--new-account-invalid",
+        "examples-entity-pages--edit-account",
+        "examples-entity-pages--people-list",
+        "examples-entity-pages--person-record"
+      ]
+    },
+    {
       "title": "Error pages",
       "summary": "Error pages.",
       "path": "src/examples/ErrorPages.tsx",
       "stories": [
         "examples-error-pages--not-found",
-        "examples-error-pages--server-error"
+        "examples-error-pages--server-error",
+        "examples-error-pages--forbidden"
       ]
     },
     {
@@ -282,11 +310,20 @@
         "examples-list-page--second-page",
         "examples-list-page--opened-from-link",
         "examples-list-page--other-tenant",
+        "examples-list-page--board",
+        "examples-list-page--board-filtered",
         "examples-list-page--rows-selected",
         "examples-list-page--all-matching-selected",
         "examples-list-page--bulk-delete-confirm",
         "examples-list-page--bulk-delete-pending",
-        "examples-list-page--bulk-delete-partial-failure"
+        "examples-list-page--bulk-delete-partial-failure",
+        "examples-list-page--as-viewer",
+        "examples-list-page--as-viewer-board",
+        "examples-list-page--as-editor-with-selection",
+        "examples-list-page--saved-view-chosen",
+        "examples-list-page--saved-view-modified",
+        "examples-list-page--save-view-dialog",
+        "examples-list-page--columns-chosen"
       ]
     },
     {
@@ -304,7 +341,10 @@
         "examples-record-page--rename-succeeded",
         "examples-record-page--rename-failed-rolled-back",
         "examples-record-page--rename-conflict",
-        "examples-record-page--archive-pending"
+        "examples-record-page--archive-pending",
+        "examples-record-page--as-viewer-more-actions",
+        "examples-record-page--as-editor-more-actions",
+        "examples-record-page--rename-forbidden"
       ]
     },
     {
@@ -1715,6 +1755,7 @@
             "home",
             "file",
             "users",
+            "building",
             "settings",
             "trend-up",
             "trend-down",
@@ -5133,6 +5174,7 @@
         "home",
         "file",
         "users",
+        "building",
         "settings",
         "trend-up",
         "trend-down",
@@ -11298,6 +11340,7 @@
             "home",
             "file",
             "users",
+            "building",
             "settings",
             "trend-up",
             "trend-down",

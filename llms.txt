@@ -157,8 +157,10 @@ UI rules (design system v0)
 
 ## Examples
 
+- [App](src/examples/App.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
+- [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
 - [List page](src/examples/ListPage.tsx)
 - [Record page](src/examples/RecordPage.tsx)
