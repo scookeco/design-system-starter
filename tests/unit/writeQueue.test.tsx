@@ -170,3 +170,21 @@ describe('per-record write queue', () => {
     await waitFor(() => expect(result.current).toEqual([]));
   });
 });
+
+describe('a move decided from a snapshot (asRead)', () => {
+  it('an assistant’s stale proposal gets a 409, even after a live update refreshed the cache', async () => {
+    const { useApplyProposal } = await import('../../src/app/model/ai');
+    const client = testClient();
+    client.setQueryData(recordKeys.detail(ACME, ID), original);
+    const { result } = renderHook(() => useApplyProposal(), { wrapper: wrapperFor(client) });
+    // Someone else edits the record after the proposal was made, and the cache hears about it.
+    anotherUser('acme', { kind: 'edit', id: ID, changes: { name: 'Edited elsewhere' }, silent: true });
+    act(() => reconcileLiveEvent(client, ACME, { type: 'record.updated', record: onServer(), by: OTHER_PERSON.acme }, 'u-sam'));
+    const target = original.status === 'pending' ? 'active' : 'pending';
+    const outcome = await act(() =>
+      result.current.apply.mutateAsync({ ids: [ID], moves: [{ recordId: ID, name: original.name, before: original.status, after: target, version: original.version, reason: '' }] }),
+    );
+    expect(outcome.outcomes[ID]).toEqual({ ok: false, reason: 'someone else changed it first' });
+    expect(onServer().status).toBe(original.status);
+  });
+});

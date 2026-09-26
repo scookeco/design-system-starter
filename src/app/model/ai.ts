@@ -359,8 +359,9 @@ export type MoveOutcome = { ok: true } | { ok: false; reason: string };
 
 /**
  * Apply an accepted proposal, and undo it. The assistant gets no write path of its own: each change
- * goes through moveRecord, so it is refused with `can` before sending, checked again by the
- * server, versioned (a stale proposal gets a 409), and patches and invalidates like a board move.
+ * goes through moveRecord (and so the record's write queue), so it is refused with `can` before
+ * sending, checked again by the server, versioned against the version the proposal was made from
+ * (`asRead`: a stale proposal gets a 409, even if a live update already refreshed the cache), and patches and invalidates like a board move.
  * One change failing doesn't stop the rest; each reports its own outcome.
  */
 export function useApplyProposal() {
@@ -373,7 +374,7 @@ export function useApplyProposal() {
         const proposed = moves.find((m) => m.recordId === id);
         if (!proposed) continue;
         try {
-          const moved = await move.mutateAsync({ record: { id, version: proposed.version }, status: proposed.after });
+          const moved = await move.mutateAsync({ record: { id, version: proposed.version }, status: proposed.after, asRead: true });
           outcomes[id] = { ok: true };
           if (proposed.before !== 'archived') applied.push({ id, before: proposed.before, version: moved.version });
         } catch (error) {
@@ -387,7 +388,7 @@ export function useApplyProposal() {
     mutationFn: async (applied: readonly AppliedMove[]) => {
       const failed: string[] = [];
       for (const record of applied) {
-        await move.mutateAsync({ record: { id: record.id, version: record.version }, status: record.before }).catch(() => failed.push(record.id));
+        await move.mutateAsync({ record: { id: record.id, version: record.version }, status: record.before, asRead: true }).catch(() => failed.push(record.id));
       }
       return { failed };
     },

@@ -187,11 +187,16 @@ export function useMoveRecord() {
   const client = useQueryClient();
   return useMutation({
     mutationKey: [...partition, 'moveRecord'],
-    mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => {
+    /**
+     * `asRead`: send the version on `record` as If-Match, not the latest confirmed one. For a move
+     * decided from a snapshot (an assistant's proposal): if the record changed since it was read, the
+     * server refuses with a 409 instead of the move landing on a record nobody reviewed.
+     */
+    mutationFn: ({ record, status, asRead = false }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus; asRead?: boolean }) => {
       refuseUnless(grant, 'record:move', client.getQueryData<RecordEntity>(recordKeys.detail(partition, record.id)));
       return writeQueues(client).enqueue(partition, record.id, {
         label: 'Moving…',
-        send: (latest) => postStatus(tenant, record.id, status, latest),
+        send: (latest) => postStatus(tenant, record.id, status, asRead ? record.version : latest),
         fallbackVersion: record.version,
       });
     },
