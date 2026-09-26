@@ -7,7 +7,7 @@
  *   record   deleted elsewhere: the page says so instead of acting on a record that's gone.
  */
 import { Button, Center, Cluster, EmptyState, Link, Text, useFormat, type Formatter } from '../index';
-import { useLiveActivity, useShowNewRecords } from '../app/model/live';
+import { useLiveActivity, useShowNewRecords, type LiveActivity } from '../app/model/live';
 import { usePersonName } from '../app/registries/refs';
 
 /** "just now" inside a minute (the clock may not have moved at all), then the locale's relative time. */
@@ -15,8 +15,14 @@ export const updatedAgo = (format: Formatter, at: number, now = Date.now()) => (
 
 /** Above a list's rows: what arrived since it was fetched. Renders nothing until something has. */
 export function LiveListNotice() {
-  const format = useFormat();
   const activity = useLiveActivity();
+  // Nothing has arrived: render nothing, and subscribe to nothing more (the list's own render is untouched).
+  if (activity.newIds.length === 0 && activity.lastAt === undefined) return null;
+  return <LiveListNoticeContent activity={activity} />;
+}
+
+function LiveListNoticeContent({ activity }: { activity: LiveActivity }) {
+  const format = useFormat();
   const showNew = useShowNewRecords();
   const by = usePersonName(activity.lastBy ?? '');
   const count = activity.newIds.length;
