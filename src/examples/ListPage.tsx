@@ -713,8 +713,8 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone, onJobSta
         {
           onSuccess: () => {
             setConfirmOpen(false);
+            // No toast: the job's banner above the list announces it at once and stays with its progress.
             onJobStarted();
-            toast({ title: `Deleting ${records}`, description: 'It runs in the background: follow it above the list, or under Jobs on any page.', tone: 'info' });
           },
           onError: () => {
             setConfirmOpen(false);

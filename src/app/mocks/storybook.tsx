@@ -86,17 +86,38 @@ const TOOLBAR_CHANGES = ['edit', 'add', 'delete'] as const;
 type ToolbarChange = (typeof TOOLBAR_CHANGES)[number];
 const isToolbarChange = (value: unknown): value is ToolbarChange => (TOOLBAR_CHANGES as readonly unknown[]).includes(value);
 
-function ToolbarChanges({ tenant, history, pushed, onPushed }: { tenant: Tenant; history: MemoryHistory; pushed: unknown; onPushed: () => void }) {
+function ToolbarChanges({ client, tenant, history, pushed, onPushed }: { client: QueryClientType; tenant: Tenant; history: MemoryHistory; pushed: unknown; onPushed: () => void }) {
   const push = useEffectEvent((change: ToolbarChange) => {
+    // The record on screen: the URL's, or the one record the page has loaded (a record story opens at /).
     const onRecord = /^\/records\/([^/]+)/.exec(history.location().pathname)?.[1];
-    const id = onRecord && onRecord !== 'new' ? onRecord : undefined;
+    const details = client.getQueryCache().findAll({ predicate: (q) => q.queryKey[2] === 'record' });
+    const loaded = details.length === 1 ? (details[0]?.queryKey[3] as { id?: string } | undefined)?.id : undefined;
+    const id = onRecord && onRecord !== 'new' ? onRecord : loaded;
     anotherUser(tenant, change === 'add' ? { kind: 'add' } : { kind: change, ...(id ? { id } : {}) });
     onPushed();
   });
-  // Once per pick: the toolbar then goes back to "none", ready for the next one.
+  // Once per pick, once the page has loaded (a change that lands before the first answer is just
+  // part of it); the toolbar then goes back to "none", ready for the next one.
   useEffect(() => {
-    if (isToolbarChange(pushed)) push(pushed);
-  }, [pushed]);
+    if (!isToolbarChange(pushed)) return;
+    if (isSettled(client)) {
+      push(pushed);
+      return;
+    }
+    let done = false;
+    const unsubscribe = client.getQueryCache().subscribe(() => {
+      if (done || !isSettled(client)) return;
+      done = true;
+      queueMicrotask(() => {
+        unsubscribe();
+        push(pushed);
+      });
+    });
+    return () => {
+      done = true;
+      unsubscribe();
+    };
+  }, [client, pushed]);
   return null;
 }
 
@@ -119,7 +140,7 @@ function StoryProviders({ session, tenant, url, script, pushed, onPushed, childr
   return (
     <AppProviders session={session} tenant={tenant} queryClient={client} history={history} live={mockLive}>
       <SettledSignal client={client} tenant={tenant} script={script} />
-      <ToolbarChanges tenant={tenant} history={history} pushed={pushed} onPushed={onPushed} />
+      <ToolbarChanges client={client} tenant={tenant} history={history} pushed={pushed} onPushed={onPushed} />
       {children}
     </AppProviders>
   );
