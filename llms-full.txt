@@ -108,7 +108,7 @@ UI rules (design system v0)
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
-- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
+- [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
@@ -1553,47 +1553,71 @@ Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `r
 
 component · `src/components/Kbd/Kbd.tsx` · usage: `docs/usage/Kbd.usage.tsx`
 
-A key the person presses, in a key-cap style: keyboard hints ("Tab to accept"), shortcut lists.
+A key or a keyboard shortcut, shown as key caps: in hints ("Tab to accept"), tooltips, menus, the command palette and the shortcuts overlay. `keys` takes shortcut notation and renders it for the platform (⌘K on a Mac, Ctrl K elsewhere); `children` names one key as printed. Symbols a screen reader would read badly (⌘, ↵) carry a spoken name. It only shows keys; register a shortcut with useShortcut.
 
 Props:
-- `children: string`: One key, as printed on it: "Tab", "Esc", "Enter", "⌘". For a combination, render one Kbd per key.
-- …plus the native attributes of `AriaAttributes`, `Attributes`, `DOMAttributes`, `HTMLAttributes`, `RefAttributes`.
+- `platform?: KeyPlatform`: Override the detected platform (gallery and tests).
+- `thenLabel?: string` = `'then'`: Word between the strokes of a sequence ("g i" → G then I).
+- `keys?: string`: Shortcut notation: "mod+k", "shift+?", "g i" (a sequence), "j". `mod` is ⌘ on a Mac and Ctrl elsewhere.
+- `children?: never`: One key, named as printed on it: "Tab", "Esc", "Enter". For a hint in running text ("Tab to accept"); prefer `keys`, which also knows the platform, for a shortcut.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
+Variants: platform (mac | other).
+
+#### ariaKeyShortcuts
+
+utility, part of Kbd. The shortcut in aria-keyshortcuts syntax ("Meta+K", "Control+K", "G I"), for the control it triggers. Screen readers announce it with the control's name.
+Signature: `(keys: string, platform?: KeyPlatform) => string`
+
+#### formatShortcut
+
+utility, part of Kbd. A shortcut as plain text for the platform: "⌘K", "Ctrl+K", "G then I". For places that take a string (a Tooltip's content, a palette row's label); render <Kbd> where markup is allowed.
+Signature: `(keys: string, platform?: KeyPlatform) => string`
+
 **When to use**
 
-- A key the person presses, named in a hint or a list of shortcuts: “Tab to accept”, “Shift Enter for a new line”.
-- One Kbd per key; a combination is several side by side.
+- Showing a shortcut where people will learn it: a tooltip (`Tooltip shortcut`), a menu item (`MenuItem.shortcut`), a command palette row, the shortcuts overlay. Pass `keys` in shortcut notation (`mod+k`, `g i`).
+- Naming a key in a hint: “<Kbd>Tab</Kbd> to accept”, one Kbd per key (`children`, the key as printed).
+- `formatShortcut` where only a string fits; `ariaKeyShortcuts` for the `aria-keyshortcuts` attribute of a control the system doesn’t already set it on.
 
 **When not to use**
 
+- Registering the shortcut itself → `useShortcut` (Kbd only shows keys)
 - Code, a command or a value to copy → `CodeBlock`, or inline `<code>`
-- A clickable shortcut → a `Button` whose label names the action; mention the key beside it
+- A clickable shortcut → a `Button` whose label names the action; show the key beside it or in its tooltip
 
-**Do:** The hint names the keys and what they do.
+**Do:** Notation, not glyphs: `mod+k` shows ⌘K on a Mac and Ctrl K elsewhere, from the string the shortcut is registered with; a hint names its keys.
 
 ```tsx
-<Text>
-  <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss
-</Text>
+<Cluster gap="md" align="center">
+  <Tooltip content="Search and run commands" shortcut="mod+k">
+    <Button variant="secondary" icon="search">
+      Search
+    </Button>
+  </Tooltip>
+  <Text>
+    <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss
+  </Text>
+</Cluster>
 ```
 
-**Don't:** A combination in one cap reads as one strange key.
+**Don't:** A combination typed into one cap, or a hard-coded ⌘: one strange key, wrong on Windows, and read as “place of interest sign”. Use `keys="shift+enter"`.
 
 ```tsx
 <Text>
-  Press <Kbd>Shift+Enter</Kbd>
+  Press <Kbd>Shift+Enter</Kbd> or ⌘K
 </Text>
 ```
 
 **Accessibility**
 
-- Renders `<kbd>`, which screen readers read as plain text: the key names must be words people say (“Esc”, “Enter”), with symbols (⌘) only beside a word.
-- A hint with keys needs a pointer path too: a visible button for the same action.
+- Renders `<kbd>`. Symbols from `keys` (⌘ ⇧ ⌥ ⌃ ↵ arrows) carry a visually hidden spoken name; with `children`, name keys with words people say (“Esc”, “Enter”).
+- Showing a shortcut isn’t announcing it: `Tooltip shortcut` and `MenuItem.shortcut` also set `aria-keyshortcuts` on the control.
+- A hint with keys needs a pointer path too: a visible button for the same action. Single-key shortcuts can be turned off (WCAG 2.2 SC 2.1.4) in the shortcuts overlay.
 
-Stories: `components-kbd--single-key`, `components-kbd--combination`.
-Tokens read: `color.bg.surface`, `color.border.strong`, `color.fg.default`, `radius.indicator`, `size.icon.sm`, `space.inset.2xs`, `text.code`.
+Stories: `components-kbd--mac`, `components-kbd--windows-and-linux`, `components-kbd--shift-chord`, `components-kbd--single-key`, `components-kbd--sequence`, `components-kbd--named-keys`, `components-kbd--key-by-name`, `components-kbd--combination`.
+Tokens read: `color.bg.surface`, `color.border.strong`, `color.fg.default`, `radius.indicator`, `size.icon.sm`, `space.gap.2xs`, `space.inset.2xs`, `text.caption`, `text.code`.
 
 ### Link
 
@@ -1709,9 +1733,9 @@ States: open, defaultOpen.
 - The trigger keeps its own accessible name and gets `aria-expanded`; arrow keys and typeahead move through items.
 - Focus returns to the trigger when the menu closes. Labels are verb-first, like buttons.
 
-Stories: `components-menu--closed`, `components-menu--open`, `components-menu--account-menu`.
-Composes: Icon.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `z.dropdown`.
+Stories: `components-menu--closed`, `components-menu--open`, `components-menu--with-shortcuts`, `components-menu--account-menu`.
+Composes: Icon, Kbd.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
 
 ### Message
 
@@ -1873,8 +1897,8 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - The current item gets `aria-current="page"`, not only a heavier look. Section labels name their lists.
 
 Stories: `components-nav--with-icons`, `components-nav--no-current-page`, `components-nav--grouped-sub-nav`.
-Composes: Icon, Link, Tooltip.
-Tokens read: `color.action.primary`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.fg.default`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.lg`, `space.gap.xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.label`, `z.tooltip`.
+Composes: Icon, Kbd, Link, Tooltip.
+Tokens read: `color.action.primary`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
 
 ### NavTabs
 
@@ -3535,6 +3559,7 @@ Props:
 - `content: string`: Supplemental text. Never the only place essential information lives.
 - `children: ReactElement`: A focusable element, typically a system Button. It keeps its own accessible name.
 - `side?: 'top' | 'right' | 'bottom' | 'left'` = `'top'`
+- `shortcut?: string`: The keyboard shortcut for the control, shown after the text ("Archive E") and set as the control's aria-keyshortcuts. It only shows the keys: register them with useShortcut.
 - `open?: boolean`
 - `defaultOpen?: boolean`
 - `onOpenChange?: (open: boolean) => void`
@@ -3581,8 +3606,9 @@ States: open, defaultOpen.
 - Opens on hover and keyboard focus, closes on Escape; the trigger keeps its own accessible name.
 - Wrap a focusable element (a system Button): a tooltip on non-focusable content is unreachable by keyboard.
 
-Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-tooltip--open-bottom`.
-Tokens read: `color.bg.inverse`, `color.fg.inverse`, `radius.control`, `shadow.popover`, `size.overlay-max`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `z.tooltip`.
+Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-tooltip--open-bottom`, `components-tooltip--with-shortcut`.
+Composes: Kbd.
+Tokens read: `color.bg.inverse`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `z.tooltip`.
 
 ## Primitives reference
 
@@ -4381,8 +4407,8 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 - A sticky `footer` reserves `space.scroll-padding.end` in main, so a field that gets focus scrolls clear of the bar instead of under it (SC 2.4.11).
 
 Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
-Composes: Button, Drawer, Icon, Link, Nav, Spinner, Toast, Tooltip.
-Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
+Composes: Button, Drawer, Icon, Kbd, Link, Nav, Spinner, Toast, Tooltip.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
 
 ### AssistantPanel
 
@@ -4726,6 +4752,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 ## Types
 
 - `AccordionItem` (`src/components/Accordion/Accordion.tsx`): `interface AccordionItem { value: string; title: string; meta?: ReactNode; content: ReactNode; disabled?: boolean; }`
+- `ActiveShortcut` (`src/components/Shortcuts/registry.ts`): `interface ActiveShortcut { id: string; keys: string; description: string; scope: string; characterKey: boolean; }` A registered shortcut, as the help overlay and the palette read it.
 - `AvatarSize` (`src/components/Avatar/Avatar.tsx`): `type AvatarSize = 'sm' | 'md' | 'lg'`
 - `BadgeTone` (`src/components/Badge/Badge.tsx`): `type BadgeTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 - `BannerTone` (`src/components/Banner/Banner.tsx`): `type BannerTone = 'info' | 'success' | 'warning' | 'danger'`
@@ -4751,12 +4778,13 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
 - `IconName` (`src/components/Icon/Icon.tsx`): `type IconName = keyof typeof PATHS`
 - `InsetToken` (`src/tokens/tokens.ts`): `type InsetToken = keyof typeof vars.space.inset`
+- `KeyPlatform` (`src/components/Kbd/Kbd.tsx`): `type KeyPlatform = 'mac' | 'other'` Where a shortcut is shown: Apple keyboards name modifiers with symbols (⌘ ⇧ ⌥ ⌃), everyone else with words (Ctrl, Shift, Alt). `mod` is the platform's command key: ⌘ on a Mac, Ctrl elsewhere.
 - `LayoutElement` (`src/primitives/types.ts`): `type LayoutElement = 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav' | 'form' | 'fieldset' | 'ul' | 'ol' | 'li' | 'dl'` Elements a layout primitive may render as. Closed on purpose: layout, not widgets.
 - `LinkComponent` (`src/components/Link/Link.tsx`): `type LinkComponent = ComponentType<LinkComponentProps>` An app's router link, adapted to take `href`: React Router's `<Link to>`, Next's `<Link href>`.
 - `LinkComponentProps` (`src/components/Link/Link.tsx`): `type LinkComponentProps = Omit<ComponentPropsWithRef<'a'>, 'href'> & { href: string; }` What the system hands an app's link component: every anchor prop, with `href` always set and `ref` included. The component must spread the rest onto its anchor and forward `ref` (tooltips and focus management attach to it).
 - `LocaleSettings` (`src/format/format.ts`): `interface LocaleSettings { locale: string; timeZone: string; }` Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings ("$" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.
 - `MenuEntry` (`src/components/Menu/Menu.tsx`): `type MenuEntry = MenuItem | 'separator'` An item, or 'separator' for a divider between groups.
-- `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; }`
+- `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }`
 - `MessageRole` (`src/components/Message/Message.tsx`): `type MessageRole = 'user' | 'assistant' | 'tool' | 'system'` Who a turn is from: the person, the assistant, a tool the assistant ran, or the system (a note in the thread).
 - `MeterStatus` (`src/components/Meter/Meter.tsx`): `type MeterStatus = 'ok' | 'warning' | 'danger'`
 - `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconName; }`
@@ -4768,6 +4796,8 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ScrollRegionToken` (`src/tokens/tokens.ts`): `type ScrollRegionToken = keyof typeof vars.size['scroll-region']`
 - `SegmentedOption` (`src/components/SegmentedControl/SegmentedControl.tsx`): `interface SegmentedOption { value: string; label: string; }`
 - `SelectOption` (`src/components/Select/Select.tsx`): `interface SelectOption { value: string; label: string; disabled?: boolean; }`
+- `ShortcutConflict` (`src/components/Shortcuts/registry.ts`): `interface ShortcutConflict { keys: string; kept: string; refused: string; }`
+- `ShortcutDefinition` (`src/components/Shortcuts/registry.ts`): `interface ShortcutDefinition { id: string; keys: string; description: string; scope?: string; handler: (event: KeyboardEvent) => void; allowInInputs?: boolean; allowInDialogs?: boolean; enabled?: boolean; }`
 - `SidebarWidthToken` (`src/tokens/tokens.ts`): `type SidebarWidthToken = keyof typeof vars.size.sidebar`
 - `SkeletonShape` (`src/components/Skeleton/Skeleton.tsx`): `type SkeletonShape = 'text' | 'block' | 'table-row'`
 - `SortDirection` (`src/components/Table/Table.tsx`): `type SortDirection = 'ascending' | 'descending'`

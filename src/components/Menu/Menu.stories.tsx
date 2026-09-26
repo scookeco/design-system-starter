@@ -24,6 +24,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Closed: Story = {};
 export const Open: Story = { tags: ['modal-open', '!autodocs'], args: { defaultOpen: true } };
+/** Shortcuts at the end of each item, muted; the items get aria-keyshortcuts. The page registers the keys with useShortcut. */
+export const WithShortcuts: Story = {
+  tags: ['modal-open', '!autodocs'],
+  args: {
+    defaultOpen: true,
+    items: [
+      { label: 'Mark as read', shortcut: 'u' },
+      { label: 'Archive', icon: 'archive', shortcut: 'e' },
+      { label: 'Open command palette', shortcut: 'mod+k' },
+      'separator',
+      { label: 'Delete conversation', tone: 'danger', shortcut: '#' },
+    ],
+  },
+};
 export const AccountMenu: Story = {
   tags: ['modal-open', '!autodocs'],
   args: {

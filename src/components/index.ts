@@ -56,7 +56,6 @@ export { Divider, type DividerProps } from './Divider/Divider';
 export { Toggle, type ToggleProps } from './Toggle/Toggle';
 export { HoverCard, type HoverCardProps } from './HoverCard/HoverCard';
 // AI patterns
-export { Kbd, type KbdProps } from './Kbd/Kbd';
 export { AiMarker, type AiMarkerProps } from './AiMarker/AiMarker';
 export { StreamingText, type StreamingTextProps, type StreamStatus } from './StreamingText/StreamingText';
 export { Message, type MessageProps, type MessageRole } from './Message/Message';
@@ -68,3 +67,18 @@ export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type Chang
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';
 export { Disclosure, type DisclosureProps } from './Disclosure/Disclosure';
 export { Accordion, type AccordionProps, type AccordionItem } from './Accordion/Accordion';
+// Keyboard
+export { Kbd, formatShortcut, ariaKeyShortcuts, type KbdProps, type KeyPlatform } from './Kbd/Kbd';
+export {
+  ShortcutHelp,
+  useShortcut,
+  useActiveShortcuts,
+  useCharacterKeyShortcuts,
+  findShortcutConflicts,
+  isReservedShortcut,
+  RESERVED_SHORTCUTS,
+  type ShortcutHelpProps,
+  type ShortcutDefinition,
+  type ActiveShortcut,
+  type ShortcutConflict,
+} from './Shortcuts/Shortcuts';

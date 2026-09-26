@@ -108,7 +108,7 @@ UI rules (design system v0)
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
-- [Kbd](docs/usage/Kbd.usage.tsx): A key the person presses, in a key-cap style
+- [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content

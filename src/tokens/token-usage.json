@@ -322,6 +322,7 @@
         "Button",
         "Drawer",
         "Icon",
+        "Kbd",
         "Link",
         "Nav",
         "Spinner",
@@ -531,6 +532,10 @@
             {
               "unit": "AppShell",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -556,6 +561,15 @@
           ]
         },
         {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.default",
           "readBy": [
             {
@@ -564,6 +578,10 @@
             },
             {
               "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -794,6 +812,10 @@
           "token": "radius.indicator",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Link",
               "how": "css"
             }
@@ -921,6 +943,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
@@ -987,6 +1013,10 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
@@ -1032,6 +1062,10 @@
             {
               "unit": "Toast",
               "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
             }
           ]
         },
@@ -1056,6 +1090,15 @@
             },
             {
               "unit": "Toast",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -1175,11 +1218,24 @@
           "token": "text.caption",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -5286,6 +5342,10 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Tag",
               "how": "css"
             }
@@ -5376,6 +5436,10 @@
           "readBy": [
             {
               "unit": "Composer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -8882,7 +8946,9 @@
       "kind": "component",
       "dir": "src/components/Kbd",
       "exports": [
-        "Kbd"
+        "Kbd",
+        "ariaKeyShortcuts",
+        "formatShortcut"
       ],
       "stylesheets": [
         "src/components/Kbd/Kbd.css"
@@ -8936,7 +9002,25 @@
           ]
         },
         {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
           "readBy": [
             {
               "unit": "Kbd",
@@ -9542,10 +9626,12 @@
         "src/components/Menu/Menu.css"
       ],
       "composes": [
-        "Icon"
+        "Icon",
+        "Kbd"
       ],
       "composesAll": [
-        "Icon"
+        "Icon",
+        "Kbd"
       ],
       "tokens": [
         {
@@ -9567,6 +9653,15 @@
           ]
         },
         {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.border.default",
           "readBy": [
             {
@@ -9576,8 +9671,21 @@
           ]
         },
         {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.default",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -9639,6 +9747,15 @@
           ]
         },
         {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "radius.surface",
           "readBy": [
             {
@@ -9680,6 +9797,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -9705,6 +9826,19 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Menu",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
               "unit": "Menu",
               "how": "css"
             }
@@ -9715,6 +9849,15 @@
           "readBy": [
             {
               "unit": "Menu",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -9750,7 +9893,20 @@
           "token": "text.caption",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Menu",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -10531,6 +10687,7 @@
       ],
       "composesAll": [
         "Icon",
+        "Kbd",
         "Link",
         "Tooltip"
       ],
@@ -10572,8 +10729,30 @@
           ]
         },
         {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.default",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Nav",
               "how": "css"
@@ -10664,6 +10843,10 @@
           "token": "radius.indicator",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Link",
               "how": "css"
             }
@@ -10704,6 +10887,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             }
@@ -10722,6 +10909,10 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             }
@@ -10737,10 +10928,28 @@
           ]
         },
         {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.gap.xs",
           "readBy": [
             {
               "unit": "Nav",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -10771,11 +10980,24 @@
           "token": "text.caption",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -13466,6 +13688,471 @@
         }
       ]
     },
+    "Shortcuts": {
+      "kind": "component",
+      "dir": "src/components/Shortcuts",
+      "exports": [
+        "RESERVED_SHORTCUTS",
+        "ShortcutHelp",
+        "findShortcutConflicts",
+        "isReservedShortcut",
+        "useActiveShortcuts",
+        "useCharacterKeyShortcuts",
+        "useShortcut"
+      ],
+      "stylesheets": [
+        "src/components/Shortcuts/Shortcuts.css"
+      ],
+      "composes": [
+        "Dialog",
+        "Kbd",
+        "Switch"
+      ],
+      "composesAll": [
+        "Dialog",
+        "Icon",
+        "Kbd",
+        "Switch"
+      ],
+      "tokens": [
+        {
+          "token": "color.action.primary",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.elevated",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.hover",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.scrim",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.disabled",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.on-action",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.surface",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.modal",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.sm",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.sm",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.modal",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Sidebar": {
       "kind": "primitive",
       "dir": "src/primitives/Sidebar",
@@ -15598,6 +16285,10 @@
             {
               "unit": "Field",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -15722,6 +16413,10 @@
             },
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -17743,14 +18438,45 @@
       "stylesheets": [
         "src/components/Tooltip/Tooltip.css"
       ],
-      "composes": [],
-      "composesAll": [],
+      "composes": [
+        "Kbd"
+      ],
+      "composesAll": [
+        "Kbd"
+      ],
       "tokens": [
         {
           "token": "color.bg.inverse",
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -17774,6 +18500,15 @@
           ]
         },
         {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "shadow.popover",
           "readBy": [
             {
@@ -17783,10 +18518,46 @@
           ]
         },
         {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.overlay-max",
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -17813,7 +18584,20 @@
           "token": "text.caption",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]

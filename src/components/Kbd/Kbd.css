@@ -1,5 +1,21 @@
 @layer components {
+  /* 1. block: one key, or a shortcut's strokes */
   .kbd {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+    white-space: nowrap;
+  }
+
+  /* 2. parts */
+  .kbd__stroke {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-gap-2xs);
+  }
+
+  .kbd__key {
     display: inline-block;
     min-inline-size: var(--size-icon-sm);
     padding-inline: var(--space-inset-2xs);
@@ -9,6 +25,9 @@
     color: var(--color-fg-default);
     font: var(--text-code);
     text-align: center;
-    white-space: nowrap;
+  }
+
+  .kbd__then {
+    font: var(--text-caption);
   }
 }
