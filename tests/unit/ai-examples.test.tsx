@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, renderHook, screen, waitFor, within } from '@testing-library/react';
+import { getResponse, http } from 'msw';
 import { afterEach, describe, expect, it } from 'vitest';
+import { aiHandlers, aiHoldAfter } from '../../src/app/mocks/ai';
 import { db, setRoles } from '../../src/app/mocks/db';
 import { useApplyProposal } from '../../src/app/model/ai';
 import { AiReviewChanges } from '../../src/examples/AiReviewChanges';
 import { AssistantChatPage } from '../../src/examples/AssistantChatPage';
 import { ExampleApp } from '../../src/examples/App';
 import { RecordCopilot } from '../../src/examples/RecordCopilot';
-import { renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -90,6 +92,43 @@ describe('Assistant chat page', () => {
     const nav = await screen.findByRole('navigation', { name: 'Conversations' });
     await within(nav).findByRole('link', { name: 'How many records are overdue?' });
   });
+
+  it('a chat created while the history is still loading is listed: the first load can’t land over the create', async () => {
+    // The history's first read reaches the server before the new chat exists, and its answer arrives after the create.
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let heldEarly = false;
+    server.use(
+      http.get(
+        '*/api/t/acme/ai/conversations',
+        async ({ request }) => {
+          const early = await getResponse(aiHandlers, request);
+          heldEarly = true;
+          await gate;
+          return early;
+        },
+        { once: true },
+      ),
+      // Hold the answer mid-stream, as the Streaming story does, so nothing refetches the history once it ends.
+      aiHoldAfter(3),
+    );
+    let created = false;
+    const onResponse = ({ request, response }: { request: Request; response: Response }) => {
+      if (request.method === 'POST' && new URL(request.url).pathname.endsWith('/ai/conversations') && response.status === 201) created = true;
+    };
+    server.events.on('response:mocked', onResponse);
+    const { history } = renderWithApp(<AssistantChatPage initialPrompt="What can you help with?" />, { url: '/assistant' });
+    await waitFor(() => expect(heldEarly).toBe(true));
+    await waitFor(() => expect(created).toBe(true));
+    server.events.removeListener('response:mocked', onResponse);
+    release();
+    await waitFor(() => expect(history.location().search).toBe('?c=c-4'));
+    await screen.findByText(/^I can answer/);
+    const nav = await screen.findByRole('navigation', { name: 'Conversations' });
+    expect(await within(nav).findByRole('link', { name: 'New chat' })).toBeTruthy();
+  }, PAGE_FLOW_TIMEOUT);
 });
 
 describe('AI routes', () => {
