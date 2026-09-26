@@ -11,6 +11,7 @@ import { ROLES, type Role, type Session, type Tenant } from '../api/schemas';
 import { AppProviders } from '../providers';
 import { createMemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
+import { aiHandlers } from './ai';
 import { handlers } from './handlers';
 
 /**
@@ -99,7 +100,8 @@ const withMockApi: Decorator = (Story, context) => {
 export const mockApiMeta = {
   decorators: [withMockApi],
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
-  parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: handlers } } },
+  // The assistant's routes (./ai) sit beside the rest; they import the same route wrapper, so they live in their own module.
+  parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
   beforeEach: () => {
     resetDb();
   },
