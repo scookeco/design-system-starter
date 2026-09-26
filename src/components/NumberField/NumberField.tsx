@@ -22,7 +22,10 @@ export interface NumberFieldProps extends EscapeHatch {
   currency?: string;
   min?: number;
   max?: number;
-  /** Arrow keys and the stepper buttons move by this (in the value's units). Default 1. */
+  /**
+   * Arrow keys and the stepper buttons move by this (in the value's units), and the value snaps to
+   * its multiples: leave it unset for money unless only whole units are allowed.
+   */
   step?: number;
   maximumFractionDigits?: number;
   description?: string;
