@@ -292,6 +292,7 @@ Where the facts come from:
 - After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
 - Stories tagged `no-visual` get no screenshot and no axe run. Only the WCAG 2.2 check fixtures use it: they are deliberate violations.
 - **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0` in its globals, freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
+- **Screenshots are byte-stable.** Chromium launches with `--disable-partial-raster` (in `playwright.config.ts`). Without it, a region that repaints after a story settles (a list arriving, a button leaving its pending state, a dialog opening) is re-rasterised on its own, and rounded edges come out a colour level or two different from a full raster. That stays under the comparison threshold, but it churned baseline files on every run.
 - Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
 
 ## Deliberately not included yet
