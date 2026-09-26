@@ -89,7 +89,9 @@ import { STATUS } from '../app/model/status';
 import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
+import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
@@ -172,6 +174,8 @@ function ListPageContent({
   const createRecord = useCreateRecord();
   const retryDelete = useBulkDeleteRecords();
   const move = useMoveRecord();
+  const can = useCan();
+  const createPermission = usePermission('record:create');
 
   const [url, nav] = useUrlState(listCodec);
   const query = { ...url, q: url.q.trim(), pageSize: PAGE_SIZE };
@@ -285,27 +289,33 @@ function ListPageContent({
               Export
             </Button>
           </Tooltip>
-          <Dialog
-            title="New record"
-            description="Records start as drafts, owned by you, until they are sent."
-            open={dialogOpen}
-            onOpenChange={setDialogOpen}
-            trigger={<Button icon="plus">New record</Button>}
-            footer={
-              <>
-                <Button variant="secondary" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={() => submitCreate()} loading={createRecord.isPending}>
-                  Create record
-                </Button>
-              </>
-            }
-          >
-            <Stack as="form" gap="md" onSubmit={submitCreate}>
-              <TextField label="Name" value={draftName} onChange={(event) => setDraftName(event.target.value)} error={nameError} required />
-            </Stack>
-          </Dialog>
+          {createPermission.allowed ? (
+            <Dialog
+              title="New record"
+              description="Records start as drafts, owned by you, until they are sent."
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              trigger={<Button icon="plus">New record</Button>}
+              footer={
+                <>
+                  <Button variant="secondary" onClick={() => setDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={() => submitCreate()} loading={createRecord.isPending}>
+                    Create record
+                  </Button>
+                </>
+              }
+            >
+              <Stack as="form" gap="md" onSubmit={submitCreate}>
+                <TextField label="Name" value={draftName} onChange={(event) => setDraftName(event.target.value)} error={nameError} required />
+              </Stack>
+            </Dialog>
+          ) : (
+            <Button icon="plus" {...gated(createPermission)}>
+              New record
+            </Button>
+          )}
         </>
       }
     />
@@ -318,6 +328,7 @@ function ListPageContent({
     <Center max="lg" gutters="lg">
       <Stack gap="lg">
         {header}
+        <PermissionNote permission={createPermission} />
 
         {firstUse ? (
           <EmptyState
@@ -325,7 +336,7 @@ function ListPageContent({
             title="Create your first record"
             description="Records keep each agreement, its owner and its amount in one place."
             action={
-              <Button icon="plus" onClick={() => setDialogOpen(true)}>
+              <Button icon="plus" onClick={() => setDialogOpen(true)} {...gated(createPermission)}>
                 New record
               </Button>
             }
@@ -334,7 +345,7 @@ function ListPageContent({
           <>
             <NavTabs
               label="Record views"
-              items={VIEWS.map(({ view, label }) => ({
+              items={VIEWS.filter((v) => !v.requires || can(v.requires)).map(({ view, label }) => ({
                 label: counts.data ? `${label} (${format.number(counts.data.counts[view])})` : label,
                 // A tab keeps the search, drops filters the new view can't use, and starts at page 1.
                 href: nav.href({ view, status: [], page: 1 }),
@@ -492,7 +503,7 @@ function ListPageContent({
               <RecordBoard
                 columns={toBoard(rows, query.view, query.status)}
                 statusCounts={counts.data?.statuses}
-                allowMove
+                allowMove={can('record:move')}
                 movingId={move.isPending ? move.variables.record.id : undefined}
                 onMove={moveRecord}
               />
@@ -588,7 +599,8 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
   const toast = useToast();
   const format = useFormat();
   const bulkDelete = useBulkDeleteRecords();
-  const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined);
+  const deletePermission = usePermission('record:delete');
+  const [confirmOpen, setConfirmOpen] = useState(initialBulkDelete !== undefined && deletePermission.allowed);
   const count = selectedCount(selection);
   const deletable = deletableCount(selection);
   const skipped = count - deletable;
@@ -610,7 +622,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
   // Gallery and tests: confirm straight away, once.
   const submitted = useRef(false);
   const submitOnMount = useEffectEvent(() => {
-    if (initialBulkDelete !== 'submit' || submitted.current) return;
+    if (initialBulkDelete !== 'submit' || submitted.current || !deletePermission.allowed) return;
     submitted.current = true;
     confirm();
   });
@@ -622,6 +634,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
         <Cluster gap="sm" align="center">
           <Text aria-live="polite">{`${format.number(count)} selected`}</Text>
           {skipped > 0 ? <Text size="caption" tone="muted">{`${format.number(skipped)} on legal hold can’t be deleted`}</Text> : null}
+          <PermissionNote permission={deletePermission} />
         </Cluster>
         <Cluster gap="sm">
           <Button variant="ghost" onClick={onClear} disabled={bulkDelete.isPending}>
@@ -640,7 +653,7 @@ function BulkActionBar({ selection, initialBulkDelete, onClear, onDone }: BulkAc
               if (!bulkDelete.isPending) setConfirmOpen(open);
             }}
             trigger={
-              <Button variant="danger" disabled={deletable === 0}>
+              <Button variant="danger" disabled={deletable === 0} {...gated(deletePermission)}>
                 Delete
               </Button>
             }

@@ -3,6 +3,8 @@
  *
  *   404 (signed in)   inside the app's shell, so navigation stays and the person can go anywhere:
  *                     an EmptyState as the page's h1, and a link home.
+ *   403 (signed in)   the same, for a page this person may not open: what they can't do and who can
+ *                     change that. Never a silent redirect home.
  *   Error (any state) in AuthLayout, because the app, and so the shell, may be what failed to load:
  *                     what happened in plain words, Try again, and a way home.
  *
@@ -22,6 +24,23 @@ export function NotFoundPage() {
           description="The link may be out of date, or the page may have moved."
           action={<Link href="/home">Go to Home</Link>}
         />
+      </Center>
+    </ExampleShell>
+  );
+}
+
+export interface ForbiddenPageProps {
+  /** The primary nav item the page belongs under, so the shell still shows where they are. */
+  current?: string;
+  /** Why, in words they can act on (from DENIAL_REASONS). */
+  reason?: string;
+}
+
+export function ForbiddenPage({ current = '', reason = 'Ask a workspace admin for access.' }: ForbiddenPageProps) {
+  return (
+    <ExampleShell current={current}>
+      <Center max="lg" gutters="lg">
+        <EmptyState reason="no-results" headingLevel={1} title="You don’t have access to this page" description={reason} action={<Link href="/home">Go to Home</Link>} />
       </Center>
     </ExampleShell>
   );

@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { render, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 import type { RecordEntity } from '../../src/app/api/schemas';
 import { recordKeys } from '../../src/app/model/keys';
@@ -11,8 +10,7 @@ import { useAccount, useRecord, useRecordCounts, useRecordList } from '../../src
 import { AccountRef } from '../../src/app/registries/refs';
 import { db } from '../../src/app/mocks/db';
 import { seedRecords } from '../../src/app/mocks/seed';
-import { AppProviders } from '../../src/app/providers';
-import { server, setupMockApi, testClient } from './app-harness';
+import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 setupMockApi();
 
@@ -22,11 +20,7 @@ const original = seedRecords('acme').find((r) => r.id === ID) as RecordEntity;
 /** Mount a hook with a record already in the cache, and hand back the cache to assert on. */
 const setup = async <T,>(hook: () => T) => {
   const client = testClient();
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <AppProviders tenant="acme" queryClient={client}>
-      {children}
-    </AppProviders>
-  );
+  const wrapper = wrapperFor(client);
   const view = renderHook(() => ({ record: useRecord(ID), hook: hook() }), { wrapper });
   await waitFor(() => expect(view.result.current.record.isSuccess).toBe(true));
   const cached = () => client.getQueryData<RecordEntity>(recordKeys.detail('acme', ID));
@@ -159,11 +153,7 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
 
   it('renaming in the detail view patches the list that is on screen AND lists cached earlier, before any refetch', async () => {
     const client = testClient();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppProviders tenant="acme" queryClient={client}>
-        {children}
-      </AppProviders>
-    );
+    const wrapper = wrapperFor(client);
     // A list page is on screen; another tab's page was visited earlier and is cached but unmounted.
     const listed = renderHook(() => useRecordList(firstPage), { wrapper });
     await waitFor(() => expect(listed.result.current.isSuccess).toBe(true));
@@ -193,11 +183,7 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
 
   it('rolls the listed copies back with the detail when the server refuses', async () => {
     const client = testClient();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppProviders tenant="acme" queryClient={client}>
-        {children}
-      </AppProviders>
-    );
+    const wrapper = wrapperFor(client);
     const listed = renderHook(() => useRecordList(firstPage), { wrapper });
     await waitFor(() => expect(listed.result.current.isSuccess).toBe(true));
     const target = listed.result.current.data?.items[0] as RecordEntity;
@@ -212,11 +198,7 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
 
   it('a move lands in every listed copy (the table and the board are the same cache entry)', async () => {
     const client = testClient();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppProviders tenant="acme" queryClient={client}>
-        {children}
-      </AppProviders>
-    );
+    const wrapper = wrapperFor(client);
     const view = renderHook(() => ({ list: useRecordList(firstPage), move: useMoveRecord() }), { wrapper });
     await waitFor(() => expect(view.result.current.list.isSuccess).toBe(true));
     const target = view.result.current.list.data?.items.find((r) => r.status !== 'archived' && r.status !== 'active') as RecordEntity;
@@ -227,11 +209,7 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
 
   it('renaming an account needs no list patch at all: rows hold its id and join through the directory', async () => {
     const client = testClient();
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppProviders tenant="acme" queryClient={client}>
-        {children}
-      </AppProviders>
-    );
+    const wrapper = wrapperFor(client);
     const listed = renderHook(() => useRecordList({ ...firstPage, pageSize: 50 }), { wrapper });
     await waitFor(() => expect(listed.result.current.isSuccess).toBe(true));
     const accountId = listed.result.current.data?.items[0]?.accountId as string;
@@ -240,8 +218,9 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
 
     const view = renderHook(() => ({ account: useAccount(accountId), update: useUpdateAccount(accountId) }), { wrapper });
     await waitFor(() => expect(view.result.current.account.isSuccess).toBe(true));
+    const Wrapper = wrapperFor(client);
     const rows = render(
-      <AppProviders tenant="acme" queryClient={client}>
+      <Wrapper>
         <ul>
           {listed.result.current.data?.items
             .filter((r) => r.accountId === accountId)
@@ -251,7 +230,7 @@ describe('the query-cache trap: a detail edit reaches every cached list', () => 
               </li>
             ))}
         </ul>
-      </AppProviders>,
+      </Wrapper>,
     );
     await waitFor(() => expect(rows.getAllByText(view.result.current.account.data?.name ?? '?')).toHaveLength(sharing));
 

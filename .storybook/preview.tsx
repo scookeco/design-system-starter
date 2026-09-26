@@ -153,6 +153,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    role: {
+      description: 'Your role in the mock workspace (a story that sets its own role wins)',
+      toolbar: {
+        title: 'Role',
+        icon: 'user',
+        items: [
+          { value: 'viewer', title: 'Viewer' },
+          { value: 'editor', title: 'Editor' },
+          { value: 'admin', title: 'Admin' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     failure: {
       description: 'Mock API failure rate',
       toolbar: {
@@ -167,7 +180,7 @@ const preview: Preview = {
       },
     },
   },
-  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0' },
+  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0', role: 'admin' },
   loaders: [mswLoader()],
   decorators: [withContainerWidth, withTheme, withLocale, withMockSettings],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and

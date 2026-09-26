@@ -19,8 +19,10 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 import { ApiError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { postArchive, postBulkDelete, patchRecordName, postPerson, postRecord, postStatus, type NewRecord } from '../api/records';
-import type { Account, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage, Tenant } from '../api/schemas';
+import type { Account, Capability, MovableStatus, Person, RecordEntity, RecordFilter, RecordPage, Tenant } from '../api/schemas';
+import { useGrant } from '../session';
 import { useTenant } from '../tenant';
+import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { accountKeys, recordKeys } from './keys';
 
 /**
@@ -45,6 +47,18 @@ export const patchListedRecord = (client: QueryClient, tenant: Tenant, id: strin
     return next ? { ...page, items: page.items.map((r, i) => (i === index ? next : r)) } : undefined;
   });
 
+/**
+ * Guard every write: each mutation asks the same predicate as the button and the route guard
+ * (`can`), and refuses with a 403 of its own before any request is sent. Hiding a button is UX;
+ * this and the server's own check are what actually stop a write.
+ */
+const refuseUnless = (grant: Grant, capability: Capability, subject?: Parameters<typeof can>[2]) => {
+  if (!can(grant, capability, subject)) throw new ApiError(403, 'forbidden', DENIAL_REASONS[capability]);
+};
+
+/** A 403: this person may not do this (the client refused, or the server did). */
+export const isForbidden = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 403;
+
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;
 
@@ -55,12 +69,18 @@ export const isConflict = (error: unknown): error is ApiError => error instanceo
  */
 export function useRenameRecord(id: string) {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   const key = recordKeys.detail(tenant, id);
   return useMutation({
     mutationKey: [tenant, 'renameRecord', { id }],
-    mutationFn: ({ name, version }: { name: string; version: number }) => patchRecordName(tenant, id, name, version),
+    mutationFn: ({ name, version }: { name: string; version: number }) => {
+      refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
+      return patchRecordName(tenant, id, name, version);
+    },
     onMutate: async ({ name, version }) => {
+      // Refused before the optimistic patch, so a denied rename never flashes the new name.
+      refuseUnless(grant, 'record:rename', client.getQueryData<RecordEntity>(key));
       // A read in flight must not land on top of the optimistic name: not the detail, not a list.
       await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(tenant) })]);
       const previous = client.getQueryData<RecordEntity>(key);
@@ -104,10 +124,14 @@ export function useRenameRecord(id: string) {
  */
 export function useMoveRecord() {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'moveRecord'],
-    mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => postStatus(tenant, record.id, status, record.version),
+    mutationFn: ({ record, status }: { record: Pick<RecordEntity, 'id' | 'version'>; status: MovableStatus }) => {
+      refuseUnless(grant, 'record:move', client.getQueryData<RecordEntity>(recordKeys.detail(tenant, record.id)));
+      return postStatus(tenant, record.id, status, record.version);
+    },
     onSuccess: (moved) => {
       client.setQueryData(recordKeys.detail(tenant, moved.id), moved);
       patchListedRecord(client, tenant, moved.id, () => moved);
@@ -122,10 +146,14 @@ export function useMoveRecord() {
 /** archiveRecord: pessimistic. Nothing changes until the server says so; then lists and counts refetch. */
 export function useArchiveRecord(id: string) {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'archiveRecord', { id }],
-    mutationFn: () => postArchive(tenant, id),
+    mutationFn: () => {
+      refuseUnless(grant, 'record:archive', client.getQueryData<RecordEntity>(recordKeys.detail(tenant, id)));
+      return postArchive(tenant, id);
+    },
     onSuccess: (archived) => {
       client.setQueryData(recordKeys.detail(tenant, id), archived);
       patchListedRecord(client, tenant, id, () => archived);
@@ -144,10 +172,14 @@ export function useArchiveRecord(id: string) {
  */
 export function useCreateRecord() {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'createRecord'],
-    mutationFn: ({ record, idempotencyKey }: { record: NewRecord; idempotencyKey: string }) => postRecord(tenant, record, idempotencyKey),
+    mutationFn: ({ record, idempotencyKey }: { record: NewRecord; idempotencyKey: string }) => {
+      refuseUnless(grant, 'record:create');
+      return postRecord(tenant, record, idempotencyKey);
+    },
     onSuccess: (created) => {
       client.setQueryData(recordKeys.detail(tenant, created.id), created);
       return Promise.all([
@@ -167,10 +199,14 @@ export type BulkSelection = { ids: readonly string[] } | { filter: RecordFilter 
  */
 export function useBulkDeleteRecords() {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'bulkDeleteRecords'],
-    mutationFn: (selection: BulkSelection) => postBulkDelete(tenant, selection),
+    mutationFn: (selection: BulkSelection) => {
+      refuseUnless(grant, 'record:delete');
+      return postBulkDelete(tenant, selection);
+    },
     onSuccess: (result) => {
       for (const id of result.deleted) client.removeQueries({ queryKey: recordKeys.detail(tenant, id), exact: true });
       return Promise.all([
@@ -184,10 +220,14 @@ export function useBulkDeleteRecords() {
 /** addPerson: pessimistic. The quick-create for an owner: appends the new person, then refetches people. */
 export function useAddPerson() {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'addPerson'],
-    mutationFn: (name: string) => postPerson(tenant, name),
+    mutationFn: (name: string) => {
+      refuseUnless(grant, 'people:create');
+      return postPerson(tenant, name);
+    },
     onSuccess: (person) => {
       client.setQueryData<{ items: Person[] }>(recordKeys.people(tenant), (current) => (current ? { items: [...current.items, person] } : current));
       return client.invalidateQueries({ queryKey: recordKeys.people(tenant) });
@@ -202,10 +242,14 @@ const upsertAccount = (current: { items: Account[] } | undefined, account: Accou
 /** createAccount: pessimistic, with an idempotency key. Seeds the detail and appends to the directory. */
 export function useCreateAccount() {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'createAccount'],
-    mutationFn: ({ account, idempotencyKey }: { account: AccountInput; idempotencyKey: string }) => postAccount(tenant, account, idempotencyKey),
+    mutationFn: ({ account, idempotencyKey }: { account: AccountInput; idempotencyKey: string }) => {
+      refuseUnless(grant, 'account:create');
+      return postAccount(tenant, account, idempotencyKey);
+    },
     onSuccess: (created) => {
       client.setQueryData(accountKeys.detail(tenant, created.id), created);
       client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, created));
@@ -221,10 +265,14 @@ export function useCreateAccount() {
  */
 export function useUpdateAccount(id: string) {
   const tenant = useTenant();
+  const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
     mutationKey: [tenant, 'updateAccount', { id }],
-    mutationFn: ({ changes, version }: { changes: Partial<AccountInput>; version: number }) => patchAccount(tenant, id, changes, version),
+    mutationFn: ({ changes, version }: { changes: Partial<AccountInput>; version: number }) => {
+      refuseUnless(grant, 'account:edit');
+      return patchAccount(tenant, id, changes, version);
+    },
     onSuccess: (updated) => {
       client.setQueryData(accountKeys.detail(tenant, id), updated);
       client.setQueryData<{ items: Account[] }>(accountKeys.list(tenant), (current) => upsertAccount(current, updated));

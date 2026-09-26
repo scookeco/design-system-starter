@@ -21,6 +21,11 @@
  *            A 409 (someone else changed it) shows a Banner with Reload instead.
  *   Archive  pessimistic: "Archiving…" on More, the other actions disabled, then the new status.
  *   Delete   pessimistic, confirmed; refused for records on legal hold (the canDelete predicate).
+ *
+ * Permissions: each "More" item is shown only when the person holds its capability, and enabled
+ * only when `can` also allows it for this record (an archived record can't be renamed). The same
+ * check refuses the mutation, and the server answers 403 if the client is bypassed. A 403 that
+ * arrives anyway (a role changed mid-session) says so in a toast that stays.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
 import {
@@ -51,13 +56,14 @@ import {
 } from '../index';
 import { ExampleShell } from './ExampleShell';
 import type { RecordEntity } from '../app/api/schemas';
-import { isConflict, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
-import { canArchive, canDelete, canRename, isOnLegalHold } from '../app/model/predicates';
+import { isConflict, isForbidden, useArchiveRecord, useBulkDeleteRecords, useRenameRecord } from '../app/model/mutations';
+import { isOnLegalHold } from '../app/model/predicates';
 import { useRecord } from '../app/model/queries';
 import { STATUS } from '../app/model/status';
 import { FieldDisplay, isNumericField } from '../app/registries/fields';
 import { RECORD_PROPERTIES } from '../app/registries/recordFields';
 import { usePersonName } from '../app/registries/refs';
+import { useCan } from '../app/session';
 
 interface Activity {
   id: string;
@@ -151,6 +157,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const rename = useRenameRecord(recordId);
   const archive = useArchiveRecord(recordId);
   const remove = useBulkDeleteRecords();
+  const can = useCan();
   const [section, setSection] = useState<RecordSection>(initialSection);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -177,6 +184,10 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
         onSuccess: () => setNameDraft(undefined),
         onError: (error) => {
           if (isConflict(error)) return; // The Banner explains it.
+          if (isForbidden(error)) {
+            toast({ title: 'You can’t rename this record', description: `${error.message} It’s back to “${record.name}”.`, tone: 'danger', duration: Infinity });
+            return;
+          }
           toast({
             title: 'Couldn’t rename the record',
             description: `It’s back to “${record.name}”. Choose Rename to try “${name}” again.`,
@@ -203,7 +214,8 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
   const archiveRecord = () =>
     archive.mutate(undefined, {
       onSuccess: () => toast({ title: 'Record archived', description: 'It’s out of the active lists. Find it under Archived.', tone: 'success' }),
-      onError: () => toast({ title: 'Couldn’t archive the record', description: 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
+      onError: (error) =>
+        toast({ title: 'Couldn’t archive the record', description: isForbidden(error) ? error.message : 'Nothing changed. Try again.', tone: 'danger', duration: Infinity }),
     });
 
   const deleteRecord = () =>
@@ -351,20 +363,26 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
                     {archive.isPending ? 'Archiving…' : 'More'}
                   </Button>
                 }
+                // Shown when the person holds the capability; enabled when `can` allows it for this record.
                 items={[
-                  {
-                    label: 'Rename',
-                    disabled: !canRename(record) || rename.isPending,
-                    onSelect: () => {
-                      setNameDraft((draft) => draft ?? record.name);
-                      setRenameOpen(true);
-                    },
-                  },
-                  { label: 'Duplicate', icon: 'plus', onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) },
+                  ...(can('record:rename')
+                    ? [
+                        {
+                          label: 'Rename',
+                          disabled: !can('record:rename', record) || rename.isPending,
+                          onSelect: () => {
+                            setNameDraft((draft) => draft ?? record.name);
+                            setRenameOpen(true);
+                          },
+                        },
+                      ]
+                    : []),
+                  ...(can('record:create') ? [{ label: 'Duplicate', icon: 'plus' as const, onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) }] : []),
                   { label: 'Export as CSV', icon: 'download' },
-                  { label: 'Archive', disabled: !canArchive(record), onSelect: archiveRecord },
-                  'separator',
-                  { label: 'Delete record', tone: 'danger', disabled: !canDelete(record), onSelect: () => setConfirmDelete(true) },
+                  ...(can('record:archive') ? [{ label: 'Archive', disabled: !can('record:archive', record), onSelect: archiveRecord }] : []),
+                  ...(can('record:delete')
+                    ? (['separator', { label: 'Delete record', tone: 'danger', disabled: !can('record:delete', record), onSelect: () => setConfirmDelete(true) }] as const)
+                    : []),
                 ]}
               />
             </>

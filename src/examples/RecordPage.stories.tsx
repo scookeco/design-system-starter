@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fail, hold } from '../app/mocks/overrides';
-import { mockApiMeta, mswOverrides } from '../app/mocks/storybook';
+import { mockApi, mockApiMeta, mswOverrides } from '../app/mocks/storybook';
 import { RecordPage } from './RecordPage';
 
 const meta = {
@@ -33,3 +33,17 @@ export const RenameConflict: Story = {
 };
 /** Pessimistic archive, in flight: "Archiving…" on More, the other actions disabled. */
 export const ArchivePending: Story = { tags: ['busy'], args: { initialAction: { kind: 'archive' } }, parameters: mswOverrides(hold('post', '/records/:id/archive')) };
+
+/** Viewer: the More menu holds only what a viewer can do. Items they lack the capability for are hidden. */
+export const AsViewerMoreActions: Story = { tags: ['modal-open'], args: { initialMenuOpen: true }, parameters: mockApi({ role: 'viewer' }) };
+/** Editor: rename, duplicate and archive, but no Delete (admins only). */
+export const AsEditorMoreActions: Story = { tags: ['modal-open'], args: { initialMenuOpen: true }, parameters: mockApi({ role: 'editor' }) };
+/**
+ * A forced 403: the UI allowed the rename, the server refused it (a role changed mid-session). The
+ * optimistic name rolls back and a toast that stays says why.
+ */
+export const RenameForbidden: Story = {
+  args: rename,
+  parameters: mswOverrides(fail('patch', '/records/:id', 403, 'forbidden', 'Your role in this workspace changed: you can no longer rename records.')),
+};
+

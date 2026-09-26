@@ -4,7 +4,8 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import type { Tenant } from './api/schemas';
+import type { Session, Tenant } from './api/schemas';
+import { SessionProvider } from './session';
 import { TenantProvider } from './tenant';
 import type { UrlHistory } from './url/history';
 import { HistoryProvider } from './url/useUrlState';
@@ -23,6 +24,8 @@ export const createQueryClient = () =>
   });
 
 export interface AppProvidersProps {
+  /** Who is signed in and what they may do in each workspace. Loaded once, before the app mounts. */
+  session: Session;
   tenant: Tenant;
   /** Pass one to share or inspect the cache (tests, stories); otherwise each mount makes its own. */
   queryClient?: QueryClient;
@@ -31,14 +34,16 @@ export interface AppProvidersProps {
   children: ReactNode;
 }
 
-export function AppProviders({ tenant, queryClient, history, children }: AppProvidersProps) {
+export function AppProviders({ session, tenant, queryClient, history, children }: AppProvidersProps) {
   const [ownClient] = useState(createQueryClient);
   return (
     <QueryClientProvider client={queryClient ?? ownClient}>
-      {/* A tenant switch remounts everything below: selections, drafts and in-flight work stay with the old tenant. */}
-      <TenantProvider key={tenant} tenant={tenant}>
-        {history ? <HistoryProvider history={history}>{children}</HistoryProvider> : children}
-      </TenantProvider>
+      <SessionProvider session={session}>
+        {/* A tenant switch remounts everything below: selections, drafts and in-flight work stay with the old tenant. */}
+        <TenantProvider key={tenant} tenant={tenant}>
+          {history ? <HistoryProvider history={history}>{children}</HistoryProvider> : children}
+        </TenantProvider>
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

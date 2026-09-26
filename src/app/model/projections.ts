@@ -2,7 +2,7 @@
  * Views are pure projections of cached entities: store → view, no copies. Each derived item keeps
  * the id it came from, and every "what counts as X" goes through a named predicate.
  */
-import type { RecordEntity, RecordStatus, RecordView } from '../api/schemas';
+import type { Capability, RecordEntity, RecordStatus, RecordView } from '../api/schemas';
 import { canDelete, canMove, hasStatus, isOnLegalHold, VIEW_PREDICATES } from './predicates';
 import { STATUS } from './status';
 
@@ -67,11 +67,14 @@ export const toBoard = (rows: readonly RecordRow[], view: RecordView, status: re
     .filter((option) => status.length === 0 || status.includes(option.value))
     .map(({ value }) => ({ status: value, label: STATUS[value].label, tone: STATUS[value].tone, rows: rows.filter((row) => hasStatus(value)({ status: row.statusKey })) }));
 
-/** The list's tabs: a label per view. Each view *is* a predicate (VIEW_PREDICATES); a new tab is one entry in both. */
-export const VIEWS: readonly { view: RecordView; label: string; matches: (record: Pick<RecordEntity, 'status'>) => boolean }[] = [
+/**
+ * The list's tabs: a label per view. Each view *is* a predicate (VIEW_PREDICATES); a new tab is one
+ * entry in both. A tab that needs a capability says so, and shows only to people who hold it.
+ */
+export const VIEWS: readonly { view: RecordView; label: string; matches: (record: Pick<RecordEntity, 'status'>) => boolean; requires?: Capability }[] = [
   { view: 'all', label: 'All', matches: VIEW_PREDICATES.all },
   { view: 'open', label: 'Open', matches: VIEW_PREDICATES.open },
-  { view: 'drafts', label: 'Drafts', matches: VIEW_PREDICATES.drafts },
+  { view: 'drafts', label: 'Drafts', matches: VIEW_PREDICATES.drafts, requires: 'record:read-drafts' },
   { view: 'archived', label: 'Archived', matches: VIEW_PREDICATES.archived },
 ];
 

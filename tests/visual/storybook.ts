@@ -46,13 +46,13 @@ export const FROZEN_NOW = new Date(SEED_EPOCH);
 /**
  * Open a story once it has rendered and settled. Every spec gets the same determinism: the mock
  * API answers instantly and never fails (latency:0;failure:0, whatever the gallery's toolbar
- * defaults), the clock is frozen, and stories tagged `data` wait until their queries settle
+ * defaults), the signed-in role is admin unless the story sets its own (role:admin), the clock is frozen, and stories tagged `data` wait until their queries settle
  * (html[data-queries-settled]). `busy` stories hold a request open on purpose and aren't waited on.
  */
 export const openStory = async (page: Page, id: string, theme: (typeof THEMES)[number]) => {
   const tags = index.entries[id]?.tags ?? [];
   await page.clock.setFixedTime(FROZEN_NOW);
-  await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=theme:${theme};latency:0;failure:0`);
+  await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=theme:${theme};latency:0;failure:0;role:admin`);
   await page.waitForFunction(() => document.body.classList.contains('sb-show-main'));
   // Rendered into the root, or (overlay-only stories) into a portal beside it.
   await page.waitForFunction(() => {

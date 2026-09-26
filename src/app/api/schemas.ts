@@ -9,6 +9,32 @@ export const TENANTS = ['acme', 'globex'] as const;
 export const TenantSchema = z.enum(TENANTS);
 export type Tenant = z.infer<typeof TenantSchema>;
 
+/**
+ * Capabilities: resource:action. Endpoints and UI check these, never role names. Which role holds
+ * which is decided in exactly one place (ROLE_CAPABILITIES in src/app/model/permissions.ts).
+ */
+export const CAPABILITIES = [
+  'record:read',
+  /** See drafts. Viewers get a narrower projection of the same records: drafts are work in progress. */
+  'record:read-drafts',
+  'record:create',
+  'record:rename',
+  'record:move',
+  'record:archive',
+  'record:delete',
+  'account:read',
+  'account:create',
+  'account:edit',
+  'people:create',
+] as const;
+export const CapabilitySchema = z.enum(CAPABILITIES);
+export type Capability = z.infer<typeof CapabilitySchema>;
+
+/** A small ladder, each role holding everything below it. A role is held per workspace (a membership). */
+export const ROLES = ['viewer', 'editor', 'admin'] as const;
+export const RoleSchema = z.enum(ROLES);
+export type Role = z.infer<typeof RoleSchema>;
+
 /** A record's lifecycle: draft → pending → active, with overdue and archived branches. */
 export const RECORD_STATUSES = ['draft', 'pending', 'active', 'overdue', 'archived'] as const;
 export const RecordStatusSchema = z.enum(RECORD_STATUSES);
@@ -87,6 +113,27 @@ export const ErrorBodySchema = z.object({
   }),
 });
 export type ErrorBody = z.infer<typeof ErrorBodySchema>;
+
+/** The signed-in person, as the identity provider knows them. */
+export const UserSchema = z.object({ id: z.string().min(1), name: z.string().min(1), email: z.email() });
+export type User = z.infer<typeof UserSchema>;
+
+/**
+ * A membership: the person's role in one workspace and the capabilities the SERVER derived from it.
+ * The client renders from `capabilities` and never works them out from `role`, which is for display.
+ * `scope` names the permission partition: responses differ by it, so cache keys include it.
+ */
+export const MembershipSchema = z.object({
+  tenant: TenantSchema,
+  role: RoleSchema,
+  capabilities: z.array(CapabilitySchema),
+  scope: z.string().min(1),
+});
+export type Membership = z.infer<typeof MembershipSchema>;
+
+/** What the app loads once at start, before any workspace data. */
+export const SessionSchema = z.object({ user: UserSchema, memberships: z.array(MembershipSchema).min(1) });
+export type Session = z.infer<typeof SessionSchema>;
 
 /** The list's tabs. Each is a named predicate in src/app/model; the server counts the same ones. */
 export const RECORD_VIEWS = ['all', 'open', 'drafts', 'archived'] as const;

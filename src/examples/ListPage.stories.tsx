@@ -47,3 +47,11 @@ export const BulkDeletePartialFailure: Story = {
   args: { initialSelection: 'matching', initialBulkDelete: 'submit' },
   parameters: mockApi({ url: '/records?view=drafts' }),
 };
+
+/** Viewer: no Drafts tab (the server hides drafts from this role), and New record disabled with the reason beside it. */
+export const AsViewer: Story = { parameters: mockApi({ role: 'viewer' }) };
+/** Viewer on the board: the same columns, minus drafts, and no Move to… on any card. */
+export const AsViewerBoard: Story = { parameters: mockApi({ role: 'viewer', url: '/records?display=board' }) };
+/** Editor: can create and move, but only admins delete. The bulk bar's Delete says so. */
+export const AsEditorWithSelection: Story = { args: { initialSelection: 'page' }, parameters: mockApi({ role: 'editor' }) };
+

@@ -48,7 +48,9 @@ import { FieldInput } from '../app/registries/fields';
 import { CREATE_FIELDS } from '../app/registries/recordFields';
 import { useTenant } from '../app/tenant';
 import { WORKSPACES } from '../app/workspaces';
+import { usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { gated, PermissionNote } from './Permission';
 
 export interface RecordDraft {
   name: string;
@@ -111,6 +113,7 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
   const accounts = useAccounts();
   const createRecord = useCreateRecord();
   const addPerson = useAddPerson();
+  const addPersonPermission = usePermission('people:create');
   const summaryRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<RecordDraft>({ ...EMPTY, ...initialDraft });
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
@@ -272,32 +275,41 @@ export function CreateEditFlow({ initialDraft, initialSubmitted = false, initial
                   />
                 ))}
                 <Cluster>
-                  <Dialog
-                    size="sm"
-                    title="Add a person"
-                    description="People own records. They’re invited when a record is sent."
-                    open={quickCreateOpen}
-                    onOpenChange={setQuickCreateOpen}
-                    trigger={
-                      <Button variant="ghost" size="sm" icon="plus">
+                  {addPersonPermission.allowed ? (
+                    <Dialog
+                      size="sm"
+                      title="Add a person"
+                      description="People own records. They’re invited when a record is sent."
+                      open={quickCreateOpen}
+                      onOpenChange={setQuickCreateOpen}
+                      trigger={
+                        <Button variant="ghost" size="sm" icon="plus">
+                          Add a person
+                        </Button>
+                      }
+                      footer={
+                        <>
+                          <Button variant="secondary" onClick={() => setQuickCreateOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={() => createPerson()} loading={addPerson.isPending}>
+                            Add person
+                          </Button>
+                        </>
+                      }
+                    >
+                      <Stack as="form" gap="md" onSubmit={createPerson}>
+                        <TextField label="Full name" value={personName} onChange={(event) => setPersonName(event.target.value)} error={personError} />
+                      </Stack>
+                    </Dialog>
+                  ) : (
+                    <>
+                      <Button variant="ghost" size="sm" icon="plus" {...gated(addPersonPermission)}>
                         Add a person
                       </Button>
-                    }
-                    footer={
-                      <>
-                        <Button variant="secondary" onClick={() => setQuickCreateOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={() => createPerson()} loading={addPerson.isPending}>
-                          Add person
-                        </Button>
-                      </>
-                    }
-                  >
-                    <Stack as="form" gap="md" onSubmit={createPerson}>
-                      <TextField label="Full name" value={personName} onChange={(event) => setPersonName(event.target.value)} error={personError} />
-                    </Stack>
-                  </Dialog>
+                      <PermissionNote permission={addPersonPermission} />
+                    </>
+                  )}
                 </Cluster>
                 <Textarea
                   label="Description (optional)"
