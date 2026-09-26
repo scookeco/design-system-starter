@@ -97,6 +97,7 @@ UI rules (design system v0)
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
 - [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
@@ -179,6 +180,7 @@ UI rules (design system v0)
 - [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
 - [Assistant chat](src/examples/AssistantChatPage.tsx)
+- [Command palette](src/examples/CommandMenu.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
 - [Create with AI](src/examples/CreateWithAi.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
@@ -885,6 +887,68 @@ States: copyable.
 Stories: `components-codeblock--default`, `components-codeblock--multi-line`, `components-codeblock--no-language`, `components-codeblock--not-copyable`.
 Composes: Button, CopyButton, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.caption`, `text.code`, `text.label`.
+
+### CommandPalette
+
+component · `src/components/CommandPalette/CommandPalette.tsx` · usage: `docs/usage/CommandPalette.usage.tsx`
+
+The command palette: type to jump to a page or record or run an action. A modal dialog with the ARIA combobox pattern: the input keeps focus, ↑ ↓ move the active option (aria-activedescendant), ↵ runs it, Esc closes and focus returns. Results are grouped, ranked forgivingly, and their count is announced. Open it with ⌘K / Ctrl+K from the app's shell composition (useShortcut), and pass only what the person may do.
+
+Props:
+- `open?: boolean`
+- `defaultOpen?: boolean` = `false`
+- `onOpenChange?: (open: boolean) => void`
+- `groups: readonly CommandGroup[]`: Groups in order. A group with no matching items is left out.
+- `query?: string`: Controlled query: pass it (and onQueryChange) when a group searches the server.
+- `onQueryChange?: (query: string) => void`
+- `label?: string` = `'Command palette'`: Accessible name of the dialog and the input.
+- `placeholder?: string` = `'Search or jump to…'`
+- `loading?: boolean` = `false`: A group is still searching: shows a spinner in the input and says so in the count.
+- `emptyMessage?: string` = `'Nothing matches. Try another word.'`: Shown when nothing matches.
+- `countMessage?: (count: number) => string` = `(count) => (count === 1 ? '1 result' : '${String(count)} results')`: Announced as the results change: `(count) => '12 results'`.
+- `maxPerGroup?: number` = `6`: The most items a local group shows for a query (all of them with an empty query).
+- `platform?: KeyPlatform`: Override the detected platform for key hints (gallery and tests).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: platform (mac | other).
+States: open, defaultOpen, loading.
+
+**When to use**
+
+- Once per app, in the shell composition, opened with ⌘K / Ctrl+K (`useShortcut` with `allowInInputs`) and from a Search button in the header that shows the keys.
+- Jumping to any page or record and running actions by typing: pages from the route table, records from a server search (`filter: "none"`), actions that mirror buttons.
+
+**When not to use**
+
+- Searching one list → `SearchField` on the list page (its results stay in the page and the URL)
+- Choosing a value for a form field → `Combobox`
+- The only way to reach something → visible navigation and buttons first; the palette is the fast path
+
+**Do:** Grouped rows with a type in the description and a shortcut where one exists; only what this person may do is passed in.
+
+```tsx
+<Button variant="secondary" icon="search">
+  <span>Search</span> <Kbd keys="mod+k" />
+</Button>
+```
+
+**Don't:** A search button with no sign of the shortcut: pointer users never learn ⌘K exists. (And never pass rows the person can’t run: filter with `can` first.)
+
+```tsx
+<Button variant="secondary" icon="search">Search</Button>
+```
+
+**Accessibility**
+
+- A modal dialog (focus trapped, the page inert, Esc closes, focus returns) holding the ARIA combobox pattern: the input keeps focus and `aria-activedescendant` names the active option.
+- The number of results is announced (`role="status"`) as the query changes; `countMessage` words it.
+- ↑ ↓ wrap around the list, ↵ runs the active row, and pointer users can click any row. Shortcuts on rows are also `aria-keyshortcuts`.
+- Keep labels verb-first for actions and give records a type in `description`, so a result is clear without seeing its group.
+
+Stories: `components-commandpalette--open`, `components-commandpalette--filtered`, `components-commandpalette--matched-by-keyword`, `components-commandpalette--no-results`, `components-commandpalette--searching`.
+Composes: Icon, Kbd, Spinner.
+Tokens read: `color.bg.elevated`, `color.bg.scrim`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.linear`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `size.control.lg`, `size.control.md`, `size.dialog.md`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `z.modal`.
 
 ### Composer
 
@@ -4762,6 +4826,8 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ChangeDecision` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeDecision = 'accepted' | 'rejected'`
 - `ChangeOutcome` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }` How each change went once applied: done, or why it failed.
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
+- `CommandGroup` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandGroup { id: string; label: string; items: readonly CommandItem[]; filter?: 'local' | 'none'; }`
+- `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconName; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
 - `ComposerAttachment` (`src/components/Composer/Composer.tsx`): `interface ComposerAttachment { id: string; name: string; }`
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").

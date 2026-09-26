@@ -4897,6 +4897,415 @@
         }
       ]
     },
+    "CommandPalette": {
+      "kind": "component",
+      "dir": "src/components/CommandPalette",
+      "exports": [
+        "CommandPalette"
+      ],
+      "stylesheets": [
+        "src/components/CommandPalette/CommandPalette.css"
+      ],
+      "composes": [
+        "Icon",
+        "Kbd",
+        "Spinner"
+      ],
+      "composesAll": [
+        "Icon",
+        "Kbd",
+        "Spinner"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.elevated",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.scrim",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.selected",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.linear",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.spin",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.surface",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.modal",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.lg",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.md",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Spinner",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.scroll-region.lg",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.code",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.modal",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Composer": {
       "kind": "component",
       "dir": "src/components/Composer",

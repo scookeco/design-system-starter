@@ -97,6 +97,7 @@ UI rules (design system v0)
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
+- [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
 - [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
@@ -179,6 +180,7 @@ UI rules (design system v0)
 - [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
 - [Assistant chat](src/examples/AssistantChatPage.tsx)
+- [Command palette](src/examples/CommandMenu.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
 - [Create with AI](src/examples/CreateWithAi.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)

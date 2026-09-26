@@ -68,6 +68,7 @@ export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating }
 export { Disclosure, type DisclosureProps } from './Disclosure/Disclosure';
 export { Accordion, type AccordionProps, type AccordionItem } from './Accordion/Accordion';
 // Keyboard
+export { CommandPalette, type CommandPaletteProps, type CommandGroup, type CommandItem } from './CommandPalette/CommandPalette';
 export { Kbd, formatShortcut, ariaKeyShortcuts, type KbdProps, type KeyPlatform } from './Kbd/Kbd';
 export {
   ShortcutHelp,
