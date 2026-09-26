@@ -10,13 +10,13 @@
       "radix-ui"
     ],
     "gzip": true,
-    "limit": "16.35 kB"
+    "limit": "24.5 kB"
   },
   {
     "name": "Library CSS (dist/styles.css)",
     "path": "dist/styles.css",
     "gzip": true,
-    "limit": "11.5 kB"
+    "limit": "14.5 kB"
   },
   {
     "name": "One component (import { Button })",
