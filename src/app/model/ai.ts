@@ -12,6 +12,8 @@
  *   renameConversation   pessimistic  conversations (the entry)      conversations
  *   deleteConversation   pessimistic  removes the detail             conversations
  *   ask (useAssistant)   streaming    its own turns, token by token  the conversation and list, when stored
+ *   applyProposal        pessimistic  through moveRecord, one per accepted change (its patches and invalidations)
+ *   undoProposal         pessimistic  through moveRecord, back to each status, with the version each move returned
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
@@ -33,9 +35,11 @@ import {
 } from '../api/ai';
 import { ApiError, ContractError } from '../api/client';
 import type { Capability } from '../api/schemas';
+import type { MovableStatus } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
 import { useTenant } from '../tenant';
 import type { Partition } from './keys';
+import { isConflict, isForbidden, useMoveRecord } from './mutations';
 import { can, DENIAL_REASONS } from './permissions';
 
 export const aiKeys = {
@@ -205,40 +209,51 @@ export function useAssistant({ context, conversationId, initialTurns = [] }: Use
 
   const stream = useMutation({
     mutationKey: [...partition, 'assistant'],
-    mutationFn: async ({ prompt, answerId }: { prompt: string; answerId: string }) => {
+    /** Streams one answer into the turn `answerId`, and resolves with the finished turn. */
+    mutationFn: async ({ prompt, answerId, time, stored }: { prompt: string; answerId: string; time: string; stored: string | undefined }): Promise<AssistantTurn> => {
       const abort = new AbortController();
       controller.current = abort;
+      // The turn as it builds, mirrored into state as each event lands.
+      let turn: AssistantTurn = { id: answerId, role: 'assistant', text: '', status: 'pending', time, tools: [], sources: [] };
+      const next = (change: (t: AssistantTurn) => AssistantTurn) => {
+        turn = change(turn);
+        const settled = turn;
+        update(answerId, () => settled);
+      };
       try {
         if (!can(grant, ASK)) throw new ApiError(403, 'forbidden', DENIAL_REASONS[ASK]);
-        await streamAssistant(tenant, { prompt, context, ...(conversationId ? { conversationId } : {}) }, (event) => update(answerId, (turn) => apply(turn, event)), abort.signal);
-        update(answerId, (turn) => (turn.status === 'error' ? turn : { ...turn, status: 'complete' }));
+        await streamAssistant(tenant, { prompt, context, ...(stored ? { conversationId: stored } : {}) }, (event) => next((t) => apply(t, event)), abort.signal);
+        next((t) => (t.status === 'error' ? t : { ...t, status: 'complete' }));
       } catch (error) {
-        if (isAbort(error) || abort.signal.aborted) update(answerId, (turn) => ({ ...turn, status: 'stopped' }));
-        else update(answerId, (turn) => ({ ...turn, status: 'error', failure: failureOf(error) }));
+        if (isAbort(error) || abort.signal.aborted) next((t) => ({ ...t, status: 'stopped' }));
+        else next((t) => ({ ...t, status: 'error', failure: failureOf(error) }));
       } finally {
         controller.current = undefined;
       }
+      return turn;
     },
-    onSettled: () =>
-      conversationId
+    onSettled: (_turn, _error, { stored }) =>
+      stored
         ? Promise.all([
-            client.invalidateQueries({ queryKey: aiKeys.conversation(partition, conversationId) }),
+            client.invalidateQueries({ queryKey: aiKeys.conversation(partition, stored) }),
             client.invalidateQueries({ queryKey: aiKeys.conversations(partition) }),
           ])
         : undefined,
   });
 
-  const start = (prompt: string, answerId: string) => stream.mutate({ prompt, answerId });
+  /** Resolves with the finished answer, so a caller can chain the next step without a gap. */
+  const start = (prompt: string, answerId: string, time: string, stored = conversationId) => stream.mutateAsync({ prompt, answerId, time, stored });
 
-  const ask = (prompt: string) => {
-    const now = new Date().toISOString();
+  /** Ask. `into` stores the exchange in a conversation created just now (before this render knows its id). */
+  const ask = (prompt: string, into?: { conversationId: string }) => {
+    const time = new Date().toISOString();
     const answerId = nextTurnId();
     setTurns((current) => [
       ...current,
-      { id: nextTurnId(), role: 'user', text: prompt, status: 'complete', time: now, tools: [], sources: [] },
-      { id: answerId, role: 'assistant', text: '', status: 'pending', time: now, tools: [], sources: [] },
+      { id: nextTurnId(), role: 'user', text: prompt, status: 'complete', time, tools: [], sources: [] },
+      { id: answerId, role: 'assistant', text: '', status: 'pending', time, tools: [], sources: [] },
     ]);
-    start(prompt, answerId);
+    return start(prompt, answerId, time, into?.conversationId ?? conversationId);
   };
 
   /** Ask the question behind this answer again, in its place. */
@@ -246,8 +261,9 @@ export function useAssistant({ context, conversationId, initialTurns = [] }: Use
     const index = turns.findIndex((t) => t.id === answerId);
     const question = turns.slice(0, index).findLast((t) => t.role === 'user');
     if (index === -1 || !question) return;
-    update(answerId, (turn) => ({ ...turn, text: '', status: 'pending', tools: [], sources: [], proposal: undefined, refusal: undefined, failure: undefined, time: new Date().toISOString() }));
-    start(question.text, answerId);
+    const time = new Date().toISOString();
+    update(answerId, (turn) => ({ ...turn, text: '', status: 'pending', tools: [], sources: [], proposal: undefined, refusal: undefined, failure: undefined, time }));
+    void start(question.text, answerId, time);
   };
 
   return {
@@ -329,4 +345,52 @@ export function useDraftSuggestion() {
       setStatus('idle');
     },
   };
+}
+
+/** A move that was applied: enough to put the record back (its status before, and its version now). */
+export interface AppliedMove {
+  id: string;
+  before: MovableStatus;
+  version: number;
+}
+
+/** How one proposed change went. */
+export type MoveOutcome = { ok: true } | { ok: false; reason: string };
+
+/**
+ * Apply an accepted proposal, and undo it. The assistant gets no write path of its own: each change
+ * goes through moveRecord, so it is refused with `can` before sending, checked again by the
+ * server, versioned (a stale proposal gets a 409), and patches and invalidates like a board move.
+ * One change failing doesn't stop the rest; each reports its own outcome.
+ */
+export function useApplyProposal() {
+  const move = useMoveRecord();
+  const apply = useMutation({
+    mutationFn: async ({ ids, moves }: { ids: readonly string[]; moves: readonly ProposedMove[] }) => {
+      const outcomes: Record<string, MoveOutcome> = {};
+      const applied: AppliedMove[] = [];
+      for (const id of ids) {
+        const proposed = moves.find((m) => m.recordId === id);
+        if (!proposed) continue;
+        try {
+          const moved = await move.mutateAsync({ record: { id, version: proposed.version }, status: proposed.after });
+          outcomes[id] = { ok: true };
+          if (proposed.before !== 'archived') applied.push({ id, before: proposed.before, version: moved.version });
+        } catch (error) {
+          outcomes[id] = { ok: false, reason: isConflict(error) ? 'someone else changed it first' : isForbidden(error) ? error.message : 'the server refused it' };
+        }
+      }
+      return { outcomes, applied };
+    },
+  });
+  const undo = useMutation({
+    mutationFn: async (applied: readonly AppliedMove[]) => {
+      const failed: string[] = [];
+      for (const record of applied) {
+        await move.mutateAsync({ record: { id: record.id, version: record.version }, status: record.before }).catch(() => failed.push(record.id));
+      }
+      return { failed };
+    },
+  });
+  return { apply, undo };
 }

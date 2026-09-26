@@ -35,6 +35,8 @@ export interface MessageProps extends EscapeHatch {
   feedback?: ReactNode;
   /** The AI mark on an assistant turn. Defaults to an AiMarker; pass null only where the whole surface is already marked. */
   marker?: ReactNode;
+  /** Shown under a stopped turn, so it doesn't read as a finished answer. */
+  stoppedLabel?: string;
 }
 
 /**
@@ -54,6 +56,7 @@ export function Message({
   onEdit,
   feedback,
   marker = role === 'assistant' ? <AiMarker variant="inline" /> : null,
+  stoppedLabel = 'Stopped before the answer finished.',
   UNSAFE_className,
   UNSAFE_style,
 }: MessageProps) {
@@ -91,6 +94,7 @@ export function Message({
         {marker}
       </div>
       <div className="message__body">{children}</div>
+      {status === 'stopped' ? <p className="message__note">{stoppedLabel}</p> : null}
       {error ? (
         <p className="message__error" role="alert">
           <Icon name="danger" />

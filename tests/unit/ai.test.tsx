@@ -81,7 +81,9 @@ describe('the mock assistant answers as the signed-in person', () => {
 describe('useAssistant', () => {
   const ask = async (context: Parameters<typeof useAssistant>[0]['context'], prompt: string) => {
     const hook = renderHook(() => useAssistant({ context }), { wrapper: wrapperFor(testClient()) });
-    act(() => hook.result.current.ask(prompt));
+    act(() => {
+      void hook.result.current.ask(prompt);
+    });
     await waitFor(() => expect(hook.result.current.streaming).toBe(false));
     return hook;
   };
@@ -115,7 +117,9 @@ describe('useAssistant', () => {
   it('keeps what arrived when the person stops it', async () => {
     server.use(http.post('*/api/t/:tenant/ai/respond', () => new HttpResponse(new ReadableStream({ start: (c) => c.enqueue(new TextEncoder().encode('{"type":"token","text":"Partly "}\n')) }))));
     const hook = renderHook(() => useAssistant({ context: { kind: 'workspace' } }), { wrapper: wrapperFor(testClient()) });
-    act(() => hook.result.current.ask('Hello'));
+    act(() => {
+      void hook.result.current.ask('Hello');
+    });
     await waitFor(() => expect(hook.result.current.turns[1]?.text).toBe('Partly '));
     act(() => hook.result.current.stop());
     await waitFor(() => expect(hook.result.current.turns[1]?.status).toBe('stopped'));
@@ -157,7 +161,9 @@ describe('conversations', () => {
     const create = renderHook(() => useCreateConversation(), { wrapper });
     const created = await act(() => create.result.current.mutateAsync());
     const assistant = renderHook(() => useAssistant({ context: { kind: 'workspace' }, conversationId: created.id }), { wrapper });
-    act(() => assistant.result.current.ask('How many records are overdue?'));
+    act(() => {
+      void assistant.result.current.ask('How many records are overdue?');
+    });
     await waitFor(() => expect(list.result.current.data?.[0]).toMatchObject({ id: created.id, title: 'How many records are overdue?' }));
 
     const rename = renderHook(() => useRenameConversation(), { wrapper });

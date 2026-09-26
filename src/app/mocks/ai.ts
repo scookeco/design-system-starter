@@ -230,6 +230,8 @@ const streamAnswer = (answer: Answer, plan: StreamPlan, onDone?: () => void) => 
     async start(controller) {
       const send = (event: AiEvent) => controller.enqueue(encoder.encode(line(event)));
       for (const event of answer.events.filter((e) => e.type === 'tool' || e.type === 'refusal')) send(event);
+      // Sources first, as retrieval-grounded models do: a citation is a working link from the moment it appears.
+      if (answer.sources?.length) send({ type: 'citations', sources: answer.sources });
       if (paced && answer.events.length > 0) await delay(TOKEN_MS * 4);
       const words = tokens(answer.text);
       for (const [index, word] of words.entries()) {
@@ -248,7 +250,6 @@ const streamAnswer = (answer: Answer, plan: StreamPlan, onDone?: () => void) => 
         if (paced) await delay(TOKEN_MS);
       }
       if (cancelled) return;
-      if (answer.sources?.length) send({ type: 'citations', sources: answer.sources });
       for (const event of answer.events.filter((e) => e.type === 'proposal')) send(event);
       send({ type: 'done' });
       onDone?.();

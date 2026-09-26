@@ -46,6 +46,12 @@
     font: var(--text-body);
   }
 
+  .message__note {
+    margin: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
   .message__error {
     display: flex;
     align-items: center;

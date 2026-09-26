@@ -233,6 +233,21 @@
   ],
   "examples": [
     {
+      "title": "AI bulk changes",
+      "summary": "GOLDEN EXAMPLE (AI): an agent that proposes bulk changes, reviewed before anything happens.",
+      "path": "src/examples/AiReviewChanges.tsx",
+      "stories": [
+        "examples-ai-bulk-changes--ready",
+        "examples-ai-bulk-changes--proposing",
+        "examples-ai-bulk-changes--proposed",
+        "examples-ai-bulk-changes--applied",
+        "examples-ai-bulk-changes--partly-failed",
+        "examples-ai-bulk-changes--undone",
+        "examples-ai-bulk-changes--as-viewer",
+        "examples-ai-bulk-changes--as-viewer-refused"
+      ]
+    },
+    {
       "title": "App",
       "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
       "path": "src/examples/App.tsx",
@@ -241,6 +256,28 @@
         "examples-app--record-from-link",
         "examples-app--unknown-path",
         "examples-app--guarded-route"
+      ]
+    },
+    {
+      "title": "Assistant chat",
+      "summary": "GOLDEN EXAMPLE (AI): a full chat page, for questions that span the workspace.",
+      "path": "src/examples/AssistantChatPage.tsx",
+      "stories": [
+        "examples-assistant-chat--with-history",
+        "examples-assistant-chat--new-chat",
+        "examples-assistant-chat--empty-history",
+        "examples-assistant-chat--loading-history",
+        "examples-assistant-chat--tool-activity",
+        "examples-assistant-chat--streaming",
+        "examples-assistant-chat--stopped",
+        "examples-assistant-chat--refusal",
+        "examples-assistant-chat--other-workspace",
+        "examples-assistant-chat--rate-limited",
+        "examples-assistant-chat--content-filtered",
+        "examples-assistant-chat--connection-dropped",
+        "examples-assistant-chat--conversation-gone",
+        "examples-assistant-chat--rename-dialog",
+        "examples-assistant-chat--delete-dialog"
       ]
     },
     {
@@ -256,6 +293,20 @@
         "examples-create-and-edit--create-failed",
         "examples-create-and-edit--quick-create-open",
         "examples-create-and-edit--as-viewer-denied"
+      ]
+    },
+    {
+      "title": "Create with AI",
+      "summary": "GOLDEN EXAMPLE (AI): inline AI in a create form. The description field can be drafted by the assistant, beside writing it by hand, never instead of it.",
+      "path": "src/examples/CreateWithAi.tsx",
+      "stories": [
+        "examples-create-with-ai--default",
+        "examples-create-with-ai--suggesting",
+        "examples-create-with-ai--suggestion-ready",
+        "examples-create-with-ai--accepted",
+        "examples-create-with-ai--rate-limited",
+        "examples-create-with-ai--as-viewer",
+        "examples-create-with-ai--refused"
       ]
     },
     {
@@ -324,6 +375,23 @@
         "examples-list-page--saved-view-modified",
         "examples-list-page--save-view-dialog",
         "examples-list-page--columns-chosen"
+      ]
+    },
+    {
+      "title": "Record copilot",
+      "summary": "GOLDEN EXAMPLE (AI): a copilot beside a record. The record page is the existing one, untouched; the assistant joins its shell through WithAssistant, as an AssistantPanel in AppShell's assistant slot (a Drawer on narrow screens).",
+      "path": "src/examples/RecordCopilot.tsx",
+      "stories": [
+        "examples-record-copilot--empty",
+        "examples-record-copilot--answered",
+        "examples-record-copilot--summary",
+        "examples-record-copilot--streaming",
+        "examples-record-copilot--stopped",
+        "examples-record-copilot--refusal",
+        "examples-record-copilot--rate-limited",
+        "examples-record-copilot--content-filtered",
+        "examples-record-copilot--connection-dropped",
+        "examples-record-copilot--panel-closed"
       ]
     },
     {
@@ -7526,6 +7594,13 @@
           "required": false,
           "default": "role === 'assistant' ? <AiMarker variant=\"inline\" /> : null",
           "description": "The AI mark on an assistant turn. Defaults to an AiMarker; pass null only where the whole surface is already marked."
+        },
+        {
+          "name": "stoppedLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Stopped before the answer finished.'",
+          "description": "Shown under a stopped turn, so it doesn't read as a finished answer."
         }
       ],
       "inherits": [],

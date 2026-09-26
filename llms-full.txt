@@ -170,12 +170,16 @@ UI rules (design system v0)
 
 ## Examples
 
+- [AI bulk changes](src/examples/AiReviewChanges.tsx)
 - [App](src/examples/App.tsx)
+- [Assistant chat](src/examples/AssistantChatPage.tsx)
 - [Create and edit](src/examples/CreateEditFlow.tsx)
+- [Create with AI](src/examples/CreateWithAi.tsx)
 - [Dashboard](src/examples/DashboardPage.tsx)
 - [Entity pages](src/examples/EntityPages.tsx)
 - [Error pages](src/examples/ErrorPages.tsx)
 - [List page](src/examples/ListPage.tsx)
+- [Record copilot](src/examples/RecordCopilot.tsx)
 - [Record page](src/examples/RecordPage.tsx)
 - [Settings page](src/examples/SettingsPage.tsx)
 - [Setup wizard](src/examples/SetupWizard.tsx)
@@ -1721,6 +1725,7 @@ Props:
 - `onEdit?: () => void`: Shows Edit on a user turn: puts its text back in the composer.
 - `feedback?: ReactNode`: A Feedback control for an assistant turn.
 - `marker?: ReactNode` = `role === 'assistant' ? <AiMarker variant="inline" /> : null`: The AI mark on an assistant turn. Defaults to an AiMarker; pass null only where the whole surface is already marked.
+- `stoppedLabel?: string` = `'Stopped before the answer finished.'`: Shown under a stopped turn, so it doesn't read as a finished answer.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
