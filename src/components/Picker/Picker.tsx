@@ -14,6 +14,7 @@ import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, 
 import { ComboBoxStateContext, FieldError, I18nProvider, Label, ListBoxItem, Text } from 'react-aria-components';
 import { useFormat } from '../../format';
 import { Icon } from '../Icon/Icon';
+import { CheckIcon, DangerIcon } from '../Icon/icons';
 import '../Field/Field.css';
 import './Picker.css';
 
@@ -70,7 +71,7 @@ export function PickerHelp({ description, error }: { description?: string | unde
         </Text>
       ) : null}
       <FieldError className="field__error">
-        <Icon name="danger" />
+        <Icon icon={DangerIcon} />
         <span>{error}</span>
       </FieldError>
     </>
@@ -122,7 +123,7 @@ export function PickerOption({ option }: { option: PickerOptionData }) {
           </span>
           {isSelected ? (
             <span className="picker__check">
-              <Icon name="check" />
+              <Icon icon={CheckIcon} />
             </span>
           ) : null}
         </>

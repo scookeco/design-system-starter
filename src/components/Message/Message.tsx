@@ -7,6 +7,7 @@ import { Avatar } from '../Avatar/Avatar';
 import { Button } from '../Button/Button';
 import { CopyButton } from '../CopyButton/CopyButton';
 import { Icon } from '../Icon/Icon';
+import { DangerIcon, EditIcon, RetryIcon, SparkleIcon } from '../Icon/icons';
 import type { StreamStatus } from '../StreamingText/StreamingText';
 import './Message.css';
 
@@ -80,7 +81,7 @@ export function Message({
           <Avatar name={author} size="sm" decorative />
         ) : (
           <span className="message__avatar" aria-hidden="true">
-            <Icon name="sparkle" />
+            <Icon icon={SparkleIcon} />
           </span>
         )}
         <span className="message__author" id={headerId}>
@@ -97,7 +98,7 @@ export function Message({
       {status === 'stopped' ? <p className="message__note">{stoppedLabel}</p> : null}
       {error ? (
         <p className="message__error" role="alert">
-          <Icon name="danger" />
+          <Icon icon={DangerIcon} />
           <span>{error}</span>
         </p>
       ) : null}
@@ -105,12 +106,12 @@ export function Message({
         <div className="message__actions">
           {copyText !== undefined ? <CopyButton text={copyText} variant="ghost" accessibleName={`Copy ${role === 'user' ? 'message' : 'answer'}`} /> : null}
           {onEdit ? (
-            <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Button variant="ghost" size="sm" icon={EditIcon} onClick={onEdit}>
               Edit
             </Button>
           ) : null}
           {onRetry ? (
-            <Button variant="ghost" size="sm" onClick={onRetry}>
+            <Button variant="ghost" size="sm" icon={RetryIcon} onClick={onRetry}>
               Retry
             </Button>
           ) : null}

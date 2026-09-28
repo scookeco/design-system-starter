@@ -1,4 +1,4 @@
-import { Button, Cluster, Dialog, TextField } from '../../src/index';
+import { Button, Cluster, Dialog, PlusIcon, TextField } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -19,7 +19,7 @@ export const usage: UsageDoc = {
       <Dialog
         title="New record"
         description="Records start as drafts."
-        trigger={<Button icon="plus">New record</Button>}
+        trigger={<Button icon={PlusIcon}>New record</Button>}
         footer={
           <>
             <Button variant="secondary">Cancel</Button>

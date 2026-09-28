@@ -4,6 +4,7 @@ import { DemoNarrow } from '../../../.storybook/DemoBox';
 import { Badge } from '../Badge/Badge';
 import { Button } from '../Button/Button';
 import { PageHeader } from './PageHeader';
+import { MoreIcon, PlusIcon } from '../Icon/icons';
 
 /** Stories format with the system's formats, like apps do (apps use useFormat()). */
 const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
@@ -12,7 +13,7 @@ const actions = (
   <>
     <Button variant="secondary">Share</Button>
     <Button>Request approval</Button>
-    <Button variant="secondary" icon="more">
+    <Button variant="secondary" icon={MoreIcon}>
       More
     </Button>
   </>
@@ -30,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 export const TitleOnly: Story = {};
 export const WithDescription: Story = { args: { description: 'Track every record, who owns it and where it stands.' } };
 export const WithAction: Story = {
-  args: { description: 'Track every record, who owns it and where it stands.', actions: <Button icon="plus">New record</Button> },
+  args: { description: 'Track every record, who owns it and where it stands.', actions: <Button icon={PlusIcon}>New record</Button> },
 };
 export const WithStatus: Story = {
   args: {

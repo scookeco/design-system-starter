@@ -2,38 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { LinkComponentProps } from '../../src/index';
-import {
-  AppShell,
-  Avatar,
-  Badge,
-  Banner,
-  Breadcrumbs,
-  Button,
-  Checkbox,
-  EmptyState,
-  Link,
-  LinkProvider,
-  Meter,
-  Nav,
-  SegmentedControl,
-  Stat,
-  NavTabs,
-  PageLayout,
-  RadioGroup,
-  Select,
-  Skeleton,
-  Spinner,
-  Switch,
-  Textarea,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  TextField,
-} from '../../src/index';
+import { AppShell, Avatar, Badge, Banner, Breadcrumbs, Button, Checkbox, EmptyState, HomeIcon, Link, LinkProvider, Meter, Nav, NavTabs, PageLayout, RadioGroup, SegmentedControl, Select, Skeleton, Spinner, Stack, Stat, Switch, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Textarea, TextField } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -238,7 +207,7 @@ describe('AppShell', () => {
 
 describe('AppShell icon rail', () => {
   const shell = (props: Partial<Parameters<typeof AppShell>[0]> = {}) => (
-    <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />} {...props}>
+    <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />} {...props}>
       <p>Page</p>
     </AppShell>
   );

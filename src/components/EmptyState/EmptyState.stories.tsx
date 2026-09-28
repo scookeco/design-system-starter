@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../Button/Button';
 import { EmptyState } from './EmptyState';
+import { PlusIcon } from '../Icon/icons';
 
 const meta = {
   title: 'Components/EmptyState',
@@ -9,7 +10,7 @@ const meta = {
     reason: 'first-use',
     title: 'Create your first record',
     description: 'Records keep each agreement, its owner and its amount in one place.',
-    action: <Button icon="plus">New record</Button>,
+    action: <Button icon={PlusIcon}>New record</Button>,
   },
 } satisfies Meta<typeof EmptyState>;
 

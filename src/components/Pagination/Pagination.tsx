@@ -1,6 +1,7 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { useFormat } from '../../format/LocaleProvider';
 import { Icon } from '../Icon/Icon';
+import { ChevronLeftIcon, ChevronRightIcon } from '../Icon/icons';
 import './Pagination.css';
 
 export interface PaginationProps extends EscapeHatch {
@@ -77,7 +78,7 @@ export function Pagination({
       <ul role="list" className="pagination__list">
         <li>
           <button type="button" className="pagination__step" aria-disabled={current === 1 || undefined} onClick={() => go(current - 1)}>
-            <Icon name="chevron-left" />
+            <Icon icon={ChevronLeftIcon} />
             {previousLabel}
           </button>
         </li>
@@ -103,7 +104,7 @@ export function Pagination({
         <li>
           <button type="button" className="pagination__step" aria-disabled={current === pages || undefined} onClick={() => go(current + 1)}>
             {nextLabel}
-            <Icon name="chevron-right" />
+            <Icon icon={ChevronRightIcon} />
           </button>
         </li>
       </ul>

@@ -1,5 +1,6 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CheckIcon } from '../Icon/icons';
 import './Stepper.css';
 
 export interface StepperStep {
@@ -32,7 +33,7 @@ export function Stepper({ label, steps, current, completedLabel = 'Completed', U
         return (
           <li key={step.label} className="stepper__step" data-state={state} aria-current={state === 'current' ? 'step' : undefined}>
             <span className="stepper__marker" aria-hidden="true">
-              {state === 'completed' ? <Icon name="check" /> : index + 1}
+              {state === 'completed' ? <Icon icon={CheckIcon} /> : index + 1}
             </span>
             <span className="stepper__label">
               {state === 'completed' ? <span className="visually-hidden">{`${completedLabel}: `}</span> : null}

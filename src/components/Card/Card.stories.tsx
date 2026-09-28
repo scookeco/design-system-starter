@@ -4,6 +4,7 @@ import { Button } from '../Button/Button';
 import { Text } from '../Text/Text';
 import { TextField } from '../TextField/TextField';
 import { Card, CardBody, CardFooter, CardHeader } from './Card';
+import { PlusIcon } from '../Icon/icons';
 
 /** Stories format with the system's formats, like apps do (apps use useFormat()). */
 const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
@@ -15,7 +16,7 @@ function ProfileCard({ header = true, footer = 'end', actions = false }: { heade
         <CardHeader
           title="Profile"
           description="Your name and photo on records and comments."
-          actions={actions ? <Button variant="ghost" size="sm" icon="plus">Add</Button> : undefined}
+          actions={actions ? <Button variant="ghost" size="sm" icon={PlusIcon}>Add</Button> : undefined}
         />
       ) : null}
       <CardBody>

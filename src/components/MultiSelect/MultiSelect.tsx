@@ -2,6 +2,7 @@ import { useContext, useRef } from 'react';
 import { Button, ComboBox, ComboBoxStateContext, Input, ListBox, Popover } from 'react-aria-components';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { ChevronDownIcon } from '../Icon/icons';
 import { ComboboxEscapeCloses, ComboboxOpenOnMount, PickerHelp, PickerLabel, PickerLocale, PickerOption, usePortalContainer, type PickerOptionData } from '../Picker/Picker';
 import { Tag } from '../Tag/Tag';
 import './MultiSelect.css';
@@ -113,7 +114,7 @@ export function MultiSelect({
           <Chosen options={options} removeLabel={removeLabel} />
           <Input className="picker__input multi-select__input" {...(placeholder ? { placeholder } : {})} />
           <Button className="picker__button" aria-label={showOptionsLabel}>
-            <Icon name="chevron-down" />
+            <Icon icon={ChevronDownIcon} />
           </Button>
         </div>
         <PickerHelp description={description} error={error} />

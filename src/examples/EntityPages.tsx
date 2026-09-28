@@ -16,31 +16,7 @@
  *           focused summary, a safe-to-retry create (idempotency key), a 409 on a stale edit
  */
 import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
-import {
-  Badge,
-  Banner,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Center,
-  Cluster,
-  EmptyState,
-  Link,
-  PageHeader,
-  PageLayout,
-  Skeleton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  Text,
-  currencyDigits,
-  useFormat,
-} from '../index';
+import { Badge, Banner, Button, Card, CardBody, CardHeader, Center, Cluster, currencyDigits, EmptyState, Link, PageHeader, PageLayout, PlusIcon, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text, useFormat } from '../index';
 import { isConflict } from '../app/model/mutations';
 import { toRow } from '../app/model/projections';
 import { useAccounts, usePeople, useRecordCounts, useRecordList } from '../app/model/queries';
@@ -75,7 +51,7 @@ export function EntityListPage<E extends Entity>({ config }: { config: EntityCon
             description={config.description}
             actions={
               config.form && config.capabilities.create ? (
-                <Button icon="plus" onClick={() => navigate(`${config.path}/new`)} {...gated(create)}>
+                <Button icon={PlusIcon} onClick={() => navigate(`${config.path}/new`)} {...gated(create)}>
                   {`New ${config.label.one.toLowerCase()}`}
                 </Button>
               ) : undefined

@@ -15,7 +15,7 @@
  * Back doesn't return to the empty URL. A shared link always wins over the default.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
-import { Badge, Button, Cluster, Dialog, Menu, Select, Stack, TextField, useToast, type MenuEntry } from '../index';
+import { Badge, Button, Cluster, Dialog, Menu, PlusIcon, Select, Stack, TextField, useToast, type MenuEntry } from '../index';
 import { ApiError } from '../app/api/client';
 import { useDeleteView, useSaveView, useUpdateView } from '../app/model/mutations';
 import { useSavedViews } from '../app/model/queries';
@@ -142,7 +142,7 @@ export function SavedViewsBar({ url, nav, openedBare, initialDialog }: SavedView
   };
 
   const menu: MenuEntry[] = [
-    { label: 'Save as new view…', icon: 'plus', onSelect: () => open('save') },
+    { label: 'Save as new view…', icon: PlusIcon, onSelect: () => open('save') },
     ...(active
       ? ([
           ...(modified ? [{ label: `Save changes to “${active.name}”`, onSelect: saveChanges }] : []),

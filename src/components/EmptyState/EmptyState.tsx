@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { PlusIcon, SearchIcon, WarningIcon, type IconDefinition } from '../Icon/icons';
 import { Text } from '../Text/Text';
 import './EmptyState.css';
 
@@ -11,10 +12,10 @@ import './EmptyState.css';
  */
 export type EmptyStateReason = 'first-use' | 'no-results' | 'error';
 
-const REASON_ICON: Record<EmptyStateReason, IconName> = {
-  'first-use': 'plus',
-  'no-results': 'search',
-  error: 'warning',
+const REASON_ICON: Record<EmptyStateReason, IconDefinition> = {
+  'first-use': PlusIcon,
+  'no-results': SearchIcon,
+  error: WarningIcon,
 };
 
 export interface EmptyStateProps extends EscapeHatch {
@@ -37,7 +38,7 @@ export function EmptyState({ reason, title, description, action, headingLevel = 
   return (
     <div className={cx('empty-state', UNSAFE_className)} style={UNSAFE_style} data-reason={reason}>
       <span className="empty-state__mark">
-        <Icon name={REASON_ICON[reason]} size="md" />
+        <Icon icon={REASON_ICON[reason]} size="md" />
       </span>
       <div className="empty-state__text">
         <Heading level={headingLevel} size={4}>

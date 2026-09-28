@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Accordion as AccordionPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { ChevronRightIcon } from '../Icon/icons';
 import '../Disclosure/Disclosure.css';
 import './Accordion.css';
 
@@ -60,7 +61,7 @@ function headingElement(Heading: 'h3', item: AccordionItem) {
   return (
     <Heading className="accordion__heading disclosure__header">
       <AccordionPrimitive.Trigger className="disclosure__trigger">
-        <Icon name="chevron-right" />
+        <Icon icon={ChevronRightIcon} />
         <span>{item.title}</span>
       </AccordionPrimitive.Trigger>
       {item.meta ? <span className="disclosure__meta">{item.meta}</span> : null}

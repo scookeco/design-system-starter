@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { Toolbar as ToolbarPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import type { IconDefinition } from '../Icon/icons';
 import { Tooltip } from '../Tooltip/Tooltip';
 import './Toolbar.css';
 
@@ -29,7 +30,7 @@ export function Toolbar({ label, orientation = 'horizontal', children, UNSAFE_cl
 export interface ToolbarButtonProps {
   /** Verb-first label. Also the accessible name when the label is hidden. Required. */
   children: string;
-  icon?: IconName;
+  icon?: IconDefinition;
   /** Show only the icon; the label moves into a tooltip and the accessible name. Needs `icon`. */
   hideLabel?: boolean;
   onClick?: () => void;
@@ -53,7 +54,7 @@ export function ToolbarButton({ children, icon, hideLabel = false, onClick, disa
       aria-label={hideLabel && icon ? children : undefined}
       onClick={onClick}
     >
-      {icon ? <Icon name={icon} /> : null}
+      {icon ? <Icon icon={icon} /> : null}
       {hideLabel && icon ? null : <span>{children}</span>}
     </ToolbarPrimitive.Button>
   );

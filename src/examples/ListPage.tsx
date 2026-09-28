@@ -46,37 +46,7 @@
  * Selection belongs to one filter: change the search, a filter or the view and it clears.
  */
 import { useCallback, useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
-import {
-  Badge,
-  Banner,
-  Button,
-  Center,
-  Checkbox,
-  Cluster,
-  Dialog,
-  EmptyState,
-  Link,
-  NavTabs,
-  PageHeader,
-  Pagination,
-  Popover,
-  SearchField,
-  SegmentedControl,
-  Skeleton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  Tag,
-  Text,
-  TextField,
-  Tooltip,
-  useFormat,
-  useToast,
-} from '../index';
+import { Badge, Banner, Button, Center, Checkbox, Cluster, Dialog, DownloadIcon, EmptyState, Link, NavTabs, PageHeader, Pagination, PlusIcon, Popover, SearchField, SegmentedControl, SettingsIcon, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tag, Text, TextField, Tooltip, useFormat, useToast } from '../index';
 import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
 import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, useStartBulkDelete, type BulkSelection } from '../app/model/mutations';
 import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
@@ -334,7 +304,7 @@ function ListPageContent({
       actions={
         <>
           <Tooltip content="Download the filtered list as CSV">
-            <Button variant="secondary" icon="download">
+            <Button variant="secondary" icon={DownloadIcon}>
               Export
             </Button>
           </Tooltip>
@@ -344,7 +314,7 @@ function ListPageContent({
               description="Records start as drafts, owned by you, until they are sent."
               open={dialogOpen}
               onOpenChange={setDialogOpen}
-              trigger={<Button icon="plus">New record</Button>}
+              trigger={<Button icon={PlusIcon}>New record</Button>}
               footer={
                 <>
                   <Button variant="secondary" onClick={() => setDialogOpen(false)}>
@@ -361,7 +331,7 @@ function ListPageContent({
               </Stack>
             </Dialog>
           ) : (
-            <Button icon="plus" {...gated(createPermission)}>
+            <Button icon={PlusIcon} {...gated(createPermission)}>
               New record
             </Button>
           )}
@@ -386,7 +356,7 @@ function ListPageContent({
             title="Create your first record"
             description="Records keep each agreement, its owner and its amount in one place."
             action={
-              <Button icon="plus" onClick={() => setDialogOpen(true)} {...gated(createPermission)}>
+              <Button icon={PlusIcon} onClick={() => setDialogOpen(true)} {...gated(createPermission)}>
                 New record
               </Button>
             }
@@ -419,7 +389,7 @@ function ListPageContent({
                     open={filtersOpen}
                     onOpenChange={setFiltersOpen}
                     trigger={
-                      <Button ref={filtersRef} variant="secondary" icon="settings">
+                      <Button ref={filtersRef} variant="secondary" icon={SettingsIcon}>
                         {query.status.length > 0 ? `Filters (${format.number(query.status.length)})` : 'Filters'}
                       </Button>
                     }

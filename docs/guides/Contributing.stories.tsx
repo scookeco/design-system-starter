@@ -68,6 +68,26 @@ export const Separator = Divider;
         <Text>
           A semantic token deprecates the same way: keep the old token as an alias of the new one for the deprecation window.
         </Text>
+        <Text>
+          <strong>When the old way can’t stay an alias, deprecate the lookup instead.</strong> Icons used to be passed by name (
+          <code>icon="archive"</code>). A component that accepts a name has to carry every icon to look it up, so the <code>icon</code> props
+          now take the icon itself, and the names live on in one deprecated module that no system component imports:
+        </Text>
+        <Code label="Icons: from a name to a value">{`
+// Before: every component that drew an icon bundled all of them.
+<ToolbarButton icon="archive">Archive</ToolbarButton>
+
+// Now: the page bundles this icon and no other.
+import { ArchiveIcon } from 'src/index';
+<ToolbarButton icon={ArchiveIcon}>Archive</ToolbarButton>
+
+// Data that names icons, until it stores the values: deprecated, and it bundles the whole set.
+/** @deprecated */ iconsByName.archive
+`}</Code>
+        <Text>
+          <code>IconName</code> and <code>iconsByName</code> are removed once nothing uses them. Every call site in this repository has moved; the
+          tree-shaking check (<code>npm run size</code>) fails if a component pulls in an icon it doesn’t draw.
+        </Text>
       </DocSection>
       <DocSection title="4. Versioning" intro="Today the system is one folder in one repository, released with the app. Semantic versioning starts when a second app consumes it; the table says how each change will be released then.">
         <Table caption="Kinds of change">

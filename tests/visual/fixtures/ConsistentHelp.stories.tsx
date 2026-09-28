@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AppShell, Avatar, Button, Heading, Menu, Nav } from '../../../src/index';
+import { AppShell, Avatar, Button, Heading, HomeIcon, Menu, Nav } from '../../../src/index';
 
 /**
  * Check fixture for SC 3.2.6 (tests/visual/wcag22.spec.ts): an app page whose shell has an account
@@ -14,7 +14,7 @@ const meta = {
     <AppShell
       brand="Acme"
       sidebarStorageKey={null}
-      nav={<Nav label="Main" current="/home" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}
+      nav={<Nav label="Main" current="/home" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}
       userMenu={
         <Menu
           align="end"

@@ -1346,7 +1346,8 @@
       ],
       "composes": [
         "Button",
-        "Drawer"
+        "Drawer",
+        "Icon"
       ],
       "composesAll": [
         "Button",
@@ -3658,7 +3659,8 @@
         "src/components/ChatThread/ChatThread.css"
       ],
       "composes": [
-        "Button"
+        "Button",
+        "Icon"
       ],
       "composesAll": [
         "Button",
@@ -5732,6 +5734,7 @@
       ],
       "composes": [
         "Button",
+        "Icon",
         "Kbd",
         "Tag"
       ],
@@ -6609,7 +6612,8 @@
         "src/components/CopyButton/CopyButton.css"
       ],
       "composes": [
-        "Button"
+        "Button",
+        "Icon"
       ],
       "composesAll": [
         "Button",
@@ -8449,6 +8453,7 @@
       ],
       "composes": [
         "Button",
+        "Icon",
         "RadioGroup",
         "Toggle"
       ],
@@ -10454,7 +10459,9 @@
     "Icon": {
       "kind": "component",
       "dir": "src/components/Icon",
-      "exports": [],
+      "exports": [
+        "iconsByName"
+      ],
       "stylesheets": [
         "src/components/Icon/Icon.css"
       ],
@@ -18239,7 +18246,8 @@
         "src/layouts/SplitView/SplitView.css"
       ],
       "composes": [
-        "Button"
+        "Button",
+        "Icon"
       ],
       "composesAll": [
         "Button",

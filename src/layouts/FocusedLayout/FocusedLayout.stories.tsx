@@ -6,6 +6,7 @@ import { Progress } from '../../components/Progress/Progress';
 import { Stepper } from '../../components/Stepper/Stepper';
 import { Cluster } from '../../primitives/Cluster/Cluster';
 import { FocusedLayout } from './FocusedLayout';
+import { CloseIcon } from '../../components/Icon/icons';
 
 const steps = [{ label: 'Workspace' }, { label: 'Invite' }, { label: 'Plan' }, { label: 'Review' }];
 
@@ -23,7 +24,7 @@ const meta = {
     brand: 'Acme',
     task: 'Set up your workspace',
     exit: (
-      <Button variant="ghost" icon="close">
+      <Button variant="ghost" icon={CloseIcon}>
         Exit setup
       </Button>
     ),

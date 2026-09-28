@@ -1,4 +1,4 @@
-import { Button, Cluster, Toggle, Tooltip } from '../../src/index';
+import { Button, Cluster, MenuIcon, Toggle, Tooltip } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -18,7 +18,7 @@ export const usage: UsageDoc = {
       <Cluster gap="sm">
         <Toggle label="Show archived" defaultPressed />
         <Tooltip content="Compact rows">
-          <Toggle label="Compact rows" icon="menu" hideLabel />
+          <Toggle label="Compact rows" icon={MenuIcon} hideLabel />
         </Tooltip>
       </Cluster>
     ),

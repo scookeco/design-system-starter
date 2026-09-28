@@ -14,23 +14,7 @@
  * step's h1 so screen reader and keyboard users start at the top of the new step.
  */
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import {
-  Banner,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Cluster,
-  FocusedLayout,
-  PageHeader,
-  Progress,
-  RadioGroup,
-  Stack,
-  Stepper,
-  Text,
-  TextField,
-  Textarea,
-} from '../index';
+import { Banner, Button, Card, CardBody, CardHeader, CloseIcon, Cluster, FocusedLayout, PageHeader, Progress, RadioGroup, Stack, Stepper, Text, Textarea, TextField } from '../index';
 
 export interface WorkspaceDraft {
   name: string;
@@ -128,7 +112,7 @@ export function SetupWizard({ initialStep = 0, initialDraft, initialAttempted = 
       brand="Acme"
       task="Set up your workspace"
       exit={
-        <Button variant="ghost" icon="close">
+        <Button variant="ghost" icon={CloseIcon}>
           Exit setup
         </Button>
       }

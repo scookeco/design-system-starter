@@ -3,6 +3,7 @@ import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
 import { Field, fieldIds } from '../Field/Field';
 import { Icon } from '../Icon/Icon';
+import { CloseIcon, DangerIcon, FileIcon, SuccessIcon, UploadIcon } from '../Icon/icons';
 import { Progress } from '../Progress/Progress';
 import './FileUpload.css';
 
@@ -162,7 +163,7 @@ export function FileUpload({
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
         >
-          <Icon name="upload" size="md" />
+          <Icon icon={UploadIcon} size="md" />
           <Button
             ref={browseRef}
             id={ids.controlId}
@@ -193,7 +194,7 @@ export function FileUpload({
             const uploading = !file.error && file.progress !== undefined && file.progress < 100;
             return (
               <li key={file.id} className="file-upload__item" data-status={file.error ? 'error' : uploading ? 'uploading' : 'done'}>
-                <Icon name="file" size="md" />
+                <Icon icon={FileIcon} size="md" />
                 <div className="file-upload__body">
                   {uploading ? (
                     <Progress label={file.name} value={file.progress ?? 0} valueText={`${String(Math.round(file.progress ?? 0))}% of ${formatBytes(file.size)}`} />
@@ -202,12 +203,12 @@ export function FileUpload({
                       <span className="file-upload__name">{file.name}</span>
                       {file.error ? (
                         <span className="file-upload__error">
-                          <Icon name="danger" />
+                          <Icon icon={DangerIcon} />
                           <span>{file.error}</span>
                         </span>
                       ) : (
                         <span className="file-upload__meta">
-                          <Icon name="success" />
+                          <Icon icon={SuccessIcon} />
                           <span>{formatBytes(file.size)}, uploaded</span>
                         </span>
                       )}
@@ -224,7 +225,7 @@ export function FileUpload({
                     else removeButtons.current.delete(file.id);
                   }}
                 >
-                  <Icon name="close" />
+                  <Icon icon={CloseIcon} />
                 </button>
               </li>
             );

@@ -1,6 +1,7 @@
 import { Children, isValidElement, useEffect, useRef, useState, type ReactNode } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
+import { ChevronDownIcon } from '../Icon/icons';
 import './ChatThread.css';
 
 export interface ChatThreadProps extends EscapeHatch {
@@ -102,7 +103,7 @@ export function ChatThread({ label, children, empty, jumpLabel = 'Jump to latest
       )}
       {away ? (
         <div className="chat-thread__jump">
-          <Button variant="secondary" size="sm" icon="chevron-down" onClick={toLatest}>
+          <Button variant="secondary" size="sm" icon={ChevronDownIcon} onClick={toLatest}>
             {jumpLabel}
           </Button>
         </div>

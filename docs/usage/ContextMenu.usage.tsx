@@ -1,4 +1,4 @@
-import { Button, ContextMenu, Menu } from '../../src/index';
+import { Button, ContextMenu, Menu, MoreIcon } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -13,7 +13,7 @@ export const usage: UsageDoc = {
     render: () => (
       <ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>
         <div tabIndex={0} role="group" aria-label="Northwind renewal">
-          Northwind renewal <Menu trigger={<Button variant="ghost" icon="more" aria-label="More actions">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />
+          Northwind renewal <Menu trigger={<Button variant="ghost" icon={MoreIcon} aria-label="More actions">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />
         </div>
       </ContextMenu>
     ),

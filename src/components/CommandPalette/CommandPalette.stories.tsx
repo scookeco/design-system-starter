@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CommandPalette, type CommandGroup } from './CommandPalette';
+import { BuildingIcon, FileIcon, HomeIcon, PlusIcon, SettingsIcon } from '../Icon/icons';
 
 const noop = () => undefined;
 
@@ -8,26 +9,26 @@ const GROUPS: CommandGroup[] = [
     id: 'pages',
     label: 'Jump to',
     items: [
-      { id: 'home', label: 'Home', description: 'Page', icon: 'home', shortcut: 'g h', onSelect: noop },
-      { id: 'records', label: 'Records', description: 'Page', icon: 'file', shortcut: 'g r', onSelect: noop },
-      { id: 'accounts', label: 'Accounts', description: 'Page', icon: 'building', shortcut: 'g a', onSelect: noop },
-      { id: 'settings', label: 'Settings', description: 'Page', icon: 'settings', onSelect: noop },
+      { id: 'home', label: 'Home', description: 'Page', icon: HomeIcon, shortcut: 'g h', onSelect: noop },
+      { id: 'records', label: 'Records', description: 'Page', icon: FileIcon, shortcut: 'g r', onSelect: noop },
+      { id: 'accounts', label: 'Accounts', description: 'Page', icon: BuildingIcon, shortcut: 'g a', onSelect: noop },
+      { id: 'settings', label: 'Settings', description: 'Page', icon: SettingsIcon, onSelect: noop },
     ],
   },
   {
     id: 'accounts',
     label: 'Accounts',
     items: [
-      { id: 'a1', label: 'Northwind Traders', description: 'Account · northwind.example', icon: 'building', onSelect: noop },
-      { id: 'a2', label: 'Blue Harbor Logistics', description: 'Account · blueharbor.example', icon: 'building', onSelect: noop },
-      { id: 'a3', label: 'Contoso Health', description: 'Account · contoso-health.example', icon: 'building', onSelect: noop },
+      { id: 'a1', label: 'Northwind Traders', description: 'Account · northwind.example', icon: BuildingIcon, onSelect: noop },
+      { id: 'a2', label: 'Blue Harbor Logistics', description: 'Account · blueharbor.example', icon: BuildingIcon, onSelect: noop },
+      { id: 'a3', label: 'Contoso Health', description: 'Account · contoso-health.example', icon: BuildingIcon, onSelect: noop },
     ],
   },
   {
     id: 'actions',
     label: 'Actions',
     items: [
-      { id: 'new', label: 'New record', keywords: ['create', 'add'], icon: 'plus', onSelect: noop },
+      { id: 'new', label: 'New record', keywords: ['create', 'add'], icon: PlusIcon, onSelect: noop },
       { id: 'keys', label: 'Keyboard shortcuts', keywords: ['help'], shortcut: '?', onSelect: noop },
     ],
   },

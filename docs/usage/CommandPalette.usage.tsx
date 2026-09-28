@@ -1,4 +1,4 @@
-import { Button, CommandPalette, Kbd } from '../../src/index';
+import { Button, CommandPalette, Kbd, SearchIcon } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -15,14 +15,14 @@ export const usage: UsageDoc = {
   do: {
     caption: 'Grouped rows with a type in the description and a shortcut where one exists; only what this person may do is passed in.',
     render: () => (
-      <Button variant="secondary" icon="search">
+      <Button variant="secondary" icon={SearchIcon}>
         <span>Search</span> <Kbd keys="mod+k" />
       </Button>
     ),
   },
   dont: {
     caption: 'A search button with no sign of the shortcut: pointer users never learn ⌘K exists. (And never pass rows the person can’t run: filter with `can` first.)',
-    render: () => <Button variant="secondary" icon="search">Search</Button>,
+    render: () => <Button variant="secondary" icon={SearchIcon}>Search</Button>,
   },
   accessibility: [
     'A modal dialog (focus trapped, the page inert, Esc closes, focus returns) holding the ARIA combobox pattern: the input keeps focus and `aria-activedescendant` names the active option.',

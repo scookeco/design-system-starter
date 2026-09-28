@@ -3,6 +3,7 @@ import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
 import { RadioGroup } from '../RadioGroup/RadioGroup';
 import { Toggle } from '../Toggle/Toggle';
+import { ThumbsDownIcon, ThumbsUpIcon } from '../Icon/icons';
 import './Feedback.css';
 
 export type FeedbackRating = 'up' | 'down';
@@ -70,8 +71,8 @@ export function Feedback({
     <div className={cx('feedback', UNSAFE_className)} style={UNSAFE_style}>
       <div className="feedback__row">
         <div className="feedback__buttons" role="group" aria-label={label}>
-          <Toggle size="sm" icon="thumbs-up" label="Helpful" pressed={rating === 'up'} onPressedChange={(pressed) => rate('up', pressed)} />
-          <Toggle size="sm" icon="thumbs-down" label="Not helpful" pressed={rating === 'down'} onPressedChange={(pressed) => rate('down', pressed)} />
+          <Toggle size="sm" icon={ThumbsUpIcon} label="Helpful" pressed={rating === 'up'} onPressedChange={(pressed) => rate('up', pressed)} />
+          <Toggle size="sm" icon={ThumbsDownIcon} label="Not helpful" pressed={rating === 'down'} onPressedChange={(pressed) => rate('down', pressed)} />
         </div>
         {/* Present from mount, so the thanks is announced when it appears. */}
         <span className="feedback__thanks" role="status">

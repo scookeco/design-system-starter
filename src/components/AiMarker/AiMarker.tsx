@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { SparkleIcon } from '../Icon/icons';
 import './AiMarker.css';
 
 export type AiMarkerProps = Closed<Omit<ComponentPropsWithRef<'span'>, 'children'>> & {
@@ -17,7 +18,7 @@ export type AiMarkerProps = Closed<Omit<ComponentPropsWithRef<'span'>, 'children
 export function AiMarker({ children = 'AI-generated', variant = 'badge', UNSAFE_className, UNSAFE_style, ...rest }: AiMarkerProps) {
   return (
     <span {...rest} className={cx('ai-marker', UNSAFE_className)} style={UNSAFE_style} data-variant={variant}>
-      <Icon name="sparkle" />
+      <Icon icon={SparkleIcon} />
       <span>{children}</span>
     </span>
   );

@@ -1,5 +1,6 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { ChevronRightIcon } from '../Icon/icons';
 import { RouterLink } from '../Link/Link';
 import './Breadcrumbs.css';
 
@@ -28,7 +29,7 @@ export function Breadcrumbs({ items, current, label = 'Breadcrumb', UNSAFE_class
               {item.label}
             </RouterLink>
             <span className="breadcrumbs__separator">
-              <Icon name="chevron-right" />
+              <Icon icon={ChevronRightIcon} />
             </span>
           </li>
         ))}

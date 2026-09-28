@@ -4,6 +4,7 @@ import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
 import { Kbd } from '../Kbd/Kbd';
 import { Tag } from '../Tag/Tag';
+import { AttachIcon, SendIcon, StopIcon } from '../Icon/icons';
 import './Composer.css';
 
 export interface ComposerAttachment {
@@ -121,7 +122,7 @@ export function Composer({
         <div className="composer__controls">
           {onAttach ? (
             <>
-              <Button variant="ghost" size="sm" icon="plus" disabled={disabled} onClick={() => files.current?.click()}>
+              <Button variant="ghost" size="sm" icon={AttachIcon} disabled={disabled} onClick={() => files.current?.click()}>
                 Attach
               </Button>
               <input
@@ -145,11 +146,11 @@ export function Composer({
             </span>
           ) : null}
           {streaming ? (
-            <Button variant="secondary" size="sm" icon="stop" onClick={onStop}>
+            <Button variant="secondary" size="sm" icon={StopIcon} onClick={onStop}>
               Stop
             </Button>
           ) : (
-            <Button type="submit" size="sm" disabled={!canSend}>
+            <Button type="submit" size="sm" icon={SendIcon} disabled={!canSend}>
               Send
             </Button>
           )}

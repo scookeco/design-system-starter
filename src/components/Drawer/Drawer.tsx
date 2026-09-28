@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CloseIcon } from '../Icon/icons';
 import './Drawer.css';
 
 export interface DrawerProps extends EscapeHatch {
@@ -60,7 +61,7 @@ export function Drawer({
           <header className="drawer__header">
             <DialogPrimitive.Title className={hideTitle ? 'visually-hidden' : 'drawer__title'}>{title}</DialogPrimitive.Title>
             <DialogPrimitive.Close className="drawer__close" aria-label={closeLabel}>
-              <Icon name="close" />
+              <Icon icon={CloseIcon} />
             </DialogPrimitive.Close>
           </header>
           {description ? <DialogPrimitive.Description className="drawer__description">{description}</DialogPrimitive.Description> : null}

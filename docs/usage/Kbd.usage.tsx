@@ -1,4 +1,4 @@
-import { ariaKeyShortcuts, Button, Cluster, formatShortcut, Kbd, Text, Tooltip } from '../../src/index';
+import { ariaKeyShortcuts, Button, Cluster, formatShortcut, Kbd, SearchIcon, Text, Tooltip } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -18,7 +18,7 @@ export const usage: UsageDoc = {
     render: () => (
       <Cluster gap="md" align="center">
         <Tooltip content="Search and run commands" shortcut="mod+k">
-          <Button variant="secondary" icon="search">
+          <Button variant="secondary" icon={SearchIcon}>
             Search
           </Button>
         </Tooltip>

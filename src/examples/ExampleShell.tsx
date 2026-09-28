@@ -7,7 +7,7 @@
  * (src/app/session.tsx). Static example pages render outside it and get a fixed menu.
  */
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { AppShell, Avatar, Breadcrumbs, Button, Menu, Nav, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
+import { AppShell, Avatar, Breadcrumbs, BuildingIcon, Button, FileIcon, HomeIcon, InboxIcon, Menu, Nav, SettingsIcon, ShieldIcon, UsersIcon, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
 import { useOptionalAppSession, type AppSession } from '../app/session';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
@@ -17,18 +17,18 @@ import { JobsIndicator } from './Jobs';
 const NAV: readonly NavSection[] = [
   {
     items: [
-      { label: 'Home', href: '/home', icon: 'home' },
-      { label: 'Inbox', href: '/inbox', icon: 'download' },
-      { label: 'Records', href: '/records', icon: 'file' },
-      { label: 'Accounts', href: '/accounts', icon: 'building' },
-      { label: 'People', href: '/people', icon: 'users' },
+      { label: 'Home', href: '/home', icon: HomeIcon },
+      { label: 'Inbox', href: '/inbox', icon: InboxIcon },
+      { label: 'Records', href: '/records', icon: FileIcon },
+      { label: 'Accounts', href: '/accounts', icon: BuildingIcon },
+      { label: 'People', href: '/people', icon: UsersIcon },
     ],
   },
   {
     label: 'Workspace',
     items: [
-      { label: 'Settings', href: '/settings', icon: 'settings' },
-      { label: 'Admin', href: '/admin/members', icon: 'eye' },
+      { label: 'Settings', href: '/settings', icon: SettingsIcon },
+      { label: 'Admin', href: '/admin/members', icon: ShieldIcon },
     ],
   },
 ];
@@ -104,7 +104,7 @@ function AccountMenu({ app, current }: { app: AppSession; current: string }) {
   const others = app.memberships.filter((m) => m.tenant !== app.tenant);
   const items: MenuEntry[] = [
     { label: 'Profile' },
-    { label: 'Settings', icon: 'settings' },
+    { label: 'Settings', icon: SettingsIcon },
     ...(others.length > 0 ? (['separator'] as const) : []),
     ...others.map((m) => ({
       label: `Switch to ${WORKSPACES[m.tenant].name}`,
@@ -140,7 +140,7 @@ function StaticAccountMenu() {
           <Avatar name="Sam Rivera" size="sm" />
         </Button>
       }
-      items={[{ label: 'Profile' }, { label: 'Settings', icon: 'settings' }, 'separator', { label: 'Sign out' }]}
+      items={[{ label: 'Profile' }, { label: 'Settings', icon: SettingsIcon }, 'separator', { label: 'Sign out' }]}
     />
   );
 }

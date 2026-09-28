@@ -1,7 +1,8 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { SearchIcon, type IconDefinition } from '../Icon/icons';
 import { ariaKeyShortcuts, Kbd, type KeyPlatform } from '../Kbd/Kbd';
 import { Spinner } from '../Spinner/Spinner';
 import './CommandPalette.css';
@@ -13,7 +14,7 @@ export interface CommandItem {
   label: string;
   /** A second line: where it lives, its type, its owner. Matched too. */
   description?: string;
-  icon?: IconName;
+  icon?: IconDefinition;
   /** Extra words that should find it ("create", "add" for New record). */
   keywords?: readonly string[];
   /** Its keyboard shortcut, shown at the row's end (register the keys with useShortcut). */
@@ -187,7 +188,7 @@ export function CommandPalette({
           <DialogPrimitive.Content className={cx('command-palette', UNSAFE_className)} style={UNSAFE_style} aria-describedby={undefined}>
             <DialogPrimitive.Title className="visually-hidden">{label}</DialogPrimitive.Title>
             <div className="command-palette__search">
-              <Icon name="search" />
+              <Icon icon={SearchIcon} />
               <input
                 className="command-palette__input"
                 role="combobox"
@@ -228,7 +229,7 @@ export function CommandPalette({
                           onPointerMove={() => setActive(mine)}
                           onClick={() => run(item)}
                         >
-                          {item.icon ? <Icon name={item.icon} /> : null}
+                          {item.icon ? <Icon icon={item.icon} /> : null}
                           <span className="command-palette__text">
                             <span className="command-palette__label">{item.label}</span>
                             {item.description ? <span className="command-palette__description">{item.description}</span> : null}

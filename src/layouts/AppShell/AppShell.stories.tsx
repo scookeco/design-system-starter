@@ -11,6 +11,7 @@ import { Center } from '../../primitives/Center/Center';
 import { Stack } from '../../primitives/Stack/Stack';
 import { AssistantPanel } from '../AssistantPanel/AssistantPanel';
 import { AppShell } from './AppShell';
+import { FileIcon, HomeIcon, PlusIcon, SettingsIcon, UsersIcon } from '../../components/Icon/icons';
 
 const nav = (
   <Nav
@@ -19,12 +20,12 @@ const nav = (
     sections={[
       {
         items: [
-          { label: 'Home', href: '/home', icon: 'home' },
-          { label: 'Records', href: '/records', icon: 'file' },
-          { label: 'People', href: '/people', icon: 'users' },
+          { label: 'Home', href: '/home', icon: HomeIcon },
+          { label: 'Records', href: '/records', icon: FileIcon },
+          { label: 'People', href: '/people', icon: UsersIcon },
         ],
       },
-      { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: 'settings' }] },
+      { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: SettingsIcon }] },
     ]}
   />
 );
@@ -39,7 +40,7 @@ const userMenu = (open = false) => (
         <Avatar name="Sam Rivera" size="sm" />
       </Button>
     }
-    items={[{ label: 'Profile' }, { label: 'Settings', icon: 'settings' }, 'separator', { label: 'Sign out' }]}
+    items={[{ label: 'Profile' }, { label: 'Settings', icon: SettingsIcon }, 'separator', { label: 'Sign out' }]}
   />
 );
 
@@ -73,10 +74,10 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const SidebarCollapsed: Story = { args: { defaultSidebarCollapsed: true } };
 export const WithoutBreadcrumbs: Story = { args: { breadcrumbs: undefined } };
-export const WithGlobalAction: Story = { args: { actions: <Button icon="plus">New record</Button> } };
+export const WithGlobalAction: Story = { args: { actions: <Button icon={PlusIcon}>New record</Button> } };
 export const WithHelp: Story = {
   args: {
-    actions: <Button icon="plus">New record</Button>,
+    actions: <Button icon={PlusIcon}>New record</Button>,
     help: <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />,
   },
 };

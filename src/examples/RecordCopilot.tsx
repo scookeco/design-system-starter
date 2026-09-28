@@ -17,7 +17,7 @@
  * never its contents: the server reads it as the person (canSee), in their workspace.
  */
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { AssistantPanel, Button, ChatThread, Cluster, Composer, EmptyState, Stack } from '../index';
+import { AssistantPanel, Button, ChatThread, Cluster, Composer, EmptyState, SparkleIcon, Stack } from '../index';
 import { useAssistant } from '../app/model/ai';
 import { useRecord } from '../app/model/queries';
 import { useSession } from '../app/session';
@@ -86,7 +86,7 @@ function CopilotPanel({ recordId, initialPrompt, initialStopAfter, defaultOpen =
               <Stack gap="xs">
                 {SUGGESTED.map((prompt) => (
                   <Cluster key={prompt} gap="xs">
-                    <Button variant="secondary" size="sm" icon="sparkle" onClick={() => assistant.ask(prompt)}>
+                    <Button variant="secondary" size="sm" icon={SparkleIcon} onClick={() => assistant.ask(prompt)}>
                       {prompt}
                     </Button>
                   </Cluster>

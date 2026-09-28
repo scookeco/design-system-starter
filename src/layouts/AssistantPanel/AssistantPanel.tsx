@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEv
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../../components/Button/Button';
 import { Drawer } from '../../components/Drawer/Drawer';
+import { CloseIcon, SparkleIcon } from '../../components/Icon/icons';
 import './AssistantPanel.css';
 
 const DEFAULT_STORAGE_KEY = 'assistant-panel.width';
@@ -192,7 +193,7 @@ export function AssistantPanel({
               <Button variant="ghost" size="sm" onClick={() => resize(wide ? bounds.initial : bounds.max)}>
                 {wide ? 'Narrow' : 'Widen'}
               </Button>
-              <Button variant="ghost" size="sm" icon="close" onClick={() => setOpen(false)}>
+              <Button variant="ghost" size="sm" icon={CloseIcon} onClick={() => setOpen(false)}>
                 {closeLabel}
               </Button>
             </div>
@@ -202,7 +203,7 @@ export function AssistantPanel({
         </aside>
       ) : (
         <div className="assistant-panel__rail">
-          <Button ref={launcher} variant="secondary" size="sm" icon="sparkle" aria-expanded={false} onClick={() => setOpen(true)}>
+          <Button ref={launcher} variant="secondary" size="sm" icon={SparkleIcon} aria-expanded={false} onClick={() => setOpen(true)}>
             {launcherLabel}
           </Button>
         </div>
@@ -213,7 +214,7 @@ export function AssistantPanel({
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
           trigger={
-            <Button variant="secondary" size="sm" icon="sparkle">
+            <Button variant="secondary" size="sm" icon={SparkleIcon}>
               {launcherLabel}
             </Button>
           }

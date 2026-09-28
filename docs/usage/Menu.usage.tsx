@@ -1,4 +1,4 @@
-import { Button, Cluster, Menu } from '../../src/index';
+import { Button, Cluster, DownloadIcon, Menu } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -19,7 +19,7 @@ export const usage: UsageDoc = {
         <Button>Edit</Button>
         <Menu
           trigger={<Button variant="secondary">More</Button>}
-          items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: 'download' }, 'separator', { label: 'Delete record' }]}
+          items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: DownloadIcon }, 'separator', { label: 'Delete record' }]}
         />
       </Cluster>
     ),

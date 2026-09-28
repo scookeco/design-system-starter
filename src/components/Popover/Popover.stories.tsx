@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../Button/Button';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { Popover } from './Popover';
+import { SettingsIcon } from '../Icon/icons';
 
 const meta = {
   title: 'Components/Popover',
@@ -9,7 +10,7 @@ const meta = {
   args: {
     label: 'Filter by status',
     trigger: (
-      <Button variant="secondary" icon="settings">
+      <Button variant="secondary" icon={SettingsIcon}>
         Filters
       </Button>
     ),

@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../../components/Button/Button';
+import { ChevronLeftIcon } from '../../components/Icon/icons';
 import './SplitView.css';
 
 /** The list pane's share of the width, in percent: the most and least it can take. */
@@ -128,7 +129,7 @@ export function SplitView({
       <section className="split-view__detail" aria-label={detailLabel}>
         {onBack ? (
           <div className="split-view__back">
-            <Button variant="ghost" size="sm" icon="chevron-left" onClick={onBack}>
+            <Button variant="ghost" size="sm" icon={ChevronLeftIcon} onClick={onBack}>
               {backLabel}
             </Button>
           </div>

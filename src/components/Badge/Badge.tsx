@@ -1,15 +1,16 @@
 import type { ComponentPropsWithRef } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { DangerIcon, InfoIcon, SuccessIcon, WarningIcon, type IconDefinition } from '../Icon/icons';
 import './Badge.css';
 
 export type BadgeTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
-const TONE_ICON: Record<BadgeTone, IconName | null> = {
-  success: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  info: 'info',
+const TONE_ICON: Record<BadgeTone, IconDefinition | null> = {
+  success: SuccessIcon,
+  warning: WarningIcon,
+  danger: DangerIcon,
+  info: InfoIcon,
   neutral: null,
 };
 
@@ -27,7 +28,7 @@ export function Badge({ tone = 'neutral', indicator = 'icon', children, UNSAFE_c
   return (
     <span {...rest} className={cx('badge', UNSAFE_className)} style={UNSAFE_style} data-tone={tone}>
       {indicator === 'dot' ? <span className="badge__dot" aria-hidden="true" /> : null}
-      {indicator === 'icon' && icon ? <Icon name={icon} /> : null}
+      {indicator === 'icon' && icon ? <Icon icon={icon} /> : null}
       <span className="badge__label">{children}</span>
     </span>
   );
