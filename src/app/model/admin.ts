@@ -18,6 +18,7 @@ import { useTenant } from '../tenant';
 import type { Partition } from './keys';
 import { removalBlocked, roleChangeBlocked } from './members';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
+import { refetchAfterWrite } from './refetch';
 
 export const adminKeys = {
   members: (p: Partition) => [...p, 'members', {}] as const,
@@ -59,10 +60,13 @@ function useAdminWrite<V, R>(name: string, write: (variables: V, members: readon
       refuseUnless(grant, 'members:manage');
       return write(variables, client.getQueryData<{ items: Member[] }>(adminKeys.members(partition))?.items ?? []);
     },
-    onSuccess: (result, variables) => {
-      client.setQueryData<{ items: Member[] }>(adminKeys.members(partition), (data) => (data ? { items: patch(data.items, result, variables) } : data));
-      return Promise.all([client.invalidateQueries({ queryKey: adminKeys.members(partition) }), client.invalidateQueries({ queryKey: adminKeys.audit(partition) })]);
-    },
+    onSuccess: (result, variables) =>
+      Promise.all([
+        refetchAfterWrite(client, adminKeys.members(partition), () =>
+          client.setQueryData<{ items: Member[] }>(adminKeys.members(partition), (data) => (data ? { items: patch(data.items, result, variables) } : data)),
+        ),
+        refetchAfterWrite(client, adminKeys.audit(partition)),
+      ]),
   });
 }
 

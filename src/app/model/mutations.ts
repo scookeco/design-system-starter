@@ -19,17 +19,21 @@
  *   untagRecord        (undoable)                                                     undo window)
  *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts        (listed ids)
- *   startBulkDelete    pessimistic  jobs (appends, queued)     nothing yet: the job's polls refetch lists
+ *   startBulkDelete    pessimistic  jobs (appends, queued)     jobs; then the job's polls refetch lists
  *                                                              and counts as it deletes ("all matching")
- *   cancelJob          pessimistic  jobs (the entry)           jobs
- *   dismissJob         pessimistic  jobs (removes)             nothing
+ *   cancelJob          pessimistic  jobs (the entry)           jobs, lists, counts
+ *   dismissJob         pessimistic  jobs (removes)             jobs
  *   addPerson          pessimistic  people (appends)           people
  *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key)
- *   updateAccount      pessimistic  directory entry, detail      nothing else: records hold the id, so
- *                                                               every join re-renders from the directory
+ *   updateAccount      pessimistic  directory entry, detail      directory, nothing else: records hold the id,
+ *                                                               so every join re-renders from the directory
  *   saveView           pessimistic  views (appends)                  views
  *   updateView         pessimistic  views (the entry; default moves) views     (rename, save changes, default)
  *   deleteView         pessimistic  views (removes)                  views
+ *
+ * Every "invalidates" goes through refetchAfterWrite (./refetch), patching inside it, so a list still
+ * on its first load reads again after the write. The exception is renameRecord, which cancels in
+ * onMutate and invalidates directly.
  */
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
@@ -44,6 +48,7 @@ import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { applyChanges, compareVersions, realConflicts } from './conflicts';
 import { accountKeys, jobKeys, recordKeys, viewKeys, type Partition } from './keys';
 import { isSystemTag } from './predicates';
+import { refetchAfterWrite } from './refetch';
 import { confirmRecord, isCancelled, writeQueues } from './writeQueue';
 
 /**
@@ -129,7 +134,7 @@ export function useUpdateRecord(id: string) {
         },
       });
     },
-    onSuccess: () => client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
+    onSuccess: () => refetchAfterWrite(client, recordKeys.lists(partition)),
     onError: (error) => {
       const theirs = conflictingRecord(error);
       if (theirs) confirmRecord(client, partition, theirs);
@@ -200,17 +205,13 @@ export function useMoveRecord() {
         fallbackVersion: record.version,
       });
     },
-    onSuccess: () =>
-      Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]),
+    onSuccess: () => refetchListsAndCounts(client, partition),
   });
 }
 
-/** Lists and counts: what a status or tag change can move rows between. */
-const invalidateListsAndCounts = (client: QueryClient, partition: Partition) =>
-  Promise.all([client.invalidateQueries({ queryKey: recordKeys.lists(partition) }), client.invalidateQueries({ queryKey: recordKeys.counts(partition) })]);
+/** Lists and counts: what a status or tag change can move rows between. Read after the write, even on a first load (./refetch). */
+const refetchListsAndCounts = (client: QueryClient, partition: Partition) =>
+  Promise.all([refetchAfterWrite(client, recordKeys.lists(partition)), refetchAfterWrite(client, recordKeys.counts(partition))]);
 
 /**
  * archiveRecord: optimistic, undoable, through the record's write queue. Pass the undo window's
@@ -234,7 +235,7 @@ export function useArchiveRecord(id: string) {
         send: () => postArchive(tenant, id),
       });
     },
-    onSettled: (_data, error) => (isCancelled(error) ? undefined : invalidateListsAndCounts(client, partition)),
+    onSettled: (_data, error) => (isCancelled(error) ? undefined : refetchListsAndCounts(client, partition)),
   });
 }
 
@@ -254,7 +255,7 @@ export function useRestoreRecord(id: string) {
         send: (latest) => postRestore(tenant, id, status, latest),
       });
     },
-    onSettled: () => invalidateListsAndCounts(client, partition),
+    onSettled: () => refetchListsAndCounts(client, partition),
   });
 }
 
@@ -290,7 +291,7 @@ function useTagWrite(id: string, change: 'add' | 'remove') {
         send: (latest, confirmed) => patchRecord(tenant, id, { tags: next(confirmed?.tags ?? [], tag) }, latest),
       });
     },
-    onSettled: (_data, error) => (isCancelled(error) ? undefined : client.invalidateQueries({ queryKey: recordKeys.lists(partition) })),
+    onSettled: (_data, error) => (isCancelled(error) ? undefined : refetchAfterWrite(client, recordKeys.lists(partition))),
   });
 }
 
@@ -312,10 +313,7 @@ export function useCreateRecord() {
     },
     onSuccess: (created) => {
       client.setQueryData(recordKeys.detail(partition, created.id), created);
-      return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]);
+      return refetchListsAndCounts(client, partition);
     },
   });
 }
@@ -340,10 +338,7 @@ export function useBulkDeleteRecords() {
     },
     onSuccess: (result) => {
       for (const id of result.deleted) client.removeQueries({ queryKey: recordKeys.detail(partition, id), exact: true });
-      return Promise.all([
-        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
-        client.invalidateQueries({ queryKey: recordKeys.counts(partition) }),
-      ]);
+      return refetchListsAndCounts(client, partition);
     },
   });
 }
@@ -361,8 +356,9 @@ export function useAddPerson() {
       return postPerson(tenant, name);
     },
     onSuccess: (person) => {
-      client.setQueryData<{ items: Person[] }>(recordKeys.people(partition), (current) => (current ? { items: [...current.items, person] } : current));
-      return client.invalidateQueries({ queryKey: recordKeys.people(partition) });
+      return refetchAfterWrite(client, recordKeys.people(partition), () =>
+        client.setQueryData<{ items: Person[] }>(recordKeys.people(partition), (current) => (current ? { items: [...current.items, person] } : current)),
+      );
     },
   });
 }
@@ -385,8 +381,9 @@ export function useCreateAccount() {
     },
     onSuccess: (created) => {
       client.setQueryData(accountKeys.detail(partition, created.id), created);
-      client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, created));
-      return client.invalidateQueries({ queryKey: accountKeys.list(partition) });
+      return refetchAfterWrite(client, accountKeys.list(partition), () =>
+        client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, created)),
+      );
     },
   });
 }
@@ -409,7 +406,10 @@ export function useUpdateAccount(id: string) {
     },
     onSuccess: (updated) => {
       client.setQueryData(accountKeys.detail(partition, id), updated);
-      client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, updated));
+      // The directory may be on its first load, read before this edit: a stale answer would put the old name back on every row.
+      return refetchAfterWrite(client, accountKeys.list(partition), () =>
+        client.setQueryData<{ items: Account[] }>(accountKeys.list(partition), (current) => upsertAccount(current, updated)),
+      );
     },
   });
 }
@@ -424,10 +424,10 @@ export function useSaveView() {
   return useMutation({
     mutationKey: [...partition, 'saveView'],
     mutationFn: (view: { name: string; config: SavedViewConfig }) => postView(tenant, view),
-    onSuccess: (saved) => {
-      client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: [...current.items, saved] } : current));
-      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
-    },
+    onSuccess: (saved) =>
+      refetchAfterWrite(client, viewKeys.list(partition), () =>
+        client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: [...current.items, saved] } : current)),
+      ),
   });
 }
 
@@ -439,12 +439,12 @@ export function useUpdateView() {
   return useMutation({
     mutationKey: [...partition, 'updateView'],
     mutationFn: ({ id, changes }: { id: string; changes: Partial<{ name: string; config: SavedViewConfig; isDefault: boolean }> }) => patchView(tenant, id, changes),
-    onSuccess: (updated) => {
-      client.setQueryData<Views>(viewKeys.list(partition), (current) =>
-        current ? { items: current.items.map((v) => (v.id === updated.id ? updated : updated.isDefault ? { ...v, isDefault: false } : v)) } : current,
-      );
-      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
-    },
+    onSuccess: (updated) =>
+      refetchAfterWrite(client, viewKeys.list(partition), () =>
+        client.setQueryData<Views>(viewKeys.list(partition), (current) =>
+          current ? { items: current.items.map((v) => (v.id === updated.id ? updated : updated.isDefault ? { ...v, isDefault: false } : v)) } : current,
+        ),
+      ),
   });
 }
 
@@ -456,10 +456,10 @@ export function useDeleteView() {
   return useMutation({
     mutationKey: [...partition, 'deleteView'],
     mutationFn: (id: string) => deleteView(tenant, id),
-    onSuccess: ({ deleted }) => {
-      client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: current.items.filter((v) => v.id !== deleted) } : current));
-      return client.invalidateQueries({ queryKey: viewKeys.list(partition) });
-    },
+    onSuccess: ({ deleted }) =>
+      refetchAfterWrite(client, viewKeys.list(partition), () =>
+        client.setQueryData<Views>(viewKeys.list(partition), (current) => (current ? { items: current.items.filter((v) => v.id !== deleted) } : current)),
+      ),
   });
 }
 
@@ -482,9 +482,11 @@ export function useStartBulkDelete() {
       refuseUnless(grant, 'record:delete');
       return postBulkDeleteJob(tenant, selection);
     },
-    onSuccess: (job) => {
-      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => ({ items: [job, ...(current?.items ?? []).filter((j) => j.id !== job.id)] }));
-    },
+    // The job list may be on its first load (the shell's indicator mounts with the page), read before this job existed.
+    onSuccess: (job) =>
+      refetchAfterWrite(client, jobKeys.list(partition), () =>
+        client.setQueryData<Jobs>(jobKeys.list(partition), (current) => ({ items: [job, ...(current?.items ?? []).filter((j) => j.id !== job.id)] })),
+      ),
   });
 }
 
@@ -497,8 +499,12 @@ export function useCancelJob() {
     mutationKey: [...partition, 'cancelJob'],
     mutationFn: (id: string) => postCancelJob(tenant, id),
     onSuccess: (job) => {
-      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.map((j) => (j.id === job.id ? job : j)) } : current));
-      return Promise.all([client.invalidateQueries({ queryKey: recordKeys.lists(partition) }), client.invalidateQueries({ queryKey: recordKeys.counts(partition) })]);
+      return Promise.all([
+        refetchAfterWrite(client, jobKeys.list(partition), () =>
+          client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.map((j) => (j.id === job.id ? job : j)) } : current)),
+        ),
+        refetchListsAndCounts(client, partition),
+      ]);
     },
   });
 }
@@ -511,8 +517,9 @@ export function useDismissJob() {
   return useMutation({
     mutationKey: [...partition, 'dismissJob'],
     mutationFn: (id: string) => deleteJob(tenant, id),
-    onSuccess: ({ dismissed }) => {
-      client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.filter((j) => j.id !== dismissed) } : current));
-    },
+    onSuccess: ({ dismissed }) =>
+      refetchAfterWrite(client, jobKeys.list(partition), () =>
+        client.setQueryData<Jobs>(jobKeys.list(partition), (current) => (current ? { items: current.items.filter((j) => j.id !== dismissed) } : current)),
+      ),
   });
 }
