@@ -27,6 +27,7 @@ import { usePartition, useSession } from '../session';
 import { useTenant } from '../tenant';
 import { recordKeys, type Partition } from './keys';
 import { patchListedRecord } from './mutations';
+import { refetchAfterWrite } from './refetch';
 import { confirmRecord } from './writeQueue';
 
 /** What the live channel has told one partition since its lists were last fetched. */
@@ -100,9 +101,10 @@ export function reconcileLiveEvent(client: QueryClient, partition: Partition, ev
   }
   store.update(partition, touched);
   // Membership, order and totals may have changed: mark every list stale, but refetch none that is
-  // on screen (that would reorder rows under the cursor). Counts are safe to refetch now.
+  // on screen (that would reorder rows under the cursor). Counts are safe to refetch now, and are
+  // read after the change even if their first load was still in flight.
   void client.invalidateQueries({ queryKey: lists, refetchType: 'none' });
-  void client.invalidateQueries({ queryKey: recordKeys.counts(partition) });
+  void refetchAfterWrite(client, recordKeys.counts(partition));
 }
 
 /**

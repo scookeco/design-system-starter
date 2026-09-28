@@ -20,11 +20,11 @@ const MUTATIONS = [
   { verb: 'tagRecord · untagRecord', presents: 'Optimistic, queued; untag held for the undo window', patches: 'The record and every listed copy', invalidates: 'Every list', failure: 'The tag is back; legal hold is refused by both sides' },
   { verb: 'createRecord', presents: 'Pessimistic, with an idempotency key', patches: 'The new record’s detail entry', invalidates: 'Every list and count', failure: 'The draft stays; a retry sends the same key, so no duplicate' },
   { verb: 'bulkDeleteRecords', presents: 'Pessimistic, confirmed (listed ids)', patches: 'Removes deleted records', invalidates: 'Every list and count', failure: 'Partial: a banner that stays (“50 deleted, 9 failed”) with Retry' },
-  { verb: 'startBulkDelete', presents: 'A job, confirmed (“all N matching”)', patches: 'Appends the job, queued', invalidates: 'Nothing yet: each poll that moves the job refetches lists and counts', failure: 'Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed' },
-  { verb: 'cancelJob · dismissJob', presents: 'Pessimistic', patches: 'The job (cancelled), or removes it', invalidates: 'Every list and count (cancel)', failure: 'A finished job can’t be cancelled; a running one can’t be dismissed' },
+  { verb: 'startBulkDelete', presents: 'A job, confirmed (“all N matching”)', patches: 'Appends the job, queued', invalidates: 'The person’s jobs; each poll that moves the job then refetches lists and counts', failure: 'Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed' },
+  { verb: 'cancelJob · dismissJob', presents: 'Pessimistic', patches: 'The job (cancelled), or removes it', invalidates: 'The person’s jobs; every list and count (cancel)', failure: 'A finished job can’t be cancelled; a running one can’t be dismissed' },
   { verb: 'addPerson', presents: 'Pessimistic', patches: 'Appends to people', invalidates: 'People', failure: 'The dialog stays open with an error' },
   { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory', failure: 'The form stays, with a banner' },
-  { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'Nothing else: records hold its id, so every row re-renders from the directory', failure: 'A banner; a 409 says someone else changed it' },
+  { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'The directory, and nothing else: records hold its id, so every row re-renders from it', failure: 'A banner; a 409 says someone else changed it' },
   { verb: 'saveView · updateView · deleteView', presents: 'Pessimistic', patches: 'The person’s views (the default moves on update)', invalidates: 'Views', failure: 'The dialog stays open with the server’s reason' },
   { verb: 'markRead · markUnread · archive · unarchive (inbox)', presents: 'Optimistic: a person’s own frequent triage', patches: 'The items in every cached inbox view, and the counts', invalidates: 'Inbox views', failure: 'Every view put back as it was; a toast that stays' },
   { verb: 'inviteMember · changeRole · removeMember', presents: 'Pessimistic: it changes what someone else can do', patches: 'Members (the answer)', invalidates: 'Members, the audit log', failure: 'The dialog stays open with the server’s reason (last admin, your own role, already a member)' },
@@ -322,6 +322,11 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
         <Rules
           items={[
             <>An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.</>,
+            <>
+              After a write, refetch what it changed with <code>refetchAfterWrite</code> (<code>src/app/model/refetch.ts</code>), never{' '}
+              <code>invalidateQueries</code> alone: a list still on its first load read the server before the write, and invalidating
+              joins that read instead of sending a new one. Patch the cache inside its callback, after the cancel.
+            </>,
             <>
               Edits send the version they were based on as <code>If-Match</code>. The server answers <code>409</code> with its version if
               someone changed the record since (and <code>428</code> without the header), and the page shows what changed instead of

@@ -5835,16 +5835,17 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 | `tagRecord · untagRecord` | Optimistic, queued; untag held for the undo window | The record and every listed copy | Every list | The tag is back; legal hold is refused by both sides |
 | `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count | The draft stays; a retry sends the same key, so no duplicate |
 | `bulkDeleteRecords` | Pessimistic, confirmed (listed ids) | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
-| `startBulkDelete` | A job, confirmed (“all N matching”) | Appends the job, queued | Nothing yet: each poll that moves the job refetches lists and counts | Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed |
-| `cancelJob · dismissJob` | Pessimistic | The job (cancelled), or removes it | Every list and count (cancel) | A finished job can’t be cancelled; a running one can’t be dismissed |
+| `startBulkDelete` | A job, confirmed (“all N matching”) | Appends the job, queued | The person’s jobs; each poll that moves the job then refetches lists and counts | Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed |
+| `cancelJob · dismissJob` | Pessimistic | The job (cancelled), or removes it | The person’s jobs; every list and count (cancel) | A finished job can’t be cancelled; a running one can’t be dismissed |
 | `addPerson` | Pessimistic | Appends to people | People | The dialog stays open with an error |
 | `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory | The form stays, with a banner |
-| `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | Nothing else: records hold its id, so every row re-renders from the directory | A banner; a 409 says someone else changed it |
+| `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | The directory, and nothing else: records hold its id, so every row re-renders from it | A banner; a 409 says someone else changed it |
 | `saveView · updateView · deleteView` | Pessimistic | The person’s views (the default moves on update) | Views | The dialog stays open with the server’s reason |
 | `markRead · markUnread · archive · unarchive (inbox)` | Optimistic: a person’s own frequent triage | The items in every cached inbox view, and the counts | Inbox views | Every view put back as it was; a toast that stays |
 | `inviteMember · changeRole · removeMember` | Pessimistic: it changes what someone else can do | Members (the answer) | Members, the audit log | The dialog stays open with the server’s reason (last admin, your own role, already a member) |
 
 - An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
+- After a write, refetch what it changed with `refetchAfterWrite` (`src/app/model/refetch.ts`), never `invalidateQueries` alone: a list still on its first load read the server before the write, and invalidating joins that read instead of sending a new one. Patch the cache inside its callback, after the cancel.
 - Edits send the version they were based on as `If-Match`. The server answers `409` with its version if someone changed the record since (and `428` without the header), and the page shows what changed instead of silently overwriting it (see “Versions and conflicts” below).
 - A pending write disables the controls that would start it again. Errors that need action stay on screen until dismissed.
 - See them on the [record page](src/examples/RecordPage.tsx) (rename pending, succeeded, failed and rolled back, conflict; archive pending) and the [create form](src/examples/CreateEditFlow.tsx).

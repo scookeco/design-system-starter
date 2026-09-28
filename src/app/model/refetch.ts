@@ -7,8 +7,19 @@
  * conversation created while the history was loading was missing until the next refetch).
  * Cancelling first sends a fresh read after the write, whatever state the query was in.
  *
- * Adopted by the assistant's conversation verbs (model/ai.ts). The other pessimistic verbs still
- * invalidate directly.
+ * Every write that refetches goes through it (tests/unit/refetch.test.tsx holds a first load past
+ * each family's write):
+ *   records   updateRecord, moveRecord, archiveRecord, restoreRecord, tag/untag, createRecord,
+ *             bulkDeleteRecords (lists, counts)
+ *   jobs      startBulkDelete, cancelJob, dismissJob (the job list; cancel also lists and counts),
+ *             and a poll that sees a job move (lists, counts)
+ *   others    addPerson, createAccount, updateAccount, saveView/updateView/deleteView, the admin
+ *             writes, the assistant's conversations (model/ai.ts), counts after a live event
+ *
+ * Left out on purpose:
+ *   renameRecord and inbox triage are optimistic and cancel their reads in onMutate;
+ *   a live event marks lists stale without refetching them (live.ts, refetchType 'none');
+ *   "Show N new" refetches lists already on screen, which have data, so invalidating restarts them.
  */
 import type { QueryClient, QueryKey } from '@tanstack/react-query';
 

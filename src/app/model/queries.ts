@@ -12,6 +12,7 @@ import { usePartition } from '../session';
 import { useTenant } from '../tenant';
 import { isActiveJob, jobSettings } from './jobs';
 import { accountKeys, jobKeys, recordKeys, viewKeys, type Partition } from './keys';
+import { refetchAfterWrite } from './refetch';
 
 /**
  * keepPreviousData, but never across a partition: the previous page may stay on screen while the
@@ -125,8 +126,9 @@ export function useJobs() {
         return was !== undefined && (was.done !== job.done || was.state !== job.state);
       });
       if (moved) {
-        void client.invalidateQueries({ queryKey: recordKeys.lists(partition) });
-        void client.invalidateQueries({ queryKey: recordKeys.counts(partition) });
+        // The job changed records on the server: even a list still on its first load reads again.
+        void refetchAfterWrite(client, recordKeys.lists(partition));
+        void refetchAfterWrite(client, recordKeys.counts(partition));
       }
       return answer;
     },
