@@ -14,6 +14,9 @@
  *   ask (useAssistant)   streaming    its own turns, token by token  the conversation and list, when stored
  *   applyProposal        pessimistic  through moveRecord, one per accepted change (its patches and invalidations)
  *   undoProposal         pessimistic  through moveRecord, back to each status, with the version each move returned
+ *
+ * The conversation verbs invalidate through refetchAfterWrite (./refetch): a chat can be created
+ * while the history's first load is still in flight, and that load must not land over it.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
@@ -41,6 +44,7 @@ import { useTenant } from '../tenant';
 import type { Partition } from './keys';
 import { isConflict, isForbidden, useMoveRecord } from './mutations';
 import { can, DENIAL_REASONS } from './permissions';
+import { refetchAfterWrite } from './refetch';
 
 export const aiKeys = {
   conversations: (p: Partition) => [...p, 'ai-conversations', {}] as const,
@@ -71,7 +75,8 @@ export function useCreateConversation() {
     mutationFn: () => postConversation(tenant),
     onSuccess: (created) => {
       client.setQueryData(aiKeys.conversation(partition, created.id), created);
-      return client.invalidateQueries({ queryKey: aiKeys.conversations(partition) });
+      // The history may still be on its first load, read before this chat existed.
+      return refetchAfterWrite(client, aiKeys.conversations(partition));
     },
   });
 }
@@ -83,10 +88,10 @@ export function useRenameConversation() {
   return useMutation({
     mutationKey: [...partition, 'renameConversation'],
     mutationFn: ({ id, title }: { id: string; title: string }) => patchConversation(tenant, id, title),
-    onSuccess: (renamed) => {
-      client.setQueryData<Summaries>(aiKeys.conversations(partition), (current) => (current ? { items: current.items.map((c) => (c.id === renamed.id ? renamed : c)) } : current));
-      return client.invalidateQueries({ queryKey: aiKeys.conversations(partition) });
-    },
+    onSuccess: (renamed) =>
+      refetchAfterWrite(client, aiKeys.conversations(partition), () =>
+        client.setQueryData<Summaries>(aiKeys.conversations(partition), (current) => (current ? { items: current.items.map((c) => (c.id === renamed.id ? renamed : c)) } : current)),
+      ),
   });
 }
 
@@ -99,8 +104,9 @@ export function useDeleteConversation() {
     mutationFn: (id: string) => deleteConversation(tenant, id),
     onSuccess: ({ deleted }) => {
       client.removeQueries({ queryKey: aiKeys.conversation(partition, deleted), exact: true });
-      client.setQueryData<Summaries>(aiKeys.conversations(partition), (current) => (current ? { items: current.items.filter((c) => c.id !== deleted) } : current));
-      return client.invalidateQueries({ queryKey: aiKeys.conversations(partition) });
+      return refetchAfterWrite(client, aiKeys.conversations(partition), () =>
+        client.setQueryData<Summaries>(aiKeys.conversations(partition), (current) => (current ? { items: current.items.filter((c) => c.id !== deleted) } : current)),
+      );
     },
   });
 }
@@ -235,8 +241,8 @@ export function useAssistant({ context, conversationId, initialTurns = [] }: Use
     onSettled: (_turn, _error, { stored }) =>
       stored
         ? Promise.all([
-            client.invalidateQueries({ queryKey: aiKeys.conversation(partition, stored) }),
-            client.invalidateQueries({ queryKey: aiKeys.conversations(partition) }),
+            refetchAfterWrite(client, aiKeys.conversation(partition, stored)),
+            refetchAfterWrite(client, aiKeys.conversations(partition)),
           ])
         : undefined,
   });
