@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { EscapeHatch } from '../../internal/closed-api';
 import { Button, type ButtonSize } from '../Button/Button';
+import { CheckIcon, CopyIcon } from '../Icon/icons';
 import './CopyButton.css';
 
 export interface CopyButtonProps extends EscapeHatch {
@@ -71,7 +72,7 @@ export function CopyButton({
       <Button
         variant={variant}
         size={size}
-        icon={copied ? 'check' : 'copy'}
+        icon={copied ? CheckIcon : CopyIcon}
         aria-label={copied ? undefined : accessibleName}
         UNSAFE_className={UNSAFE_className}
         UNSAFE_style={UNSAFE_style}

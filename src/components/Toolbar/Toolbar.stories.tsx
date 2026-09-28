@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Toolbar, ToolbarButton, ToolbarSeparator } from './Toolbar';
+import { ArchiveIcon, CopyIcon, DownloadIcon } from '../Icon/icons';
 
 const meta = {
   title: 'Components/Toolbar',
@@ -8,15 +9,15 @@ const meta = {
     label: 'Conversation actions',
     children: (
       <>
-        <ToolbarButton shortcut="e">
+        <ToolbarButton icon={ArchiveIcon} shortcut="e">
           Archive
         </ToolbarButton>
         <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>
         <ToolbarSeparator />
-        <ToolbarButton icon="download" hideLabel>
+        <ToolbarButton icon={DownloadIcon} hideLabel>
           Export
         </ToolbarButton>
-        <ToolbarButton icon="copy" hideLabel disabled>
+        <ToolbarButton icon={CopyIcon} hideLabel disabled>
           Copy link
         </ToolbarButton>
         <ToolbarSeparator />

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ArchiveIcon } from '../Icon/icons';
 import { ContextMenu } from './ContextMenu';
 
 const meta = {
@@ -9,7 +10,7 @@ const meta = {
     items: [
       { label: 'Open', shortcut: 'enter' },
       { label: 'Mark as unread', shortcut: 'u' },
-      { label: 'Archive', shortcut: 'e' },
+      { label: 'Archive', icon: ArchiveIcon, shortcut: 'e' },
       'separator',
       { label: 'Delete', tone: 'danger' },
     ],

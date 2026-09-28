@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../Button/Button';
 import { Tooltip } from './Tooltip';
+import { DownloadIcon } from '../Icon/icons';
 
 const meta = {
   title: 'Components/Tooltip',
   component: Tooltip,
   args: {
     content: 'Download the filtered list as CSV',
-    children: <Button variant="secondary" icon="download">Export</Button>,
+    children: <Button variant="secondary" icon={DownloadIcon}>Export</Button>,
   },
   // Centred, so the tooltip has room on every side inside the viewport screenshot.
   parameters: { layout: 'centered' },

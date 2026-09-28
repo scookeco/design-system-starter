@@ -13,6 +13,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import {
+  ArchiveIcon,
   Badge,
   Banner,
   Button,
@@ -22,6 +23,7 @@ import {
   ContextMenu,
   EmptyState,
   Heading,
+  InboxIcon,
   Kbd,
   Link,
   NavTabs,
@@ -43,6 +45,7 @@ import {
   useShortcut,
   useToast,
   type CheckedState,
+  type IconDefinition,
   type MenuEntry,
 } from '../index';
 import type { InboxItem, InboxView } from '../app/api/inbox';
@@ -183,6 +186,7 @@ function InboxContent({ initialSelection }: { initialSelection: readonly string[
   });
 
   const archiveLabel = url.view === 'inbox' ? 'Archive' : 'Move to Inbox';
+  const archiveIcon = url.view === 'inbox' ? ArchiveIcon : InboxIcon;
   const allChecked: CheckedState = hasItems && selected.length === items.length ? true : selected.length > 0 ? 'indeterminate' : false;
 
   const list = (
@@ -193,7 +197,7 @@ function InboxContent({ initialSelection }: { initialSelection: readonly string[
             <span role="status">{`${format.number(selected.length)} selected`}</span>
           </Text>
           <Toolbar label="Selected conversations">
-            <ToolbarButton shortcut="e" onClick={archiveTargets}>
+            <ToolbarButton icon={archiveIcon} shortcut="e" onClick={archiveTargets}>
               {archiveLabel}
             </ToolbarButton>
             <ToolbarButton shortcut="u" onClick={toggleRead}>
@@ -250,6 +254,7 @@ function InboxContent({ initialSelection }: { initialSelection: readonly string[
                 selected={selection.has(item.id)}
                 href={nav.href({ item: item.id })}
                 archiveLabel={archiveLabel}
+                archiveIcon={archiveIcon}
                 onSelectedChange={(on) => toggleSelected(item.id, on)}
                 onArchive={() => {
                   nav.replace({ item: item.id });
@@ -265,7 +270,7 @@ function InboxContent({ initialSelection }: { initialSelection: readonly string[
   );
 
   const detail = current ? (
-    <Detail item={current} archiveLabel={archiveLabel} onArchive={archiveTargets} onToggleRead={toggleRead} />
+    <Detail item={current} archiveLabel={archiveLabel} archiveIcon={archiveIcon} onArchive={archiveTargets} onToggleRead={toggleRead} />
   ) : (
     <EmptyState
       reason="no-results"
@@ -310,18 +315,19 @@ interface InboxRowProps {
   selected: boolean;
   href: string;
   archiveLabel: string;
+  archiveIcon: IconDefinition;
   onSelectedChange: (on: boolean) => void;
   onArchive: () => void;
   onToggleRead: () => void;
 }
 
 /** One conversation. Right-click (or Shift+F10 on its link) offers the toolbar's actions too. */
-function InboxRow({ item, open, selected, href, archiveLabel, onSelectedChange, onArchive, onToggleRead }: InboxRowProps) {
+function InboxRow({ item, open, selected, href, archiveLabel, archiveIcon, onSelectedChange, onArchive, onToggleRead }: InboxRowProps) {
   const format = useFormat();
   const from = usePersonName(item.fromId) ?? '…';
   const actions: MenuEntry[] = [
     { label: item.read ? 'Mark unread' : 'Mark read', shortcut: 'u', onSelect: onToggleRead },
-    { label: archiveLabel, shortcut: 'e', onSelect: onArchive },
+    { label: archiveLabel, icon: archiveIcon, shortcut: 'e', onSelect: onArchive },
   ];
   return (
     <ContextMenu items={actions} label={item.subject}>
@@ -357,7 +363,17 @@ function InboxRow({ item, open, selected, href, archiveLabel, onSelectedChange, 
 }
 
 /** The open conversation: who, when, what it's about (joined by id), and the same actions as the list. */
-function Detail({ item, archiveLabel, onArchive, onToggleRead }: { item: InboxItem; archiveLabel: string; onArchive: () => void; onToggleRead: () => void }) {
+function Detail({
+  item,
+  archiveLabel,
+  archiveIcon,
+  onArchive,
+  onToggleRead,
+}: {
+  item: InboxItem;
+  archiveLabel: string;
+  archiveIcon: IconDefinition;
+  onArchive: () => void; onToggleRead: () => void }) {
   const format = useFormat();
   return (
     <Stack gap="md">
@@ -378,7 +394,7 @@ function Detail({ item, archiveLabel, onArchive, onToggleRead }: { item: InboxIt
         </Cluster>
       </Stack>
       <Toolbar label="Conversation actions">
-        <ToolbarButton shortcut="e" onClick={onArchive}>
+        <ToolbarButton icon={archiveIcon} shortcut="e" onClick={onArchive}>
           {archiveLabel}
         </ToolbarButton>
         <ToolbarButton shortcut="u" onClick={onToggleRead}>

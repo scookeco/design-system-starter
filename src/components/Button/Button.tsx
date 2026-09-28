@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import type { IconDefinition } from '../Icon/icons';
 import { Spinner } from '../Spinner/Spinner';
 import './Button.css';
 
@@ -12,7 +13,7 @@ export type ButtonProps = Closed<ComponentPropsWithRef<'button'>> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   /** Leading icon from the system set. Decorative: the label remains the accessible name. */
-  icon?: IconName;
+  icon?: IconDefinition;
   /**
    * Pending state: shows a spinner, keeps the label (so the accessible name survives)
    * and blocks activation with aria-disabled, so focus is not lost.
@@ -53,7 +54,7 @@ export function Button({
       aria-disabled={loading ? true : rest['aria-disabled']}
       onClick={handleClick}
     >
-      {loading ? <Spinner /> : icon ? <Icon name={icon} /> : null}
+      {loading ? <Spinner /> : icon ? <Icon icon={icon} /> : null}
       <span className="button__label">{children}</span>
     </button>
   );

@@ -28,6 +28,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
+  (iconsByName is deprecated). The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.

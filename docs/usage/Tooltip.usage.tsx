@@ -1,4 +1,4 @@
-import { Button, Cluster, Tooltip } from '../../src/index';
+import { Button, Cluster, DownloadIcon, Tooltip } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -16,7 +16,7 @@ export const usage: UsageDoc = {
     render: () => (
       <Cluster>
         <Tooltip content="Downloads every row that matches the filters">
-          <Button variant="secondary" icon="download">
+          <Button variant="secondary" icon={DownloadIcon}>
             Export CSV
           </Button>
         </Tooltip>

@@ -12,6 +12,7 @@ import { Center } from '../../primitives/Center/Center';
 import { Stack } from '../../primitives/Stack/Stack';
 import { AppShell } from '../AppShell/AppShell';
 import { AssistantPanel, type AssistantPanelProps } from './AssistantPanel';
+import { FileIcon, PlusIcon } from '../../components/Icon/icons';
 
 const conversation = (
   <>
@@ -33,7 +34,7 @@ function InShell(props: Partial<AssistantPanelProps>) {
     <AppShell
       brand="Acme"
       sidebarStorageKey={null}
-      nav={<Nav label="Main" current="/records" sections={[{ items: [{ label: 'Records', href: '/records', icon: 'file' }] }]} />}
+      nav={<Nav label="Main" current="/records" sections={[{ items: [{ label: 'Records', href: '/records', icon: FileIcon }] }]} />}
       assistant={
         <AssistantPanel title="Assistant" storageKey={null} {...props}>
           {conversation}
@@ -67,7 +68,7 @@ export const WithHeaderActions: Story = {
   render: () => (
     <InShell
       actions={
-        <Button variant="ghost" size="sm" icon="plus">
+        <Button variant="ghost" size="sm" icon={PlusIcon}>
           New chat
         </Button>
       }

@@ -33,6 +33,6 @@
       "@internationalized/date"
     ],
     "gzip": true,
-    "limit": "1.5 kB"
+    "limit": "640 B"
   }
 ]

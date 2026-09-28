@@ -1,5 +1,6 @@
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { MinusIcon, TrendDownIcon, TrendUpIcon, type IconDefinition } from '../Icon/icons';
 import './Stat.css';
 
 export type StatDirection = 'up' | 'down' | 'flat';
@@ -25,7 +26,7 @@ export interface StatProps extends EscapeHatch {
   directionLabels?: Record<StatDirection, string>;
 }
 
-const DIRECTION_ICON: Record<StatDirection, IconName> = { up: 'trend-up', down: 'trend-down', flat: 'minus' };
+const DIRECTION_ICON: Record<StatDirection, IconDefinition> = { up: TrendUpIcon, down: TrendDownIcon, flat: MinusIcon };
 const DIRECTION_LABELS: Record<StatDirection, string> = { up: 'Up', down: 'Down', flat: 'No change' };
 
 /**
@@ -41,7 +42,7 @@ export function Stat({ label, value, delta, comparison, directionLabels = DIRECT
       {delta ? (
         <p className="stat__delta">
           <span className="stat__change" data-tone={delta.tone ?? 'neutral'}>
-            <Icon name={DIRECTION_ICON[delta.direction]} />
+            <Icon icon={DIRECTION_ICON[delta.direction]} />
             <span className="visually-hidden">{`${directionLabels[delta.direction]} `}</span>
             {delta.direction === 'flat' ? null : delta.value}
           </span>

@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CloseIcon } from '../Icon/icons';
 import './Dialog.css';
 
 export interface DialogProps extends EscapeHatch {
@@ -51,7 +52,7 @@ export function Dialog({
             <header className="dialog__header">
               <DialogPrimitive.Title className="dialog__title">{title}</DialogPrimitive.Title>
               <DialogPrimitive.Close className="dialog__close" aria-label={closeLabel}>
-                <Icon name="close" />
+                <Icon icon={CloseIcon} />
               </DialogPrimitive.Close>
             </header>
             {description ? <DialogPrimitive.Description className="dialog__description">{description}</DialogPrimitive.Description> : null}

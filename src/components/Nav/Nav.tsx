@@ -1,6 +1,7 @@
 import { createContext, useContext, useId, type MouseEvent } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import type { IconDefinition } from '../Icon/icons';
 import { RouterLink } from '../Link/Link';
 import { Tooltip } from '../Tooltip/Tooltip';
 import './Nav.css';
@@ -17,7 +18,7 @@ export interface NavItem {
   label: string;
   href: string;
   /** Leading icon from the system set. Decorative: the label is the accessible name. */
-  icon?: IconName;
+  icon?: IconDefinition;
 }
 
 export interface NavSection {
@@ -71,7 +72,7 @@ export function Nav({ label, sections, current, onNavigate, UNSAFE_className, UN
                     }}
                   >
                     {item.icon ? (
-                      <Icon name={item.icon} />
+                      <Icon icon={item.icon} />
                     ) : rail ? (
                       <span className="nav__initial" aria-hidden="true">
                         {Array.from(item.label)[0]}

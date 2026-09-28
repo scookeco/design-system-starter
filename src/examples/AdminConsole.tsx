@@ -15,37 +15,7 @@
  * a projection of the mutations, denied attempts included.
  */
 import { useState } from 'react';
-import {
-  Badge,
-  Banner,
-  Button,
-  Center,
-  CodeBlock,
-  Cluster,
-  Combobox,
-  DateRangePicker,
-  Dialog,
-  EmptyState,
-  Menu,
-  MultiSelect,
-  NavTabs,
-  PageHeader,
-  Pagination,
-  RadioGroup,
-  Skeleton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  Text,
-  TextField,
-  useFormat,
-  useToast,
-  type BadgeTone,
-} from '../index';
+import { Badge, Banner, Button, Center, ChevronDownIcon, ChevronRightIcon, Cluster, CodeBlock, Combobox, DateRangePicker, Dialog, DownloadIcon, EmptyState, Menu, MoreIcon, MultiSelect, NavTabs, PageHeader, Pagination, PlusIcon, RadioGroup, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text, TextField, useFormat, useToast, type BadgeTone } from '../index';
 import { AUDIT_ACTIONS, type AuditAction, type AuditEvent, type Member } from '../app/api/admin';
 import { ApiError } from '../app/api/client';
 import { ROLES, type Capability, type Role } from '../app/api/schemas';
@@ -145,7 +115,7 @@ function MembersSection({ initialDialog }: { initialDialog: MemberDialog | undef
         description={active === undefined ? `Who’s in ${WORKSPACES[tenant].name}.` : `${format.number(active)} members in ${WORKSPACES[tenant].name}, and open invitations.`}
         actions={
           <Stack gap="2xs" align="end">
-            <Button icon="plus" onClick={() => setOpen(true)} {...gated(invite)}>
+            <Button icon={PlusIcon} onClick={() => setOpen(true)} {...gated(invite)}>
               Invite member
             </Button>
             <PermissionNote permission={invite} />
@@ -234,7 +204,7 @@ function MembersTable({ initialDialog }: { initialDialog: MemberDialog | undefin
                     <Menu
                       align="end"
                       trigger={
-                        <Button variant="ghost" size="sm" icon="more" aria-label={`Actions for ${member.email}`}>
+                        <Button variant="ghost" size="sm" icon={MoreIcon} aria-label={`Actions for ${member.email}`}>
                           Actions
                         </Button>
                       }
@@ -470,7 +440,7 @@ function AuditSection({ initialExpanded }: { initialExpanded: readonly string[] 
         <Button
           variant="secondary"
           size="sm"
-          icon="download"
+          icon={DownloadIcon}
           loading={exporter.isPending}
           onClick={() =>
             exporter.mutate(filter, {
@@ -542,7 +512,7 @@ function AuditSection({ initialExpanded }: { initialExpanded: readonly string[] 
                         <Button
                           variant="ghost"
                           size="sm"
-                          icon={open ? 'chevron-down' : 'chevron-right'}
+                          icon={open ? ChevronDownIcon : ChevronRightIcon}
                           aria-expanded={open}
                           onClick={() =>
                             setExpanded((before) => {

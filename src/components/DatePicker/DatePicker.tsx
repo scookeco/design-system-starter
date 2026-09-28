@@ -18,6 +18,7 @@ import {
 import { useFormat } from '../../format';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '../Icon/icons';
 import { PickerHelp, PickerLabel, PickerLocale, useEscapeCloses, usePortalContainer, useStartOpen } from '../Picker/Picker';
 import './DatePicker.css';
 
@@ -95,11 +96,11 @@ function CalendarHeader({ previousMonthLabel, nextMonthLabel }: { previousMonthL
   return (
     <header className="date-picker__header">
       <Button slot="previous" className="picker__button" aria-label={previousMonthLabel}>
-        <Icon name="chevron-left" />
+        <Icon icon={ChevronLeftIcon} />
       </Button>
       <Heading className="date-picker__heading" />
       <Button slot="next" className="picker__button" aria-label={nextMonthLabel}>
-        <Icon name="chevron-right" />
+        <Icon icon={ChevronRightIcon} />
       </Button>
     </header>
   );
@@ -114,7 +115,7 @@ function Field({ size, error, disabled, calendarLabel, children }: { size: strin
     <Group className="field__control picker__control date-picker__control" data-size={size} data-invalid={error ? true : undefined} data-disabled={disabled || undefined}>
       {children}
       <Button className="picker__button" aria-label={calendarLabel}>
-        <Icon name="chevron-down" />
+        <Icon icon={CalendarIcon} />
       </Button>
     </Group>
   );

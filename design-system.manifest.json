@@ -4,7 +4,7 @@
   "name": "Design system starter",
   "summary": "Design system starter where design-system drift fails the build.",
   "entry": "src/index.ts",
-  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.\n  Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
+  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.\n  Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name\n  (iconsByName is deprecated). The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
   "commands": [
     {
       "command": "npm run dev",
@@ -238,7 +238,7 @@
     },
     {
       "title": "Icons",
-      "summary": "A small, closed set drawn on one 20-unit grid with one stroke token. Components take an icon by name; product code never imports an icon file.",
+      "summary": "A small, closed set drawn on one 20-unit grid with one stroke token. Each icon is a value you import from the system’s entry and pass to a component’s icon prop, so a page bundles only the icons it uses.",
       "path": "docs/foundations/Icons.stories.tsx",
       "story": "foundations-icons--icons"
     }
@@ -1181,6 +1181,15 @@
       "propsOf": "AppShell"
     },
     {
+      "name": "ArchiveIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "AssistantPanel",
       "kind": "layout",
       "source": "src/layouts/AssistantPanel/AssistantPanel.tsx",
@@ -1415,6 +1424,15 @@
       "propsOf": "AssistantPanel"
     },
     {
+      "name": "AttachIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "AuthLayout",
       "kind": "layout",
       "source": "src/layouts/AuthLayout/AuthLayout.tsx",
@@ -1475,7 +1493,7 @@
         },
         "dont": {
           "caption": "Sign-in inside the app shell: navigation to pages the person can’t open yet, and a frame that implies they’re signed in.",
-          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Button>Continue with SSO</Button>\n</AppShell>"
+          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Button>Continue with SSO</Button>\n</AppShell>"
         },
         "accessibility": [
           "Provides banner (brand), main (the card) and contentinfo (footer) landmarks; the page supplies the one h1 inside the card.",
@@ -2400,6 +2418,15 @@
       "propsOf": "Breadcrumbs"
     },
     {
+      "name": "BuildingIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Button",
       "kind": "component",
       "source": "src/components/Button/Button.tsx",
@@ -2441,45 +2468,10 @@
         },
         {
           "name": "icon",
-          "type": "IconName",
+          "type": "IconDefinition",
           "required": false,
           "default": null,
-          "description": "Leading icon from the system set. Decorative: the label remains the accessible name.",
-          "values": [
-            "menu",
-            "search",
-            "stop",
-            "danger",
-            "check",
-            "success",
-            "warning",
-            "info",
-            "close",
-            "chevron-down",
-            "sort-ascending",
-            "sort-descending",
-            "sort-none",
-            "plus",
-            "minus",
-            "download",
-            "upload",
-            "copy",
-            "chevron-right",
-            "chevron-left",
-            "home",
-            "file",
-            "users",
-            "building",
-            "settings",
-            "trend-up",
-            "trend-down",
-            "more",
-            "eye",
-            "eye-off",
-            "sparkle",
-            "thumbs-up",
-            "thumbs-down"
-          ]
+          "description": "Leading icon from the system set. Decorative: the label remains the accessible name."
         },
         {
           "name": "loading",
@@ -2678,6 +2670,15 @@
         "ghost",
         "danger"
       ]
+    },
+    {
+      "name": "CalendarIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Card",
@@ -3307,6 +3308,53 @@
       "propsOf": "ChatThread"
     },
     {
+      "name": "CheckIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": "Beside a label, to help people find an action or a place quickly: `<Button icon={PlusIcon}>New record</Button>`, a `Nav` item, a `Menu` item, a `ToolbarButton`. Import the icon from the system entry and pass it as the value.",
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx",
+      "usage": {
+        "whenToUse": [
+          "Beside a label, to help people find an action or a place quickly: `<Button icon={PlusIcon}>New record</Button>`, a `Nav` item, a `Menu` item, a `ToolbarButton`. Import the icon from the system entry and pass it as the value.",
+          "One meaning per icon, everywhere: `ArchiveIcon` archives, `InboxIcon` is the inbox, `SparkleIcon` marks AI and only AI. Look the set up on Foundations/Icons.",
+          "Data that names its icon (a config keyed by route, say) stores the value (`{ \"/inbox\": InboxIcon }`), not a string."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "No icon in the set means what you need",
+            "instead": "a text label alone; propose the icon as a design-system change (Guides/Contributing)"
+          },
+          {
+            "situation": "Looking an icon up by a name from data (`iconsByName[name]`)",
+            "instead": "store the icon value itself. `iconsByName` and `IconName` are deprecated: the lookup bundles every icon"
+          },
+          {
+            "situation": "An icon that looks close enough (a download arrow for an inbox)",
+            "instead": "the icon that means it, or no icon"
+          },
+          {
+            "situation": "Status told by an icon alone",
+            "instead": "`Badge` or `Banner`, which pair the status icon with text"
+          }
+        ],
+        "do": {
+          "caption": "The value, next to a label that says the same thing: the page bundles this icon and no other.",
+          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton icon={ArchiveIcon} shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n</Toolbar>"
+        },
+        "dont": {
+          "caption": "A lookup by name: it works, but pulls the whole icon set into the bundle, and the name isn’t checked where the data is written. Import `ArchiveIcon` instead.",
+          "code": "<Cluster gap=\"sm\">\n  <Button variant=\"secondary\" icon={iconsByName.archive}>\n    Archive\n  </Button>\n</Cluster>"
+        },
+        "accessibility": [
+          "Icons are decorative: the system renders them `aria-hidden` and not focusable, so a control’s accessible name comes from its label.",
+          "An icon-only button needs an `aria-label` and a `Tooltip` with the same words (`Button` with `hideLabel`, `ToolbarButton` without children).",
+          "Never rely on the icon alone to tell status or meaning; the visible text says it."
+        ]
+      }
+    },
+    {
       "name": "Checkbox",
       "kind": "component",
       "source": "src/components/Checkbox/Checkbox.tsx",
@@ -3502,6 +3550,33 @@
       "definition": "type CheckedState = boolean | 'indeterminate'"
     },
     {
+      "name": "ChevronDownIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "ChevronLeftIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "ChevronRightIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Citation",
       "kind": "component",
       "source": "src/components/Citation/Citation.tsx",
@@ -3625,6 +3700,15 @@
       "description": null,
       "partOf": "Citation",
       "propsOf": "Citation"
+    },
+    {
+      "name": "CloseIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Cluster",
@@ -4278,7 +4362,7 @@
       "status": null,
       "description": null,
       "partOf": "CommandPalette",
-      "definition": "interface CommandItem { id: string; label: string; description?: string; icon?: IconName; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }"
+      "definition": "interface CommandItem { id: string; label: string; description?: string; icon?: IconDefinition; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }"
     },
     {
       "name": "CommandPalette",
@@ -4423,11 +4507,11 @@
         ],
         "do": {
           "caption": "Grouped rows with a type in the description and a shortcut where one exists; only what this person may do is passed in.",
-          "code": "<Button variant=\"secondary\" icon=\"search\">\n  <span>Search</span> <Kbd keys=\"mod+k\" />\n</Button>"
+          "code": "<Button variant=\"secondary\" icon={SearchIcon}>\n  <span>Search</span> <Kbd keys=\"mod+k\" />\n</Button>"
         },
         "dont": {
           "caption": "A search button with no sign of the shortcut: pointer users never learn ⌘K exists. (And never pass rows the person can’t run: filter with `can` first.)",
-          "code": "<Button variant=\"secondary\" icon=\"search\">Search</Button>"
+          "code": "<Button variant=\"secondary\" icon={SearchIcon}>Search</Button>"
         },
         "accessibility": [
           "A modal dialog (focus trapped, the page inert, Esc closes, focus returns) holding the ARIA combobox pattern: the input keeps focus and `aria-activedescendant` names the active option.",
@@ -4854,7 +4938,7 @@
         ],
         "do": {
           "caption": "The same items as the visible ⋯ menu, on a focusable region.",
-          "code": "<ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>\n  <div tabIndex={0} role=\"group\" aria-label=\"Northwind renewal\">\n    Northwind renewal <Menu trigger={<Button variant=\"ghost\" icon=\"more\" aria-label=\"More actions\">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />\n  </div>\n</ContextMenu>"
+          "code": "<ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>\n  <div tabIndex={0} role=\"group\" aria-label=\"Northwind renewal\">\n    Northwind renewal <Menu trigger={<Button variant=\"ghost\" icon={MoreIcon} aria-label=\"More actions\">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />\n  </div>\n</ContextMenu>"
         },
         "dont": {
           "caption": "Actions that exist only on right-click: invisible to most people, and to keyboard users who don’t know Shift+F10.",
@@ -5125,6 +5209,15 @@
       "propsOf": "CopyButton"
     },
     {
+      "name": "CopyIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Cover",
       "kind": "primitive",
       "source": "src/primitives/Cover/Cover.tsx",
@@ -5301,6 +5394,15 @@
       "description": null,
       "partOf": "Cover",
       "propsOf": "Cover"
+    },
+    {
+      "name": "DangerIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "DateInput",
@@ -5964,7 +6066,7 @@
         ],
         "do": {
           "caption": "A focused quick-create: a short title, the fields, and the primary action last.",
-          "code": "<Dialog\n  title=\"New record\"\n  description=\"Records start as drafts.\"\n  trigger={<Button icon=\"plus\">New record</Button>}\n  footer={\n    <>\n      <Button variant=\"secondary\">Cancel</Button>\n      <Button>Create record</Button>\n    </>\n  }\n>\n  <TextField label=\"Name\" />\n</Dialog>"
+          "code": "<Dialog\n  title=\"New record\"\n  description=\"Records start as drafts.\"\n  trigger={<Button icon={PlusIcon}>New record</Button>}\n  footer={\n    <>\n      <Button variant=\"secondary\">Cancel</Button>\n      <Button>Create record</Button>\n    </>\n  }\n>\n  <TextField label=\"Name\" />\n</Dialog>"
         },
         "dont": {
           "caption": "A vague confirm: “Are you sure?” with “OK” forces people to reread what they clicked.",
@@ -6284,6 +6386,15 @@
       "propsOf": "Divider"
     },
     {
+      "name": "DownloadIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Drawer",
       "kind": "component",
       "source": "src/components/Drawer/Drawer.tsx",
@@ -6501,6 +6612,15 @@
       "propsOf": "Drawer"
     },
     {
+      "name": "EditIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "EmptyState",
       "kind": "component",
       "source": "src/components/EmptyState/EmptyState.tsx",
@@ -6593,7 +6713,7 @@
         ],
         "do": {
           "caption": "Say what goes here and offer the one action that fills it.",
-          "code": "<EmptyState\n  reason=\"first-use\"\n  headingLevel={4}\n  title=\"Create your first record\"\n  description=\"Records track agreements from draft to renewal.\"\n  action={<Button icon=\"plus\">New record</Button>}\n/>"
+          "code": "<EmptyState\n  reason=\"first-use\"\n  headingLevel={4}\n  title=\"Create your first record\"\n  description=\"Records track agreements from draft to renewal.\"\n  action={<Button icon={PlusIcon}>New record</Button>}\n/>"
         },
         "dont": {
           "caption": "A dead end: no explanation and no way forward.",
@@ -6687,6 +6807,24 @@
       "status": null,
       "description": "The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.",
       "definition": "interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }"
+    },
+    {
+      "name": "EyeIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "EyeOffIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Feedback",
@@ -6881,6 +7019,15 @@
       "description": null,
       "partOf": "Feedback",
       "definition": "interface FeedbackValue { rating: FeedbackRating; reason?: string; }"
+    },
+    {
+      "name": "FileIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "FileRejection",
@@ -7246,7 +7393,7 @@
         },
         "dont": {
           "caption": "A wizard inside the app shell: the full navigation invites people to leave half-way, and nothing says how to exit safely.",
-          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Text>Step 1 of 3: Name your workspace</Text>\n</AppShell>"
+          "code": "<AppShell\n  brand=\"Acme\"\n  nav={<Nav label=\"Main (don’t example)\" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}\n  skipLinkLabel=\"Skip to content (don’t example)\"\n  sidebarStorageKey={null}\n>\n  <Text>Step 1 of 3: Name your workspace</Text>\n</AppShell>"
         },
         "accessibility": [
           "Provides banner (the header) and main landmarks; the step’s `PageHeader` is the page’s h1, and the task name in the header is not a heading.",
@@ -7796,6 +7943,15 @@
       "propsOf": "Heading"
     },
     {
+      "name": "HomeIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "HoverCard",
       "kind": "component",
       "source": "src/components/HoverCard/HoverCard.tsx",
@@ -7961,44 +8117,61 @@
       "propsOf": "HoverCard"
     },
     {
+      "name": "IconDefinition",
+      "kind": "type-only",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": "An icon from the system set: pass it to a component's `icon` prop.",
+      "partOf": "Icon",
+      "definition": "interface IconDefinition { readonly name: string; readonly path: string; }"
+    },
+    {
       "name": "IconName",
       "kind": "type-only",
-      "source": "src/components/Icon/Icon.tsx",
-      "status": null,
-      "description": null,
+      "source": "src/components/Icon/names.ts",
+      "status": "deprecated",
+      "description": "An icon's name in the set.",
       "partOf": "Icon",
-      "definition": "type IconName = keyof typeof PATHS",
+      "definition": "type IconName = keyof typeof iconsByName",
       "values": [
         "menu",
         "search",
         "stop",
         "danger",
-        "check",
+        "file",
         "success",
         "warning",
         "info",
+        "check",
         "close",
         "chevron-down",
+        "chevron-right",
+        "chevron-left",
         "sort-ascending",
         "sort-descending",
         "sort-none",
         "plus",
         "minus",
-        "download",
-        "upload",
-        "copy",
-        "chevron-right",
-        "chevron-left",
-        "home",
-        "file",
-        "users",
-        "building",
-        "settings",
-        "trend-up",
-        "trend-down",
         "more",
         "eye",
         "eye-off",
+        "calendar",
+        "download",
+        "upload",
+        "copy",
+        "edit",
+        "archive",
+        "retry",
+        "send",
+        "attach",
+        "home",
+        "inbox",
+        "users",
+        "building",
+        "settings",
+        "shield",
+        "trend-up",
+        "trend-down",
         "sparkle",
         "thumbs-up",
         "thumbs-down"
@@ -8184,6 +8357,24 @@
       "description": null,
       "partOf": "Imposter",
       "propsOf": "Imposter"
+    },
+    {
+      "name": "InboxIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "InfoIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "InlineEdit",
@@ -8509,7 +8700,7 @@
         ],
         "do": {
           "caption": "Notation, not glyphs: `mod+k` shows ⌘K on a Mac and Ctrl K elsewhere, from the string the shortcut is registered with; a hint names its keys.",
-          "code": "<Cluster gap=\"md\" align=\"center\">\n  <Tooltip content=\"Search and run commands\" shortcut=\"mod+k\">\n    <Button variant=\"secondary\" icon=\"search\">\n      Search\n    </Button>\n  </Tooltip>\n  <Text>\n    <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss\n  </Text>\n</Cluster>"
+          "code": "<Cluster gap=\"md\" align=\"center\">\n  <Tooltip content=\"Search and run commands\" shortcut=\"mod+k\">\n    <Button variant=\"secondary\" icon={SearchIcon}>\n      Search\n    </Button>\n  </Tooltip>\n  <Text>\n    <Kbd>Tab</Kbd> to accept · <Kbd>Esc</Kbd> to dismiss\n  </Text>\n</Cluster>"
         },
         "dont": {
           "caption": "A combination typed into one cap, or a hard-coded ⌘: one strange key, wrong on Windows, and read as “place of interest sign”. Use `keys=\"shift+enter\"`.",
@@ -9001,7 +9192,7 @@
         ],
         "do": {
           "caption": "The primary action stays visible; the rest live behind “More”, with the destructive one last.",
-          "code": "<Cluster gap=\"xs\">\n  <Button>Edit</Button>\n  <Menu\n    trigger={<Button variant=\"secondary\">More</Button>}\n    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: 'download' }, 'separator', { label: 'Delete record' }]}\n  />\n</Cluster>"
+          "code": "<Cluster gap=\"xs\">\n  <Button>Edit</Button>\n  <Menu\n    trigger={<Button variant=\"secondary\">More</Button>}\n    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: DownloadIcon }, 'separator', { label: 'Delete record' }]}\n  />\n</Cluster>"
         },
         "dont": {
           "caption": "The main action hidden in a menu with a single item: one extra click for nothing.",
@@ -9080,13 +9271,22 @@
       "definition": "type MenuEntry = MenuItem | 'separator'"
     },
     {
+      "name": "MenuIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "MenuItem",
       "kind": "type-only",
       "source": "src/components/Menu/Menu.tsx",
       "status": null,
       "description": null,
       "partOf": "Menu",
-      "definition": "interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }"
+      "definition": "interface MenuItem { label: string; onSelect?: () => void; icon?: IconDefinition; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }"
     },
     {
       "name": "MenuProps",
@@ -9545,6 +9745,24 @@
       ]
     },
     {
+      "name": "MinusIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "MoreIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "MultiSelect",
       "kind": "component",
       "source": "src/components/MultiSelect/MultiSelect.tsx",
@@ -9964,7 +10182,7 @@
       "status": null,
       "description": null,
       "partOf": "Nav",
-      "definition": "interface NavItem { label: string; href: string; icon?: IconName; }"
+      "definition": "interface NavItem { label: string; href: string; icon?: IconDefinition; }"
     },
     {
       "name": "NavProps",
@@ -10877,6 +11095,15 @@
       "propsOf": "Pagination"
     },
     {
+      "name": "PlusIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Popover",
       "kind": "component",
       "source": "src/components/Popover/Popover.tsx",
@@ -11561,6 +11788,15 @@
       "propsOf": "Reel"
     },
     {
+      "name": "RetryIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "ReviewChanges",
       "kind": "component",
       "source": "src/components/ReviewChanges/ReviewChanges.tsx",
@@ -12004,6 +12240,15 @@
       "propsOf": "SearchField"
     },
     {
+      "name": "SearchIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "SegmentedControl",
       "kind": "component",
       "source": "src/components/SegmentedControl/SegmentedControl.tsx",
@@ -12421,6 +12666,33 @@
       "description": null,
       "partOf": "Select",
       "propsOf": "Select"
+    },
+    {
+      "name": "SendIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "SettingsIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "ShieldIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "ShortcutConflict",
@@ -13158,6 +13430,24 @@
       "propsOf": "Slider"
     },
     {
+      "name": "SortAscendingIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "SortDescendingIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "SortDirection",
       "kind": "type-only",
       "source": "src/components/Table/Table.tsx",
@@ -13169,6 +13459,15 @@
         "ascending",
         "descending"
       ]
+    },
+    {
+      "name": "SortNoneIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Source",
@@ -13242,6 +13541,15 @@
       "description": null,
       "partOf": "Citation",
       "propsOf": "SourcesList"
+    },
+    {
+      "name": "SparkleIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Spinner",
@@ -14076,6 +14384,15 @@
       "definition": "interface StepperStep { label: string; }"
     },
     {
+      "name": "StopIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "StreamStatus",
       "kind": "type-only",
       "source": "src/components/StreamingText/StreamingText.tsx",
@@ -14299,6 +14616,15 @@
       "description": null,
       "partOf": "StreamingText",
       "propsOf": "StreamingText"
+    },
+    {
+      "name": "SuccessIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Suggestion",
@@ -16190,6 +16516,24 @@
       "propsOf": "Textarea"
     },
     {
+      "name": "ThumbsDownIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "ThumbsUpIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "Timeline",
       "kind": "component",
       "source": "src/components/Timeline/Timeline.tsx",
@@ -16634,45 +16978,10 @@
         },
         {
           "name": "icon",
-          "type": "IconName",
+          "type": "IconDefinition",
           "required": false,
           "default": null,
-          "description": "Leading icon from the system set.",
-          "values": [
-            "menu",
-            "search",
-            "stop",
-            "danger",
-            "check",
-            "success",
-            "warning",
-            "info",
-            "close",
-            "chevron-down",
-            "sort-ascending",
-            "sort-descending",
-            "sort-none",
-            "plus",
-            "minus",
-            "download",
-            "upload",
-            "copy",
-            "chevron-right",
-            "chevron-left",
-            "home",
-            "file",
-            "users",
-            "building",
-            "settings",
-            "trend-up",
-            "trend-down",
-            "more",
-            "eye",
-            "eye-off",
-            "sparkle",
-            "thumbs-up",
-            "thumbs-down"
-          ]
+          "description": "Leading icon from the system set."
         },
         {
           "name": "hideLabel",
@@ -16761,7 +17070,7 @@
         ],
         "do": {
           "caption": "The label names what it turns on and never changes; pressed shows in fill, border and weight.",
-          "code": "<Cluster gap=\"sm\">\n  <Toggle label=\"Show archived\" defaultPressed />\n  <Tooltip content=\"Compact rows\">\n    <Toggle label=\"Compact rows\" icon=\"menu\" hideLabel />\n  </Tooltip>\n</Cluster>"
+          "code": "<Cluster gap=\"sm\">\n  <Toggle label=\"Show archived\" defaultPressed />\n  <Tooltip content=\"Compact rows\">\n    <Toggle label=\"Compact rows\" icon={MenuIcon} hideLabel />\n  </Tooltip>\n</Cluster>"
         },
         "dont": {
           "caption": "A plain button that swaps its label between “Show archived” and “Hide archived”: the state is only in the words, and the name keeps changing.",
@@ -16900,7 +17209,7 @@
         ],
         "do": {
           "caption": "Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.",
-          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n  <ToolbarButton shortcut=\"u\">Mark as unread</ToolbarButton>\n  <ToolbarSeparator />\n  <ToolbarButton icon=\"download\" hideLabel>\n    Export\n  </ToolbarButton>\n</Toolbar>"
+          "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton icon={ArchiveIcon} shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n  <ToolbarButton shortcut=\"u\">Mark as unread</ToolbarButton>\n  <ToolbarSeparator />\n  <ToolbarButton icon={DownloadIcon} hideLabel>\n    Export\n  </ToolbarButton>\n</Toolbar>"
         },
         "dont": {
           "caption": "A page’s main actions forced into a toolbar: they belong in the header, as ordinary buttons.",
@@ -16983,45 +17292,10 @@
         },
         {
           "name": "icon",
-          "type": "IconName",
+          "type": "IconDefinition",
           "required": false,
           "default": null,
-          "description": null,
-          "values": [
-            "menu",
-            "search",
-            "stop",
-            "danger",
-            "check",
-            "success",
-            "warning",
-            "info",
-            "close",
-            "chevron-down",
-            "sort-ascending",
-            "sort-descending",
-            "sort-none",
-            "plus",
-            "minus",
-            "download",
-            "upload",
-            "copy",
-            "chevron-right",
-            "chevron-left",
-            "home",
-            "file",
-            "users",
-            "building",
-            "settings",
-            "trend-up",
-            "trend-down",
-            "more",
-            "eye",
-            "eye-off",
-            "sparkle",
-            "thumbs-up",
-            "thumbs-down"
-          ]
+          "description": null
         },
         {
           "name": "hideLabel",
@@ -17220,7 +17494,7 @@
         ],
         "do": {
           "caption": "The visible label stays; the tooltip adds a hint about when the action applies.",
-          "code": "<Cluster>\n  <Tooltip content=\"Downloads every row that matches the filters\">\n    <Button variant=\"secondary\" icon=\"download\">\n      Export CSV\n    </Button>\n  </Tooltip>\n</Cluster>"
+          "code": "<Cluster>\n  <Tooltip content=\"Downloads every row that matches the filters\">\n    <Button variant=\"secondary\" icon={DownloadIcon}>\n      Export CSV\n    </Button>\n  </Tooltip>\n</Cluster>"
         },
         "dont": {
           "caption": "The only explanation of a required format hidden in a tooltip: touch users never see it.",
@@ -17284,6 +17558,42 @@
       "description": null,
       "partOf": "Tooltip",
       "propsOf": "Tooltip"
+    },
+    {
+      "name": "TrendDownIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "TrendUpIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "UploadIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "UsersIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "VisuallyHidden",
@@ -17391,6 +17701,15 @@
       "propsOf": "VisuallyHidden"
     },
     {
+      "name": "WarningIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
       "name": "ariaKeyShortcuts",
       "kind": "utility",
       "source": "src/components/Kbd/Kbd.tsx",
@@ -17437,6 +17756,14 @@
       "partOf": "Kbd",
       "docs": "docs/usage/Kbd.usage.tsx",
       "signature": "(keys: string, platform?: KeyPlatform) => string"
+    },
+    {
+      "name": "iconsByName",
+      "kind": "utility",
+      "source": "src/components/Icon/names.ts",
+      "status": "deprecated",
+      "description": "Every icon, keyed by name.",
+      "partOf": "Icon"
     },
     {
       "name": "isReservedShortcut",

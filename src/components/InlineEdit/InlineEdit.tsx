@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent 
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
+import { DangerIcon, EditIcon } from '../Icon/icons';
 import '../Field/Field.css';
 import './InlineEdit.css';
 
@@ -131,6 +132,7 @@ export function InlineEdit({
           <span className="inline-edit__value" data-empty={value ? undefined : 'true'}>
             {value || placeholder}
           </span>
+          {disabledReason ? null : <Icon icon={EditIcon} />}
         </button>
         {disabledReason ? (
           <p className="inline-edit__message" id={`${id}-reason`}>
@@ -167,7 +169,7 @@ export function InlineEdit({
       </div>
       {error ? (
         <p className="inline-edit__message" data-tone="danger" id={`${id}-error`}>
-          <Icon name="danger" />
+          <Icon icon={DangerIcon} />
           <span>{error}</span>
         </p>
       ) : null}

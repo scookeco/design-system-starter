@@ -35,33 +35,7 @@
  * arrives anyway (a role changed mid-session) says so in a toast that stays.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
-import {
-  Avatar,
-  Badge,
-  Banner,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Center,
-  Cluster,
-  Dialog,
-  EmptyState,
-  Frame,
-  Grid,
-  Link,
-  Menu,
-  NavTabs,
-  PageHeader,
-  PageLayout,
-  Skeleton,
-  Stack,
-  Tag,
-  Text,
-  TextField,
-  useFormat,
-  useToast,
-} from '../index';
+import { ArchiveIcon, Avatar, Badge, Banner, Button, Card, CardBody, CardHeader, Center, Cluster, Dialog, DownloadIcon, EmptyState, Frame, Grid, Link, Menu, MoreIcon, NavTabs, PageHeader, PageLayout, PlusIcon, Skeleton, Stack, Tag, Text, TextField, useFormat, useToast } from '../index';
 import { ExampleShell } from './ExampleShell';
 import { DeletedElsewhere } from './Freshness';
 import { MOVABLE_STATUSES, type MovableStatus, type RecordEntity } from '../app/api/schemas';
@@ -488,7 +462,7 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
                 defaultOpen={initialMenuOpen}
                 align="end"
                 trigger={
-                  <Button variant="secondary" icon="more" loading={archiving}>
+                  <Button variant="secondary" icon={MoreIcon} loading={archiving}>
                     {archiving ? 'Archiving…' : 'More'}
                   </Button>
                 }
@@ -509,9 +483,9 @@ function RecordPageContent({ recordId, initialAction, initialMenuOpen = false, i
                         },
                       ]
                     : []),
-                  ...(can('record:create') ? [{ label: 'Duplicate', icon: 'plus' as const, onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) }] : []),
-                  { label: 'Export as CSV', icon: 'download' },
-                  ...(can('record:archive') ? [{ label: 'Archive', disabled: !can('record:archive', record), onSelect: archiveRecord }] : []),
+                  ...(can('record:create') ? [{ label: 'Duplicate', icon: PlusIcon, onSelect: () => toast({ title: 'Record duplicated', tone: 'success' }) }] : []),
+                  { label: 'Export as CSV', icon: DownloadIcon },
+                  ...(can('record:archive') ? [{ label: 'Archive', icon: ArchiveIcon, disabled: !can('record:archive', record), onSelect: archiveRecord }] : []),
                   ...(can('record:delete')
                     ? (['separator', { label: 'Delete record', tone: 'danger', disabled: !can('record:delete', record), onSelect: () => setConfirmDelete(true) }] as const)
                     : []),
@@ -671,7 +645,7 @@ function TagEditor({ tags, onRemove, onAdd }: { tags: readonly string[]; onRemov
       {addable.length > 0 ? (
         <Menu
           trigger={
-            <Button variant="ghost" size="sm" icon="plus">
+            <Button variant="ghost" size="sm" icon={PlusIcon}>
               Add tag
             </Button>
           }

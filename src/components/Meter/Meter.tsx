@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { DangerIcon, WarningIcon } from '../Icon/icons';
 import './Meter.css';
 
 export type MeterStatus = 'ok' | 'warning' | 'danger';
@@ -64,7 +65,7 @@ export function Meter({
       </div>
       {statusText ? (
         <p className="meter__status" aria-hidden="true">
-          <Icon name={status === 'danger' ? 'danger' : 'warning'} />
+          <Icon icon={status === 'danger' ? DangerIcon : WarningIcon} />
           {statusText}
         </p>
       ) : null}

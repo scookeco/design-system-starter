@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { ChevronRightIcon } from '../Icon/icons';
 import './Disclosure.css';
 
 export interface DisclosureProps extends EscapeHatch {
@@ -27,7 +28,7 @@ export function Disclosure({ summary, meta, children, defaultOpen = false, UNSAF
     <CollapsiblePrimitive.Root {...rootProps} defaultOpen={defaultOpen} className={cx('disclosure', UNSAFE_className)} style={UNSAFE_style}>
       <div className="disclosure__header">
         <CollapsiblePrimitive.Trigger className="disclosure__trigger">
-          <Icon name="chevron-right" />
+          <Icon icon={ChevronRightIcon} />
           <span>{summary}</span>
         </CollapsiblePrimitive.Trigger>
         {meta ? <span className="disclosure__meta">{meta}</span> : null}

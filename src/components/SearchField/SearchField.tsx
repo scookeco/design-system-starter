@@ -2,6 +2,7 @@ import { useId, useRef, type ComponentPropsWithRef, type KeyboardEvent } from 'r
 import { cx, type Closed } from '../../internal/closed-api';
 import { Field, fieldIds } from '../Field/Field';
 import { Icon } from '../Icon/Icon';
+import { CloseIcon, SearchIcon } from '../Icon/icons';
 import './SearchField.css';
 
 export type SearchFieldProps = Closed<Omit<ComponentPropsWithRef<'input'>, 'type' | 'size' | 'value' | 'defaultValue' | 'onChange'>> & {
@@ -54,7 +55,7 @@ export function SearchField({
   return (
     <Field ids={ids} label={label} hideLabel={hideLabel} description={description}>
       <div className={cx('search-field field__control', UNSAFE_className)} style={UNSAFE_style}>
-        <Icon name="search" />
+        <Icon icon={SearchIcon} />
         <input
           {...rest}
           ref={inputRef}
@@ -68,7 +69,7 @@ export function SearchField({
         />
         {value !== '' ? (
           <button type="button" className="search-field__clear" aria-label={clearLabel} onClick={clear}>
-            <Icon name="close" />
+            <Icon icon={CloseIcon} />
           </button>
         ) : null}
       </div>

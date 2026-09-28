@@ -10,11 +10,16 @@
  * (block names such as "button" also occur as attribute values elsewhere, so they don't qualify
  * on their own). Positive controls: every unit must have a marker, and importing everything must
  * find all of them.
+ *
+ * Icons are checked the same way, one level down: an icon is recognised by its path data, and a
+ * single import may carry only the icons its unit (and what it composes) names in its source. So
+ * `import { Button }` carries no icon at all: Button draws the one it's given.
  */
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { build, type Rollup } from 'vite';
+import * as icons from '../src/components/Icon/icons.ts';
 import type { TokenUsage } from './checks/token-usage.ts';
 
 const root = resolve(import.meta.dirname, '..');
@@ -76,13 +81,33 @@ const bundle = async (source: string): Promise<string> => {
 
 const unitsIn = (output: string) => [...markers].filter(([, list]) => list.some((m) => output.includes(m))).map(([name]) => name);
 
+// Icons: each one's path data is its marker; a unit may carry the icons its own source names.
+const ICONS = Object.entries(icons).map(([exportName, icon]) => ({ exportName, marker: JSON.stringify(icon.path) }));
+for (const { exportName, marker } of ICONS) if (occurrences(code, marker) !== 1) problems.push(`${exportName}: its path data is not in dist/index.js exactly once, so the check can't see it`);
+const iconsIn = (output: string) => ICONS.filter(({ marker }) => output.includes(marker)).map(({ exportName }) => exportName);
+const ICON_DIR = 'src/components/Icon';
+const sourceFiles = (dir: string): string[] =>
+  readdirSync(join(root, dir), { withFileTypes: true }).flatMap((entry) =>
+    entry.isDirectory() ? sourceFiles(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) && !/\.(stories|test)\.tsx?$/.test(entry.name) ? [join(dir, entry.name)] : [],
+  );
+/** The icons a unit's own code names (its stories don't count; the Icon unit defines them all and draws none). */
+const iconsNamedBy = (unit: string) => {
+  const dir = usage.units[unit]?.dir;
+  if (!dir || dir === ICON_DIR) return [];
+  const source = sourceFiles(dir).map((file) => readFileSync(join(root, file), 'utf8')).join('\n');
+  return ICONS.filter(({ exportName }) => new RegExp(`\\b${exportName}\\b`).test(source)).map(({ exportName }) => exportName);
+};
+
 // 3. Positive control: the whole library contains every unit.
 const everything = await bundle(`export * from ${JSON.stringify(dist)};\n`);
 const missing = [...markers.keys()].filter((name) => !unitsIn(everything).includes(name));
 if (missing.length) problems.push(`importing everything did not find: ${missing.join(', ')}`);
+const missingIcons = ICONS.map(({ exportName }) => exportName).filter((name) => !iconsIn(everything).includes(name));
+if (missingIcons.length) problems.push(`importing everything did not find the icons: ${missingIcons.join(', ')}`);
 
 // 4. One import per unit: only that unit and what it composes.
 let checked = 0;
+const iconCounts = new Map<string, number>();
 for (const [name, unit] of Object.entries(usage.units)) {
   const first = unit.exports[0];
   if (!first || !markers.has(name)) continue;
@@ -91,11 +116,27 @@ for (const [name, unit] of Object.entries(usage.units)) {
   const extra = unitsIn(output).filter((n) => !allowed.has(n));
   if (!unitsIn(output).includes(name)) problems.push(`import { ${first} }: the bundle does not contain ${name} itself`);
   if (extra.length) problems.push(`import { ${first} } also pulls in ${extra.join(', ')}`);
+  // The Icon unit defines the set; it's checked below, one icon at a time.
+  if (name !== 'Icon') {
+    const allowedIcons = new Set([name, ...unit.composesAll].flatMap(iconsNamedBy));
+    const extraIcons = iconsIn(output).filter((icon) => !allowedIcons.has(icon));
+    if (extraIcons.length) problems.push(`import { ${first} } carries icons it doesn't draw: ${extraIcons.join(', ')}`);
+  }
+  iconCounts.set(first, iconsIn(output).length);
   checked += 1;
 }
+
+// 5. One icon is one icon; the deprecated lookup by name is the whole set (a control that it's seen).
+for (const { exportName } of ICONS) {
+  const found = iconsIn(await bundle(`export { ${exportName} } from ${JSON.stringify(dist)};\n`));
+  if (found.join() !== exportName) problems.push(`import { ${exportName} } carries ${found.join(', ') || 'no icon'}`);
+}
+const lookup = iconsIn(await bundle(`export { iconsByName } from ${JSON.stringify(dist)};\n`));
+if (lookup.length !== ICONS.length) problems.push(`import { iconsByName } carries ${String(lookup.length)} of ${String(ICONS.length)} icons; the check can't see the lookup`);
 
 if (problems.length) {
   console.error(`Tree-shaking check failed:\n  ${problems.join('\n  ')}`);
   process.exit(1);
 }
-console.log(`Tree-shaking: ${String(checked)} single-component imports pull in only what they compose.`);
+console.log(`Tree-shaking: ${String(checked)} single-component imports pull in only what they compose, and only the icons they draw.`);
+console.log(`  Icons carried: Button ${String(iconCounts.get('Button'))}, FileUpload ${String(iconCounts.get('FileUpload'))}, all ${String(iconsIn(everything).length)} of ${String(ICONS.length)} with everything; each icon imports alone.`);

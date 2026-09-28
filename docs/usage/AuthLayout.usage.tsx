@@ -1,4 +1,4 @@
-import { AppShell, AuthLayout, Button, Heading, Nav, Stack, Text } from '../../src/index';
+import { AppShell, AuthLayout, Button, Heading, HomeIcon, Nav, Stack, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -31,7 +31,7 @@ export const usage: UsageDoc = {
     render: () => (
       <AppShell
         brand="Acme"
-        nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}
+        nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}
         skipLinkLabel="Skip to content (don’t example)"
         sidebarStorageKey={null}
       >

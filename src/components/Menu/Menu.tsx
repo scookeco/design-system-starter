@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
 import { DropdownMenu as MenuPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import type { IconDefinition } from '../Icon/icons';
 import { ariaKeyShortcuts, Kbd } from '../Kbd/Kbd';
 import './Menu.css';
 
@@ -10,7 +11,7 @@ export interface MenuItem {
   label: string;
   onSelect?: () => void;
   /** Decorative leading icon. */
-  icon?: IconName;
+  icon?: IconDefinition;
   /** danger marks a destructive item. Keep it last, after a separator. */
   tone?: 'default' | 'danger';
   disabled?: boolean;
@@ -72,7 +73,7 @@ export function Menu({ trigger, items, label, align = 'start', UNSAFE_className,
 export function MenuItemContent({ item }: { item: MenuItem }) {
   return (
     <>
-      {item.icon ? <Icon name={item.icon} /> : null}
+      {item.icon ? <Icon icon={item.icon} /> : null}
       <span className="menu__item-label">{item.label}</span>
       {item.shortcut ? (
         <span className="menu__shortcut">

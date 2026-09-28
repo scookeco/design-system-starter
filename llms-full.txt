@@ -28,6 +28,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
+  (iconsByName is deprecated). The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.
@@ -543,7 +545,7 @@ Props:
 - `children: ReactNode`: Visible label. Required: icon-only buttons need `aria-label` and a Tooltip.
 - `variant?: ButtonVariant` = `'primary'`: Visual intent. A new look is a new variant here, never a new component.
 - `size?: ButtonSize` = `'md'`
-- `icon?: IconName`: Leading icon from the system set. Decorative: the label remains the accessible name.
+- `icon?: IconDefinition`: Leading icon from the system set. Decorative: the label remains the accessible name.
 - `loading?: boolean` = `false`: Pending state: shows a spinner, keeps the label (so the accessible name survives) and blocks activation with aria-disabled, so focus is not lost.
 - …plus the native attributes of `AriaAttributes`, `Attributes`, `ButtonHTMLAttributes`, `DOMAttributes`, `HTMLAttributes`, `RefAttributes`.
 
@@ -1014,7 +1016,7 @@ States: open, defaultOpen, loading.
 **Do:** Grouped rows with a type in the description and a shortcut where one exists; only what this person may do is passed in.
 
 ```tsx
-<Button variant="secondary" icon="search">
+<Button variant="secondary" icon={SearchIcon}>
   <span>Search</span> <Kbd keys="mod+k" />
 </Button>
 ```
@@ -1022,7 +1024,7 @@ States: open, defaultOpen, loading.
 **Don't:** A search button with no sign of the shortcut: pointer users never learn ⌘K exists. (And never pass rows the person can’t run: filter with `can` first.)
 
 ```tsx
-<Button variant="secondary" icon="search">Search</Button>
+<Button variant="secondary" icon={SearchIcon}>Search</Button>
 ```
 
 **Accessibility**
@@ -1122,7 +1124,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 ```tsx
 <ContextMenu items={[{ label: 'Archive', shortcut: 'e' }, { label: 'Delete', tone: 'danger' }]}>
   <div tabIndex={0} role="group" aria-label="Northwind renewal">
-    Northwind renewal <Menu trigger={<Button variant="ghost" icon="more" aria-label="More actions">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />
+    Northwind renewal <Menu trigger={<Button variant="ghost" icon={MoreIcon} aria-label="More actions">More</Button>} items={[{ label: 'Archive' }, { label: 'Delete', tone: 'danger' }]} />
   </div>
 </ContextMenu>
 ```
@@ -1336,7 +1338,7 @@ States: open, defaultOpen.
 <Dialog
   title="New record"
   description="Records start as drafts."
-  trigger={<Button icon="plus">New record</Button>}
+  trigger={<Button icon={PlusIcon}>New record</Button>}
   footer={
     <>
       <Button variant="secondary">Cancel</Button>
@@ -1587,7 +1589,7 @@ Variants: reason (first-use | no-results | error); headingLevel (1 | 2 | 3 | 4).
   headingLevel={4}
   title="Create your first record"
   description="Records track agreements from draft to renewal."
-  action={<Button icon="plus">New record</Button>}
+  action={<Button icon={PlusIcon}>New record</Button>}
 />
 ```
 
@@ -1941,7 +1943,7 @@ Signature: `(keys: string, platform?: KeyPlatform) => string`
 ```tsx
 <Cluster gap="md" align="center">
   <Tooltip content="Search and run commands" shortcut="mod+k">
-    <Button variant="secondary" icon="search">
+    <Button variant="secondary" icon={SearchIcon}>
       Search
     </Button>
   </Tooltip>
@@ -2066,7 +2068,7 @@ States: open, defaultOpen.
   <Button>Edit</Button>
   <Menu
     trigger={<Button variant="secondary">More</Button>}
-    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: 'download' }, 'separator', { label: 'Delete record' }]}
+    items={[{ label: 'Duplicate record' }, { label: 'Export PDF', icon: DownloadIcon }, 'separator', { label: 'Delete record' }]}
   />
 </Cluster>
 ```
@@ -3980,7 +3982,7 @@ A button that stays pressed: a view option or formatting mode that applies immed
 
 Props:
 - `label: string`: What it turns on ("Bold", "Show archived"). Constant: aria-pressed carries the state. Required.
-- `icon?: IconName`: Leading icon from the system set.
+- `icon?: IconDefinition`: Leading icon from the system set.
 - `hideLabel?: boolean` = `false`: Icon only; the label becomes the accessible name. Needs an icon, and pair it with a Tooltip showing the label.
 - `pressed?: boolean`
 - `defaultPressed?: boolean`
@@ -4010,7 +4012,7 @@ States: hideLabel, pressed, defaultPressed, disabled.
 <Cluster gap="sm">
   <Toggle label="Show archived" defaultPressed />
   <Tooltip content="Compact rows">
-    <Toggle label="Compact rows" icon="menu" hideLabel />
+    <Toggle label="Compact rows" icon={MenuIcon} hideLabel />
   </Tooltip>
 </Cluster>
 ```
@@ -4053,7 +4055,7 @@ component, part of Toolbar. One control in a Toolbar. A hidden label or a shortc
 
 Props:
 - `children: string`: Verb-first label. Also the accessible name when the label is hidden. Required.
-- `icon?: IconName`
+- `icon?: IconDefinition`
 - `hideLabel?: boolean` = `false`: Show only the icon; the label moves into a tooltip and the accessible name. Needs `icon`.
 - `onClick?: () => void`
 - `disabled?: boolean`
@@ -4082,12 +4084,12 @@ component, part of Toolbar. A divider between groups of toolbar controls.
 
 ```tsx
 <Toolbar label="Conversation actions">
-  <ToolbarButton shortcut="e">
+  <ToolbarButton icon={ArchiveIcon} shortcut="e">
     Archive
   </ToolbarButton>
   <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>
   <ToolbarSeparator />
-  <ToolbarButton icon="download" hideLabel>
+  <ToolbarButton icon={DownloadIcon} hideLabel>
     Export
   </ToolbarButton>
 </Toolbar>
@@ -4146,7 +4148,7 @@ States: open, defaultOpen.
 ```tsx
 <Cluster>
   <Tooltip content="Downloads every row that matches the filters">
-    <Button variant="secondary" icon="download">
+    <Button variant="secondary" icon={DownloadIcon}>
       Export CSV
     </Button>
   </Tooltip>
@@ -5074,7 +5076,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 ```tsx
 <AppShell
   brand="Acme"
-  nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}
+  nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}
   skipLinkLabel="Skip to content (don’t example)"
   sidebarStorageKey={null}
 >
@@ -5142,7 +5144,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 ```tsx
 <AppShell
   brand="Acme"
-  nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }] }]} />}
+  nav={<Nav label="Main (don’t example)" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />}
   skipLinkLabel="Skip to content (don’t example)"
   sidebarStorageKey={null}
 >
@@ -5388,7 +5390,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
 - `ComboboxOption` (`src/components/Combobox/Combobox.tsx`): `interface ComboboxOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `CommandGroup` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandGroup { id: string; label: string; items: readonly CommandItem[]; filter?: 'local' | 'none'; }`
-- `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconName; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
+- `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconDefinition; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
 - `ComposerAttachment` (`src/components/Composer/Composer.tsx`): `interface ComposerAttachment { id: string; name: string; }`
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
@@ -5404,7 +5406,8 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `GapToken` (`src/tokens/tokens.ts`): `type GapToken = keyof typeof vars.space.gap`
 - `GridItemToken` (`src/tokens/tokens.ts`): `type GridItemToken = keyof typeof vars.size['grid-item']`
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
-- `IconName` (`src/components/Icon/Icon.tsx`): `type IconName = keyof typeof PATHS`
+- `IconDefinition` (`src/components/Icon/icons.ts`): `interface IconDefinition { readonly name: string; readonly path: string; }` An icon from the system set: pass it to a component's `icon` prop.
+- `IconName` (`src/components/Icon/names.ts`): `type IconName = keyof typeof iconsByName` An icon's name in the set.
 - `InsetToken` (`src/tokens/tokens.ts`): `type InsetToken = keyof typeof vars.space.inset`
 - `IsoDate` (`src/components/DatePicker/DatePicker.tsx`): `type IsoDate = string` A calendar date as the system passes it: ISO "2026-09-25", no time, no zone.
 - `KeyPlatform` (`src/components/Kbd/Kbd.tsx`): `type KeyPlatform = 'mac' | 'other'` Where a shortcut is shown: Apple keyboards name modifiers with symbols (⌘ ⇧ ⌥ ⌃), everyone else with words (Ctrl, Shift, Alt). `mod` is the platform's command key: ⌘ on a Mac, Ctrl elsewhere.
@@ -5413,11 +5416,11 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `LinkComponentProps` (`src/components/Link/Link.tsx`): `type LinkComponentProps = Omit<ComponentPropsWithRef<'a'>, 'href'> & { href: string; }` What the system hands an app's link component: every anchor prop, with `href` always set and `ref` included. The component must spread the rest onto its anchor and forward `ref` (tooltips and focus management attach to it).
 - `LocaleSettings` (`src/format/format.ts`): `interface LocaleSettings { locale: string; timeZone: string; }` Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings ("$" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.
 - `MenuEntry` (`src/components/Menu/Menu.tsx`): `type MenuEntry = MenuItem | 'separator'` An item, or 'separator' for a divider between groups.
-- `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconName; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }`
+- `MenuItem` (`src/components/Menu/Menu.tsx`): `interface MenuItem { label: string; onSelect?: () => void; icon?: IconDefinition; tone?: 'default' | 'danger'; disabled?: boolean; shortcut?: string; }`
 - `MessageRole` (`src/components/Message/Message.tsx`): `type MessageRole = 'user' | 'assistant' | 'tool' | 'system'` Who a turn is from: the person, the assistant, a tool the assistant ran, or the system (a note in the thread).
 - `MeterStatus` (`src/components/Meter/Meter.tsx`): `type MeterStatus = 'ok' | 'warning' | 'danger'`
 - `MultiSelectOption` (`src/components/MultiSelect/MultiSelect.tsx`): `type MultiSelectOption = PickerOptionData`
-- `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconName; }`
+- `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconDefinition; }`
 - `NavSection` (`src/components/Nav/Nav.tsx`): `interface NavSection { label?: string; items: readonly NavItem[]; }`
 - `NavTab` (`src/components/NavTabs/NavTabs.tsx`): `interface NavTab { label: string; href: string; }`
 - `ProposedChange` (`src/components/ReviewChanges/ReviewChanges.tsx`): `interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }` One proposed change: a field's old and new value, or a text rewrite shown word by word.
@@ -5483,7 +5486,7 @@ export function RecordsPage() {
     <AppShell brand="Acme" nav={<Nav label="Main" sections={NAV} current="/records" />} userMenu={accountMenu}>
       <Center max="lg" gutters="lg">
         <Stack gap="lg">
-          <PageHeader title="Records" actions={<Button icon="plus">New record</Button>} />
+          <PageHeader title="Records" actions={<Button icon={PlusIcon}>New record</Button>} />
           {/* the page */}
         </Stack>
       </Center>
@@ -6485,6 +6488,22 @@ export const Separator = Divider;
 
 A semantic token deprecates the same way: keep the old token as an alias of the new one for the deprecation window.
 
+**When the old way can’t stay an alias, deprecate the lookup instead.** Icons used to be passed by name (`icon="archive"`). A component that accepts a name has to carry every icon to look it up, so the `icon` props now take the icon itself, and the names live on in one deprecated module that no system component imports:
+
+```
+// Before: every component that drew an icon bundled all of them.
+<ToolbarButton icon="archive">Archive</ToolbarButton>
+
+// Now: the page bundles this icon and no other.
+import { ArchiveIcon } from 'src/index';
+<ToolbarButton icon={ArchiveIcon}>Archive</ToolbarButton>
+
+// Data that names icons, until it stores the values: deprecated, and it bundles the whole set.
+/** @deprecated */ iconsByName.archive
+```
+
+`IconName` and `iconsByName` are removed once nothing uses them. Every call site in this repository has moved; the tree-shaking check (`npm run size`) fails if a component pulls in an icon it doesn’t draw.
+
 #### 4. Versioning
 
 Today the system is one folder in one repository, released with the app. Semantic versioning starts when a second app consumes it; the table says how each change will be released then.
@@ -6619,6 +6638,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
+  (iconsByName is deprecated). The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.

@@ -15,7 +15,7 @@
  * product would send the description too). Data: useDraftSuggestion (src/app/model/ai.ts).
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
-import { AiMarker, Banner, Button, Card, CardBody, CardHeader, Center, Cluster, Link, PageHeader, Stack, Suggestion, Text, TextField } from '../index';
+import { AiMarker, Banner, Button, Card, CardBody, CardHeader, Center, Cluster, Link, PageHeader, SparkleIcon, Stack, StopIcon, Suggestion, Text, TextField } from '../index';
 import { useDraftSuggestion } from '../app/model/ai';
 import { useCreateRecord } from '../app/model/mutations';
 import { usePeople } from '../app/model/queries';
@@ -149,11 +149,11 @@ export function CreateWithAi({ initialName = '', initialSuggest = false, initial
                     />
                     <Cluster gap="sm">
                       {suggesting ? (
-                        <Button variant="secondary" size="sm" icon="stop" onClick={suggestion.stop}>
+                        <Button variant="secondary" size="sm" icon={StopIcon} onClick={suggestion.stop}>
                           Stop
                         </Button>
                       ) : (
-                        <Button variant="secondary" size="sm" icon="sparkle" onClick={() => suggestion.suggest(name)} {...gated(suggestPermission)}>
+                        <Button variant="secondary" size="sm" icon={SparkleIcon} onClick={() => suggestion.suggest(name)} {...gated(suggestPermission)}>
                           Suggest description
                         </Button>
                       )}

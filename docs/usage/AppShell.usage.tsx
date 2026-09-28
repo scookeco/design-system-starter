@@ -1,11 +1,11 @@
-import { AppShell, Breadcrumbs, Button, Center, Heading, Nav, Stack, Text } from '../../src/index';
+import { AppShell, Breadcrumbs, Button, Center, FileIcon, Heading, HomeIcon, Nav, Stack, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 const nav = (label: string) => (
   <Nav
     label={label}
     current="/records"
-    sections={[{ items: [{ label: 'Home', href: '/home', icon: 'home' }, { label: 'Records', href: '/records', icon: 'file' }] }]}
+    sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }, { label: 'Records', href: '/records', icon: FileIcon }] }]}
   />
 );
 

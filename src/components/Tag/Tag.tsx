@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CloseIcon } from '../Icon/icons';
 import './Tag.css';
 
 export interface TagProps extends EscapeHatch {
@@ -21,7 +22,7 @@ export function Tag({ children, onRemove, removeLabel, removeRef, UNSAFE_classNa
       <span className="tag__label">{children}</span>
       {onRemove ? (
         <button type="button" className="tag__remove" aria-label={removeLabel ?? `Remove ${children}`} onClick={onRemove} ref={removeRef}>
-          <Icon name="close" />
+          <Icon icon={CloseIcon} />
         </button>
       ) : null}
     </span>

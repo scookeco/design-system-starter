@@ -3,6 +3,7 @@ import { Select as SelectPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Field, fieldIds } from '../Field/Field';
 import { Icon } from '../Icon/Icon';
+import { CheckIcon, ChevronDownIcon } from '../Icon/icons';
 import './Select.css';
 
 export interface SelectOption {
@@ -64,7 +65,7 @@ export function Select({
             <SelectPrimitive.Value placeholder={placeholder} />
           </span>
           <SelectPrimitive.Icon className="select__chevron">
-            <Icon name="chevron-down" />
+            <Icon icon={ChevronDownIcon} />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>
@@ -74,7 +75,7 @@ export function Select({
                 <SelectPrimitive.Item key={option.value} value={option.value} disabled={option.disabled} className="select__item">
                   <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
                   <SelectPrimitive.ItemIndicator className="select__indicator">
-                    <Icon name="check" />
+                    <Icon icon={CheckIcon} />
                   </SelectPrimitive.ItemIndicator>
                 </SelectPrimitive.Item>
               ))}

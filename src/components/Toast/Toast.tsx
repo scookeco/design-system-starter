@@ -2,17 +2,18 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { Toast as ToastPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../Button/Button';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { CloseIcon, DangerIcon, InfoIcon, SuccessIcon, WarningIcon, type IconDefinition } from '../Icon/icons';
 import './Toast.css';
 
 export type ToastTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
-const TONE_ICON: Record<ToastTone, IconName> = {
-  success: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  info: 'info',
-  neutral: 'info',
+const TONE_ICON: Record<ToastTone, IconDefinition> = {
+  success: SuccessIcon,
+  warning: WarningIcon,
+  danger: DangerIcon,
+  info: InfoIcon,
+  neutral: InfoIcon,
 };
 
 /** The one action a toast can offer, such as Undo. Choosing it closes the toast. */
@@ -61,7 +62,7 @@ export function Toast({ title, description, tone = 'neutral', closeLabel = 'Dism
       data-tone={tone}
     >
       <span className="toast__icon">
-        <Icon name={TONE_ICON[tone]} size="md" />
+        <Icon icon={TONE_ICON[tone]} size="md" />
       </span>
       <div className="toast__text">
         <ToastPrimitive.Title className="toast__title">{title}</ToastPrimitive.Title>
@@ -75,7 +76,7 @@ export function Toast({ title, description, tone = 'neutral', closeLabel = 'Dism
         </ToastPrimitive.Action>
       ) : null}
       <ToastPrimitive.Close className="toast__close" aria-label={closeLabel}>
-        <Icon name="close" />
+        <Icon icon={CloseIcon} />
       </ToastPrimitive.Close>
     </ToastPrimitive.Root>
   );

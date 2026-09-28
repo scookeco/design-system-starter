@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Icon } from '../Icon/Icon';
+import { DangerIcon } from '../Icon/icons';
 import './Field.css';
 
 /** Ids a control needs to wire itself to its label and supporting text. */
@@ -66,7 +67,7 @@ export function Field({ ids, label, hideLabel = false, description, error, nativ
       ) : null}
       {error ? (
         <p className="field__error" id={ids.errorId}>
-          <Icon name="danger" />
+          <Icon icon={DangerIcon} />
           <span>{error}</span>
         </p>
       ) : null}

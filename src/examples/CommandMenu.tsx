@@ -15,7 +15,7 @@
  */
 import { useQueries } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Button, CommandPalette, Kbd, ShortcutHelp, Tooltip, useShortcut, type CommandGroup, type CommandItem, type IconName } from '../index';
+import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
 import { getRecord } from '../app/api/records';
 import type { Capability } from '../app/api/schemas';
 import { recordKeys } from '../app/model/keys';
@@ -42,21 +42,21 @@ export const GO_KEYS: Readonly<Record<string, string>> = {
 };
 
 /** An icon per top-level section, for Jump to rows. */
-const SECTION_ICONS: Readonly<Record<string, IconName>> = {
-  '/home': 'home',
-  '/records': 'file',
-  '/accounts': 'building',
-  '/people': 'users',
-  '/settings': 'settings',
-  '/inbox': 'download',
-  '/admin': 'eye',
+const SECTION_ICONS: Readonly<Record<string, IconDefinition>> = {
+  '/home': HomeIcon,
+  '/records': FileIcon,
+  '/accounts': BuildingIcon,
+  '/people': UsersIcon,
+  '/settings': SettingsIcon,
+  '/inbox': InboxIcon,
+  '/admin': ShieldIcon,
 };
 
 interface PaletteAction {
   id: string;
   label: string;
   keywords?: readonly string[];
-  icon?: IconName;
+  icon?: IconDefinition;
   /** Asked with `can`, like the button this mirrors. */
   capability: Capability;
   href: string;
@@ -64,9 +64,9 @@ interface PaletteAction {
 
 /** Actions that mirror a button elsewhere in the app. Each needs what its button needs. */
 export const PALETTE_ACTIONS: readonly PaletteAction[] = [
-  { id: 'action:new-record', label: 'New record', keywords: ['create', 'add'], icon: 'plus', capability: 'record:create', href: '/records/new' },
-  { id: 'action:new-account', label: 'New account', keywords: ['create', 'add', 'customer'], icon: 'plus', capability: 'account:create', href: '/accounts/new' },
-  { id: 'action:invite', label: 'Invite member', keywords: ['add', 'user', 'team'], icon: 'users', capability: 'members:manage', href: '/admin/members?invite=1' },
+  { id: 'action:new-record', label: 'New record', keywords: ['create', 'add'], icon: PlusIcon, capability: 'record:create', href: '/records/new' },
+  { id: 'action:new-account', label: 'New account', keywords: ['create', 'add', 'customer'], icon: PlusIcon, capability: 'account:create', href: '/accounts/new' },
+  { id: 'action:invite', label: 'Invite member', keywords: ['add', 'user', 'team'], icon: UsersIcon, capability: 'members:manage', href: '/admin/members?invite=1' },
 ];
 
 /** Pages the palette can jump to: routes without params, in the shell, deduplicated by title. */
@@ -105,7 +105,7 @@ export function CommandMenu({ helpOpen, onHelpOpenChange, initialQuery = '', def
   return (
     <>
       <Tooltip content="Search pages, records and actions" shortcut="mod+k">
-        <Button variant="secondary" icon="search" onClick={() => setOpen(true)}>
+        <Button variant="secondary" icon={SearchIcon} onClick={() => setOpen(true)}>
           <span>Search</span> <Kbd keys="mod+k" />
         </Button>
       </Tooltip>
@@ -139,7 +139,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
     id: `route:${route.path}`,
     label: routeTitle(route),
     description: 'Page',
-    icon: SECTION_ICONS[`/${route.path.split('/')[1] ?? ''}`] ?? 'file',
+    icon: SECTION_ICONS[`/${route.path.split('/')[1] ?? ''}`] ?? FileIcon,
     keywords: [route.path],
     ...(GO_KEYS[route.path] ? { shortcut: GO_KEYS[route.path] } : {}),
     onSelect: () => open({ kind: 'page', id: route.path, href: route.path }),
@@ -151,7 +151,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
           id: `record:${record.id}`,
           label: record.name,
           description: `Record · ${STATUS[record.status].label}`,
-          icon: 'file',
+          icon: FileIcon,
           onSelect: () => open({ kind: 'record', id: record.id, href: `/records/${record.id}` }),
         }))
       : [];
@@ -160,7 +160,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         id: `account:${account.id}`,
         label: account.name,
         description: `Account · ${account.domain}`,
-        icon: 'building',
+        icon: BuildingIcon,
         onSelect: () => open({ kind: 'account', id: account.id, href: `/accounts/${account.id}` }),
       }))
     : [];
@@ -169,7 +169,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         id: `person:${person.id}`,
         label: person.name,
         description: `Person · ${person.email}`,
-        icon: 'users',
+        icon: UsersIcon,
         onSelect: () => open({ kind: 'person', id: person.id, href: `/people/${person.id}` }),
       }))
     : [];
@@ -255,7 +255,7 @@ function useRecentRows(recent: readonly RecentItem[], known: readonly CommandIte
     }
     const record = records[recordIds.indexOf(item.id)]?.data;
     return record
-      ? [{ id: `recent:record:${record.id}`, label: record.name, description: `Record · ${STATUS[record.status].label}`, icon: 'file', onSelect: () => open(item) }]
+      ? [{ id: `recent:record:${record.id}`, label: record.name, description: `Record · ${STATUS[record.status].label}`, icon: FileIcon, onSelect: () => open(item) }]
       : [];
   });
 }

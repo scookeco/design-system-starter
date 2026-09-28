@@ -17,7 +17,7 @@
  * applying goes through the same write path as the board's Move to….
  */
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { AiMarker, Button, Card, CardBody, Center, Cluster, PageHeader, ReviewChanges, Stack, Text, type ChangeDecision, type ProposedChange } from '../index';
+import { AiMarker, Button, Card, CardBody, Center, Cluster, PageHeader, ReviewChanges, SparkleIcon, Stack, Text, type ChangeDecision, type ProposedChange } from '../index';
 import type { ProposedMove } from '../app/api/ai';
 import { useApplyProposal, useAssistant } from '../app/model/ai';
 import { useRecordCounts } from '../app/model/queries';
@@ -104,7 +104,7 @@ export function AiReviewChanges({ initialRun = false, initialApply = false, init
             title="Tidy overdue records"
             description="The assistant proposes changes to records you could change yourself. Nothing changes until you review and apply them."
             actions={
-              <Button icon="sparkle" variant="secondary" loading={assistant.streaming} onClick={() => void run()} {...gated(permission)}>
+              <Button icon={SparkleIcon} variant="secondary" loading={assistant.streaming} onClick={() => void run()} {...gated(permission)}>
                 {assistant.streaming ? 'Proposing…' : answer ? 'Propose again' : 'Propose changes'}
               </Button>
             }

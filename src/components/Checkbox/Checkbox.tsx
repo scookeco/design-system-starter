@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { Checkbox as CheckboxPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { CheckIcon, MinusIcon } from '../Icon/icons';
 import './Checkbox.css';
 
 export type CheckedState = boolean | 'indeterminate';
@@ -31,7 +32,7 @@ export function Checkbox({ label, hideLabel = false, description, UNSAFE_classNa
     <div className={cx('checkbox', UNSAFE_className)} style={UNSAFE_style}>
       <CheckboxPrimitive.Root {...rootProps} id={id} className="checkbox__box" aria-describedby={descriptionId}>
         <CheckboxPrimitive.Indicator className="checkbox__indicator">
-          {rootProps.checked === 'indeterminate' ? <Icon name="minus" /> : <Icon name="check" />}
+          {rootProps.checked === 'indeterminate' ? <Icon icon={MinusIcon} /> : <Icon icon={CheckIcon} />}
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       <div className="checkbox__text">

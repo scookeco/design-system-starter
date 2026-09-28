@@ -3,6 +3,7 @@ import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Button } from '../../components/Button/Button';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { Icon } from '../../components/Icon/Icon';
+import { ChevronLeftIcon, ChevronRightIcon, MenuIcon } from '../../components/Icon/icons';
 import { NavDisplayContext } from '../../components/Nav/Nav';
 import { ToastProvider } from '../../components/Toast/Toast';
 import { Tooltip } from '../../components/Tooltip/Tooltip';
@@ -163,7 +164,7 @@ export function AppShell({
                   aria-controls={sidebarId}
                   onClick={toggleCollapsed}
                 >
-                  <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} />
+                  <Icon icon={collapsed ? ChevronRightIcon : ChevronLeftIcon} />
                 </button>
               </Tooltip>
             </div>
@@ -178,7 +179,7 @@ export function AppShell({
                 open={navOpen}
                 onOpenChange={setNavOpen}
                 trigger={
-                  <Button variant="ghost" icon="menu">
+                  <Button variant="ghost" icon={MenuIcon}>
                     {menuLabel}
                   </Button>
                 }

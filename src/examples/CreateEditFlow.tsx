@@ -35,27 +35,7 @@
  * form follows it quietly; a dirty one keeps every keystroke and warns, with Review changes.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
-import {
-  Banner,
-  Button,
-  EmptyState,
-  Skeleton,
-  Card,
-  CardBody,
-  CardHeader,
-  Center,
-  Cluster,
-  Dialog,
-  Link,
-  PageHeader,
-  RadioGroup,
-  Stack,
-  Switch,
-  TextField,
-  Textarea,
-  currencyDigits,
-  useFormat,
-} from '../index';
+import { Banner, Button, Card, CardBody, CardHeader, Center, Cluster, currencyDigits, Dialog, EmptyState, Link, PageHeader, PlusIcon, RadioGroup, Skeleton, Stack, Switch, Textarea, TextField, useFormat } from '../index';
 import type { Person, RecordEntity } from '../app/api/schemas';
 import type { RecordChanges } from '../app/api/records';
 import { changesBetween } from '../app/model/conflicts';
@@ -237,7 +217,7 @@ function AddPersonControl({ initialOpen, onAdded }: { initialOpen: boolean; onAd
           open={open}
           onOpenChange={setOpen}
           trigger={
-            <Button variant="ghost" size="sm" icon="plus">
+            <Button variant="ghost" size="sm" icon={PlusIcon}>
               Add a person
             </Button>
           }
@@ -258,7 +238,7 @@ function AddPersonControl({ initialOpen, onAdded }: { initialOpen: boolean; onAd
         </Dialog>
       ) : (
         <>
-          <Button variant="ghost" size="sm" icon="plus" {...gated(addPersonPermission)}>
+          <Button variant="ghost" size="sm" icon={PlusIcon} {...gated(addPersonPermission)}>
             Add a person
           </Button>
           <PermissionNote permission={addPersonPermission} />

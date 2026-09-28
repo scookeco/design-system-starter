@@ -18,7 +18,7 @@
  * stores the exchange and names the chat after the question.
  */
 import { useEffect, useEffectEvent, useRef, useState, type FormEvent } from 'react';
-import { Button, Center, ChatThread, Cluster, Composer, Dialog, EmptyState, Menu, Nav, PageHeader, PageLayout, Skeleton, Stack, Text, TextField } from '../index';
+import { Button, Center, ChatThread, Cluster, Composer, Dialog, EmptyState, Menu, MoreIcon, Nav, PageHeader, PageLayout, PlusIcon, Skeleton, SparkleIcon, Stack, Text, TextField } from '../index';
 import { turnFromStored, useAssistant, useConversation, useConversations, useCreateConversation, useDeleteConversation, useRenameConversation } from '../app/model/ai';
 import { useSession } from '../app/session';
 import { WORKSPACES } from '../app/workspaces';
@@ -166,7 +166,7 @@ export function AssistantChatPage({ initialPrompt, initialStopAfter, initialDial
             action={
               <Cluster gap="xs">
                 {SUGGESTED.map((prompt) => (
-                  <Button key={prompt} variant="secondary" size="sm" icon="sparkle" onClick={() => void ask(prompt)}>
+                  <Button key={prompt} variant="secondary" size="sm" icon={SparkleIcon} onClick={() => void ask(prompt)}>
                     {prompt}
                   </Button>
                 ))}
@@ -204,14 +204,14 @@ export function AssistantChatPage({ initialPrompt, initialStopAfter, initialDial
             description={`The assistant answers from the records you can see in ${WORKSPACES[tenant].name}, as you.`}
             actions={
               <>
-                <Button variant="secondary" icon="plus" onClick={newChat}>
+                <Button variant="secondary" icon={PlusIcon} onClick={newChat}>
                   New chat
                 </Button>
                 {open ? (
                   <Menu
                     align="end"
                     trigger={
-                      <Button variant="secondary" icon="more">
+                      <Button variant="secondary" icon={MoreIcon}>
                         More
                       </Button>
                     }

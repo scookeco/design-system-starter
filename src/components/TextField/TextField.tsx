@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ComponentPropsWithRef, type Re
 import { cx, type Closed } from '../../internal/closed-api';
 import { Field, fieldIds } from '../Field/Field';
 import { Icon } from '../Icon/Icon';
+import { EyeIcon, EyeOffIcon } from '../Icon/icons';
 import './TextField.css';
 
 export type TextFieldProps = Closed<Omit<ComponentPropsWithRef<'input'>, 'size'>> & {
@@ -88,7 +89,7 @@ export function TextField({
             disabled={rest.disabled}
             onClick={() => setPasswordVisible((visible) => !visible)}
           >
-            <Icon name={passwordVisible ? 'eye-off' : 'eye'} />
+            <Icon icon={passwordVisible ? EyeOffIcon : EyeIcon} />
           </button>
         </div>
       ) : (

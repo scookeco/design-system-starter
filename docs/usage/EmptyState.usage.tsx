@@ -1,4 +1,4 @@
-import { Button, EmptyState } from '../../src/index';
+import { Button, EmptyState, PlusIcon } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -19,7 +19,7 @@ export const usage: UsageDoc = {
         headingLevel={4}
         title="Create your first record"
         description="Records track agreements from draft to renewal."
-        action={<Button icon="plus">New record</Button>}
+        action={<Button icon={PlusIcon}>New record</Button>}
       />
     ),
   },

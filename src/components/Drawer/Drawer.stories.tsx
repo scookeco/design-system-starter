@@ -5,6 +5,7 @@ import { Checkbox } from '../Checkbox/Checkbox';
 import { Nav } from '../Nav/Nav';
 import { Text } from '../Text/Text';
 import { Drawer } from './Drawer';
+import { FileIcon, HomeIcon, MenuIcon } from '../Icon/icons';
 
 /** Stories format with the system's formats, like apps do (apps use useFormat()). */
 const f = createFormatter({ locale: 'en-US', timeZone: 'UTC' });
@@ -52,7 +53,7 @@ export const StartOpen: Story = {
     hideTitle: true,
     description: undefined,
     footer: undefined,
-    trigger: <Button variant="ghost" icon="menu">Menu</Button>,
+    trigger: <Button variant="ghost" icon={MenuIcon}>Menu</Button>,
     children: (
       <Nav
         label="Main"
@@ -60,8 +61,8 @@ export const StartOpen: Story = {
         sections={[
           {
             items: [
-              { label: 'Home', href: '/home', icon: 'home' },
-              { label: 'Records', href: '/records', icon: 'file' },
+              { label: 'Home', href: '/home', icon: HomeIcon },
+              { label: 'Records', href: '/records', icon: FileIcon },
             ],
           },
         ]}

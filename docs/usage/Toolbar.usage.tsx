@@ -1,4 +1,4 @@
-import { Button, Cluster, Toolbar, ToolbarButton, ToolbarSeparator } from '../../src/index';
+import { ArchiveIcon, Button, Cluster, DownloadIcon, Toolbar, ToolbarButton, ToolbarSeparator } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -12,12 +12,12 @@ export const usage: UsageDoc = {
     caption: 'Related actions in one tab stop, grouped by separators, with shortcuts in their tooltips.',
     render: () => (
       <Toolbar label="Conversation actions">
-        <ToolbarButton shortcut="e">
+        <ToolbarButton icon={ArchiveIcon} shortcut="e">
           Archive
         </ToolbarButton>
         <ToolbarButton shortcut="u">Mark as unread</ToolbarButton>
         <ToolbarSeparator />
-        <ToolbarButton icon="download" hideLabel>
+        <ToolbarButton icon={DownloadIcon} hideLabel>
           Export
         </ToolbarButton>
       </Toolbar>

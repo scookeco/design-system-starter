@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Button, ComboBox, Input, ListBox, Popover } from 'react-aria-components';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { ChevronDownIcon } from '../Icon/icons';
 import { ComboboxEscapeCloses, ComboboxOpenOnMount, PickerHelp, PickerLabel, PickerLocale, PickerOption, usePortalContainer } from '../Picker/Picker';
 import './Combobox.css';
 
@@ -85,7 +86,7 @@ export function Combobox({
         <div className="field__control picker__control" data-size={size} data-invalid={error ? true : undefined} data-disabled={disabled || undefined}>
           <Input className="picker__input" {...(placeholder ? { placeholder } : {})} />
           <Button className="picker__button" aria-label={showOptionsLabel}>
-            <Icon name="chevron-down" />
+            <Icon icon={ChevronDownIcon} />
           </Button>
         </div>
         <PickerHelp description={description} error={error} />

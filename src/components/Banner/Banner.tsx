@@ -1,11 +1,12 @@
 import { useId, type ComponentPropsWithRef, type ReactNode } from 'react';
 import { cx, type Closed } from '../../internal/closed-api';
-import { Icon, type IconName } from '../Icon/Icon';
+import { Icon } from '../Icon/Icon';
+import { CloseIcon, DangerIcon, InfoIcon, SuccessIcon, WarningIcon, type IconDefinition } from '../Icon/icons';
 import './Banner.css';
 
 export type BannerTone = 'info' | 'success' | 'warning' | 'danger';
 
-const TONE_ICON: Record<BannerTone, IconName> = { info: 'info', success: 'success', warning: 'warning', danger: 'danger' };
+const TONE_ICON: Record<BannerTone, IconDefinition> = { info: InfoIcon, success: SuccessIcon, warning: WarningIcon, danger: DangerIcon };
 
 export type BannerProps = Closed<Omit<ComponentPropsWithRef<'div'>, 'title' | 'role' | 'children'>> & {
   /** Severity. Always shown as icon + text as well as colour. */
@@ -52,7 +53,7 @@ export function Banner({
       aria-labelledby={title ? titleId : undefined}
       className={cx('banner', UNSAFE_className)} style={UNSAFE_style} data-tone={tone}>
       <span className="banner__icon">
-        <Icon name={TONE_ICON[tone]} size="md" />
+        <Icon icon={TONE_ICON[tone]} size="md" />
       </span>
       <div className="banner__text">
         {title ? (
@@ -65,7 +66,7 @@ export function Banner({
       {action ? <div className="banner__action">{action}</div> : null}
       {onDismiss ? (
         <button type="button" className="banner__dismiss" aria-label={dismissLabel} onClick={onDismiss}>
-          <Icon name="close" />
+          <Icon icon={CloseIcon} />
         </button>
       ) : null}
     </div>

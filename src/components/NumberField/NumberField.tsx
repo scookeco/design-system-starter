@@ -2,6 +2,7 @@ import { Button, Group, Input, NumberField as AriaNumberField } from 'react-aria
 import { currencyDigits } from '../../format';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { MinusIcon, PlusIcon } from '../Icon/icons';
 import { PickerHelp, PickerLabel, PickerLocale } from '../Picker/Picker';
 import './NumberField.css';
 
@@ -99,10 +100,10 @@ export function NumberField({
           {hideStepper ? null : (
             <>
               <Button slot="decrement" className="picker__button" aria-label={decrementLabel}>
-                <Icon name="minus" />
+                <Icon icon={MinusIcon} />
               </Button>
               <Button slot="increment" className="picker__button" aria-label={incrementLabel}>
-                <Icon name="plus" />
+                <Icon icon={PlusIcon} />
               </Button>
             </>
           )}

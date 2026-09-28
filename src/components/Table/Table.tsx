@@ -2,6 +2,7 @@ import { useId, type ComponentPropsWithRef, type ReactNode } from 'react';
 import { vars, type ScrollRegionToken } from '../../tokens/tokens';
 import { cx, tokenStyle, type Closed, type EscapeHatch } from '../../internal/closed-api';
 import { Icon } from '../Icon/Icon';
+import { SortAscendingIcon, SortDescendingIcon, SortNoneIcon } from '../Icon/icons';
 import './Table.css';
 
 export interface TableProps extends EscapeHatch {
@@ -71,13 +72,13 @@ export interface TableHeaderCellProps {
 }
 
 export function TableHeaderCell({ children, numeric = false, sort, onSort }: TableHeaderCellProps) {
-  const icon = sort === 'ascending' ? 'sort-ascending' : sort === 'descending' ? 'sort-descending' : 'sort-none';
+  const icon = sort === 'ascending' ? SortAscendingIcon : sort === 'descending' ? SortDescendingIcon : SortNoneIcon;
   return (
     <th className="table__header-cell" scope="col" aria-sort={sort} data-numeric={numeric ? 'true' : undefined}>
       {onSort ? (
         <button type="button" className="table__sort" onClick={onSort}>
           {children}
-          <Icon name={icon} />
+          <Icon icon={icon} />
         </button>
       ) : (
         children

@@ -1,15 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Nav } from './Nav';
+import { FileIcon, HomeIcon, SettingsIcon, UsersIcon } from '../Icon/icons';
 
 const primary = [
   {
     items: [
-      { label: 'Home', href: '/home', icon: 'home' },
-      { label: 'Records', href: '/records', icon: 'file' },
-      { label: 'People', href: '/people', icon: 'users' },
+      { label: 'Home', href: '/home', icon: HomeIcon },
+      { label: 'Records', href: '/records', icon: FileIcon },
+      { label: 'People', href: '/people', icon: UsersIcon },
     ],
   },
-  { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: 'settings' }] },
+  { label: 'Workspace', items: [{ label: 'Settings', href: '/settings', icon: SettingsIcon }] },
 ] as const;
 
 const settings = [
