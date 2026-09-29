@@ -17,6 +17,7 @@ import { useGrant, usePartition } from '../session';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
 import { useTenant } from '../tenant';
 import type { Partition } from './keys';
+import { refetchAfterWrite } from './refetch';
 
 export const inboxKeys = {
   /** Both views (Inbox, Archived) and their counts. */
@@ -94,7 +95,8 @@ function useTriage(action: TriageAction) {
     onError: (_error, _ids, context) => {
       for (const [key, list] of context?.snapshots ?? []) client.setQueryData(key, list);
     },
-    onSettled: () => client.invalidateQueries({ queryKey: inboxKeys.all(partition) }),
+    // A view that started loading after onMutate read the server before this write: read again.
+    onSettled: () => refetchAfterWrite(client, inboxKeys.all(partition)),
   });
 }
 
