@@ -171,6 +171,6 @@ useShortcut({
   );
 }
 
-const meta = { title: 'Guides/Keyboard and power users', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Keyboard and power users', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'The command palette, the shortcut registry, keyboard-first parts' } } satisfies Meta;
 export default meta;
 export const KeyboardAndPowerUsersGuide: StoryObj = { name: 'Keyboard and power users', render: () => <KeyboardPowerUsers /> };

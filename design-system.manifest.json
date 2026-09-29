@@ -4,11 +4,11 @@
   "name": "Design system starter",
   "summary": "Design system starter where design-system drift fails the build.",
   "entry": "src/index.ts",
-  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.\n  Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name\n  (iconsByName is deprecated). The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
+  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.\n  Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.\n  The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
   "commands": [
     {
       "command": "npm run dev",
-      "description": "Storybook dev server (the gallery)."
+      "description": "Storybook dev server (the gallery). Restart it after `npm ci` or pulling: a running server keeps the old dependencies and stories, logs \"Unable to index files\", and serves a blank or stale gallery."
     },
     {
       "command": "npm run tokens",
@@ -74,115 +74,115 @@
   "guides": [
     {
       "title": "Getting started",
-      "summary": "Five steps: bring the system in, load its styles once, render every signed-in page inside AppShell, route its links through your router, and set the reader’s locale.",
+      "summary": "Install, import, the shell, router links, locale",
       "path": "docs/guides/GettingStarted.stories.tsx",
       "story": "guides-getting-started--getting-started-guide"
     },
     {
       "title": "Principles",
-      "summary": "Three rules the whole system is built around. Each one is enforced by the build, not by review, so a change that breaks one fails before anyone has to spot it.",
+      "summary": "Tokens only, compose don’t restyle, accessible by default",
       "path": "docs/guides/Principles.stories.tsx",
       "story": "guides-principles--principles-guide"
     },
     {
       "title": "Decision ladder",
-      "summary": "Before building anything new, walk the ladder from the top and stop at the first yes. Most needs stop at the first rung.",
+      "summary": "Template, variant, component or primitive; proposing a token",
       "path": "docs/guides/DecisionLadder.stories.tsx",
       "story": "guides-decision-ladder--decision-ladder-guide"
     },
     {
       "title": "Layout",
-      "summary": "Four layouts frame a page; eleven layout primitives arrange everything inside it. They take gaps, widths and ratios as tokens, so a layout can’t drift off the scale, and they hold no domain knowledge.",
+      "summary": "Which layout, which primitive, composing into AppShell",
       "path": "docs/guides/Layout.stories.tsx",
       "story": "guides-layout--layout-guide"
     },
     {
       "title": "Page archetypes",
-      "summary": "Most pages are one of a few archetypes. Each has one golden example: copy it, swap the nouns, keep the structure and the states. Don’t copy another screen.",
+      "summary": "Which golden example to copy for a page, and how",
       "path": "docs/guides/PageArchetypes.stories.tsx",
       "story": "guides-page-archetypes--page-archetypes-guide"
     },
     {
       "title": "Data",
-      "summary": "The design system draws; the app layer knows. Everything about fetching, caching, validating and writing data lives in src/app, which the golden examples use and the system never imports.",
+      "summary": "Cache, joins, permissions, URL state, writes, freshness",
       "path": "docs/guides/Data.stories.tsx",
       "story": "guides-data--data-guide"
     },
     {
       "title": "Accessibility",
-      "summary": "The target is WCAG 2.2 AA. The system guarantees what can be decided once; product code owns what depends on the page. Both halves are needed.",
+      "summary": "Who owns what for WCAG 2.2 AA, and how it’s checked",
       "path": "docs/guides/Accessibility.stories.tsx",
       "story": "guides-accessibility--accessibility-guide"
     },
     {
       "title": "Accessibility conformance",
-      "summary": "What the build checks against WCAG 2.2 AA, what it can’t, and how to run it. A green build is necessary for a conformance claim, never sufficient.",
+      "summary": "What’s automated, what needs a person, claiming conformance",
       "path": "docs/guides/AccessibilityConformance.stories.tsx",
       "story": "guides-accessibility-conformance--accessibility-conformance-guide"
     },
     {
       "title": "Accessibility statement",
-      "summary": "A template for the statement a product publishes about its accessibility. Copy it, replace every [bracketed] part, and keep it true: a statement that overclaims is worse than none.",
+      "summary": "A template for the product’s accessibility statement",
       "path": "docs/guides/AccessibilityStatement.stories.tsx",
       "story": "guides-accessibility-statement--accessibility-statement-guide"
     },
     {
       "title": "Content",
-      "summary": "Plain, specific and calm. The words are part of the interface: a vague label or a blaming error is a defect like any other.",
+      "summary": "Button and link labels, errors, casing and words",
       "path": "docs/guides/Content.stories.tsx",
       "story": "guides-content--content-guide"
     },
     {
       "title": "Forms",
-      "summary": "Forms are among the most settled patterns in software, and breaking the conventions costs completions. Every control in the system shares one field anatomy, and the create-and-edit example shows the whole flow: validation on blur, an error summary on submit, a pending submit.",
+      "summary": "Field anatomy, which control, layout, validation, error summary",
       "path": "docs/guides/Forms.stories.tsx",
       "story": "guides-forms--forms-guide"
     },
     {
       "title": "Keyboard and power users",
-      "summary": "People who use a product all day stop reaching for the mouse. The system gives them a command palette, one registry for every shortcut, and pickers built for the keyboard, without taking anything away from people who find their way by looking.",
+      "summary": "The command palette, the shortcut registry, keyboard-first parts",
       "path": "docs/guides/KeyboardPowerUsers.stories.tsx",
       "story": "guides-keyboard-and-power-users--keyboard-and-power-users-guide"
     },
     {
       "title": "Motion",
-      "summary": "Motion gives feedback and shows where something came from. It is short, eased, built from tokens, and it gives way to the reduced-motion preference: nothing in the product depends on seeing it move.",
+      "summary": "Durations, easings, what moves, reduced motion",
       "path": "docs/guides/Motion.stories.tsx",
       "story": "guides-motion--motion-guide"
     },
     {
       "title": "Theming and adding a brand",
-      "summary": "Every alternate look (dark mode, a rebrand, a customer’s colours) is a remap of the semantic token tier. Components read only semantic tokens, so a new theme is a list of values, never a change to a component.",
+      "summary": "Dark mode, changing the brand, a second brand",
       "path": "docs/guides/Theming.stories.tsx",
       "story": "guides-theming-and-adding-a-brand--theming-guide"
     },
     {
       "title": "Escape hatches",
-      "summary": "Every system component and primitive takes UNSAFE_className and UNSAFE_style. They exist so a deadline never forces a fork, and they are loud on purpose.",
+      "summary": "When UNSAFE_className/style is acceptable, and its comment",
       "path": "docs/guides/EscapeHatches.stories.tsx",
       "story": "guides-escape-hatches--escape-hatches-guide"
     },
     {
       "title": "Contributing and versioning",
-      "summary": "Anything new starts as a proposal on the decision ladder, lands in one pull request with its stories, docs and tests, and leaves the old way through a deprecation, never a silent removal.",
+      "summary": "Propose, what a PR includes, deprecate, versioning",
       "path": "docs/guides/Contributing.stories.tsx",
       "story": "guides-contributing-and-versioning--contributing-guide"
     },
     {
       "title": "Testing",
-      "summary": "The gallery is the test fixture. Every state gets a story, and every story is screenshotted in both themes, checked by axe and by the WCAG 2.2 checks, so a new state is covered the moment it has a story.",
+      "summary": "The suites, a story per state, baselines, WCAG checks",
       "path": "docs/guides/Testing.stories.tsx",
       "story": "guides-testing--testing-guide"
     },
     {
       "title": "Agents",
-      "summary": "Coding agents read the system from three files at the repo root, generated from the code. Point an agent at llms.txt first: it holds the rules and links to everything else.",
+      "summary": "llms.txt, the manifest and the agent rules",
       "path": "docs/guides/Agents.stories.tsx",
       "story": "guides-agents--agents-guide"
     },
     {
       "title": "AI patterns",
-      "summary": "AI in this system is a set of shared parts, not a separate product: streaming answers, inline suggestions, citations, proposed changes with undo, and one assistant that acts only as the signed-in person. Define them once here so every team doesn’t invent its own.",
+      "summary": "Surfaces, citations, consent and undo, streaming, safety",
       "path": "docs/guides/AiPatterns.stories.tsx",
       "story": "guides-ai-patterns--ai-patterns-guide"
     }
@@ -190,55 +190,55 @@
   "foundations": [
     {
       "title": "Colour",
-      "summary": "Every semantic colour role, in light and dark, with the contrast it is tested at. Values, pairs and ratios are read from the token source and the contrast check, so this page cannot drift from them.",
+      "summary": "Colour roles in light and dark, with their contrast",
       "path": "docs/foundations/Colour.stories.tsx",
       "story": "foundations-colour--colour"
     },
     {
       "title": "Data visualisation",
-      "summary": "Colours for chart marks: a categorical palette for series, a sequential ramp for magnitude and a diverging scale for polarity. Values, contrast and distances are computed from the token source by the same code the tests run, in both themes.",
+      "summary": "Chart palettes: categorical, sequential, diverging",
       "path": "docs/foundations/DataVisualisation.stories.tsx",
       "story": "foundations-data-visualisation--data-visualisation"
     },
     {
       "title": "Typography",
-      "summary": "Named text styles, each a complete font shorthand. Components pick a style; they never set a size, weight or line height on their own.",
+      "summary": "Named text styles; families and weights",
       "path": "docs/foundations/Typography.stories.tsx",
       "story": "foundations-typography--typography"
     },
     {
       "title": "Spacing, sizing and radius",
-      "summary": "Every length in the system comes from these scales. Layout primitives take the gap, inset and width tokens as typed props, so product code never writes a length.",
+      "summary": "Gap, inset, sizes, radius, aspect ratios, borders",
       "path": "docs/foundations/SpacingSizingRadius.stories.tsx",
       "story": "foundations-spacing-sizing-and-radius--spacing-sizing-and-radius"
     },
     {
       "title": "Breakpoints and layout grid",
-      "summary": "Layouts respond to the space they are given, not to the device. Two breakpoint tokens mark where the page frame changes; inside it, intrinsic layout primitives wrap and stack on their own, so there is no column grid to line things up against.",
+      "summary": "Breakpoints and the layout grid",
       "path": "docs/foundations/BreakpointsLayoutGrid.stories.tsx",
       "story": "foundations-breakpoints-and-layout-grid--breakpoints-and-layout-grid"
     },
     {
       "title": "Elevation and motion",
-      "summary": "Shadows say how far a surface floats; stacking tokens say what sits on top. Motion is short, eased and optional: every duration that isn’t the only sign of progress drops to zero under reduced motion.",
+      "summary": "Shadows, stacking, durations, easings",
       "path": "docs/foundations/ElevationMotion.stories.tsx",
       "story": "foundations-elevation-and-motion--elevation-and-motion"
     },
     {
       "title": "Layers",
-      "summary": "Seven stacking tiers, lowest first. Every z-index in the system is one of these tokens, and each kind of surface has one tier, so a menu never opens under a sticky header and a tooltip never hides behind a dialog.",
+      "summary": "The seven stacking tiers and which units use each",
       "path": "docs/foundations/Layers.stories.tsx",
       "story": "foundations-layers--layers"
     },
     {
       "title": "Focus and target size",
-      "summary": "Keyboard users need to see where they are; pointer and touch users need something big enough to hit. One focus ring for every focusable element, and one minimum size for every target.",
+      "summary": "The focus ring and minimum target sizes",
       "path": "docs/foundations/FocusTargetSize.stories.tsx",
       "story": "foundations-focus-and-target-size--focus-and-target-size"
     },
     {
       "title": "Icons",
-      "summary": "A small, closed set drawn on one 20-unit grid with one stroke token. Each icon is a value you import from the system’s entry and pass to a component’s icon prop, so a page bundles only the icons it uses.",
+      "summary": "The icon set, and the export each is imported as",
       "path": "docs/foundations/Icons.stories.tsx",
       "story": "foundations-icons--icons"
     }
@@ -3327,8 +3327,8 @@
             "instead": "a text label alone; propose the icon as a design-system change (Guides/Contributing)"
           },
           {
-            "situation": "Looking an icon up by a name from data (`iconsByName[name]`)",
-            "instead": "store the icon value itself. `iconsByName` and `IconName` are deprecated: the lookup bundles every icon"
+            "situation": "Looking an icon up by a name from data",
+            "instead": "store the icon value itself: a lookup by name bundles every icon"
           },
           {
             "situation": "An icon that looks close enough (a download arrow for an inbox)",
@@ -3344,8 +3344,8 @@
           "code": "<Toolbar label=\"Conversation actions\">\n  <ToolbarButton icon={ArchiveIcon} shortcut=\"e\">\n    Archive\n  </ToolbarButton>\n</Toolbar>"
         },
         "dont": {
-          "caption": "A lookup by name: it works, but pulls the whole icon set into the bundle, and the name isn’t checked where the data is written. Import `ArchiveIcon` instead.",
-          "code": "<Cluster gap=\"sm\">\n  <Button variant=\"secondary\" icon={iconsByName.archive}>\n    Archive\n  </Button>\n</Cluster>"
+          "caption": "An icon that only looks close enough: a download arrow for the inbox tells people the wrong thing. Use `InboxIcon`, or no icon.",
+          "code": "<Cluster gap=\"sm\">\n  <Button variant=\"secondary\" icon={DownloadIcon}>\n    Inbox\n  </Button>\n</Cluster>"
         },
         "accessibility": [
           "Icons are decorative: the system renders them `aria-hidden` and not focusable, so a control’s accessible name comes from its label.",
@@ -8124,58 +8124,6 @@
       "description": "An icon from the system set: pass it to a component's `icon` prop.",
       "partOf": "Icon",
       "definition": "interface IconDefinition { readonly name: string; readonly path: string; }"
-    },
-    {
-      "name": "IconName",
-      "kind": "type-only",
-      "source": "src/components/Icon/names.ts",
-      "status": "deprecated",
-      "description": "An icon's name in the set.",
-      "partOf": "Icon",
-      "definition": "type IconName = keyof typeof iconsByName",
-      "values": [
-        "menu",
-        "search",
-        "stop",
-        "danger",
-        "file",
-        "success",
-        "warning",
-        "info",
-        "check",
-        "close",
-        "chevron-down",
-        "chevron-right",
-        "chevron-left",
-        "sort-ascending",
-        "sort-descending",
-        "sort-none",
-        "plus",
-        "minus",
-        "more",
-        "eye",
-        "eye-off",
-        "calendar",
-        "download",
-        "upload",
-        "copy",
-        "edit",
-        "archive",
-        "retry",
-        "send",
-        "attach",
-        "home",
-        "inbox",
-        "users",
-        "building",
-        "settings",
-        "shield",
-        "trend-up",
-        "trend-down",
-        "sparkle",
-        "thumbs-up",
-        "thumbs-down"
-      ]
     },
     {
       "name": "Imposter",
@@ -17756,14 +17704,6 @@
       "partOf": "Kbd",
       "docs": "docs/usage/Kbd.usage.tsx",
       "signature": "(keys: string, platform?: KeyPlatform) => string"
-    },
-    {
-      "name": "iconsByName",
-      "kind": "utility",
-      "source": "src/components/Icon/names.ts",
-      "status": "deprecated",
-      "description": "Every icon, keyed by name.",
-      "partOf": "Icon"
     },
     {
       "name": "isReservedShortcut",

@@ -11,8 +11,10 @@ import { getResponse, http } from 'msw';
 import { afterEach, describe, expect, it } from 'vitest';
 import { seedAccounts, seedPeople, seedRecords } from '../../src/app/mocks/seed';
 import { handlers } from '../../src/app/mocks/handlers';
+import { listInbox } from '../../src/app/api/inbox';
 import { useInviteMember, useMembers } from '../../src/app/model/admin';
-import { useAddPerson, useCreateAccount, useCreateRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
+import { useArchiveInbox, useInbox } from '../../src/app/model/inbox';
+import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -45,6 +47,27 @@ const holdFirstRead = (path: string) => {
     arrived: () => waitFor(() => expect(held).toBe(true)),
     release: () => release(),
   };
+};
+
+/** Hold a write before the server sees it, so a read can reach the server first. */
+const holdWrite = (method: 'patch' | 'post', path: string) => {
+  let release: () => void = () => undefined;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let held = false;
+  server.use(
+    http[method](
+      `*/api/t/acme${path}`,
+      async ({ request }) => {
+        held = true;
+        await gate;
+        return getResponse(handlers, request);
+      },
+      { once: true },
+    ),
+  );
+  return { arrived: () => waitFor(() => expect(held).toBe(true)), release: () => release() };
 };
 
 /**
@@ -134,5 +157,42 @@ describe('a write while the list is still on its first load shows on the list', 
     const draft = seedRecords('acme').find((r) => r.status === 'draft');
     await race(read, () => result.current.start.mutate({ ids: [draft?.id ?? ''], label: 'Delete 1 raced record' }), 'POST', '/jobs/bulk-delete');
     await waitFor(() => expect(itemsOf(result.current.jobs.data).map((j) => j.label)).toContain('Delete 1 raced record'));
+  });
+
+  it('records: renameRecord (optimistic; a list that starts loading while the write is in flight)', async () => {
+    const first = seedRecords('acme')
+      .filter((r) => r.status !== 'archived')
+      .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base', numeric: true }) || a.id.localeCompare(b.id))[0];
+    const client = testClient();
+    const write = holdWrite('patch', `/records/${first?.id ?? ''}`);
+    const renamer = renderHook(() => useRenameRecord(first?.id ?? ''), { wrapper: wrapperFor(client) });
+    renamer.result.current.mutate({ name: 'Aaron renamed lease', version: first?.version ?? 0 });
+    await write.arrived();
+    // The list mounts mid-write, after onMutate's cancel: its read reaches the server first.
+    const read = holdFirstRead('/records');
+    const listed = renderHook(() => useRecordList({ q: '', status: [], view: 'all', sort: 'name', page: 1, pageSize: 10 }), { wrapper: wrapperFor(client) });
+    await read.arrived();
+    const done = answered('PATCH', `/records/${first?.id ?? ''}`);
+    write.release();
+    await done;
+    read.release();
+    await waitFor(() => expect(listed.result.current.data?.items.find((r) => r.id === first?.id)?.name).toBe('Aaron renamed lease'));
+  });
+
+  it('inbox: triage (optimistic; a view that starts loading while the write is in flight)', async () => {
+    const [item] = (await listInbox('acme', 'inbox')).items;
+    const client = testClient();
+    const write = holdWrite('post', '/inbox/triage');
+    const archiver = renderHook(() => useArchiveInbox(), { wrapper: wrapperFor(client) });
+    archiver.result.current.mutate([item?.id ?? '']);
+    await write.arrived();
+    const read = holdFirstRead('/inbox');
+    const view = renderHook(() => useInbox('inbox'), { wrapper: wrapperFor(client) });
+    await read.arrived();
+    const done = answered('POST', '/inbox/triage');
+    write.release();
+    await done;
+    read.release();
+    await waitFor(() => expect(view.result.current.data?.items.some((i) => i.id === item?.id)).toBe(false));
   });
 });

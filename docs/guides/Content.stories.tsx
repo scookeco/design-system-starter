@@ -66,6 +66,6 @@ function Content() {
   );
 }
 
-const meta = { title: 'Guides/Content', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Content', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Button and link labels, errors, casing and words' } } satisfies Meta;
 export default meta;
 export const ContentGuide: StoryObj = { name: 'Content', render: () => <Content /> };

@@ -118,6 +118,6 @@ function Layout() {
   );
 }
 
-const meta = { title: 'Guides/Layout', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Layout', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Which layout, which primitive, composing into AppShell' } } satisfies Meta;
 export default meta;
 export const LayoutGuide: StoryObj = { name: 'Layout', render: () => <Layout /> };

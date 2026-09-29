@@ -90,6 +90,6 @@ function Accessibility() {
   );
 }
 
-const meta = { title: 'Guides/Accessibility', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Accessibility', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Who owns what for WCAG 2.2 AA, and how it’s checked' } } satisfies Meta;
 export default meta;
 export const AccessibilityGuide: StoryObj = { name: 'Accessibility', render: () => <Accessibility /> };

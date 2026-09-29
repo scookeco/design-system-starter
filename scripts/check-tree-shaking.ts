@@ -126,13 +126,11 @@ for (const [name, unit] of Object.entries(usage.units)) {
   checked += 1;
 }
 
-// 5. One icon is one icon; the deprecated lookup by name is the whole set (a control that it's seen).
+// 5. One icon is one icon.
 for (const { exportName } of ICONS) {
   const found = iconsIn(await bundle(`export { ${exportName} } from ${JSON.stringify(dist)};\n`));
   if (found.join() !== exportName) problems.push(`import { ${exportName} } carries ${found.join(', ') || 'no icon'}`);
 }
-const lookup = iconsIn(await bundle(`export { iconsByName } from ${JSON.stringify(dist)};\n`));
-if (lookup.length !== ICONS.length) problems.push(`import { iconsByName } carries ${String(lookup.length)} of ${String(ICONS.length)} icons; the check can't see the lookup`);
 
 if (problems.length) {
   console.error(`Tree-shaking check failed:\n  ${problems.join('\n  ')}`);

@@ -34,7 +34,6 @@ export { Spinner, type SpinnerProps, type SpinnerSize } from './Spinner/Spinner'
 export { Skeleton, type SkeletonProps, type SkeletonShape } from './Skeleton/Skeleton';
 export { Card, CardHeader, CardBody, CardFooter, type CardProps, type CardHeaderProps, type CardFooterProps } from './Card/Card';
 export * from './Icon/icons';
-export { iconsByName, type IconName } from './Icon/names';
 export { PageHeader, type PageHeaderProps } from './PageHeader/PageHeader';
 export { NavTabs, type NavTabsProps, type NavTab } from './NavTabs/NavTabs';
 export { Link, LinkProvider, type LinkProps, type LinkProviderProps, type LinkComponent, type LinkComponentProps } from './Link/Link';

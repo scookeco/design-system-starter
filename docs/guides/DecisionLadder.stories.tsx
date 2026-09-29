@@ -68,6 +68,6 @@ function DecisionLadder() {
   );
 }
 
-const meta = { title: 'Guides/Decision ladder', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Decision ladder', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Template, variant, component or primitive; proposing a token' } } satisfies Meta;
 export default meta;
 export const DecisionLadderGuide: StoryObj = { name: 'Decision ladder', render: () => <DecisionLadder /> };

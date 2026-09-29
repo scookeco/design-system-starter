@@ -23,7 +23,7 @@ npm run check                     # everything CI runs except the visual job
 
 | Script | What it does |
 |---|---|
-| `npm run dev` | Storybook dev server (the gallery). |
+| `npm run dev` | Storybook dev server (the gallery). Restart it after `npm ci` or pulling: a running server keeps the old dependencies and stories, logs "Unable to index files", and serves a blank or stale gallery. |
 | `npm run tokens` | Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`, then the token usage map `src/tokens/token-usage.json`. |
 | `npm run tokens:check` | Rebuild tokens to a temp dir and fail if the committed files or the token usage map are stale. |
 | `npm run manifest` | Generate the files for coding agents from the code, stories, usage docs, guides and `CLAUDE.md`: `design-system.manifest.json`, `llms.txt` and `llms-full.txt`. |

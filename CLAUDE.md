@@ -9,7 +9,7 @@ npm run check          # tokens:check + manifest:check + typecheck + lint + test
 npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
 npm run manifest       # regenerate llms.txt, llms-full.txt and design-system.manifest.json after changing exports, props, JSDoc, stories, usage docs, guides or the rules below
 npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first
-npm run dev            # Storybook gallery
+npm run dev            # Storybook gallery; restart it after npm ci or a pull (a running one goes stale)
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
 npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
 ```
@@ -75,8 +75,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
-- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
-  (iconsByName is deprecated). The set is on Foundations/Icons.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.
+  The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.

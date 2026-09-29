@@ -135,6 +135,6 @@ PLAYWRIGHT_PORT=6107 npm run test:wcag22
   );
 }
 
-const meta = { title: 'Guides/Accessibility conformance', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Accessibility conformance', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'What’s automated, what needs a person, claiming conformance' } } satisfies Meta;
 export default meta;
 export const AccessibilityConformanceGuide: StoryObj = { name: 'Accessibility conformance', render: () => <AccessibilityConformance /> };

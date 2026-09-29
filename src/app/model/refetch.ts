@@ -9,15 +9,16 @@
  *
  * Every write that refetches goes through it (tests/unit/refetch.test.tsx holds a first load past
  * each family's write):
- *   records   updateRecord, moveRecord, archiveRecord, restoreRecord, tag/untag, createRecord,
- *             bulkDeleteRecords (lists, counts)
+ *   records   updateRecord, renameRecord, moveRecord, archiveRecord, restoreRecord, tag/untag,
+ *             createRecord, bulkDeleteRecords (lists, counts)
  *   jobs      startBulkDelete, cancelJob, dismissJob (the job list; cancel also lists and counts),
  *             and a poll that sees a job move (lists, counts)
  *   others    addPerson, createAccount, updateAccount, saveView/updateView/deleteView, the admin
- *             writes, the assistant's conversations (model/ai.ts), counts after a live event
+ *             writes, inbox triage, the assistant's conversations (model/ai.ts), counts after a live
+ *             event. Optimistic writes still cancel in onMutate too: that covers a read already in
+ *             flight; this covers one that starts while the write is.
  *
  * Left out on purpose:
- *   renameRecord and inbox triage are optimistic and cancel their reads in onMutate;
  *   a live event marks lists stale without refetching them (live.ts, refetchType 'none');
  *   "Show N new" refetches lists already on screen, which have data, so invalidating restarts them.
  */

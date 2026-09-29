@@ -66,6 +66,6 @@ function LayersPage() {
   );
 }
 
-const meta = { title: 'Foundations/Layers', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Layers', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'The seven stacking tiers and which units use each' } } satisfies Meta;
 export default meta;
 export const Layers: StoryObj = { name: 'Layers', render: () => <LayersPage /> };

@@ -87,6 +87,6 @@ function FocusTargetPage() {
   );
 }
 
-const meta = { title: 'Foundations/Focus and target size', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Focus and target size', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'The focus ring and minimum target sizes' } } satisfies Meta;
 export default meta;
 export const FocusAndTargetSize: StoryObj = { name: 'Focus and target size', render: () => <FocusTargetPage /> };

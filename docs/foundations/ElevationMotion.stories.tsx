@@ -87,6 +87,6 @@ function ElevationMotionPage() {
   );
 }
 
-const meta = { title: 'Foundations/Elevation and motion', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Elevation and motion', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Shadows, stacking, durations, easings' } } satisfies Meta;
 export default meta;
 export const ElevationAndMotion: StoryObj = { name: 'Elevation and motion', render: () => <ElevationMotionPage /> };

@@ -204,6 +204,6 @@ function PageArchetypes() {
   );
 }
 
-const meta = { title: 'Guides/Page archetypes', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Page archetypes', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Which golden example to copy for a page, and how' } } satisfies Meta;
 export default meta;
 export const PageArchetypesGuide: StoryObj = { name: 'Page archetypes', render: () => <PageArchetypes /> };

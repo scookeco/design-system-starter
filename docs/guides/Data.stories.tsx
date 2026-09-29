@@ -662,6 +662,6 @@ export const Linked: Story = { parameters: mockApi({ url: '/records?view=open&q=
   );
 }
 
-const meta = { title: 'Guides/Data', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Data', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Cache, joins, permissions, URL state, writes, freshness' } } satisfies Meta;
 export default meta;
 export const DataGuide: StoryObj = { name: 'Data', render: () => <DataPage /> };

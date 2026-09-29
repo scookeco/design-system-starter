@@ -102,6 +102,6 @@ function TypographyPage() {
   );
 }
 
-const meta = { title: 'Foundations/Typography', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Typography', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Named text styles; families and weights' } } satisfies Meta;
 export default meta;
 export const Typography: StoryObj = { render: () => <TypographyPage /> };

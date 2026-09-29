@@ -32,8 +32,7 @@
  *   deleteView         pessimistic  views (removes)                  views
  *
  * Every "invalidates" goes through refetchAfterWrite (./refetch), patching inside it, so a list still
- * on its first load reads again after the write. The exception is renameRecord, which cancels in
- * onMutate and invalidates directly.
+ * on its first load reads again after the write.
  */
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ApiError } from '../api/client';
@@ -172,12 +171,10 @@ export function useRenameRecord(id: string) {
       await Promise.all([client.cancelQueries({ queryKey: key, exact: true }), client.cancelQueries({ queryKey: recordKeys.lists(partition) })]);
     },
     // Returning the promise keeps the mutation pending until the refetch lands. After a conflict the
-    // detail is left alone: the page says so and the person chooses.
+    // detail is left alone: the page says so and the person chooses. onMutate's cancel doesn't cover a
+    // list that starts loading while the write is in flight, so the refetch goes through ./refetch too.
     onSettled: (_data, error) =>
-      Promise.all([
-        isConflict(error) ? undefined : client.invalidateQueries({ queryKey: key, exact: true }),
-        client.invalidateQueries({ queryKey: recordKeys.lists(partition) }),
-      ]),
+      Promise.all([isConflict(error) ? undefined : refetchAfterWrite(client, key), refetchAfterWrite(client, recordKeys.lists(partition))]),
   });
 }
 

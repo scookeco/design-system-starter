@@ -1,18 +1,13 @@
 /*
- * Every icon by its name: the Foundations page's list, and the deprecated way to pick an icon by
- * string. Importing this module bundles the whole set, so no system component imports it; a unit
- * test keeps it in step with ./icons.ts.
+ * Every icon by its name: the Foundations page's list. Internal, and not exported from
+ * src/index.ts: looking an icon up by name bundles the whole set, so components take the value
+ * (Guides/Contributing tells how the old name-based API was retired). A unit test keeps it in step
+ * with ./icons.ts.
  */
 import * as icon from './icons';
 import type { IconDefinition } from './icons';
 
-/**
- * Every icon, keyed by name.
- *
- * @deprecated Import the icon itself (`InboxIcon`) and pass it as the value. Looking an icon up by
- * name bundles all of them. Kept for code that picks icons from data; removed once none does
- * (Guides/Contributing, "Deprecate before removing").
- */
+/** Every icon, keyed by name, in the set's order. */
 export const iconsByName = {
   check: icon.CheckIcon,
   success: icon.SuccessIcon,
@@ -56,11 +51,3 @@ export const iconsByName = {
   'thumbs-up': icon.ThumbsUpIcon,
   'thumbs-down': icon.ThumbsDownIcon,
 } as const satisfies Record<string, IconDefinition>;
-
-/**
- * An icon's name in the set.
- *
- * @deprecated Components take the icon value (`IconDefinition`), not its name. For data that
- * names icons, look the value up in `iconsByName` (which bundles the whole set).
- */
-export type IconName = keyof typeof iconsByName;

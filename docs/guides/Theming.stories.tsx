@@ -118,6 +118,6 @@ function Theming() {
   );
 }
 
-const meta = { title: 'Guides/Theming and adding a brand', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Theming and adding a brand', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Dark mode, changing the brand, a second brand' } } satisfies Meta;
 export default meta;
 export const ThemingGuide: StoryObj = { name: 'Theming and adding a brand', render: () => <Theming /> };
