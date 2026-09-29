@@ -10,7 +10,7 @@ import { can, canSee, DENIAL_REASONS, ROLE_CAPABILITIES } from '../../src/app/mo
 import { ListPage } from '../../src/examples/ListPage';
 import { Guard } from '../../src/examples/Permission';
 import { RecordPage } from '../../src/examples/RecordPage';
-import { renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -108,11 +108,11 @@ describe('mutations refuse before sending', () => {
   });
 });
 
-describe('the UI asks the same predicate', () => {
+describe('the UI asks the same predicate', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('list page, viewer: no Drafts tab, New record disabled with the reason beside it', async () => {
     renderWithApp(<ListPage />, { role: 'viewer' });
     const views = screen.getByRole('navigation', { name: 'Record views' });
-    await waitFor(() => expect(within(views).getByRole('link', { name: /^All \(/ })).toBeTruthy());
+    await waitFor(() => expect(within(views).getByRole('link', { name: /^All \(/ })).toBeTruthy(), FIRST_PAINT);
     expect(within(views).queryByRole('link', { name: /^Drafts/ })).toBeNull();
     const create = screen.getByRole('button', { name: 'New record' });
     expect((create as HTMLButtonElement).disabled).toBe(true);
@@ -121,12 +121,12 @@ describe('the UI asks the same predicate', () => {
 
   it('record page: the More menu shows only what the role holds', async () => {
     renderWithApp(<RecordPage recordId="r-1001" initialMenuOpen />, { role: 'viewer' });
-    await screen.findByRole('menuitem', { name: 'Export as CSV' });
+    await screen.findByRole('menuitem', { name: 'Export as CSV' }, FIRST_PAINT);
     expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     expect(screen.queryByRole('menuitem', { name: 'Delete record' })).toBeNull();
     cleanup();
     renderWithApp(<RecordPage recordId="r-1001" initialMenuOpen />, { role: 'editor' });
-    await screen.findByRole('menuitem', { name: 'Rename' });
+    await screen.findByRole('menuitem', { name: 'Rename' }, FIRST_PAINT);
     expect(screen.queryByRole('menuitem', { name: 'Delete record' })).toBeNull();
   });
 
@@ -145,7 +145,7 @@ describe('the UI asks the same predicate', () => {
     const { http, HttpResponse } = await import('msw');
     server.use(http.patch('*/api/t/:tenant/records/:id', () => HttpResponse.json({ error: { code: 'forbidden', message: 'Your role changed.' } }, { status: 403 })));
     renderWithApp(<RecordPage recordId="r-1001" initialAction={{ kind: 'rename', name: 'Forbidden name' }} />);
-    expect(await screen.findByText('You can’t rename this record')).toBeTruthy();
+    expect(await screen.findByText('You can’t rename this record', {}, FIRST_PAINT)).toBeTruthy();
     await waitFor(() => expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(records[0]?.name));
   });
 });

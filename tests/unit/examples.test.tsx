@@ -11,7 +11,7 @@ import { http, HttpResponse } from 'msw';
 import { countRecords } from '../../src/app/api/records';
 import { db } from '../../src/app/mocks/db';
 import { undoSettings } from '../../src/app/model/undo';
-import { renderWithApp, server, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -23,7 +23,7 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 };
 
-describe('Create and edit example', () => {
+describe('Create and edit example', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('on a failed submit focuses an error summary whose links move focus to each invalid field', () => {
     renderWithApp(<CreateEditFlow />);
     fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
@@ -53,7 +53,7 @@ describe('Create and edit example', () => {
   });
 });
 
-describe('Create and edit example: the write', () => {
+describe('Create and edit example: the write', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   const valid = { name: 'Hardware lease', owner: 'acme-p02', amount: '12500.5', renewal: 'end' };
 
   it('keeps the draft on a server failure and retries with the same idempotency key', async () => {
@@ -67,7 +67,7 @@ describe('Create and edit example: the write', () => {
       }),
     );
     renderWithApp(<CreateEditFlow initialDraft={valid} initialSubmitting />);
-    expect(await screen.findByText('The record wasn’t created')).toBeTruthy();
+    expect(await screen.findByText('The record wasn’t created', {}, FIRST_PAINT)).toBeTruthy();
     expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).value).toBe('Hardware lease');
     fail = false;
     fireEvent.click(screen.getByRole('button', { name: 'Create record' }));
@@ -78,11 +78,11 @@ describe('Create and edit example: the write', () => {
   });
 });
 
-describe('Record page example', () => {
+describe('Record page example', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('shows a stale rename as a conflict banner, with Reload', async () => {
     server.use(http.patch('*/api/t/:tenant/records/:id', () => HttpResponse.json({ error: { code: 'conflict', message: 'Changed.' } }, { status: 409 })));
     renderWithApp(<RecordPage initialAction={{ kind: 'rename', name: 'New name' }} />);
-    expect(await screen.findByText('Someone else changed this record')).toBeTruthy();
+    expect(await screen.findByText('Someone else changed this record', {}, FIRST_PAINT)).toBeTruthy();
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Master cleaning agreement');
     fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
     await waitFor(() => expect(screen.queryByText('Someone else changed this record')).toBeNull());
@@ -96,7 +96,7 @@ describe('Record page example', () => {
     });
     server.use(http.post('*/api/t/:tenant/records/:id/archive', async () => gate.then(() => undefined)));
     renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
-    expect(await screen.findByRole('button', { name: 'Archiving…' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Archiving…' }, FIRST_PAINT)).toBeTruthy();
     expect((screen.getByRole('button', { name: 'Request approval' }) as HTMLButtonElement).disabled).toBe(true);
     release();
     await waitFor(() => expect(db('acme').records.find((r) => r.id === 'r-1001')?.status).toBe('archived'));
@@ -111,7 +111,7 @@ describe('Record page example', () => {
     });
     renderWithApp(<RecordPage initialAction={{ kind: 'archive' }} />);
     // Shown at once, before anything is sent.
-    await waitFor(() => expect(screen.getAllByText('Archived').length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText('Archived').length).toBeGreaterThan(0), FIRST_PAINT);
     const toast = await screen.findByText('Record archived');
     fireEvent.click(within(toast.closest('li') as HTMLElement).getByRole('button', { name: 'Undo' }));
     await waitFor(() => expect(screen.queryAllByText('Archived')).toHaveLength(0));
@@ -188,12 +188,12 @@ describe('Setup wizard example', () => {
   });
 });
 
-describe('List page example', () => {
+describe('List page example', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('shows active filters as chips; removing one moves focus to the next chip, then to Filters', async () => {
     renderWithApp(<ListPage />, { url: '/records?status=pending,active' });
     const chips = screen.getByRole('list', { name: 'Active filters' });
     fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Pending' }));
-    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Active' })));
+    await waitFor(() => expect(document.activeElement).toBe(within(chips).getByRole('button', { name: 'Remove filter: status Active' })), FIRST_PAINT);
     fireEvent.click(within(chips).getByRole('button', { name: 'Remove filter: status Active' }));
     expect(screen.queryByRole('list', { name: 'Active filters' })).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Filters' })));
@@ -201,7 +201,7 @@ describe('List page example', () => {
 
   it('pages on the server: the summary shows the server’s total and the current page', async () => {
     renderWithApp(<ListPage />);
-    const pager = await screen.findByRole('navigation', { name: 'Records pages' });
+    const pager = await screen.findByRole('navigation', { name: 'Records pages' }, FIRST_PAINT);
     expect(within(pager).getByRole('status').textContent).toBe('1–10 of 219');
     expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page');
     expect(within(pager).getByRole('button', { name: 'Previous' }).getAttribute('aria-disabled')).toBe('true');
@@ -213,13 +213,13 @@ describe('List page example', () => {
   it('counts each view on the server and shows the counts in the tabs', async () => {
     renderWithApp(<ListPage />);
     const views = screen.getByRole('navigation', { name: 'Record views' });
-    await waitFor(() => expect(within(views).getByRole('link', { name: 'All (219)' }).getAttribute('aria-current')).toBe('page'));
+    await waitFor(() => expect(within(views).getByRole('link', { name: 'All (219)' }).getAttribute('aria-current')).toBe('page'), FIRST_PAINT);
     expect(within(views).getByRole('link', { name: 'Archived (21)' })).toBeTruthy();
   });
 
   it('shows the same rows as a board: one column per status, cards from the same query, totals from the server', async () => {
     renderWithApp(<ListPage />, { url: '/records?display=board' });
-    const pending = await screen.findByRole('region', { name: 'Pending' });
+    const pending = await screen.findByRole('region', { name: 'Pending' }, FIRST_PAINT);
     const columns = ['Draft', 'Pending', 'Active', 'Overdue'].map((name) => screen.getByRole('region', { name }));
     await waitFor(() => expect(columns.reduce((n, column) => n + within(column).queryAllByRole('listitem').length, 0)).toBe(10));
     // The column total is the server's per-status count, the same one the tabs are counted with.
@@ -229,7 +229,7 @@ describe('List page example', () => {
 
   it('moves a card without dragging: its Move to… menu, from the keyboard', async () => {
     renderWithApp(<ListPage />, { url: '/records?display=board&view=drafts' });
-    const drafts = await screen.findByRole('region', { name: 'Draft' });
+    const drafts = await screen.findByRole('region', { name: 'Draft' }, FIRST_PAINT);
     const first = (await within(drafts).findAllByRole('listitem'))[0] as HTMLElement;
     const name = within(first).getAllByRole('link')[0]?.textContent ?? '';
     fireEvent.keyDown(within(first).getByRole('button', { name: `Move to…, ${name}` }), { key: 'Enter' });

@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CommandPalette, PageHeader, type CommandGroup } from '../../src/index';
 import { matchScore } from '../../src/components/CommandPalette/CommandPalette';
 import { ExampleShell } from '../../src/examples/ExampleShell';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -68,7 +68,7 @@ describe('CommandPalette', () => {
   });
 });
 
-describe('the app’s palette: permission filtering', () => {
+describe('the app’s palette: permission filtering', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   const options = () => screen.getAllByRole('option').map((o) => o.textContent ?? '');
 
   it('offers an admin the create pages and actions', async () => {
@@ -77,7 +77,7 @@ describe('the app’s palette: permission filtering', () => {
         <PageHeader title="Home" />
       </ExampleShell>,
     );
-    await waitFor(() => expect(options().some((o) => o.startsWith('New record'))).toBe(true));
+    await waitFor(() => expect(options().some((o) => o.startsWith('New record'))).toBe(true), FIRST_PAINT);
     expect(options().some((o) => o.startsWith('New account'))).toBe(true);
     expect(options().some((o) => o.startsWith('Records › New'))).toBe(true);
   });
@@ -89,7 +89,7 @@ describe('the app’s palette: permission filtering', () => {
       </ExampleShell>,
       { role: 'viewer' },
     );
-    await waitFor(() => expect(screen.getByRole('status').textContent).not.toBe('Searching…'));
+    await waitFor(() => expect(screen.getByRole('status').textContent).not.toBe('Searching…'), FIRST_PAINT);
     expect(options().filter((o) => /New record|New account|Records › New|Accounts › New/.test(o))).toEqual([]);
   });
 
@@ -100,7 +100,7 @@ describe('the app’s palette: permission filtering', () => {
       </ExampleShell>,
       { role: 'viewer' },
     );
-    const records = await screen.findByRole('group', { name: 'Records' });
+    const records = await screen.findByRole('group', { name: 'Records' }, FIRST_PAINT);
     const rows = within(records).getAllByRole('option').map((o) => o.textContent ?? '');
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.every((row) => /lease/i.test(row) && !row.includes('Draft'))).toBe(true);

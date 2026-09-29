@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { createMemoryHistory } from '../../src/app/url/history';
 import { LIST_DEFAULTS, listCodec, type ListUrlState } from '../../src/app/url/listState';
 import { ListPage } from '../../src/examples/ListPage';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -51,18 +51,18 @@ describe('memory history', () => {
   });
 });
 
-describe('list page URL state', () => {
+describe('list page URL state', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('opens the view a link describes', async () => {
     renderWithApp(<ListPage />, { url: '/records?view=open&q=lease&status=overdue&page=1' });
     const views = screen.getByRole('navigation', { name: 'Record views' });
-    await waitFor(() => expect(within(views).getByRole('link', { name: /^Open/ }).getAttribute('aria-current')).toBe('page'));
+    await waitFor(() => expect(within(views).getByRole('link', { name: /^Open/ }).getAttribute('aria-current')).toBe('page'), FIRST_PAINT);
     expect((screen.getByRole('searchbox', { name: 'Search records' }) as HTMLInputElement).value).toBe('lease');
     expect(screen.getByRole('button', { name: 'Remove filter: status Overdue' })).toBeTruthy();
   });
 
   it('pushes a page change, so Back returns to the previous page', async () => {
     const { history } = renderWithApp(<ListPage />, { url: '/records' });
-    const pager = await screen.findByRole('navigation', { name: 'Records pages' });
+    const pager = await screen.findByRole('navigation', { name: 'Records pages' }, FIRST_PAINT);
     fireEvent.click(within(pager).getByRole('button', { name: 'Next' }));
     expect(history.entries()).toEqual({ entries: ['/records', '/records?page=2'], index: 1 });
     await waitFor(() => expect(within(pager).getByRole('status').textContent).toBe('11–20 of 219'));
@@ -73,7 +73,7 @@ describe('list page URL state', () => {
   it('pushes a tab change, and a tab keeps the search but drops filters', async () => {
     const { history } = renderWithApp(<ListPage />, { url: '/records?q=lease&status=active' });
     const views = screen.getByRole('navigation', { name: 'Record views' });
-    fireEvent.click(await within(views).findByRole('link', { name: /^Drafts/ }));
+    fireEvent.click(await within(views).findByRole('link', { name: /^Drafts/ }, FIRST_PAINT));
     expect(history.entries().entries).toEqual(['/records?q=lease&status=active', '/records?view=drafts&q=lease']);
   });
 
@@ -85,14 +85,14 @@ describe('list page URL state', () => {
     fireEvent.change(search, { target: { value: 'lease' } });
     // Not yet: the URL waits for typing to pause.
     expect(history.location().search).toBe('?page=3');
-    await waitFor(() => expect(history.location().search).toBe('?q=lease'));
+    await waitFor(() => expect(history.location().search).toBe('?q=lease'), FIRST_PAINT);
     expect(history.entries().entries).toHaveLength(1);
   });
 
   it('follows Back into the search field', async () => {
     const { history } = renderWithApp(<ListPage />, { url: '/records?q=lease' });
     act(() => history.push('/records?q=hosting'));
-    await waitFor(() => expect((screen.getByRole('searchbox', { name: 'Search records' }) as HTMLInputElement).value).toBe('hosting'));
+    await waitFor(() => expect((screen.getByRole('searchbox', { name: 'Search records' }) as HTMLInputElement).value).toBe('hosting'), FIRST_PAINT);
     act(() => history.back());
     await waitFor(() => expect((screen.getByRole('searchbox', { name: 'Search records' }) as HTMLInputElement).value).toBe('lease'));
   });

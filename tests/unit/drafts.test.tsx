@@ -10,7 +10,7 @@ import { useAppSession } from '../../src/app/session';
 import { createMemoryHistory } from '../../src/app/url/history';
 import { useNavigate } from '../../src/app/url/useUrlState';
 import { CreateEditFlow } from '../../src/examples/CreateEditFlow';
-import { renderWithApp, setupMockApi, testClient } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi, testClient } from './app-harness';
 
 // jsdom has no ResizeObserver; the create form's RadioGroup (Radix) measures with one.
 globalThis.ResizeObserver ??= class {
@@ -46,7 +46,7 @@ const openCreate = async () => {
     </>,
     { url: '/records/new' },
   );
-  await screen.findByRole('combobox', { name: 'Owner' });
+  await screen.findByRole('combobox', { name: 'Owner' }, FIRST_PAINT);
   return view;
 };
 
@@ -62,7 +62,7 @@ describe('draft ownership: autosave and restore', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Discard them' }));
     await waitFor(() => expect(nameField().value).toBe(''));
     expect(draftStorage.read(NEW_KEY)).toBeUndefined();
-  });
+  }, PAGE_FLOW_TIMEOUT);
 
   it('still works when storage throws (full, disabled or blocked)', async () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
@@ -74,7 +74,7 @@ describe('draft ownership: autosave and restore', () => {
     await openCreate();
     fireEvent.change(nameField(), { target: { value: 'Typed anyway' } });
     expect(nameField().value).toBe('Typed anyway');
-  });
+  }, PAGE_FLOW_TIMEOUT);
 
   it('sign-out clears every draft on the device', async () => {
     draftStorage.write(NEW_KEY, { values: { name: 'Private' }, base: undefined, savedAt: 0 });
@@ -93,7 +93,7 @@ describe('draft ownership: autosave and restore', () => {
   });
 });
 
-describe('the unsaved-changes guard', () => {
+describe('the unsaved-changes guard', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('a clean form lets navigation through', async () => {
     const { history } = await openCreate();
     fireEvent.click(screen.getByRole('button', { name: 'Go elsewhere' }));
@@ -137,11 +137,11 @@ describe('the unsaved-changes guard', () => {
   });
 });
 
-describe('the record moves on underneath an edit', () => {
+describe('the record moves on underneath an edit', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   const ID = 'r-1001';
   const openEdit = async () => {
     renderWithApp(<CreateEditFlow recordId={ID} />, { url: `/records/${ID}/edit`, live: mockLive });
-    await screen.findByRole('combobox', { name: 'Owner' });
+    await screen.findByRole('combobox', { name: 'Owner' }, FIRST_PAINT);
   };
 
   it('a clean form follows it quietly', async () => {

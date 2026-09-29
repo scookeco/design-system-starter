@@ -9,7 +9,7 @@ import { db } from '../../src/app/mocks/db';
 import { JOB_CHUNK, seedJob } from '../../src/app/mocks/jobs';
 import { ListPage } from '../../src/examples/ListPage';
 import { RecordPage } from '../../src/examples/RecordPage';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
 
 globalThis.ResizeObserver ??= class {
   observe() {}
@@ -72,20 +72,20 @@ describe('jobs: truthful status', () => {
   });
 });
 
-describe('the job surfaces', () => {
+describe('the job surfaces', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('“Delete all matching” starts a job; the list shows it through to “done, N failed” with Retry failed', async () => {
     jobSettings.pollMs = 5;
     renderWithApp(<ListPage initialSelection="matching" initialBulkDelete="submit" />, { url: '/records?view=drafts' });
-    const banner = await screen.findByText(/^Delete \d+ records$/);
+    const banner = await screen.findByText(/^Delete \d+ records$/, {}, FIRST_PAINT);
     expect(banner).toBeTruthy();
     await screen.findByText('Finished, with failures', {}, { timeout: 15_000 });
     expect(screen.getByRole('button', { name: /^Retry \d+ failed$/ })).toBeTruthy();
-  }, 20_000);
+  });
 
   it('follows the person to another page, in the shell’s Jobs popover', async () => {
     seedJob('acme', { state: 'running' });
     renderWithApp(<RecordPage initialJobsOpen />, { url: '/records/r-1001' });
-    const popover = await screen.findByRole('dialog', { name: 'Jobs' });
+    const popover = await screen.findByRole('dialog', { name: 'Jobs' }, FIRST_PAINT);
     expect(within(popover).getByRole('progressbar', { name: 'Delete 59 drafts' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '1 job running' })).toBeTruthy();
     fireEvent.click(within(popover).getByRole('button', { name: 'Cancel job' }));

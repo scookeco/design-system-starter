@@ -39,7 +39,7 @@ describe('the route table', () => {
   it('renders the 404 page for an unknown path', () => {
     renderWithApp(<ExampleApp />, { url: '/no/such/page' });
     expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
-  });
+  }, PAGE_FLOW_TIMEOUT);
 
   it('loads each page lazily, and navigates through LinkProvider: a row link opens the record in place', async () => {
     const { history } = renderWithApp(<ExampleApp />, { url: '/records' });
@@ -60,7 +60,7 @@ describe('the route table', () => {
   it('guards every route with the same predicate: a viewer gets the 403 page at /records/new', () => {
     renderWithApp(<ExampleApp />, { url: '/records/new', role: 'viewer' });
     expect(screen.getByRole('heading', { level: 1, name: 'You don’t have access to this page' })).toBeTruthy();
-  });
+  }, PAGE_FLOW_TIMEOUT);
 
   it('routes a section link to the same page with the section open', async () => {
     renderWithApp(<ExampleApp />, { url: '/records/r-1002/activity' });

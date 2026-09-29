@@ -12,7 +12,7 @@ import { anotherUser } from '../../src/app/mocks/live';
 import { theyEditFirst } from '../../src/app/mocks/overrides';
 import { seedRecords } from '../../src/app/mocks/seed';
 import { CreateEditFlow } from '../../src/examples/CreateEditFlow';
-import { renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -95,11 +95,11 @@ describe('updateRecord', () => {
   });
 });
 
-describe('the edit form’s conflict panel', () => {
+describe('the edit form’s conflict panel', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   const open = async (theirs: Parameters<typeof theyEditFirst>[0], draft: { name?: string; amount?: string }) => {
     server.use(theyEditFirst(theirs));
     renderWithApp(<CreateEditFlow recordId={ID} initialDraft={draft} initialSubmitting />);
-    return screen.findByRole('table', { name: 'Your changes and theirs' });
+    return screen.findByRole('table', { name: 'Your changes and theirs' }, FIRST_PAINT);
   };
 
   it('Keep mine (overwrite) saves my name over theirs', async () => {

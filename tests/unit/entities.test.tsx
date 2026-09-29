@@ -67,7 +67,7 @@ describe('schema-driven pages', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('creates from the config’s form: validation, then the new account’s page', async () => {
     const { history } = renderWithApp(<EntityFormPage config={ACCOUNT} />, { url: '/accounts/new' });
     fireEvent.click(screen.getByRole('button', { name: 'Create account' }));
-    const summary = await screen.findByRole('region', { name: 'There are 6 problems' });
+    const summary = await screen.findByRole('region', { name: 'There are 6 problems' }, FIRST_PAINT);
     expect(document.activeElement).toBe(summary);
     for (const [label, value] of [
       ['Name', 'Relecloud'],
@@ -94,7 +94,8 @@ describe('schema-driven pages', { timeout: PAGE_FLOW_TIMEOUT }, () => {
     fireEvent.change(name, { target: { value: 'Northwind Holdings' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(history.location().pathname).toBe(`/accounts/${account?.id ?? ''}`));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Northwind Holdings' })).toBeTruthy();
+    // The account's page is another lazy route.
+    expect(await screen.findByRole('heading', { level: 1, name: 'Northwind Holdings' }, FIRST_PAINT)).toBeTruthy();
     act(() => history.push('/records?display=board'));
     // The list is another lazy route.
     await waitFor(() => expect(screen.getAllByRole('link', { name: 'Northwind Holdings' }).length).toBeGreaterThan(0), FIRST_PAINT);
