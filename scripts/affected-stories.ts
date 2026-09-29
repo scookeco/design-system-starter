@@ -351,6 +351,9 @@ export const NON_VISUAL: readonly string[] = [
   'src/**/*.test.tsx',
 ];
 
+/** Gallery source: if the graph doesn't reach one of these, nothing the gallery loads imports it. */
+const UNREACHED_SOURCE: readonly string[] = ['{src,docs}/**/*.{ts,tsx,css,json}'];
+
 /** A committed baseline: tests/visual/__screenshots__/<platform>/<story id>--<theme>.png. */
 const BASELINE = /^tests\/visual\/__screenshots__\/[^/]+\/(.+)--(?:light|dark)\.png$/;
 
@@ -437,7 +440,9 @@ export const classify = (gallery: Gallery, changed: readonly string[], deleted: 
       else out.ignored.push(file);
       continue;
     }
-    if (NON_VISUAL.some((p) => matchesGlob(file, p))) {
+    // Gallery source nothing imports (a new module not wired in yet): no story can see it. A new story
+    // file is a root, and a new import.meta.glob is parsed where it's written, so neither lands here.
+    if (UNREACHED_SOURCE.some((p) => matchesGlob(file, p)) || NON_VISUAL.some((p) => matchesGlob(file, p))) {
       out.ignored.push(file);
       continue;
     }

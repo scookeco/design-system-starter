@@ -170,8 +170,9 @@ describe('the gallery: which stories a change reaches', () => {
     expect(sorted.ignored).toHaveLength(5);
   });
 
-  it('a file nothing imports and nothing classifies runs everything', () => {
+  it('a file nothing imports and nothing classifies runs everything; gallery source nothing imports yet runs nothing', () => {
     expect(run(['some-new.config.ts']).sorted.everything?.reason).toMatch(/unclassified/);
+    expect(run(['src/components/NotWiredYet/NotWiredYet.tsx']).ids).toEqual([]);
   });
 
   it('the self-check reports an import the bundler saw and the graph missed (negative control)', () => {
