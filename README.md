@@ -38,6 +38,7 @@ npm run check                     # everything CI runs except the visual job
 | `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
+| `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
 | `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
 
 ## Repo map
@@ -332,6 +333,23 @@ Where the facts come from:
 - **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0;role:admin` in its globals (a story that sets its own role with `mockApi({ role })` keeps it), freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
 - **Screenshots are byte-stable.** Chromium launches with `--disable-partial-raster` (in `playwright.config.ts`). Without it, a region that repaints after a story settles (a list arriving, a button leaving its pending state, a dialog opening) is re-rasterised on its own, and rounded edges come out a colour level or two different from a full raster. That stays under the comparison threshold, but it churned baseline files on every run.
 - Stories tagged `modal-open` (open Dialog, Drawer, Select or Menu) relax only axe's `aria-hidden-focus`. Radix hides the page behind a focus-trapped modal layer, and axe can't see the trap.
+
+## Targeted visual runs
+
+The full visual run is about 3,500 tests and takes 20–25 minutes locally. While iterating, `npm run test:visual:changed` runs only what your branch can affect, and the full run stays the last step before a pull request (CI always runs everything).
+
+```sh
+npm run test:visual:changed                                   # changes since origin/main, uncommitted and untracked included
+npm run test:visual:changed -- --base HEAD                    # only what you haven't committed yet
+npm run test:visual:changed -- --dry-run --verbose            # the plan: changed files → story files → stories, and why
+npm run test:visual:changed -- -- --update-snapshots=changed  # anything after a second -- goes to Playwright
+```
+
+- **How it picks.** `scripts/affected-stories.ts` builds the gallery's module graph from the source (TypeScript's parser and resolver: imports, re-exports, `import()` and the lazy routes, `import.meta.glob`, `?raw`, JSON, CSS `@import`). A story file is affected when it reaches a changed file; its stories run in both themes with axe and the WCAG 2.2 checks. A Docs tab also reaches the Docs page frame and its own usage doc. The graph reaches outside `src/`: Foundations read the token source and `scripts/checks/`, Guides/Agents renders `CLAUDE.md`, so each maps to the pages that read it. A committed baseline that changed runs its story.
+- **Barrels by name.** `import { Badge } from '../../src/index'` reaches Badge and what Badge imports, not everything `src/index.ts` re-exports. Two checks make that safe: the tree-shaking check (one import pulls in only the units it composes), and a unit test that every system stylesheet styles only its own blocks and animates only with its own keyframes, and that whatever renders a block imports its stylesheet (a stylesheet loaded on a page that doesn't render its component can't change that page).
+- **Everything runs** when a change reaches every story: `tokens/`, `src/styles/`, `.storybook/`, anything `.storybook/preview.tsx` loads statically (the locale provider, the mock settings), anything the Playwright specs load (the mock seed sets every story's clock), `playwright.config.ts`, `tests/visual/`, `package.json`, the lockfile, `.nvmrc`, `tsconfig.json` and `vite.config.ts`. So does any changed file the graph doesn't reach and that isn't on the script's non-visual list (unit tests, lint fixtures, other scripts, Markdown, generated agent files, lint and Vitest config): a new kind of input runs everything until it is classified. (A module under `src/` or `docs/` that nothing imports yet runs nothing: no story can load it.) The plan names the file and the reason.
+- **Checking the graph.** `npm run test:visual:changed -- --self-check` builds Storybook with `--stats-json` and fails if the bundler saw any import between repo files that the graph lacks, or if a stylesheet styles a block it doesn't own.
+- Playwright gets the chosen ids in a file named by `STORY_IDS_FILE`; `tests/visual/storybook.ts` filters its stories and Docs tabs to them. Ids, not a `--grep` of titles, so no title can match another by accident.
 
 ## Deliberately not included yet
 

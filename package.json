@@ -24,7 +24,8 @@
     "build-storybook": "storybook build --quiet",
     "test:visual": "npm run build-storybook && playwright test",
     "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=changed",
-    "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22"
+    "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22",
+    "test:visual:changed": "node scripts/test-visual-changed.ts"
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",
