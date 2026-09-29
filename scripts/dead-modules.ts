@@ -128,8 +128,8 @@ export const report = (result: DeadModules): string | null => {
     lines.push(
       '',
       'Usually these are what an example you deleted used: delete them (and any barrel line re-exporting one) and run npm run check again.',
-      'Kept on purpose? Add it to KEEP in scripts/dead-modules.ts with the reason. A new entry point (an e2e/ folder, a second HTML page)',
-      'goes in ROOT_GLOBS or APP_PAGES there instead.',
+      'Kept on purpose? Add it to KEEP in scripts/dead-modules.ts, with the reason.',
+      'Loaded by a new kind of entry point (an e2e/ folder, a second HTML page)? Add that to ROOT_GLOBS or APP_PAGES there.',
     );
     if (result.problems.length > 0) {
       lines.push('', 'The graph could not follow these imports; a file above may be loaded through one:');

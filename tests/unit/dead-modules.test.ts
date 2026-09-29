@@ -1,7 +1,8 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { ROOT } from '../../scripts/affected-stories';
 import { findDeadModules, findRoots, KEEP, pageEntries, report } from '../../scripts/dead-modules';
 
 /**
@@ -135,7 +136,8 @@ describe('the dead-module check, on this repo', () => {
     REAL_GRAPH_TIMEOUT,
   );
 
-  it(
+  // A portal that has trimmed the AI examples has nothing left to rehearse on.
+  it.skipIf(!existsSync(resolve(ROOT, 'src/examples/AssistantChatPage.tsx')))(
     'trimming the AI examples as the README says leaves src/app/url/chatState.ts, and only that (the rehearsal, kept)',
     () => {
       const ai = ['RecordCopilot', 'CreateWithAi', 'AiReviewChanges', 'AssistantChatPage'].flatMap((name) => [`src/examples/${name}.tsx`, `src/examples/${name}.stories.tsx`]);
