@@ -10,6 +10,7 @@ Stack: npm (Node 24, pinned to an exact version in `.nvmrc`, which CI reads, so 
 npm ci
 npx playwright install chromium   # once, for the visual and a11y suite
 npm run dev                       # Storybook on http://localhost:6006
+npm run dev:app                   # the app itself on http://localhost:5173, on the mock API
 npm run check                     # everything CI runs except the visual job
 ```
 
@@ -107,17 +108,18 @@ After that, "Update visual baselines" is how every intended visual change lands 
 
 ### 5. Plug in the real backend
 
-- **One base URL.** Call `configureApi({ baseUrl })` from `src/app/api/client.ts` once, before the app mounts. For another origin, use an absolute URL; that backend then needs CORS. Requests, the assistant's stream and the live event source all build their URLs from it.
+- **Where it runs.** `index.html` loads `src/main.tsx`, which reads the settings below and calls `startApp` in `src/bootstrap.tsx`: it loads the session, then mounts `ExampleApp` inside `LocaleProvider` and `AppProviders`, as the stories and tests do. `npm run dev:app` serves it, `npm run build:app` builds it into `dist-app/` (`vite.app.config.ts`; the library build is unchanged), and `npm run preview:app` serves that build. Both servers answer a deep link with `index.html`, and your host must do the same (a history fallback).
+- **One base URL.** Set `VITE_API_BASE_URL` (in the shell or `.env.local`), and the entry calls `configureApi({ baseUrl })` from `src/app/api/client.ts` before the app mounts. Unset, it's `/api` on the page's origin. For another origin, use an absolute URL; that backend then needs CORS. Requests, the assistant's stream and the live event source all build their URLs from it.
 - **One resource at a time.** The zod schemas in `src/app/api/schemas.ts` stay the contract. Build the endpoint to match the schema, and the client parses the response exactly as it parses the mock's. `tests/unit/api-base.test.tsx` shows the swap for the records list: a real HTTP server serves one route (MSW's `passthrough()`), and the mocks answer the rest.
-- **Keep MSW for stories and tests.** The gallery and Vitest keep the mock handlers, so every state stays reproducible. The portal itself never starts MSW. Remove a mock route only when no story or test uses it.
+- **The mock API in the app.** `VITE_API_MOCKS` is on in `dev:app` by default and off in `build:app` unless set to `true` (a demo build). When on, the entry starts MSW's service worker (`src/app/mocks/browser.ts`, `public/mockServiceWorker.js`) before the first request. It answers the routes it knows and lets every other request through, so an endpoint you haven't mocked reaches the backend. With it off, the mocks aren't in the bundle.
+- **Keep MSW for stories and tests.** The gallery and Vitest keep the mock handlers, so every state stays reproducible. Remove a mock route only when no story, test or demo uses it.
 - **Live updates:** pass `eventSourceLive()` to `AppProviders` and serve Server-Sent Events at `/t/:tenant/events`, in the shape of `LiveEventSchema`.
-- **Where it runs:** the starter has no app entry yet. Pages run in the gallery and in tests. A portal adds a Vite app entry (`index.html` and a `main.tsx`) that renders `ExampleApp` inside `LocaleProvider` and `AppProviders`.
 
 ### 6. The sign-in seam
 
 No provider is chosen here. This is where one plugs in:
 
-- **Before the app mounts:** the provider completes sign-in, then `getSession()` (`GET /session`, parsed by `SessionSchema`) gives the session and the workspaces to pass to `AppProviders`. Its `signedOut` prop renders the sign-in page, which starts the provider's flow (`SignInPage` is the pattern).
+- **Before the app mounts:** in `startApp` (`src/bootstrap.tsx`), the provider completes sign-in, then `getSession()` (`GET /session`, parsed by `SessionSchema`) gives the session and the workspaces to pass to `AppProviders`. Its `signedOut` prop renders the sign-in page, which starts the provider's flow (`SignInPage` is the pattern).
 - **Every request:** `request()` in `src/app/api/client.ts` is the one place to add `credentials: 'include'` (a cookie session) or an `Authorization` header (a token).
 - **Sign-out:** `signOut` in `src/app/session.tsx` clears the cache, the write queues and the drafts, then calls `deleteSession()`. The provider's own sign-out goes there too.
 - **A 401:** today it surfaces as the page's error state. With a real provider, send it back to sign-in, for example from a `QueryCache` `onError` in `createQueryClient` that calls `signOut`.
@@ -135,6 +137,7 @@ No provider is chosen here. This is where one plugs in:
 | Script | What it does |
 |---|---|
 | `npm run dev` | Storybook dev server (the gallery). Restart it after `npm ci` or pulling: a running server keeps the old dependencies and stories, logs "Unable to index files", and serves a blank or stale gallery. |
+| `npm run dev:app` | The app itself (`index.html` → `src/main.tsx`) on the Vite dev server, on the mock API unless `VITE_API_MOCKS=false`. |
 | `npm run tokens` | Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`, then the token usage map `src/tokens/token-usage.json`. |
 | `npm run tokens:check` | Rebuild tokens to a temp dir and fail if the committed files or the token usage map are stale. |
 | `npm run manifest` | Generate the files for coding agents from the code, stories, usage docs, guides and `CLAUDE.md`: `design-system.manifest.json`, `llms.txt` and `llms-full.txt`. |
@@ -144,13 +147,14 @@ No provider is chosen here. This is where one plugs in:
 | `npm test` | Vitest: token, contrast, CSS-structure and component tests. |
 | `npm run test:rules` | Lints every file in `fixtures/violations/` and asserts that the expected rule fires. |
 | `npm run build` | Library build (`dist/index.js`, `dist/styles.css`). |
+| `npm run build:app` | App build into `dist-app/` (`vite.app.config.ts`), without the mock API unless `VITE_API_MOCKS=true`. `npm run preview:app` serves it. |
 | `npm run size` | Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`. |
 | `npm run build-storybook` | Static gallery in `storybook-static/`. |
 | `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
 | `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
-| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`. |
+| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `build:app`, `size`. |
 
 ## Repo map
 
@@ -181,6 +185,8 @@ src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
 src/examples/           golden example pages, one per archetype (four AI examples; import, search, notifications, reports, integrations, billing), the schema-driven entity pages, and the app's route table
                         (routes.tsx) and assembly (App.tsx); also a consumer lint target
 src/index.ts            public entry point
+src/main.tsx            the app entry (index.html loads it): reads VITE_API_MOCKS and VITE_API_BASE_URL, then startApp in bootstrap.tsx
+public/                 the app's static files: MSW's service worker for the mock API (vite.app.config.ts builds the app into dist-app/)
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
 fixtures/violations/    one deliberate violation per rule; fixtures/clean/ = negative controls; fixtures/manifest/ = the manifest extractor's test entry
 tests/unit/             Vitest suites

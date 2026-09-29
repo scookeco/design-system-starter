@@ -5,11 +5,12 @@ Reference design system in which drift fails the build. See `README.md` for the 
 ## Commands
 
 ```sh
-npm run check          # tokens:check + manifest:check + typecheck + lint + test + test:rules + build + size. Must pass.
+npm run check          # tokens:check + manifest:check + typecheck + lint + test + test:rules + build + build:app + size. Must pass.
 npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
 npm run manifest       # regenerate llms.txt, llms-full.txt and design-system.manifest.json after changing exports, props, JSDoc, stories, usage docs, guides or the rules below
 npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first
 npm run dev            # Storybook gallery; restart it after npm ci or a pull (a running one goes stale)
+npm run dev:app        # the app itself on the mock API (VITE_API_MOCKS, VITE_API_BASE_URL); build:app and preview:app build and serve dist-app/
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
 npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
 npm run test:visual:changed   # the same checks for only the stories your changes reach (since origin/main, uncommitted included); -- --dry-run for the plan
@@ -31,6 +32,7 @@ Work on a branch. Never commit to `main` directly.
 - `src/app/`: the **app layer** the examples use, NOT the design system: `api/` (client + zod schemas; every response is parsed at the boundary; `configureApi` sets the one base URL), `model/` (cache keys `[tenant, scope, resource, params]`, queries, named predicates, projections, named mutations, selection, `permissions.ts`), `session.tsx` (memberships, workspace switch, sign-out, `useCan`), `telemetry.ts` (the one sink: every mutation's start and outcome, render failures), `windowing.ts` (`useWindowedRows`), `routing/` (route type, matcher, `RouteView`, `RenderBoundary`, `lazyPage`, `AppLink`), `url/` (`useUrlState`), `registries/` (field registry, `entities.ts`: entityType → fields), `mocks/` (MSW handlers, seeded db, story wiring). TanStack Query, zod and MSW are devDependencies and may only be imported here and in examples.
 - `src/examples/`: **golden examples**, one per archetype: `ListPage` (table and `RecordBoard`, `SavedViews`), `RecordPage`, `CreateEditFlow`, `EntityPages` (schema-driven list, record and form for any entity config), `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `InboxPage` (a queue with keyboard triage), `AdminConsole` (members, audit log), `ErrorPages` (404, 403, error), `ImportWizard` (CSV import as a job), `SearchPage`, `NotificationsPage` (with the header's bell in `Notifications`), `ReportsPage` (SVG charts from the chart tokens in `charts.tsx`), `IntegrationsPage` (a catalogue), `BillingPage`, `Onboarding` (the dashboard's first-run checklist); AI: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` (sharing `AssistantTurns`). `ExampleShell` is the app's shell composition (with `CommandMenu`: the ⌘K palette, "g then …" jumps and the ? overlay); `routes.tsx` is the route table and `App.tsx` assembles it. Data pages read and write through `src/app`.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
+- `src/main.tsx`: the app entry (`index.html` loads it; `vite.app.config.ts` builds it). It reads the env and calls `startApp` in `src/bootstrap.tsx`: base URL, mock API (`src/app/mocks/browser.ts`, worker in `public/`), session, then `ExampleApp` in `LocaleProvider` and `AppProviders`. A sign-in provider plugs in there.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `tests/visual/fixtures/`: one story per WCAG 2.2 check that the check must fail (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`).
 - `docs/`: gallery-only pages. `foundations/` (rendered from the token source), `guides/`, and `usage/<Name>.usage.tsx`, the usage section of each component's Docs tab. `ui/removedExamples.ts` lists golden examples this repo deleted: guide links to them render as text (README, "Start a new portal").

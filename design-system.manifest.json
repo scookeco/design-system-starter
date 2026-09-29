@@ -11,6 +11,10 @@
       "description": "Storybook dev server (the gallery). Restart it after `npm ci` or pulling: a running server keeps the old dependencies and stories, logs \"Unable to index files\", and serves a blank or stale gallery."
     },
     {
+      "command": "npm run dev:app",
+      "description": "The app itself (`index.html` → `src/main.tsx`) on the Vite dev server, on the mock API unless `VITE_API_MOCKS=false`."
+    },
+    {
       "command": "npm run tokens",
       "description": "Build `src/styles/tokens.css` and `src/tokens/tokens.ts` from `tokens/**/*.json`, then the token usage map `src/tokens/token-usage.json`."
     },
@@ -47,6 +51,10 @@
       "description": "Library build (`dist/index.js`, `dist/styles.css`)."
     },
     {
+      "command": "npm run build:app",
+      "description": "App build into `dist-app/` (`vite.app.config.ts`), without the mock API unless `VITE_API_MOCKS=true`. `npm run preview:app` serves it."
+    },
+    {
       "command": "npm run size",
       "description": "Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`."
     },
@@ -72,7 +80,7 @@
     },
     {
       "command": "npm run check",
-      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`."
+      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `build:app`, `size`."
     }
   ],
   "guides": [

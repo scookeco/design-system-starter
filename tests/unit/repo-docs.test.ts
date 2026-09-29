@@ -12,8 +12,11 @@ import { extractAgentRules } from '../../scripts/checks/agent-rules';
 const root = resolve(import.meta.dirname, '../..');
 const read = (file: string) => readFileSync(resolve(root, file), 'utf8');
 
-/** Top-level folders a repo path starts with. A path with a glob or a placeholder (`*`, `<Name>`, `{…}`) is a pattern, not a file. */
-const REPO_PATH = /^(?:src|docs|tests|scripts|tokens|fixtures|\.storybook|\.github)\/[\w./-]*$/;
+/**
+ * Top-level folders a repo path starts with, and the app entry's root files (index.html, a vite
+ * config). A path with a glob or a placeholder (`*`, `<Name>`, `{…}`) is a pattern, not a file.
+ */
+const REPO_PATH = /^(?:(?:src|docs|tests|scripts|tokens|fixtures|public|\.storybook|\.github)\/[\w./-]*|index\.html|vite(?:\.\w+)?\.config\.ts)$/;
 
 /** Every `code span` in a Markdown file that is a concrete repo path. */
 const repoPaths = (markdown: string): string[] => [...new Set([...markdown.matchAll(/`([^`\n]+)`/g)].map((m) => m[1] ?? '').filter((p) => REPO_PATH.test(p)))];
@@ -39,6 +42,7 @@ describe('README.md and CLAUDE.md', () => {
 
   it('finds paths and targets, and reports missing ones (controls)', () => {
     expect(repoPaths('Copy `src/examples/Gone.tsx`, not `src/examples/*` or `docs/usage/<Name>.usage.tsx`; run `npm test`.')).toEqual(['src/examples/Gone.tsx']);
+    expect(repoPaths('`index.html` loads `src/main.tsx`; `vite.app.config.ts` builds it with `public/` into `dist-app/`.')).toEqual(['index.html', 'src/main.tsx', 'vite.app.config.ts', 'public/']);
     expect(copyTargets('- Copy the matching golden example: list → ListPage,\n  wizard → GoneWizard. Not other screens.')).toEqual(['ListPage', 'GoneWizard']);
   });
 });
