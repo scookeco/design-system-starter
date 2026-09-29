@@ -1,7 +1,7 @@
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import { index, openStory, stories, type IndexEntry } from './storybook';
+import { index, openStory, selected, stories, type IndexEntry } from './storybook';
 import {
   accessibleAuthenticationViolations,
   CHECKS,
@@ -92,7 +92,7 @@ test.describe('WCAG 2.2 check fixtures', () => {
     for (const id of CHECKS) expect(expected, `no fixture proves "${id}" fires`).toContain(id);
   });
 
-  for (const fixture of fixtures) {
+  for (const fixture of fixtures.filter(selected)) {
     test(`${fixture.title} / ${fixture.name} fires ${expectedCheck(fixture) ?? '?'} @wcag22`, async ({ page }) => {
       await openStory(page, fixture.id, 'light');
       const results = await runChecks(page, fixture);

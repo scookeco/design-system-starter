@@ -23,9 +23,20 @@ if (!existsSync(indexPath)) {
   throw new Error('storybook-static/index.json not found. Run "npm run build-storybook" first (npm run test:visual does).');
 }
 export const index = JSON.parse(readFileSync(indexPath, 'utf8')) as { entries: Record<string, IndexEntry> };
-export const stories = Object.values(index.entries).filter((e) => e.type === 'story' && !e.tags?.includes('no-visual'));
-if (stories.length === 0) throw new Error('index.json lists no stories');
-export const docsPages = Object.values(index.entries).filter((e) => e.type === 'docs');
+const allStories = Object.values(index.entries).filter((e) => e.type === 'story' && !e.tags?.includes('no-visual'));
+if (allStories.length === 0) throw new Error('index.json lists no stories');
+
+/**
+ * `npm run test:visual:changed` (scripts/test-visual-changed.ts) runs only the stories and Docs tabs
+ * a branch can affect: it names their ids in a JSON file and passes its path in STORY_IDS_FILE.
+ * Ids, not a --grep of titles, so no title can match another by accident. Unset: everything.
+ */
+const onlyIds = process.env.STORY_IDS_FILE ? new Set(JSON.parse(readFileSync(process.env.STORY_IDS_FILE, 'utf8')) as string[]) : undefined;
+for (const id of onlyIds ?? []) if (!index.entries[id]) throw new Error(`STORY_IDS_FILE names "${id}", which storybook-static/index.json doesn't list. Rebuild Storybook.`);
+export const selected = (entry: IndexEntry) => !onlyIds || onlyIds.has(entry.id);
+
+export const stories = allStories.filter(selected);
+export const docsPages = Object.values(index.entries).filter((e) => e.type === 'docs' && selected(e));
 
 export const THEMES = ['light', 'dark'] as const;
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
