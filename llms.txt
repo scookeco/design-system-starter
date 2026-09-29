@@ -57,6 +57,8 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+  Arrow keys between a page's results come from ResultList, never a
+  hand-rolled roving tabindex.
 - Platform features: what a page needs must be Baseline widely available;
   newer ones only as enhancements that still work when dropped (or behind
   @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
