@@ -179,6 +179,18 @@ const preview: Preview = {
         ],
       },
     },
+    dataset: {
+      description: 'The mock database: the default seed, or 10,000 records (a story that sets its own dataset wins)',
+      toolbar: {
+        title: 'Dataset',
+        icon: 'database',
+        items: [
+          { value: 'default', title: 'Default seed' },
+          { value: 'large', title: '10,000 records' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     failure: {
       description: 'Mock API failure rate',
       toolbar: {
@@ -193,7 +205,7 @@ const preview: Preview = {
       },
     },
   },
-  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0', role: 'admin', anotherUser: 'none' },
+  initialGlobals: { theme: 'light', width: 'full', locale: 'en-US', latency: '400', failure: '0', role: 'admin', anotherUser: 'none', dataset: 'default' },
   loaders: [mswLoader()],
   decorators: [withContainerWidth, withTheme, withLocale, withMockSettings],
   // Every component, layout and primitive gets a Docs tab. Examples, Foundations, Guides and

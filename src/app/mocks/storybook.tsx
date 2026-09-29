@@ -19,6 +19,7 @@ import { currentSession, resetDb, setRoles } from './db';
 import { aiHandlers } from './ai';
 import { handlers } from './handlers';
 import { seedJob, type JobSeed } from './jobs';
+import { DATASETS, type Dataset } from './seed';
 import { anotherUser, mockLive, type AnotherUserChange } from './live';
 
 /** Storybook's own event for changing a global (core-events' UPDATE_GLOBALS; its module path is internal). */
@@ -170,9 +171,16 @@ export interface MockApiParameters {
    * running). Off by default: a seeded job is a still frame.
    */
   pollJobs?: number;
+  /**
+   * The database the mock server seeds: 'default', or 'large' (10,000 Acme records, for the list at
+   * scale). Wins over the gallery's Dataset toolbar (the `dataset` global, also settable in the URL).
+   */
+  dataset?: Dataset;
 }
 
 const NO_SCRIPT: readonly AnotherUserChange[] = [];
+
+const toolbarDataset = (value: unknown): Dataset => ((DATASETS as readonly unknown[]).includes(value) ? (value as Dataset) : 'default');
 
 const toolbarRole = (value: unknown): Role => (ROLES as readonly unknown[]).includes(value) ? (value as Role) : 'admin';
 
@@ -214,8 +222,9 @@ export const mockApiMeta = {
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
   // The assistant's routes (./ai) sit beside the rest; they import the same route wrapper, so they live in their own module.
   parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
-  beforeEach: (context: { parameters: { mockApi?: MockApiParameters } }) => {
-    resetDb();
+  beforeEach: (context: { parameters: { mockApi?: MockApiParameters }; globals: Record<string, unknown> }) => {
+    // Before any decorator renders: the database is chosen here, from the story, then the toolbar.
+    resetDb(context.parameters.mockApi?.dataset ?? toolbarDataset(context.globals.dataset));
     // Drafts autosave to this browser's storage: every story starts with none.
     draftStorage.clearAll();
     const { tenant = 'acme', jobs = [] } = context.parameters.mockApi ?? {};

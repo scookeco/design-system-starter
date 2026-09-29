@@ -4,7 +4,7 @@
  */
 import { SessionSchema, TENANTS, type Account, type Job, type Person, type RecordEntity, type Role, type SavedView, type Session, type Tenant } from '../api/schemas';
 import { ROLE_CAPABILITIES, type Grant } from '../model/permissions';
-import { SEED_EPOCH, seedAccounts, seedPeople, seedRecords, seedViews } from './seed';
+import { recordCountFor, SEED_EPOCH, seedAccounts, seedPeople, seedRecords, seedViews, type Dataset } from './seed';
 
 interface Partition {
   records: RecordEntity[];
@@ -35,8 +35,8 @@ export interface MockJob extends Job {
 /** Who the identity provider says is signed in. */
 const SIGNED_IN = { id: 'u-sam', name: 'Sam Rivera', email: 'sam.rivera@example.com' };
 
-const fresh = (tenant: Tenant): Partition => {
-  const records = seedRecords(tenant);
+const fresh = (tenant: Tenant, dataset: Dataset): Partition => {
+  const records = seedRecords(tenant, recordCountFor(tenant, dataset));
   const views = seedViews(tenant);
   return {
     records,
@@ -63,8 +63,9 @@ const ADMIN_EVERYWHERE = Object.fromEntries(TENANTS.map((t) => [t, 'admin'])) as
 let roles: Record<Tenant, Role> = { ...ADMIN_EVERYWHERE };
 let signedIn = true;
 
-export const resetDb = () => {
-  partitions = new Map(TENANTS.map((tenant) => [tenant, fresh(tenant)]));
+/** A fresh, seeded database: the default one, or the large one (10,000 Acme records; see DATASETS). */
+export const resetDb = (dataset: Dataset = 'default') => {
+  partitions = new Map(TENANTS.map((tenant) => [tenant, fresh(tenant, dataset)]));
   writes = 0;
   roles = { ...ADMIN_EVERYWHERE };
   signedIn = true;
