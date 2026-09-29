@@ -64,6 +64,9 @@
   .command-palette__results {
     flex: 1;
     overflow-y: auto;
+
+    /* Results shrink and grow as you type: keep the scrollbar's room, so options don't shift sideways as it comes and goes. */
+    scrollbar-gutter: stable;
     padding: var(--space-inset-xs);
   }
 

@@ -136,6 +136,9 @@
     grid-area: main;
     overflow: auto;
     padding-block: var(--space-inset-lg);
+
+    /* A short page (an empty state, a loading skeleton) and a long one sit at the same width: the scrollbar's room is kept either way. */
+    scrollbar-gutter: stable;
   }
 
   .app-shell__main:has(> .app-shell__footer) {

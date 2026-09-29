@@ -17,7 +17,8 @@
     text-wrap: balance;
   }
 
-  :where(p) {
+  /* Body copy: no single word left alone on a last line (list items and descriptions too). */
+  :where(p, li, dd, blockquote, figcaption) {
     text-wrap: pretty;
   }
 

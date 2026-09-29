@@ -14,11 +14,12 @@
     overflow: hidden;
   }
 
-  /* 2. parts: each pane scrolls on its own */
+  /* 2. parts: each pane scrolls on its own, keeping its scrollbar's room so a list that loads doesn't shift sideways */
   .split-view__list,
   .split-view__detail {
     min-inline-size: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     scroll-padding-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
   }
 

@@ -15,6 +15,9 @@
     overflow-y: auto;
     padding: var(--space-inset-md);
 
+    /* An answer streaming in grows the thread past its height: keep the scrollbar's room, so the text doesn't re-wrap when it appears. */
+    scrollbar-gutter: stable;
+
     /* Focus scrolls clear of the Jump to latest button, never under it (WCAG 2.4.11). */
     scroll-padding-block-end: var(--space-scroll-padding-end);
   }
