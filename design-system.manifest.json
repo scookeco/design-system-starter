@@ -83,6 +83,12 @@
       "story": "guides-getting-started--getting-started-guide"
     },
     {
+      "title": "Start a new portal",
+      "summary": "Copy the template, rename, trim, then plug in a backend",
+      "path": "docs/guides/StartANewPortal.stories.tsx",
+      "story": "guides-start-a-new-portal--start-a-new-portal-guide"
+    },
+    {
       "title": "Principles",
       "summary": "Tokens only, compose don’t restyle, accessible by default",
       "path": "docs/guides/Principles.stories.tsx",

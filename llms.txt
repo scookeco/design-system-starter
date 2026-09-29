@@ -68,6 +68,7 @@ UI rules (design system v0)
 ## Guides
 
 - [Getting started](docs/guides/GettingStarted.stories.tsx): Install, import, the shell, router links, locale
+- [Start a new portal](docs/guides/StartANewPortal.stories.tsx): Copy the template, rename, trim, then plug in a backend
 - [Principles](docs/guides/Principles.stories.tsx): Tokens only, compose don’t restyle, accessible by default
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Template, variant, component or primitive; proposing a token
 - [Layout](docs/guides/Layout.stories.tsx): Which layout, which primitive, composing into AppShell
