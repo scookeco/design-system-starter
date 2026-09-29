@@ -15,7 +15,7 @@ import starter from './scripts/eslint/drag-needs-alternative.js';
  * Code that consumes the system: the golden examples and anything built like them, including
  * the usage docs' live do/don't examples and the Guides pages, which must not restyle either.
  */
-const CONSUMER = ['src/examples/**', 'src/app/**', 'docs/usage/*.usage.tsx', 'docs/guides/**'];
+const CONSUMER = ['src/examples/**', 'src/app/**', 'src/main.tsx', 'src/bootstrap.tsx', 'docs/usage/*.usage.tsx', 'docs/guides/**'];
 
 // Vendor UI (headless or themed component libraries, icon sets) may only be imported inside
 // src/components and src/primitives. Add any new vendor UI package to this group.
@@ -81,8 +81,8 @@ const ESCAPE_HATCH = 'Escape hatch. Needs "// eslint-disable-next-line no-restri
 
 export default defineConfig(
   {
-    // .storybook/public holds MSW's generated service worker, which is not ours to lint.
-    ignores: ['dist/**', 'storybook-static/**', 'fixtures/**', 'playwright-report/**', 'test-results/**', 'node_modules/**', '.storybook/public/**'],
+    // .storybook/public and public/ hold MSW's generated service worker, which is not ours to lint.
+    ignores: ['dist/**', 'dist-app/**', 'public/**', 'storybook-static/**', 'fixtures/**', 'playwright-report/**', 'test-results/**', 'node_modules/**', '.storybook/public/**'],
   },
   {
     linterOptions: {

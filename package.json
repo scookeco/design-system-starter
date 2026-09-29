@@ -8,11 +8,14 @@
   },
   "scripts": {
     "dev": "storybook dev --port 6006 --ci",
+    "dev:app": "vite --config vite.app.config.ts",
     "tokens": "node scripts/build-tokens.ts && node scripts/token-usage.ts",
     "tokens:check": "node scripts/build-tokens.ts --check && node scripts/token-usage.ts --check",
     "manifest": "node scripts/manifest.ts",
     "manifest:check": "node scripts/manifest.ts --check",
     "build": "vite build",
+    "build:app": "vite build --config vite.app.config.ts",
+    "preview:app": "vite preview --config vite.app.config.ts",
     "size": "size-limit && node scripts/check-tree-shaking.ts",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
@@ -20,7 +23,7 @@
     "lint:js": "eslint . --max-warnings 0",
     "lint:css": "stylelint \"**/*.css\" --max-warnings 0",
     "test:rules": "node scripts/test-rules.ts",
-    "check": "npm run tokens:check && npm run manifest:check && npm run typecheck && npm run lint && npm run test && npm run test:rules && npm run build && npm run size",
+    "check": "npm run tokens:check && npm run manifest:check && npm run typecheck && npm run lint && npm run test && npm run test:rules && npm run build && npm run build:app && npm run size",
     "build-storybook": "storybook build --quiet",
     "test:visual": "npm run build-storybook && playwright test",
     "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=changed",
@@ -73,7 +76,8 @@
   "description": "Design system starter where design-system drift fails the build.",
   "msw": {
     "workerDirectory": [
-      ".storybook/public"
+      ".storybook/public",
+      "public"
     ]
   }
 }

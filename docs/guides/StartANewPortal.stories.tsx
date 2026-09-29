@@ -92,8 +92,14 @@ npm run lint        # imports left unused
         <Rules
           items={[
             <>
-              <code>configureApi(&#123; baseUrl &#125;)</code> in <code>src/app/api/client.ts</code>, once before the app mounts, is the only
-              setting. Requests, the assistant’s stream and live events all build their URLs from it.
+              <strong>The app entry:</strong> <code>index.html</code> loads <code>src/main.tsx</code>, which calls <code>startApp</code> in{' '}
+              <code>src/bootstrap.tsx</code>: session first, then <code>ExampleApp</code> in <code>LocaleProvider</code> and{' '}
+              <code>AppProviders</code>. <code>npm run dev:app</code> serves it; <code>npm run build:app</code> builds <code>dist-app/</code>. Deep
+              links need a history fallback on your host.
+            </>,
+            <>
+              <code>VITE_API_BASE_URL</code> becomes <code>configureApi(&#123; baseUrl &#125;)</code> in <code>src/app/api/client.ts</code>, set once
+              before the app mounts. Requests, the assistant’s stream and live events all build their URLs from it.
             </>,
             <>
               The zod schemas stay the contract: build each endpoint to its schema, and the client parses its answers as it parsed the mock’s.
@@ -101,8 +107,9 @@ npm run lint        # imports left unused
               <StoryLink id="guides-data--data-guide">Data</StoryLink>.
             </>,
             <>
-              Move one resource at a time. The gallery and the tests keep MSW, so every state stays reproducible; the portal itself never
-              starts it. <code>tests/unit/api-base.test.tsx</code> shows the records list served by a real HTTP server while the mocks answer
+              Move one resource at a time. <code>VITE_API_MOCKS</code> (on in <code>dev:app</code>, off in a build unless set) starts MSW’s worker,
+              which answers the routes it knows and lets the rest reach the backend. The gallery and the tests keep MSW, so every state stays
+              reproducible. <code>tests/unit/api-base.test.tsx</code> shows the records list served by a real HTTP server while the mocks answer
               the rest.
             </>,
           ]}
@@ -112,7 +119,7 @@ npm run lint        # imports left unused
         <Rules
           items={[
             <>
-              <strong>Before mount:</strong> the provider signs the person in, then <code>getSession()</code> loads the session that{' '}
+              <strong>Before mount:</strong> in <code>startApp</code>, the provider signs the person in, then <code>getSession()</code> loads the session that{' '}
               <code>AppProviders</code> takes. Its <code>signedOut</code> prop renders the sign-in page.
             </>,
             <>

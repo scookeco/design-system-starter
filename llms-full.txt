@@ -5705,15 +5705,16 @@ npm run lint        # imports left unused
 
 #### 5. The real backend, resource by resource
 
-- `configureApi({ baseUrl })` in `src/app/api/client.ts`, once before the app mounts, is the only setting. Requests, the assistant’s stream and live events all build their URLs from it.
+- **The app entry:** `index.html` loads `src/main.tsx`, which calls `startApp` in `src/bootstrap.tsx`: session first, then `ExampleApp` in `LocaleProvider` and `AppProviders`. `npm run dev:app` serves it; `npm run build:app` builds `dist-app/`. Deep links need a history fallback on your host.
+- `VITE_API_BASE_URL` becomes `configureApi({ baseUrl })` in `src/app/api/client.ts`, set once before the app mounts. Requests, the assistant’s stream and live events all build their URLs from it.
 - The zod schemas stay the contract: build each endpoint to its schema, and the client parses its answers as it parsed the mock’s. A payload that breaks the schema is an error state, never data. See [Data](docs/guides/Data.stories.tsx).
-- Move one resource at a time. The gallery and the tests keep MSW, so every state stays reproducible; the portal itself never starts it. `tests/unit/api-base.test.tsx` shows the records list served by a real HTTP server while the mocks answer the rest.
+- Move one resource at a time. `VITE_API_MOCKS` (on in `dev:app`, off in a build unless set) starts MSW’s worker, which answers the routes it knows and lets the rest reach the backend. The gallery and the tests keep MSW, so every state stays reproducible. `tests/unit/api-base.test.tsx` shows the records list served by a real HTTP server while the mocks answer the rest.
 
 #### 6. Where sign-in plugs in
 
 No provider is chosen yet. Whichever it is, it meets the app in four places.
 
-- **Before mount:** the provider signs the person in, then `getSession()` loads the session that `AppProviders` takes. Its `signedOut` prop renders the sign-in page.
+- **Before mount:** in `startApp`, the provider signs the person in, then `getSession()` loads the session that `AppProviders` takes. Its `signedOut` prop renders the sign-in page.
 - **Every request:** `request()` in `client.ts` is the one place for cookies (`credentials`) or an `Authorization` header.
 - **Sign-out:** `signOut` in `src/app/session.tsx` clears the cache, queued writes and drafts; the provider’s own sign-out goes there too.
 - **A 401:** today it is the page’s error state. With a provider, send it back to sign-in, for example from the query cache’s `onError`.

@@ -170,6 +170,12 @@ describe('the gallery: which stories a change reaches', () => {
     expect(sorted.ignored).toHaveLength(5);
   });
 
+  it('the app entry reaches nothing: its page, build config, worker and source are outside the gallery', () => {
+    const { sorted, ids } = run(['index.html', 'vite.app.config.ts', 'public/mockServiceWorker.js', 'src/main.tsx', 'src/bootstrap.tsx', 'src/app/mocks/browser.ts']);
+    expect(ids).toEqual([]);
+    expect(sorted.everything).toBeUndefined();
+  });
+
   it('a file nothing imports and nothing classifies runs everything; gallery source nothing imports yet runs nothing', () => {
     expect(run(['some-new.config.ts']).sorted.everything?.reason).toMatch(/unclassified/);
     expect(run(['src/components/NotWiredYet/NotWiredYet.tsx']).ids).toEqual([]);
