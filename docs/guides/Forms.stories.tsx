@@ -128,6 +128,6 @@ function Forms() {
   );
 }
 
-const meta = { title: 'Guides/Forms', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Forms', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Field anatomy, which control, layout, validation, error summary' } } satisfies Meta;
 export default meta;
 export const FormsGuide: StoryObj = { name: 'Forms', render: () => <Forms /> };

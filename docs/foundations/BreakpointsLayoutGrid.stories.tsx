@@ -103,6 +103,6 @@ function BreakpointsPage() {
   );
 }
 
-const meta = { title: 'Foundations/Breakpoints and layout grid', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Breakpoints and layout grid', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Breakpoints and the layout grid' } } satisfies Meta;
 export default meta;
 export const BreakpointsAndLayoutGrid: StoryObj = { name: 'Breakpoints and layout grid', render: () => <BreakpointsPage /> };

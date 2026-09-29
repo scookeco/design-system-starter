@@ -121,6 +121,6 @@ import { ArchiveIcon } from 'src/index';
   );
 }
 
-const meta = { title: 'Guides/Contributing and versioning', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Contributing and versioning', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Propose, what a PR includes, deprecate, versioning' } } satisfies Meta;
 export default meta;
 export const ContributingGuide: StoryObj = { name: 'Contributing and versioning', render: () => <Contributing /> };

@@ -237,6 +237,6 @@ apply     moveRecord refuses with can() before sending; the server checks again
   );
 }
 
-const meta = { title: 'Guides/AI patterns', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/AI patterns', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Surfaces, citations, consent and undo, streaming, safety' } } satisfies Meta;
 export default meta;
 export const AiPatternsGuide: StoryObj = { name: 'AI patterns', render: () => <AiPatterns /> };

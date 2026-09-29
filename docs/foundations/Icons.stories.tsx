@@ -45,6 +45,6 @@ function IconsPage() {
   );
 }
 
-const meta = { title: 'Foundations/Icons', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Icons', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'The icon set, and the export each is imported as' } } satisfies Meta;
 export default meta;
 export const Icons: StoryObj = { render: () => <IconsPage /> };

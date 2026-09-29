@@ -116,6 +116,6 @@ jq -c '.tokens | to_entries[] | select(.key | startswith("color.fg.")) | {token:
   );
 }
 
-const meta = { title: 'Guides/Agents', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Agents', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'llms.txt, the manifest and the agent rules' } } satisfies Meta;
 export default meta;
 export const AgentsGuide: StoryObj = { name: 'Agents', render: () => <Agents /> };

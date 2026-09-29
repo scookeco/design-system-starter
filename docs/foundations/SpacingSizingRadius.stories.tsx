@@ -56,6 +56,6 @@ function SpacingPage() {
   );
 }
 
-const meta = { title: 'Foundations/Spacing, sizing and radius', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Foundations/Spacing, sizing and radius', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Gap, inset, sizes, radius, aspect ratios, borders' } } satisfies Meta;
 export default meta;
 export const SpacingSizingAndRadius: StoryObj = { name: 'Spacing, sizing and radius', render: () => <SpacingPage /> };

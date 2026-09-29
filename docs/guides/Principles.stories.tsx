@@ -51,6 +51,6 @@ function Principles() {
   );
 }
 
-const meta = { title: 'Guides/Principles', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Principles', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Tokens only, compose don’t restyle, accessible by default' } } satisfies Meta;
 export default meta;
 export const PrinciplesGuide: StoryObj = { name: 'Principles', render: () => <Principles /> };

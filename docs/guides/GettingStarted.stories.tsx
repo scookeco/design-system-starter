@@ -130,6 +130,6 @@ format.relative(record.updatedAt);  // "3 days ago"
   );
 }
 
-const meta = { title: 'Guides/Getting started', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Getting started', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Install, import, the shell, router links, locale' } } satisfies Meta;
 export default meta;
 export const GettingStartedGuide: StoryObj = { name: 'Getting started', render: () => <GettingStarted /> };

@@ -80,6 +80,6 @@ function AccessibilityStatement() {
   );
 }
 
-const meta = { title: 'Guides/Accessibility statement', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Accessibility statement', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'A template for the product’s accessibility statement' } } satisfies Meta;
 export default meta;
 export const AccessibilityStatementGuide: StoryObj = { name: 'Accessibility statement', render: () => <AccessibilityStatement /> };

@@ -42,6 +42,6 @@ function EscapeHatches() {
   );
 }
 
-const meta = { title: 'Guides/Escape hatches', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Escape hatches', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'When UNSAFE_className/style is acceptable, and its comment' } } satisfies Meta;
 export default meta;
 export const EscapeHatchesGuide: StoryObj = { name: 'Escape hatches', render: () => <EscapeHatches /> };

@@ -111,6 +111,6 @@ PLAYWRIGHT_PORT=6107 npx playwright test                              # everythi
   );
 }
 
-const meta = { title: 'Guides/Testing', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Testing', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'The suites, a story per state, baselines, WCAG checks' } } satisfies Meta;
 export default meta;
 export const TestingGuide: StoryObj = { name: 'Testing', render: () => <Testing /> };

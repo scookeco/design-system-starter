@@ -289,11 +289,15 @@ export const collectPages = async (
   for (const f of files) {
     const loader = loaders[`../${f.file}`];
     if (!loader) throw new Error(`${f.file}: not found by the collector's import.meta.glob`);
-    const html = renderPage(f.file, await loader());
+    const mod = await loader();
+    const html = renderPage(f.file, mod);
     const { title, lead } = pageHeading(html);
     const name = f.title.split('/').at(-1) ?? f.title;
     const rank = order.indexOf(name);
-    pages.push({ page: { title: title || name, summary: lead, path: f.file, story: f.stories[0]?.id ?? '' }, rank: rank === -1 ? order.length : rank });
+    // What the page answers, for agents choosing one (llms.txt): its meta's parameters.summary, else its lead.
+    const declared = (mod.default as { parameters?: { summary?: unknown } } | undefined)?.parameters?.summary;
+    const summary = typeof declared === 'string' ? declared : lead;
+    pages.push({ page: { title: title || name, summary, path: f.file, story: f.stories[0]?.id ?? '' }, rank: rank === -1 ? order.length : rank });
     if (section === 'Guides') markdown.set(f.file, htmlToMarkdown(html, { headingShift: 2, href }));
   }
   pages.sort((a, b) => a.rank - b.rank || byName(a.page.title, b.page.title));

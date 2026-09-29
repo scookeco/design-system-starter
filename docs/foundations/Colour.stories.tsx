@@ -183,7 +183,7 @@ function ColourPage() {
 const meta = {
   title: 'Foundations/Colour',
   tags: ['!autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', summary: 'Colour roles in light and dark, with their contrast' },
 } satisfies Meta;
 
 export default meta;

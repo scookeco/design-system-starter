@@ -242,7 +242,7 @@ function DataVisualisationPage() {
 const meta = {
   title: 'Foundations/Data visualisation',
   tags: ['!autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', summary: 'Chart palettes: categorical, sequential, diverging' },
 } satisfies Meta;
 
 export default meta;

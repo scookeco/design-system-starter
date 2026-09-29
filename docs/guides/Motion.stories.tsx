@@ -102,6 +102,6 @@ function Motion() {
   );
 }
 
-const meta = { title: 'Guides/Motion', tags: ['!autodocs'], parameters: { layout: 'fullscreen' } } satisfies Meta;
+const meta = { title: 'Guides/Motion', tags: ['!autodocs'], parameters: { layout: 'fullscreen', summary: 'Durations, easings, what moves, reduced motion' } } satisfies Meta;
 export default meta;
 export const MotionGuide: StoryObj = { name: 'Motion', render: () => <Motion /> };
