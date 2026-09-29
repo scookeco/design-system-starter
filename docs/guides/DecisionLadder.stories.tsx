@@ -40,6 +40,30 @@ function DecisionLadder() {
           ))}
         </Stack>
       </DocSection>
+      <DocSection title="Walked: a results list you move through with the arrow keys" intro="How ResultList came to be a component: the search page needed ↑ ↓ between its results.">
+        <Rules
+          items={[
+            <>
+              <strong>Template?</strong> No: the search page already existed. It could only move with j and k, because true arrow-key movement
+              with one tab stop is behaviour, and pages don’t own keyboard models.
+            </>,
+            <>
+              <strong>Variant?</strong> None fits. <code>Nav</code> is a landmark of fixed destinations with one current page;{' '}
+              <code>Menu</code> is a popup of commands; <code>Table</code> is for rows with columns and several controls;{' '}
+              <code>Toolbar</code> holds buttons, and its ARIA role says so; <code>CommandPalette</code> is a modal combobox with the input
+              keeping focus. Each would change its meaning to carry a page of links.
+            </>,
+            <>
+              <strong>Component: yes.</strong> A new intent, a page of results opened one at a time, with a small contract (<code>label</code>,{' '}
+              <code>empty</code>, <code>total</code>, <code>start</code>, one link per item). One use today, search results; the inbox and the
+              notification centre were checked and stay tables, because their rows carry more than one control.
+            </>,
+            <>
+              <strong>Primitive: no.</strong> It is a composition of a list and links; nothing about layout or tokens is new.
+            </>,
+          ]}
+        />
+      </DocSection>
       <DocSection title="Proposing a token">
         <Rules
           items={[

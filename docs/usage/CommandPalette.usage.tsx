@@ -9,6 +9,7 @@ export const usage: UsageDoc = {
   ],
   whenNotToUse: [
     { situation: 'Searching one list', instead: '`SearchField` on the list page (its results stay in the page and the URL)' },
+    { situation: 'Every match for a query, to work through', instead: 'a search results page with `ResultList` (the palette’s “See all results” row opens it)' },
     { situation: 'Choosing a value for a form field', instead: '`Combobox`' },
     { situation: 'The only way to reach something', instead: 'visible navigation and buttons first; the palette is the fast path' },
   ],

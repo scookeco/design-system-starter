@@ -11,6 +11,7 @@ export const usage: UsageDoc = {
     { situation: 'Switching views of one record in place', instead: '`Tabs`' },
     { situation: 'Showing where a page sits in the hierarchy', instead: '`Breadcrumbs`' },
     { situation: 'Actions', instead: '`Button` or `Menu`' },
+    { situation: 'A page of results or matches, not fixed destinations', instead: '`ResultList`' },
   ],
   do: {
     caption: 'A few top-level destinations, grouped, with the current page marked.',

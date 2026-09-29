@@ -4637,6 +4637,10 @@
             "instead": "`SearchField` on the list page (its results stay in the page and the URL)"
           },
           {
+            "situation": "Every match for a query, to work through",
+            "instead": "a search results page with `ResultList` (the palette’s “See all results” row opens it)"
+          },
+          {
             "situation": "Choosing a value for a form field",
             "instead": "`Combobox`"
           },
@@ -10208,6 +10212,10 @@
           {
             "situation": "Actions",
             "instead": "`Button` or `Menu`"
+          },
+          {
+            "situation": "A page of results or matches, not fixed destinations",
+            "instead": "`ResultList`"
           }
         ],
         "do": {
@@ -15774,6 +15782,10 @@
           {
             "situation": "A single record’s properties",
             "instead": "a definition list: `Stack as=\"dl\"` with `Text as=\"dt\"/\"dd\"`"
+          },
+          {
+            "situation": "Results with one link each and nothing to compare across columns",
+            "instead": "`ResultList`"
           }
         ],
         "do": {
