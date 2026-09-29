@@ -16,6 +16,7 @@ import { dropAfterApply } from '../../src/app/mocks/overrides';
 import { useInviteMember, useMembers } from '../../src/app/model/admin';
 import { useArchiveInbox, useInbox } from '../../src/app/model/inbox';
 import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
+import { useStartImport } from '../../src/app/model/imports';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -210,5 +211,14 @@ describe('a write while the list is still on its first load shows on the list', 
     await done;
     read.release();
     await waitFor(() => expect(view.result.current.data?.items.some((i) => i.id === item?.id)).toBe(false));
+  });
+
+  // ── Demo examples ──
+  it('jobs: startImport', async () => {
+    const read = holdFirstRead('/jobs');
+    const { result } = renderHook(() => ({ jobs: useJobs(), start: useStartImport() }), { wrapper: wrapperFor(testClient()) });
+    const rows = [{ row: 2, cells: { name: 'Raced import' } }];
+    await race(read, () => result.current.start.mutate({ rows, file: 'race.csv', idempotencyKey: 'race-import' }), 'POST', '/jobs/import');
+    await waitFor(() => expect(itemsOf(result.current.jobs.data).map((j) => j.label)).toContain('Import 1 row from race.csv'));
   });
 });

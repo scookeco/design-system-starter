@@ -45,3 +45,19 @@ export type EditFieldId = (typeof EDIT_FIELDS)[number]['id'];
 
 /** The tags a person can put on a record from its page. Legal hold isn't one: legal sets and lifts it. */
 export const TAG_OPTIONS = ['priority', 'renewal', 'vendor', 'customer', 'internal'] as const;
+
+/**
+ * The fields a CSV import can fill, in the order the mapping step lists them: config, like the
+ * create form's. Each type's cell parser lives beside the import rules (src/app/model/imports.ts),
+ * keyed on the same FieldType union, so a new importable type fails to compile until it has one.
+ * `aliases` are column names a spreadsheet might use for it; the mapping step pre-selects a match.
+ */
+export const IMPORT_FIELDS = [
+  { type: 'text', id: 'name', label: 'Name', required: true, aliases: ['name', 'title', 'record', 'record name'] },
+  { type: 'person', id: 'owner', label: 'Owner', required: false, aliases: ['owner', 'owner email', 'assignee'] },
+  { type: 'account', id: 'account', label: 'Account', required: false, aliases: ['account', 'customer', 'company'] },
+  { type: 'status', id: 'status', label: 'Status', required: false, aliases: ['status', 'stage'] },
+  { type: 'money', id: 'amount', label: 'Amount', required: false, aliases: ['amount', 'value', 'contract value'] },
+  { type: 'date', id: 'renewsOn', label: 'Renews on', required: false, aliases: ['renews on', 'renewal date', 'renews'] },
+] as const satisfies readonly (FormFieldDef<string> & { required: boolean; aliases: readonly string[] })[];
+export type ImportFieldId = (typeof IMPORT_FIELDS)[number]['id'];

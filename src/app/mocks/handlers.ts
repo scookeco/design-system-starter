@@ -36,7 +36,11 @@ import { WORKSPACES } from '../workspaces';
 // B2B power features: the inbox and the admin console (members, audit log).
 import { auditRecord, b2bHandlers } from './b2b';
 // Freshness and concurrency: long-running jobs.
-import { advance, idsMatching, isActive, publicJob, queueBulkDelete } from './jobs';
+import { advance, idsMatching, isActive, publicJob, queueBulkDelete, queueImport, retryJob } from './jobs';
+// Demo examples: CSV import (rows as a job) and job retry.
+import { ImportRowSchema } from '../api/imports';
+import { IMPORT_LIMITS } from '../model/importRules';
+import { JOB_CAPABILITY } from '../model/jobs';
 
 const API = '*/api/t/:tenant';
 
@@ -468,15 +472,48 @@ const jobHandlers = [
 
   http.post(
     `${API}/jobs/:id/cancel`,
-    handle('record:delete', ({ tenant, params }) => {
+    handle('record:read', ({ tenant, grant, params }) => {
       const job = db(tenant).jobs.find((j) => j.id === params.id && !j.dismissed);
       if (!job) return error(404, 'not_found', 'This job doesn’t exist.');
+      // Cancelling needs what starting it needed: record:delete for a delete, record:create for an import.
+      if (!can(grant, JOB_CAPABILITY[job.kind])) return error(403, 'forbidden', DENIAL_REASONS[JOB_CAPABILITY[job.kind]]);
       if (!isActive(job)) return error(409, 'finished', 'This job has already finished.');
       // Stops between chunks: what's deleted stays deleted, and the job says how far it got.
       job.state = 'cancelled';
       return HttpResponse.json(publicJob(job));
     }),
   ),
+
+  // ── Demo examples: the CSV import and retrying a finished job ────────────────────────────────
+  http.post(
+    `${API}/jobs/import`,
+    handle('record:create', async ({ tenant, request }) => {
+      const key = request.headers.get('Idempotency-Key');
+      if (!key) return error(400, 'idempotency_key_required', 'Imports need an Idempotency-Key header.');
+      const replay = db(tenant).jobs.find((j) => j.idempotencyKey === key);
+      if (replay) return HttpResponse.json(publicJob(replay), { status: 202 });
+      const body = (await request.json()) as { rows?: unknown; file?: unknown };
+      const rows = ImportRowSchema.array().safeParse(body.rows);
+      if (!rows.success || rows.data.length === 0) return error(422, 'invalid', 'Choose at least one row to import.');
+      if (rows.data.length > IMPORT_LIMITS.maxRows) return error(413, 'too_many_rows', `Import up to ${String(IMPORT_LIMITS.maxRows)} rows at a time.`);
+      const n = rows.data.length;
+      const file = typeof body.file === 'string' && body.file.trim() ? body.file.trim() : 'a file';
+      return HttpResponse.json(publicJob(queueImport(tenant, rows.data, `Import ${String(n)} ${n === 1 ? 'row' : 'rows'} from ${file}`, 1, key)), { status: 202 });
+    }),
+  ),
+
+  http.post(
+    `${API}/jobs/:id/retry`,
+    handle('record:read', ({ tenant, grant, params }) => {
+      const job = db(tenant).jobs.find((j) => j.id === params.id && !j.dismissed);
+      if (!job) return error(404, 'not_found', 'This job doesn’t exist.');
+      if (!can(grant, JOB_CAPABILITY[job.kind])) return error(403, 'forbidden', DENIAL_REASONS[JOB_CAPABILITY[job.kind]]);
+      if (isActive(job)) return error(409, 'running', 'This job is still running. Retry once it ends.');
+      if (job.failed.length === 0) return error(409, 'nothing_failed', 'Nothing in this job failed.');
+      return HttpResponse.json(publicJob(retryJob(tenant, job)), { status: 202 });
+    }),
+  ),
+  // ── end Demo examples ─────────────────────────────────────────────────────────────────────────
 
   http.delete(
     `${API}/jobs/:id`,

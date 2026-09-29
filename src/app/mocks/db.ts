@@ -2,6 +2,7 @@
  * The mock server's in-memory database, one partition per tenant. Seeded deterministically and
  * reset before every story and test, so one story's writes never leak into the next.
  */
+import type { ImportRow } from '../api/imports';
 import { SessionSchema, TENANTS, type Account, type Job, type Person, type RecordEntity, type Role, type SavedView, type Session, type Tenant } from '../api/schemas';
 import { ROLE_CAPABILITIES, type Grant } from '../model/permissions';
 import { recordCountFor, SEED_EPOCH, seedAccounts, seedPeople, seedRecords, seedViews, type Dataset } from './seed';
@@ -30,6 +31,11 @@ export interface MockJob extends Job {
   dismissed: boolean;
   paused: boolean;
   failAt?: number;
+  /** An import's rows (targets are their row numbers), and which attempt this is: a retry is attempt 2. */
+  rows?: ImportRow[];
+  attempt?: number;
+  /** The Idempotency-Key it was queued with: the same key again answers with this job. */
+  idempotencyKey?: string;
 }
 
 /** Who the identity provider says is signed in. */

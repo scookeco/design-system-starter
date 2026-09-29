@@ -11,7 +11,8 @@
  */
 import { Banner, Button, Cluster, Popover, Progress, Stack, Text, useFormat, type BannerTone } from '../index';
 import type { Job } from '../app/api/schemas';
-import { isActiveJob, jobProgressText } from '../app/model/jobs';
+import { useRetryJob } from '../app/model/imports';
+import { isActiveJob, JOB_CANCELLED_NOTE, JOB_CAPABILITY, jobProgressText } from '../app/model/jobs';
 import { useCancelJob, useDismissJob, useStartBulkDelete } from '../app/model/mutations';
 import { useJobs } from '../app/model/queries';
 import { useCan } from '../app/session';
@@ -39,7 +40,7 @@ function JobDetails({ job }: { job: Job }) {
     <Stack gap="xs">
       <Progress label={job.label} value={job.done} max={Math.max(job.total, 1)} valueText={jobProgressText(job, format)} />
       {job.error ? <Text size="caption">{job.error}</Text> : null}
-      {job.state === 'cancelled' ? <Text size="caption">What was deleted before you cancelled stays deleted; nothing else was touched.</Text> : null}
+      {job.state === 'cancelled' ? <Text size="caption">{JOB_CANCELLED_NOTE[job.kind]}</Text> : null}
       {job.failed.length > 0 ? (
         <Stack as="ul" gap="2xs">
           {job.failed.slice(0, 3).map((failure) => (
@@ -65,8 +66,11 @@ function JobActions({ job }: { job: Job }) {
   const cancel = useCancelJob();
   const dismiss = useDismissJob();
   const retry = useStartBulkDelete();
+  const retryImport = useRetryJob();
+  // What the job's own actions need: record:delete for a delete, record:create for an import.
+  const capability = JOB_CAPABILITY[job.kind];
   if (isActiveJob(job)) {
-    return can('record:delete') ? (
+    return can(capability) ? (
       <Button variant="secondary" size="sm" loading={cancel.isPending} onClick={() => cancel.mutate(job.id)}>
         Cancel job
       </Button>
@@ -75,12 +79,16 @@ function JobActions({ job }: { job: Job }) {
   const failed = job.failed.length;
   return (
     <Cluster gap="xs">
-      {failed > 0 && can('record:delete') ? (
+      {failed > 0 && can(capability) ? (
         <Button
           variant="secondary"
           size="sm"
-          loading={retry.isPending}
-          onClick={() => retry.mutate({ ids: job.failed.map((f) => f.id), label: `Retry ${format.number(failed)} failed ${failed === 1 ? 'deletion' : 'deletions'}` })}
+          loading={retry.isPending || retryImport.isPending}
+          onClick={() =>
+            job.kind === 'import'
+              ? retryImport.mutate(job)
+              : retry.mutate({ ids: job.failed.map((f) => f.id), label: `Retry ${format.number(failed)} failed ${failed === 1 ? 'deletion' : 'deletions'}` })
+          }
         >
           {`Retry ${format.number(failed)} failed`}
         </Button>

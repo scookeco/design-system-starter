@@ -15,7 +15,7 @@
  */
 import { useQueries } from '@tanstack/react-query';
 import { useState } from 'react';
-import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
+import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, UploadIcon, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
 import { getRecord } from '../app/api/records';
 import type { Capability } from '../app/api/schemas';
 import { recordKeys } from '../app/model/keys';
@@ -67,6 +67,8 @@ export const PALETTE_ACTIONS: readonly PaletteAction[] = [
   { id: 'action:new-record', label: 'New record', keywords: ['create', 'add'], icon: PlusIcon, capability: 'record:create', href: '/records/new' },
   { id: 'action:new-account', label: 'New account', keywords: ['create', 'add', 'customer'], icon: PlusIcon, capability: 'account:create', href: '/accounts/new' },
   { id: 'action:invite', label: 'Invite member', keywords: ['add', 'user', 'team'], icon: UsersIcon, capability: 'members:manage', href: '/admin/members?invite=1' },
+  // Demo examples: the import wizard is a focused page, so it isn't in Jump to; this is its way in.
+  { id: 'action:import', label: 'Import records', keywords: ['csv', 'upload', 'spreadsheet'], icon: UploadIcon, capability: 'record:create', href: '/import/records' },
 ];
 
 /** Pages the palette can jump to: routes without params, in the shell, deduplicated by title. */

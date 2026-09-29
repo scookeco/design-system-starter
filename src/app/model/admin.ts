@@ -18,6 +18,7 @@ import { useTenant } from '../tenant';
 import type { Partition } from './keys';
 import { removalBlocked, roleChangeBlocked } from './members';
 import { can, DENIAL_REASONS, type Grant } from './permissions';
+import { saveFile } from './download';
 import { refetchAfterWrite } from './refetch';
 
 export const adminKeys = {
@@ -118,12 +119,7 @@ export function useExportAudit() {
     mutationFn: async (query: Omit<AuditQuery, 'page' | 'pageSize'>) => {
       refuseUnless(grant, 'audit:read');
       const file = await getAuditExport(tenant, query);
-      const url = URL.createObjectURL(new Blob([file.content], { type: file.contentType }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.filename;
-      link.click();
-      URL.revokeObjectURL(url);
+      saveFile(file);
       return file;
     },
   });
