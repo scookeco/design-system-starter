@@ -120,7 +120,7 @@ function ReportBody({ horizon, numbersOpen }: { horizon: ReportHorizon; numbersO
 function StatusCard({ report, numbersOpen }: { report: Report; numbersOpen: boolean }) {
   const format = useFormat();
   const total = report.byStatus.reduce((sum, s) => sum + s.count, 0);
-  const data: ChartDatum[] = report.byStatus.map((s) => ({ label: STATUS[s.status].label, value: s.count, display: format.number(s.count) }));
+  const data: ChartDatum[] = report.byStatus.map((s) => ({ key: s.status, label: STATUS[s.status].label, value: s.count, display: format.number(s.count) }));
   const largest = [...data].sort((a, b) => b.value - a.value)[0];
   const takeaway = largest ? `${largest.label} is the largest share: ${largest.display} of ${format.number(total)} records (${format.percent(largest.value / total, { maximumFractionDigits: 0 })}).` : '';
   return (
@@ -151,7 +151,7 @@ function AccountsCard({ report, accountName, numbersOpen }: { report: Report; ac
       ? [{ key: 'other', label: `Other (${format.number(report.otherAccounts.accounts)} accounts)`, value: report.otherAccounts.value, records: report.otherAccounts.records }]
       : []),
   ];
-  const data: ChartDatum[] = top6.map((r) => ({ label: r.label, value: r.value.minor, display: money(format, r.value) }));
+  const data: ChartDatum[] = top6.map((r) => ({ key: r.key, label: r.label, value: r.value.minor, display: money(format, r.value) }));
   const top = top6[0];
   const takeaway = top ? `${top.label} holds the most contract value: ${money(format, top.value)} across ${format.number(top.records)} records.` : 'No records belong to an account yet.';
   return (
@@ -175,7 +175,7 @@ function AccountsCard({ report, accountName, numbersOpen }: { report: Report; ac
 function RenewalsCard({ report, numbersOpen }: { report: Report; numbersOpen: boolean }) {
   const format = useFormat();
   const month = (m: string) => format.date(`${m}-01`, 'month');
-  const data: ChartDatum[] = report.renewals.map((r) => ({ label: month(r.month), value: r.value.minor, display: money(format, r.value) }));
+  const data: ChartDatum[] = report.renewals.map((r) => ({ key: r.month, label: month(r.month), value: r.value.minor, display: money(format, r.value) }));
   const busiest = [...report.renewals].sort((a, b) => b.value.minor - a.value.minor)[0];
   const max = busiest?.value;
   const takeaway = busiest

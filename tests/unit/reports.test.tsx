@@ -3,13 +3,15 @@
  * Reports: the server's aggregates (over what the person may see) and the page, whose every chart
  * has its answer in words and its numbers as a table.
  */
-import { cleanup, fireEvent, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { getResponse, http } from 'msw';
 import { afterEach, describe, expect, it } from 'vitest';
 import { getReport } from '../../src/app/api/reports';
 import { db, setRoles } from '../../src/app/mocks/db';
 import { TOP_ACCOUNTS } from '../../src/app/mocks/reports';
 import { ReportsPage } from '../../src/examples/ReportsPage';
-import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
+import { handlers } from '../../src/app/mocks/handlers';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi } from './app-harness';
 
 globalThis.ResizeObserver ??= class {
   observe() {}
@@ -57,5 +59,32 @@ describe('the reports page', { timeout: PAGE_FLOW_TIMEOUT }, () => {
     fireEvent.click(screen.getByRole('radio', { name: 'Next 12 months' }));
     expect(history.location().search).toBe('?horizon=12');
     expect(await screen.findByRole('img', { name: /Sep 2026 to Aug 2027/ })).toBeTruthy();
+  });
+
+  it('keeps one row per account when the names arrive after the chart has drawn', async () => {
+    // Hold the account directory, so the chart first draws with every name still "…".
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get(
+        '*/api/t/acme/accounts',
+        async ({ request }) => {
+          await gate;
+          return getResponse(handlers, request);
+        },
+        { once: true },
+      ),
+    );
+    renderWithApp(<ReportsPage />, { url: '/reports' });
+    const accounts = await screen.findByRole('list', { name: /^Contract value by account\./ }, FIRST_PAINT);
+    const rows = () => within(accounts).getAllByRole('listitem');
+    const count = rows().length;
+    expect(rows().every((li) => li.textContent?.startsWith('…'))).toBe(true);
+    release();
+    await waitFor(() => expect(rows().some((li) => li.textContent?.startsWith('…'))).toBe(false));
+    // The same rows, now named: none left over from the first draw.
+    expect(rows()).toHaveLength(count);
   });
 });
