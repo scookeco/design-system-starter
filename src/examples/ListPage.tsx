@@ -49,7 +49,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState, type FormEven
 import { Badge, Banner, Button, Center, Checkbox, Cluster, Dialog, DownloadIcon, EmptyState, Link, NavTabs, PageHeader, Pagination, PlusIcon, Popover, SearchField, SegmentedControl, SettingsIcon, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tag, Text, TextField, Tooltip, useFormat, useToast } from '../index';
 import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
 import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, useStartBulkDelete, type BulkSelection } from '../app/model/mutations';
-import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
+import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRows, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
   EMPTY_SELECTION,
@@ -188,7 +188,7 @@ function ListPageContent({
   const shown = new Set(url.columns);
   // The default saved view applies only when the list opened with nothing in its URL.
   const [openedBare] = useState(() => listCodec.serialise(url) === '');
-  const rows = (list.data?.items ?? []).map(toRow);
+  const rows = toRows(list.data?.items);
   const total = list.data?.total ?? 0;
   const filtered = query.q.trim() !== '' || query.status.length > 0;
   const sort = sortOf(query.sort);
