@@ -15,7 +15,7 @@
  * console; tests replace it (tests/unit/app-harness.tsx, captureTelemetry).
  */
 import type { Mutation, QueryClient } from '@tanstack/react-query';
-import { ApiError, ContractError } from './api/client';
+import { ApiError, ContractError, NetworkError } from './api/client';
 import { isCancelled } from './model/writeQueue';
 
 export type MutationPhase = 'start' | 'success' | 'failure' | 'cancelled';
@@ -85,12 +85,12 @@ export const outcomeMeta = <T,>(outcome: (data: T) => ReportedOutcome | undefine
 export const failureOf = (error: unknown): { code: string; status?: number } => {
   if (error instanceof ApiError) return { code: error.code, status: error.status };
   if (error instanceof ContractError) return { code: 'contract' };
-  // fetch rejects with a TypeError when the connection fails: the outcome on the server is unknown.
-  if (error instanceof TypeError) return { code: 'network' };
+  // The connection failed: the outcome on the server is unknown.
+  if (error instanceof NetworkError) return { code: 'network' };
   return { code: 'unknown' };
 };
 
-const isAbort = (error: unknown) => error instanceof DOMException && error.name === 'AbortError';
+const isAbort = (error: unknown) => error instanceof Error && error.name === 'AbortError';
 
 /** The verb a mutation reports as: its key's name, after the partition ([tenant, scope, name, params]). */
 export const mutationName = (mutation: Pick<Mutation<unknown, unknown, unknown, unknown>, 'options'>) => {

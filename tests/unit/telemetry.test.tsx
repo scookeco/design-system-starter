@@ -4,7 +4,7 @@
  * through the one sink (src/app/telemetry.ts), from the MutationCache, without a line in the verb.
  */
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -181,6 +181,21 @@ describe('every named mutation reports start and one outcome', () => {
     }
     expect(all.find((e) => e.name === 'renameRecord')).toMatchObject({ tenant: 'acme', subject: record.id });
   }, 30_000);
+});
+
+describe('no mutation goes unnamed', () => {
+  it('every useMutation in the app layer and the examples has a key (the name it reports as)', () => {
+    const files = [
+      ...readdirSync(resolve('src/app/model')).map((f) => resolve('src/app/model', f)),
+      ...readdirSync(resolve('src/examples')).map((f) => resolve('src/examples', f)),
+    ].filter((f) => /\.tsx?$/.test(f));
+    for (const file of files) {
+      const source = readFileSync(file, 'utf8');
+      const calls = source.match(/useMutation\(/g)?.length ?? 0;
+      const keys = source.match(/mutationKey:/g)?.length ?? 0;
+      expect({ file, keys }).toEqual({ file, keys: calls });
+    }
+  });
 });
 
 describe('outcomes', () => {

@@ -37,7 +37,7 @@
  * on its first load reads again after the write.
  */
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { ApiError } from '../api/client';
+import { ApiError, NetworkError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { deleteJob, postBulkDeleteJob, postCancelJob } from '../api/jobs';
 import { deleteView, patchView, postView } from '../api/views';
@@ -87,11 +87,11 @@ const refuseUnless = (grant: Grant, capability: Capability, subject?: Parameters
 export const isForbidden = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 403;
 
 /**
- * The connection failed (fetch rejected): the request may or may not have reached the server, so
+ * The connection failed (a NetworkError: fetch rejected): the request may or may not have reached the server, so
  * the write may have happened. Reconcile by reading again; a create retried with the same
  * idempotency key then returns what the server made, never a second one.
  */
-export const isUnknownOutcome = (error: unknown) => error instanceof TypeError;
+export const isUnknownOutcome = (error: unknown): error is NetworkError => error instanceof NetworkError;
 
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;

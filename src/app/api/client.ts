@@ -35,6 +35,21 @@ export class ContractError extends Error {
   }
 }
 
+/**
+ * The request never got an answer: the connection failed (fetch rejected). Whether the server
+ * acted on it is unknown, so a write that ends here is reconciled by reading again. A TypeError,
+ * like the fetch rejection it wraps, so code that treats a dropped stream as one still does.
+ */
+export class NetworkError extends TypeError {
+  readonly path: string;
+
+  constructor(path: string) {
+    super(`The connection failed before ${path} answered.`);
+    this.name = 'NetworkError';
+    this.path = path;
+  }
+}
+
 /** Where boundary failures go. An app points this at its error tracker; tests replace it. */
 export const reporting = {
   report: (error: ContractError) => {
@@ -72,6 +87,10 @@ export async function request<S extends z.ZodType>(schema: S, path: string, opti
     },
     ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
     ...(options.signal ? { signal: options.signal } : {}),
+  }).catch((error: unknown) => {
+    // A cancelled request stays an AbortError; anything else fetch rejects with is a lost connection.
+    if (error instanceof Error && error.name === 'AbortError') throw error;
+    throw new NetworkError(path);
   });
   const json: unknown = await response.json().catch(() => undefined);
 
