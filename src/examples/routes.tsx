@@ -76,6 +76,7 @@ const Audit = page(async () => {
 // ── end B2B power features ──────────────────────────────────────────────────────────────────
 // ── Demo examples (PR 16): import, search, notifications, reports, integrations, billing ──────
 const ImportRecords = page(async () => noParams((await import('./ImportWizard')).ImportWizard));
+const Search = page(async () => noParams((await import('./SearchPage')).SearchPage));
 // ── end Demo examples ────────────────────────────────────────────────────────────────────────
 
 export const ROUTES: readonly Route[] = [
@@ -113,5 +114,6 @@ export const ROUTES: readonly Route[] = [
   // ── end B2B power features ──
   // ── Demo examples (PR 16). Import sits outside /records, so /records/:id never reads it as an id. ──
   { path: '/import/records', layout: 'focused', page: ImportRecords, guard: 'record:create', nav: '', title: 'Import records' },
+  { path: '/search', layout: 'shell', page: Search, guard: 'workspace:read', nav: '', title: 'Search' },
   // ── end Demo examples ──
 ];

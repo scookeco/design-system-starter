@@ -26,6 +26,7 @@ import { STATUS } from '../app/model/status';
 import { routeTitle, type Route } from '../app/routing/routes';
 import { useAppSession, useCan, usePartition, type AppSession } from '../app/session';
 import { useTenant } from '../app/tenant';
+import { searchHref } from '../app/url/searchState';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
 import { ROUTES } from './routes';
@@ -197,6 +198,8 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         { id: 'accounts', label: 'Accounts', items: accountItems },
         { id: 'people', label: 'People', items: personItems },
         { id: 'actions', label: 'Actions', items: actions },
+        // Demo examples: everything that matches, on the search results page.
+        ...(searching ? [{ id: 'search', label: 'Search', filter: 'none' as const, items: [{ id: 'search:all', label: `See all results for “${query.trim()}”`, icon: SearchIcon, onSelect: () => navigate(searchHref(query)) }] }] : []),
       ]
     : [
         { id: 'recent', label: 'Recent', items: recentItems },

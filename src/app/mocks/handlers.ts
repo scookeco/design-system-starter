@@ -6,7 +6,7 @@
  *
  * The same handlers serve Storybook (msw/browser via msw-storybook-addon) and Vitest (msw/node).
  */
-import { delay, http, HttpResponse, type HttpResponseResolver } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { AccountInput } from '../api/accounts';
 import type { RecordChanges } from '../api/records';
 import {
@@ -16,7 +16,6 @@ import {
   RecordStatusSchema,
   RecordViewSchema,
   SavedViewConfigSchema,
-  TenantSchema,
   type Account,
   type SavedView,
   type Capability,
@@ -28,9 +27,8 @@ import {
   type Tenant,
 } from '../api/schemas';
 import { canArchive, canDelete, canEdit, canMove, hasStatus, isOnLegalHold, matchesFilter, matchesScope, type SearchableRecord } from '../model/predicates';
-import { can, canSee, DENIAL_REASONS, type Grant } from '../model/permissions';
-import { mockConfig } from './config';
-import { bump, currentSession, currentUserId, db, endSession, grantFor, isSignedIn, touch } from './db';
+import { can, canSee, DENIAL_REASONS } from '../model/permissions';
+import { bump, currentSession, currentUserId, db, endSession, isSignedIn, touch } from './db';
 import { emailFor, SEED_EPOCH } from './seed';
 import { WORKSPACES } from '../workspaces';
 // B2B power features: the inbox and the admin console (members, audit log).
@@ -41,44 +39,14 @@ import { advance, idsMatching, isActive, publicJob, queueBulkDelete, queueImport
 import { ImportRowSchema } from '../api/imports';
 import { IMPORT_LIMITS } from '../model/importRules';
 import { JOB_CAPABILITY } from '../model/jobs';
+// Demo examples: search, notifications, reports, integrations, billing and onboarding.
+import { demoHandlers } from './demos';
 
 const API = '*/api/t/:tenant';
 
-export const error = (status: number, code: string, message: string, current?: RecordEntity | Account) =>
-  HttpResponse.json({ error: { code, message, ...(current ? { current } : {}) } }, { status });
+import { error, handle, settle } from './route';
 
-/** Latency, then the failure roll. */
-const settle = async (): Promise<Response | undefined> => {
-  if (mockConfig.latencyMs > 0) await delay(mockConfig.latencyMs);
-  if (mockConfig.failureRate > 0 && mockConfig.random() < mockConfig.failureRate) {
-    return error(500, 'server_error', 'The server hit a problem. Try again.');
-  }
-  return undefined;
-};
-
-/**
- * Latency, the failure roll, the workspace, then the capability the route requires, then the
- * handler. Every workspace route declares its capability (deny by default): the server checks it
- * against the role it holds for the signed-in person, whatever the client did or didn't check.
- * Object-level rules (archived, legal hold) are the handler's, after this.
- */
-export const handle =
-  (
-    /** The capability, or (when the body decides, as a rename vs an edit) a function of the body. */
-    capability: Capability | ((body: unknown) => Capability),
-    resolver: (args: { tenant: Tenant; grant: Grant; request: Request; params: Record<string, string | readonly string[] | undefined> }) => Response | Promise<Response>,
-  ): HttpResponseResolver =>
-  async ({ request, params }) => {
-    const failed = await settle();
-    if (failed) return failed;
-    if (!isSignedIn()) return error(401, 'signed_out', 'Sign in to continue.');
-    const tenant = TenantSchema.safeParse(params.tenant);
-    if (!tenant.success) return error(404, 'unknown_tenant', 'No such workspace.');
-    const grant = grantFor(tenant.data);
-    const required = typeof capability === 'string' ? capability : capability(await request.clone().json().catch(() => undefined));
-    if (!can(grant, required)) return error(403, 'forbidden', DENIAL_REASONS[required]);
-    return resolver({ tenant: tenant.data, grant, request, params });
-  };
+export { error, handle };
 
 /**
  * Versioned writes: the version the client based its change on arrives as If-Match ("3"). Missing:
@@ -595,6 +563,7 @@ export const handlers = [
   ...jobHandlers,
   ...viewHandlers,
   ...b2bHandlers,
+  ...demoHandlers,
   // The session: not workspace data, so outside the tenant routes.
   http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
   http.delete('*/api/session', async () => {
