@@ -83,6 +83,11 @@ PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
               <code>'!autodocs'</code>.
             </>,
             <>Write the tags as a literal array: Storybook reads them statically, and a spread is ignored.</>,
+            <>
+              A story that acts on its own once loaded (submits a form, starts a job) looks settled for the few frames before it acts. Its
+              settled signal must wait for evidence the action happened (the job exists and has ended), not for “nothing is
+              running”, or a loaded machine captures it halfway.
+            </>,
             <>Behaviour a screenshot can’t show (focus moving, an announcement, a callback) gets a unit test with Testing Library, queried by role and name.</>,
           ]}
         />
