@@ -1,7 +1,7 @@
 /**
  * The mock assistant: a scripted, deterministic "model" behind the same wrapper as every other mock
  * route (latency and failures, sign-in, the workspace, then the capability; see handle() in
- * handlers.ts). Answers stream as newline-delimited JSON events, split into word tokens.
+ * route.ts). Answers stream as newline-delimited JSON events, split into word tokens.
  *
  * It holds no permissions of its own. Everything it reads or proposes goes through the grant of the
  * signed-in person in this workspace, with the same predicates as the rest of the server:
@@ -23,7 +23,7 @@ import { isOnLegalHold } from '../model/predicates';
 import { WORKSPACES } from '../workspaces';
 import { mockConfig } from './config';
 import { currentUserId, db } from './db';
-import { error, handle } from './handlers';
+import { error, handle } from './route';
 import { SEED_EPOCH } from './seed';
 
 const API = '*/api/t/:tenant/ai';

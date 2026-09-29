@@ -20,6 +20,7 @@
 import { useEffect, useRef } from 'react';
 import { AuthLayout, Button, Center, Cluster, EmptyState, Link } from '../index';
 import { ExampleShell } from './ExampleShell';
+import { HOME } from './routes';
 
 export function NotFoundPage() {
   return (
@@ -30,7 +31,7 @@ export function NotFoundPage() {
           headingLevel={1}
           title="Page not found"
           description="The link may be out of date, or the page may have moved."
-          action={<Link href="/home">Go to Home</Link>}
+          action={<Link href={HOME}>Go to Home</Link>}
         />
       </Center>
     </ExampleShell>
@@ -48,7 +49,7 @@ export function ForbiddenPage({ current = '', reason = 'Ask a workspace admin fo
   return (
     <ExampleShell current={current}>
       <Center max="lg" gutters="lg">
-        <EmptyState reason="no-results" headingLevel={1} title="You don’t have access to this page" description={reason} action={<Link href="/home">Go to Home</Link>} />
+        <EmptyState reason="no-results" headingLevel={1} title="You don’t have access to this page" description={reason} action={<Link href={HOME}>Go to Home</Link>} />
       </Center>
     </ExampleShell>
   );
@@ -70,7 +71,7 @@ export function ServerErrorPage({ reference = 'ERR-7F3A-2C' }: ServerErrorPagePr
         action={
           <Cluster gap="md" justify="center">
             <Button onClick={() => window.location.reload()}>Try again</Button>
-            <Link href="/home">Go to Home</Link>
+            <Link href={HOME}>Go to Home</Link>
           </Cluster>
         }
       />
@@ -135,7 +136,7 @@ export function RenderErrorPage({ current = '', onRetry, cause = 'render', repea
               ) : (
                 <Button onClick={onRetry}>Try again</Button>
               )}
-              <Link href="/home">Go to Home</Link>
+              <Link href={HOME}>Go to Home</Link>
             </Cluster>
           }
         />

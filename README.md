@@ -19,6 +19,117 @@ npm run check                     # everything CI runs except the visual job
 2. Create a branch (for example `chore/visual-baselines`), push it, and run **Actions → Update visual baselines** on that branch. It commits `tests/visual/__screenshots__/linux/*.png` back to the branch. Use a branch rather than `main`, because a protected `main` rejects the bot's push.
 3. Open a PR from that branch. If CI didn't start, push any commit or re-run it: a push made with `GITHUB_TOKEN` doesn't trigger CI. Merge once the visual job is green. From then on, any screenshot difference, or a new story with no baseline, fails the visual job.
 
+## Start a new portal
+
+This repo is a GitHub template. A portal is a **one-time copy** made with **Use this template**: nothing flows back from the starter afterwards, so the copy is yours to trim. Trimming means deleting what the portal doesn't need. Every check keeps working afterwards and tells you what else to edit. The gallery has the same steps in brief: **Guides → Start a new portal**.
+
+### 1. Create the repository
+
+1. On GitHub, **Use this template → Create a new repository**.
+2. **Settings → General → Pull Requests**: allow **squash merging** only, and untick merge commits and rebase merging.
+3. **Settings → Actions → General**: allow actions. The workflows ask for their own token permissions, so leave the default workflow permissions as they are.
+4. Clone it. Before your first commit, set the repo's commit email to your GitHub noreply address. It's listed under **Settings → Emails** on your account, where you can also turn on **Keep my email addresses private** and **Block command line pushes that expose my email**:
+   ```sh
+   git config user.email "<id>+<username>@users.noreply.github.com"
+   npm ci
+   npx playwright install chromium
+   npm run check
+   ```
+
+### 2. Rename
+
+1. In `package.json`, set `name` and `description`, then run `npm install --package-lock-only` so the lockfile's name follows.
+2. Change the first heading of this README and of `CLAUDE.md`. The manifest reads its name from the README heading and its summary from the `description`.
+3. For the brand colours, follow **Guides → Theming and adding a brand**:
+   - add the ramp to `tokens/primitive/color.json`;
+   - point the brand-carrying tokens in `tokens/semantic/color.json` at it (the guide lists them);
+   - run `npm run tokens`;
+   - run `npm test`, which checks every pair for contrast in both schemes.
+4. The demo workspace names ("Acme", "Globex" in `src/app/workspaces.ts`, and the `brand` on the signed-out pages) are sample data. Replace them when you build your pages.
+5. Run `npm run manifest`, then `npm run check`.
+
+### 3. Trim the examples
+
+Delete one example at a time, and run the loop after each:
+
+1. **Delete the files.** Remove `src/examples/<Name>.tsx` and `<Name>.stories.tsx`, plus the extra files the table below lists.
+2. **Delete the routes.** Remove the example's rows from `src/examples/routes.tsx`. Each group has a comment naming it.
+3. **Run `npm run typecheck`.** It names every file that still imports what you deleted. A test file named after the example goes whole. In a shared test file, delete only the `describe` blocks for that example.
+4. **Run `npx vitest run`.** The checks name the rest:
+   - `routes.test.tsx` lists links that now lead nowhere: nav items in `ExampleShell.tsx`, `GO_KEYS` and `PALETTE_ACTIONS` in `CommandMenu.tsx`, and `HOME` in `routes.tsx`.
+   - `story-links.test.ts` lists guide links to the deleted stories. Add the example's title id (for example `'examples-inbox'`) to `REMOVED_EXAMPLES` in `docs/ui/removedExamples.ts`. Those links then render as plain text, and Page archetypes says the example isn't in this repo.
+   - `repo-docs.test.ts` lists lines in this README and in `CLAUDE.md` that name deleted files, or tell agents to copy a deleted example. Edit or delete those lines.
+   - `manifest.test.ts`: run `npm run manifest`.
+5. **Run `npm run lint`** for imports left unused, usually icons.
+
+| Delete | Also delete | Also edit |
+|---|---|---|
+| AI examples: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` | `AssistantTurns.tsx`, `ai-examples.test.tsx` | Nothing else. Optionally drop the assistant's app layer too. In `src/app`, that's `api/ai.ts`, `model/ai.ts`, `mocks/ai.ts` (and `aiHandlers` in `mocks/handlers.ts`) and `url/chatState.ts`. In the tests, that's `ai.test.tsx`, the assistant's verbs and its 429 test in `telemetry.test.tsx`, and the `asRead` test in `writeQueue.test.tsx`. |
+| `InboxPage`, `AdminConsole` | their `describe` blocks in `b2b.test.tsx` | the Inbox and Admin nav items; `g i`, `g m` and "Invite member" in `CommandMenu.tsx`. Keep `src/app/mocks/b2b.ts`: every write's audit event goes through it. |
+| `ImportWizard` | `imports.test.tsx` | the "Import records" palette action |
+| `SearchPage` | `search.test.tsx` | the palette's "See all results" row (`searchHref`) |
+| `NotificationsPage` | `Notifications.tsx` (the bell), `notifications.test.tsx` | `NotificationsIndicator` and `notificationsOpen` in `ExampleShell.tsx` |
+| `ReportsPage` | `charts.tsx`, `reports.test.tsx` | the Reports nav item |
+| `IntegrationsPage`, `BillingPage` | `integrations.test.tsx`, `billing.test.tsx` | nothing else |
+| `DashboardPage` | `Onboarding.tsx` and its stories, `records.ts`, `onboarding.test.tsx` | point `/` and `HOME` in `routes.tsx` at another page; the Home nav item and `g h` |
+| `SetupWizard` | "Setup wizard example" in `examples.test.tsx`; "the setup wizard example" in `wcag22.test.tsx` (the redundant-entry audit stays) | nothing else |
+| `EntityPages` | `entities.test.tsx` | the Accounts and People nav items, `g a`, `g p` and "New account"; records still link to accounts, so render `AccountRef` in `src/app/registries/refs.tsx` as plain text, and drop the palette's account and people groups. In the tests, drop "New account" in `command-palette.test.tsx`, expect the account name as text in `registry.test.tsx`, and delete the entity-pages test in `routes.test.tsx` |
+
+The app layer behind a deleted example (`src/app/api`, `model`, `mocks` for billing, reports and so on) can stay until you replace it: no page imports it, so it adds nothing to a page. When you do remove a domain, `npm run typecheck` names its tests. That includes its race test in `refetch.test.tsx` and its verbs in `telemetry.test.tsx`, which lists its model files by name.
+
+**Never delete:**
+- The system: `tokens/`, `src/styles/`, `src/primitives/`, `src/components/`, `src/layouts/`, `src/format/`, `src/internal/`, `src/index.ts`.
+- The checks:
+  - `scripts/`, `fixtures/`, `.storybook/` and `.github/workflows/`;
+  - `tests/visual/`, with its fixtures;
+  - every test in `tests/unit` that checks the system or the repo rather than one example: tokens, contrast, css, docs, manifest, story links, repo docs, routes, the WCAG 2.2 audits, the app layer's tests, and so on.
+
+  The only tests you delete are those of an example you deleted, as the table lists.
+- The app skeleton the checks run on:
+  - `App.tsx`, `routes.tsx`, `ExampleShell.tsx`, `CommandMenu.tsx`, `Permission.tsx`, `ErrorPages.tsx`, `Jobs.tsx`, `Freshness.tsx`;
+  - `SignInPage` (the accessible-authentication audit runs on it);
+  - the records trio `ListPage`, `RecordPage` and `CreateEditFlow`, with their helpers. Rename and rebuild these as your own first resource rather than deleting them.
+
+### 4. The first pull request, and branch protection
+
+The copy carries the starter's Linux baselines, and a rebrand or a trim changes screenshots. So the first pull request does this:
+
+1. Push a branch and open a draft pull request. **Check (tokens, types, lint, tests, rules, build)** must pass.
+2. Run **Actions → Update visual baselines** on that branch. It deletes every Linux baseline before regenerating them, so the baselines of deleted stories go too. Then push any commit, or re-run CI, because the bot's push doesn't start it.
+3. Mark the pull request ready. Review the new PNGs, then squash-merge once **Visual regression and axe** is green.
+4. Now protect `main` under **Settings → Branches** with a branch protection rule:
+   - require a pull request;
+   - require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**.
+
+   The rule's check picker lists only checks that have reported in the past week, which is why this step comes after the first CI run. Require the gate, never the "(1/4)" shards.
+
+After that, "Update visual baselines" is how every intended visual change lands (see Visual baselines).
+
+### 5. Plug in the real backend
+
+- **One base URL.** Call `configureApi({ baseUrl })` from `src/app/api/client.ts` once, before the app mounts. For another origin, use an absolute URL; that backend then needs CORS. Requests, the assistant's stream and the live event source all build their URLs from it.
+- **One resource at a time.** The zod schemas in `src/app/api/schemas.ts` stay the contract. Build the endpoint to match the schema, and the client parses the response exactly as it parses the mock's. `tests/unit/api-base.test.tsx` shows the swap for the records list: a real HTTP server serves one route (MSW's `passthrough()`), and the mocks answer the rest.
+- **Keep MSW for stories and tests.** The gallery and Vitest keep the mock handlers, so every state stays reproducible. The portal itself never starts MSW. Remove a mock route only when no story or test uses it.
+- **Live updates:** pass `eventSourceLive()` to `AppProviders` and serve Server-Sent Events at `/t/:tenant/events`, in the shape of `LiveEventSchema`.
+- **Where it runs:** the starter has no app entry yet. Pages run in the gallery and in tests. A portal adds a Vite app entry (`index.html` and a `main.tsx`) that renders `ExampleApp` inside `LocaleProvider` and `AppProviders`.
+
+### 6. The sign-in seam
+
+No provider is chosen here. This is where one plugs in:
+
+- **Before the app mounts:** the provider completes sign-in, then `getSession()` (`GET /session`, parsed by `SessionSchema`) gives the session and the workspaces to pass to `AppProviders`. Its `signedOut` prop renders the sign-in page, which starts the provider's flow (`SignInPage` is the pattern).
+- **Every request:** `request()` in `src/app/api/client.ts` is the one place to add `credentials: 'include'` (a cookie session) or an `Authorization` header (a token).
+- **Sign-out:** `signOut` in `src/app/session.tsx` clears the cache, the write queues and the drafts, then calls `deleteSession()`. The provider's own sign-out goes there too.
+- **A 401:** today it surfaces as the page's error state. With a real provider, send it back to sign-in, for example from a `QueryCache` `onError` in `createQueryClient` that calls `signOut`.
+
+### 7. Keep the agent files accurate
+
+`CLAUDE.md`, `llms.txt`, `llms-full.txt` and `design-system.manifest.json` describe the repo to coding agents.
+
+- After each trim, `repo-docs.test.ts` names every line in `CLAUDE.md` and this README that points at something deleted. It checks every repo path in backticks, and the rules block's "Copy the matching golden example" list. That covers "Which example to copy" and most of the repo map.
+- Examples named without a path are not checked. Edit those by hand: the `src/examples/` line of `CLAUDE.md`'s repo map, and this README's `src/examples/` repo-map line.
+- Fix those lines, then run `npm run manifest`. `npm run check` fails until the generated files match.
+
 ## Scripts
 
 | Script | What it does |
@@ -247,7 +358,7 @@ Stop at the first yes:
    - `Name.tsx`: props typed with `Closed<…>` (no `className`/`style`), a required accessible name, variants as closed unions, and state via aria/native attributes. Wrap Radix here if you need behaviour. Never expose `asChild`.
    - `Name.css`: inside `@layer components`, BEM-lite classes, in the order block, parts, variants, states. Tokens only.
    - `Name.stories.tsx`: one story per variant, size and state. The visual and axe suite picks them up automatically.
-   - `docs/usage/Name.usage.tsx`: the usage section of its Docs tab (see Documentation below).
+   - `docs/usage/<Name>.usage.tsx`: the usage section of its Docs tab (see Documentation below).
    - Export it from `src/components/index.ts`.
 4. **A new primitive?** The highest bar: domain-agnostic, token-driven, impossible to express as a composition. It changes tokens, component styles and `CLAUDE.md` in the same PR.
 
@@ -276,7 +387,7 @@ The gallery is the documentation. Everything in it is rendered from the system, 
 | Section | Where | What |
 |---|---|---|
 | **Foundations** | `docs/foundations/` | Colour, data visualisation (chart palettes with their contrast and distances), typography, spacing/sizing/radius, breakpoints and layout grid, elevation and motion, layers (which units use each z tier, from the token usage map), focus and target size, icons. Names come from the generated `vars` map, and samples paint with each token's `var()` from `tokens.css`, except colour swatches, which paint with values resolved from the source so light and dark can sit side by side; values, dark values, "use for" notes (`$description`) and contrast ratios come from the token source through `scripts/checks/token-model.ts` and the shared pairs in `scripts/checks/contrast-pairs.ts`, the same code the tests run. |
-| **Guides** | `docs/guides/` | Getting started, principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, keyboard and power users (the command palette, the shortcut registry and its conventions), motion, browser support and the platform (the Baseline rule, each platform feature in use and its fallback, and the per-overlay decision on native popover and anchor positioning), theming and adding a brand, escape hatches, contributing and versioning, testing, agents (how coding agents use llms.txt and the manifest), and AI patterns (surfaces, provenance, consent and undo, permissions, honest failure, streaming accessibility). |
+| **Guides** | `docs/guides/` | Getting started, starting a new portal (copy, rename, trim, a real backend, the sign-in seam), principles, the decision ladder, layout, page archetypes, data, accessibility, accessibility conformance (what's automated, what needs a person, how to run it), an accessibility statement template, content, forms, keyboard and power users (the command palette, the shortcut registry and its conventions), motion, browser support and the platform (the Baseline rule, each platform feature in use and its fallback, and the per-overlay decision on native popover and anchor positioning), theming and adding a brand, escape hatches, contributing and versioning, testing, agents (how coding agents use llms.txt and the manifest), and AI patterns (surfaces, provenance, consent and undo, permissions, honest failure, streaming accessibility). |
 | **Docs tab** of every component, layout and primitive | `docs/usage/<Name>.usage.tsx` | When to use, when not to (and what instead), live do/don't examples built from the system, accessibility notes. `.storybook/DocsPage.tsx` renders it above the props table and stories. `<Name>` is the last segment of the story title. |
 
 - Foundations and Guides pages are stories, so they get screenshots and axe in both themes like any other story.

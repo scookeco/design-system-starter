@@ -46,14 +46,42 @@ export interface StoryLinkProblem {
   problem: string;
 }
 
+/** Where a repo lists the golden examples it deleted (their links render as text). */
+export const REMOVED_EXAMPLES_FILE = 'docs/ui/removedExamples.ts';
+
+const titleIdOf = (id: string) => id.split('--')[0] ?? id;
+
 /**
  * Dead references, plus StoryLinks whose id is an expression in a file that holds no literal story
  * ids: those can't be checked, so they fail too (keep the ids as `id: '…'` literals in the file).
+ * A reference to a deleted golden example listed in `removed` isn't dead: StoryLink renders its text.
  */
-export const findStoryLinkProblems = (files: readonly SourceFile[], ids: ReadonlySet<string>): StoryLinkProblem[] =>
+export const findStoryLinkProblems = (files: readonly SourceFile[], ids: ReadonlySet<string>, removed: readonly string[] = []): StoryLinkProblem[] =>
   files.flatMap(({ file, code }) => {
     const referenced = referencedIds(code);
-    const dead = referenced.filter((id) => !ids.has(id)).map((id) => ({ file, problem: `no story or Docs tab has the id "${id}"` }));
+    const dead = referenced
+      .filter((id) => !ids.has(id) && !removed.includes(titleIdOf(id)))
+      .map((id) => ({
+        file,
+        problem: `no story or Docs tab has the id "${id}"${
+          id.startsWith('examples-') ? ` (deleted that example on purpose? Add '${titleIdOf(id)}' to REMOVED_EXAMPLES in ${REMOVED_EXAMPLES_FILE})` : ''
+        }`,
+      }));
     const unverifiable = /<StoryLink\s+id=\{/.test(code) && referenced.length === 0 ? [{ file, problem: 'StoryLink id is an expression, and the file has no literal story ids to check' }] : [];
     return [...dead, ...unverifiable];
   });
+
+/**
+ * The removed-examples list, checked: only golden examples can be listed (a system page's links are
+ * never silenced), an entry must really be gone (no story left under its title), and a guide must
+ * still link to it (so a misspelt entry, which would silence nothing, fails instead of passing).
+ */
+export const removedExampleProblems = (removed: readonly string[], ids: ReadonlySet<string>, files: readonly SourceFile[]): string[] => {
+  const linkedTitles = new Set(files.flatMap(({ code }) => referencedIds(code).map(titleIdOf)));
+  const presentTitles = new Set([...ids].map(titleIdOf));
+  return removed.flatMap((title) => [
+    ...(title.startsWith('examples-') ? [] : [`${title}: only golden examples (examples-…) can be listed as removed`]),
+    ...(presentTitles.has(title) ? [`${title}: still has stories; delete them, or take it off the list`] : []),
+    ...(linkedTitles.has(title) ? [] : [`${title}: nothing in docs/ links to it; is it misspelt, or no longer needed on the list?`]),
+  ]);
+};

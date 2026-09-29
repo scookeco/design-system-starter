@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from '../../src/index';
 import { StoryLink } from '../ui/Code';
+import { isRemovedExample } from '../ui/removedExamples';
 import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
 const ARCHETYPES = [
@@ -204,10 +205,16 @@ function PageArchetypes() {
                 <TableCell rowHeader>{a.archetype}</TableCell>
                 <TableCell>{a.choose}</TableCell>
                 <TableCell>
-                  <StoryLink id={a.id}>{a.example}</StoryLink>
-                  <Text size="caption" tone="muted">
-                    <code>{a.file}</code>
-                  </Text>
+                  {isRemovedExample(a.id) ? (
+                    <Text tone="muted">Not in this repo: {a.example} was deleted.</Text>
+                  ) : (
+                    <>
+                      <StoryLink id={a.id}>{a.example}</StoryLink>
+                      <Text size="caption" tone="muted">
+                        <code>{a.file}</code>
+                      </Text>
+                    </>
+                  )}
                 </TableCell>
                 <TableCell>{a.shows}</TableCell>
               </TableRow>

@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
 /**
  * WCAG 2.2 criteria that are about a flow rather than a single rendered story, asserted on the
- * golden examples. Each audit is a function with a negative control that proves it can fail.
+ * golden examples. Each audit is a function with a negative control that proves it can fail. The
+ * redundant-entry audit also has its own positive controls, so a portal that deletes the setup
+ * wizard deletes only the wizard's walk-through; the sign-in audit runs on SignInPage, which stays.
  */
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -152,7 +154,32 @@ const askedAgain = (steps: readonly (readonly string[])[]) => {
   return [...again];
 };
 
-describe('Redundant entry (SC 3.3.7)', () => {
+describe('Redundant entry (SC 3.3.7): the audit', () => {
+  it('reads the questions a step asks: its text fields and radio groups, by name', () => {
+    render(
+      <form aria-label="Step">
+        <label htmlFor="step-name">Workspace name</label>
+        <input id="step-name" />
+        <div role="radiogroup" aria-labelledby="step-plan">
+          <span id="step-plan">Plan</span>
+        </div>
+      </form>,
+    );
+    expect(questionsOn(screen.getByRole('form', { name: 'Step' }))).toEqual(['Workspace name', 'Plan']);
+  });
+
+  it('passes a flow that asks each question once (positive control)', () => {
+    expect(askedAgain([['Workspace name', 'Workspace address'], ['Plan'], []])).toEqual([]);
+  });
+
+  it('negative control: catches a flow that asks for the same thing twice', () => {
+    expect(askedAgain([['Workspace name', 'Workspace address'], ['Plan'], ['Workspace name', 'Billing email']])).toEqual(['Workspace name']);
+  });
+});
+
+// The golden wizard, walked with the audit. A portal without a wizard deletes this block with the
+// example; the audit above stays for the next multi-step flow.
+describe('Redundant entry (SC 3.3.7): the setup wizard example', () => {
   const form = () => document.getElementById('setup-step') as HTMLElement;
   const next = () => fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
@@ -190,9 +217,5 @@ describe('Redundant entry (SC 3.3.7)', () => {
     // So does going back.
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect((screen.getByRole('textbox', { name: 'Workspace name' }) as HTMLInputElement).value).toBe('Acme Legal');
-  });
-
-  it('negative control: catches a flow that asks for the same thing twice', () => {
-    expect(askedAgain([['Workspace name', 'Workspace address'], ['Plan'], ['Workspace name', 'Billing email']])).toEqual(['Workspace name']);
   });
 });

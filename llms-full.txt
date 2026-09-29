@@ -68,6 +68,7 @@ UI rules (design system v0)
 ## Guides
 
 - [Getting started](docs/guides/GettingStarted.stories.tsx): Install, import, the shell, router links, locale
+- [Start a new portal](docs/guides/StartANewPortal.stories.tsx): Copy the template, rename, trim, then plug in a backend
 - [Principles](docs/guides/Principles.stories.tsx): Tokens only, compose don’t restyle, accessible by default
 - [Decision ladder](docs/guides/DecisionLadder.stories.tsx): Template, variant, component or primitive; proposing a token
 - [Layout](docs/guides/Layout.stories.tsx): Which layout, which primitive, composing into AppShell
@@ -5661,6 +5662,65 @@ Data is the app’s job, not the system’s: the examples read and write through
 - Wire its data the way the examples do: see Data.
 - Style nothing. If a component doesn’t look right for the job, walk the Decision ladder.
 - Before a pull request: `npm run check`, then the visual and axe suite (`npm run test:visual`).
+
+<!-- docs/guides/StartANewPortal.stories.tsx -->
+
+### Start a new portal
+
+A portal is a one-time copy of this repo, made with GitHub’s “Use this template”, and then trimmed by deleting what it doesn’t need. Nothing flows back from the starter later. Every check keeps working after a trim, and the checks name what else to edit. The README’s “Start a new portal” section has the same steps with every file and command.
+
+#### 1. Create and rename
+
+1. Use this template, allow squash merging only, and set the clone’s commit email to your GitHub noreply address before the first commit.
+2. Rename `name` and `description` in `package.json` (then `npm install --package-lock-only`), and the first heading of the README and `CLAUDE.md`.
+3. Change the brand colours as [Theming and adding a brand](docs/guides/Theming.stories.tsx) describes: a new ramp, the brand-carrying semantic tokens pointed at it, `npm run tokens`, and the contrast test.
+
+#### 2. Trim, one example at a time
+
+Delete, then let the checks lead you to the rest.
+
+```
+# 1. delete src/examples/<Name>.tsx and <Name>.stories.tsx (and the extra files the README lists)
+# 2. delete its rows in src/examples/routes.tsx
+npm run typecheck   # names every file still importing it: delete those tests or describe blocks
+npx vitest run      # names the rest: dead links, guide links, README and CLAUDE.md lines
+npm run manifest    # regenerate the agent files
+npm run lint        # imports left unused
+```
+
+- A link that now leads nowhere (a nav item, a palette action, a “g then …” jump, `HOME`) fails the route table test, naming the path.
+- A guide that links to a deleted example fails the story-link test. Add the example’s title id to `REMOVED_EXAMPLES` in `docs/ui/removedExamples.ts`: its links become plain text, and [Page archetypes](docs/guides/PageArchetypes.stories.tsx) says it isn’t in this repo. Every other link is still checked.
+- A README or `CLAUDE.md` line naming a deleted file, or telling agents to copy a deleted example, fails the repo docs test.
+- The app layer behind a deleted example can stay until you replace it: no page imports it. The records trio (list, record, create and edit), the sign-in page, the error pages and the shell stay: the checks run on them. Rename them into your first resource.
+
+#### 3. Never delete
+
+- The system: `tokens/`, `src/styles/`, `src/primitives/`, `src/components/`, `src/layouts/`, `src/format/`.
+- The checks: `scripts/`, `fixtures/`, `.storybook/`, the CI workflows, the visual harness in `tests/visual/`, and every unit test that checks the system or the repo rather than one example. The only tests you delete are those of an example you deleted.
+
+#### 4. The first pull request
+
+- The copy carries the starter’s Linux baselines, and a rebrand changes them. Run **Update visual baselines** on the first branch: it regenerates every baseline and drops those of deleted stories. Then re-run CI, and merge once it’s green.
+- Then protect `main`, requiring **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**. A branch protection rule offers only checks that have run recently, so this comes after the first run. See [Testing](docs/guides/Testing.stories.tsx) for how baselines change from then on.
+
+#### 5. The real backend, resource by resource
+
+- `configureApi({ baseUrl })` in `src/app/api/client.ts`, once before the app mounts, is the only setting. Requests, the assistant’s stream and live events all build their URLs from it.
+- The zod schemas stay the contract: build each endpoint to its schema, and the client parses its answers as it parsed the mock’s. A payload that breaks the schema is an error state, never data. See [Data](docs/guides/Data.stories.tsx).
+- Move one resource at a time. The gallery and the tests keep MSW, so every state stays reproducible; the portal itself never starts it. `tests/unit/api-base.test.tsx` shows the records list served by a real HTTP server while the mocks answer the rest.
+
+#### 6. Where sign-in plugs in
+
+No provider is chosen yet. Whichever it is, it meets the app in four places.
+
+- **Before mount:** the provider signs the person in, then `getSession()` loads the session that `AppProviders` takes. Its `signedOut` prop renders the sign-in page.
+- **Every request:** `request()` in `client.ts` is the one place for cookies (`credentials`) or an `Authorization` header.
+- **Sign-out:** `signOut` in `src/app/session.tsx` clears the cache, queued writes and drafts; the provider’s own sign-out goes there too.
+- **A 401:** today it is the page’s error state. With a provider, send it back to sign-in, for example from the query cache’s `onError`.
+
+#### 7. Keep the agent files true
+
+After a trim, fix the lines the repo docs test names in `CLAUDE.md` (the examples agents are told to copy, the repo map) and the README, then run `npm run manifest`. `llms.txt`, `llms-full.txt` and the manifest are generated, and `npm run check` fails while they’re stale. See [Agents](docs/guides/Agents.stories.tsx).
 
 <!-- docs/guides/Principles.stories.tsx -->
 

@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from '../../src/index';
-import { semanticColoursFrom } from '../foundations/tokens';
+import { rampOf, semanticColoursFrom } from '../foundations/tokens';
 import { Code } from '../ui/Code';
 import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
-/** The primitive ramp the house brand is built from. */
-const BRAND_RAMP = 'color.indigo.';
+/** The primitive ramp the house brand is built from: the one the primary action is drawn from. */
+const BRAND_RAMP = rampOf('color.action.primary');
 
 /** Semantic colours whose light or dark value comes from the brand ramp: read from the token build, not typed. */
 const brandTokens = semanticColoursFrom(BRAND_RAMP);

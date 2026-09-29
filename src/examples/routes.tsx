@@ -87,6 +87,12 @@ const Integrations = page(async () => noParams((await import('./IntegrationsPage
 const Billing = page(async () => noParams((await import('./BillingPage')).BillingPage));
 // ── end Demo examples ────────────────────────────────────────────────────────────────────────
 
+/**
+ * Where "Go to Home" (the 404, 403 and error pages) and a workspace switch land. A route below must
+ * match it (tests/unit/routes.test.tsx): delete the home page, point this at another route.
+ */
+export const HOME = '/home';
+
 export const ROUTES: readonly Route[] = [
   { path: '/', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
   { path: '/home', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
