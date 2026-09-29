@@ -14,13 +14,12 @@ import { draftStorage } from '../../src/app/model/drafts';
 import { jobSettings } from '../../src/app/model/jobs';
 import { undoSettings } from '../../src/app/model/undo';
 import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
-import { aiHandlers } from '../../src/app/mocks/ai';
 import { handlers } from '../../src/app/mocks/handlers';
 import { AppProviders } from '../../src/app/providers';
 import { telemetry, type TelemetryEvent } from '../../src/app/telemetry';
 import { createMemoryHistory, type MemoryHistory } from '../../src/app/url/history';
 
-export const server = setupServer(...handlers, ...aiHandlers);
+export const server = setupServer(...handlers);
 
 /** Call once at the top of a test file that talks to the mock API. */
 export const setupMockApi = () => {

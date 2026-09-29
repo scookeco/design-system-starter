@@ -16,7 +16,6 @@ import { writeQueues } from '../model/writeQueue';
 import { AppProviders } from '../providers';
 import { createMemoryHistory, type MemoryHistory } from '../url/history';
 import { currentSession, resetDb, setRoles } from './db';
-import { aiHandlers } from './ai';
 import { handlers } from './handlers';
 import { seedJob, type JobSeed } from './jobs';
 import { DATASETS, type Dataset } from './seed';
@@ -220,8 +219,7 @@ const withMockApi: Decorator = (Story, context) => {
 export const mockApiMeta = {
   decorators: [withMockApi],
   // `overrides` comes first so a story's overrides (parameters.msw.handlers.overrides) win over the defaults.
-  // The assistant's routes (./ai) sit beside the rest; they import the same route wrapper, so they live in their own module.
-  parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: [...handlers, ...aiHandlers] } } },
+  parameters: { layout: 'fullscreen', msw: { handlers: { overrides: [], api: handlers } } },
   beforeEach: (context: { parameters: { mockApi?: MockApiParameters }; globals: Record<string, unknown> }) => {
     // Before any decorator renders: the database is chosen here, from the story, then the toolbar.
     resetDb(context.parameters.mockApi?.dataset ?? toolbarDataset(context.globals.dataset));

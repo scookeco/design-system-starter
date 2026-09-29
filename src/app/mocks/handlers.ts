@@ -41,6 +41,8 @@ import { IMPORT_LIMITS } from '../model/importRules';
 import { JOB_CAPABILITY } from '../model/jobs';
 // Demo examples: search, notifications, reports, integrations, billing and onboarding.
 import { demoHandlers } from './demos';
+// AI patterns: the assistant's routes.
+import { aiHandlers } from './ai';
 
 const API = '*/api/t/:tenant';
 
@@ -564,6 +566,7 @@ export const handlers = [
   ...viewHandlers,
   ...b2bHandlers,
   ...demoHandlers,
+  ...aiHandlers,
   // The session: not workspace data, so outside the tenant routes.
   http.get('*/api/session', async () => (await settle()) ?? (isSignedIn() ? HttpResponse.json(currentSession()) : error(401, 'signed_out', 'Sign in to continue.'))),
   http.delete('*/api/session', async () => {
