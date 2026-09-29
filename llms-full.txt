@@ -6403,9 +6403,38 @@ Longhands, with a duration and an easing token. The shorthand and literal durati
 }
 ```
 
+#### Entering
+
+Overlays fade in from @starting-style: the surface declares its transition, and the starting style is where it comes from. No script, and the behaviour library underneath doesn’t know.
+
+```
+.popover {
+  transition-property: opacity;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-enter);
+}
+
+@starting-style {
+  .popover { opacity: 0; }
+}
+```
+
+- Fade with `opacity`; a toast also rises from below its own height and a drawer slides in from its edge (`translate`, flipped for right-to-left).
+- Leaving is instant. The person asked for it to go, and the page behind is what they want next.
+- A browser without `@starting-style` ignores it and the overlay appears at once: the fallback is the old behaviour.
+
+#### View transitions
+
+When a whole view changes (the example app’s routes, a list switching between table and board), the page cross-fades instead of jumping.
+
+- Only through `withViewTransition` in `src/app/viewTransition.ts`. It runs the update inside `document.startViewTransition` when the browser has it and the person hasn’t asked for reduced motion, and directly otherwise.
+- How it looks is the system’s: `src/styles/base.css` times every view-transition group with `motion.view` and `ease.standard`. Nothing names its own transition yet; the whole page cross-fades.
+- Only a move to another path cross-fades. A tab, a page of results or a filter changes the query string and swaps at once.
+- Focus, the URL and announcements behave the same with or without it; it only changes what the swap looks like.
+
 #### What moves, and what never does
 
-- Hover and press feedback, colour changes: `motion.fast`. Menus and popovers opening: `motion.base`. Dialogs, drawers and toasts entering: `motion.slow`.
+- Hover and press feedback, colour changes: `motion.fast`. Menus and popovers opening: `motion.base`. Dialogs, drawers and toasts entering: `motion.slow`. A whole view changing (a route, a list’s display): `motion.view`.
 - Animate `opacity`, `transform` and colours. Never animate layout (width, height, top, margins): it jitters the page and costs a layout on every frame.
 - Never animate the focus ring, text people are reading, or a value changing in a table or a Stat: show the new value at once.
 - No parallax, no scroll-jacking, nothing that plays on its own for more than five seconds without a way to pause it.
@@ -6416,7 +6445,7 @@ Longhands, with a duration and an easing token. The shorthand and literal durati
 - The token build writes a `prefers-reduced-motion: reduce` block into tokens.css, so every transition built from tokens collapses to zero without a media query in the component.
 - The skeleton pulse stops; the spinner keeps turning, because it is the only sign that work is in progress.
 - State still changes instantly: only the movement goes.
-- The visual suite runs with reduced motion and animations disabled, so screenshots never catch a frame mid-transition.
+- The visual suite runs with reduced motion, animations disabled and view transitions off (`html[data-view-transitions="off"]`, set by the harness), so screenshots never catch a frame mid-transition. `tests/visual/motion.spec.ts` turns motion back on and checks what moves, for how long, and that each switch stops it.
 
 <!-- docs/guides/BrowserSupport.stories.tsx -->
 

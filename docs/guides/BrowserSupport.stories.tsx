@@ -280,7 +280,7 @@ function BrowserSupport() {
             {NOT_ADOPTED.map((row) => (
               <TableRow key={row.feature}>
                 <TableCell rowHeader>{inline(row.feature)}</TableCell>
-                <TableCell>{row.why}</TableCell>
+                <TableCell>{inline(row.why)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
