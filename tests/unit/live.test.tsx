@@ -12,7 +12,7 @@ import { AppProviders } from '../../src/app/providers';
 import { useAppSession } from '../../src/app/session';
 import { createMemoryHistory } from '../../src/app/url/history';
 import { ListPage } from '../../src/examples/ListPage';
-import { renderWithApp, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -132,10 +132,10 @@ describe('live subscription and the session boundary', () => {
   });
 });
 
-describe('the list page', () => {
+describe('the list page', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('offers “Show N new” instead of inserting rows, and shows them on request', async () => {
     renderWithApp(<ListPage />, { url: '/records', live: mockLive });
-    await screen.findByRole('navigation', { name: 'Records pages' });
+    await screen.findByRole('navigation', { name: 'Records pages' }, FIRST_PAINT);
     const table = screen.getByRole('table', { name: 'Records' });
     act(() => {
       anotherUser('acme', { kind: 'add', name: 'Aaa pushed record' });

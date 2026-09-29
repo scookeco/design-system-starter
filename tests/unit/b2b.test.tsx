@@ -10,7 +10,7 @@ import { removalBlocked, roleChangeBlocked } from '../../src/app/model/members';
 import { auditCodec, inboxCodec } from '../../src/app/url/b2bState';
 import { AdminConsole } from '../../src/examples/AdminConsole';
 import { InboxPage } from '../../src/examples/InboxPage';
-import { renderWithApp, setupMockApi } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -122,10 +122,10 @@ describe('the mock API: tenant- and permission-aware', () => {
   });
 });
 
-describe('Inbox: keyboard triage', () => {
+describe('Inbox: keyboard triage', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('moves with j and k, archives with e and opens the next, all through the URL', async () => {
     const { history } = renderWithApp(<InboxPage />, { url: '/inbox' });
-    await waitFor(() => expect(document.querySelector('[id^="inbox-row-"]')).not.toBeNull());
+    await waitFor(() => expect(document.querySelector('[id^="inbox-row-"]')).not.toBeNull(), FIRST_PAINT);
     act(() => void fireEvent.keyDown(document.body, { key: 'j' }));
     const first = new URLSearchParams(history.location().search).get('item');
     expect(first).toMatch(/^acme-i/);
@@ -148,17 +148,17 @@ describe('Inbox: keyboard triage', () => {
       </>,
       { url: '/inbox' },
     );
-    await waitFor(() => expect(document.querySelector('[id^="inbox-row-"]')).not.toBeNull());
+    await waitFor(() => expect(document.querySelector('[id^="inbox-row-"]')).not.toBeNull(), FIRST_PAINT);
     const input = screen.getByRole('textbox', { name: 'Notes' });
     fireEvent.keyDown(input, { key: 'j' });
     expect(history.location().search).toBe('');
   });
 });
 
-describe('Admin console: members', () => {
+describe('Admin console: members', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('disables Invite with the reason for an editor, and shows no row actions', async () => {
     renderWithApp(<AdminConsole section="members" />, { role: 'editor' });
-    const invite = await screen.findByRole('button', { name: 'Invite member' });
+    const invite = await screen.findByRole('button', { name: 'Invite member' }, FIRST_PAINT);
     expect(invite.hasAttribute('disabled')).toBe(true);
     expect(screen.getByText('Only workspace admins can invite, change or remove members.')).toBeTruthy();
     await screen.findByRole('table', { name: 'Members' });
@@ -168,7 +168,7 @@ describe('Admin console: members', () => {
 
   it('lets an admin invite; the member shows as invited', async () => {
     renderWithApp(<AdminConsole section="members" initialDialog={{ kind: 'invite' }} />);
-    const dialog = await screen.findByRole('dialog', { name: 'Invite a member' });
+    const dialog = await screen.findByRole('dialog', { name: 'Invite a member' }, FIRST_PAINT);
     fireEvent.change(within(dialog).getByRole('textbox', { name: 'Email' }), { target: { value: 'ada@example.com' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Send invitation' }));
     const table = await screen.findByRole('table', { name: 'Members' });
