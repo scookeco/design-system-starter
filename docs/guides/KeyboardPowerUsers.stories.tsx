@@ -18,7 +18,7 @@ const CONVENTIONS = [
   { kind: '⌘ / Ctrl chords (mod+k)', use: 'App-wide commands people use from anywhere, including while typing.', rule: 'Never a chord the browser owns (copy, paste, find, new tab, zoom…): the registry refuses them.' },
   { kind: 'Sequences (g then i)', use: 'Jumps: two letters, the first a verb ("go"). Many jumps, one prefix.', rule: 'A single key that starts a sequence conflicts with it (g alone would always fire first).' },
   { kind: 'Single keys (j, k, e, ?)', use: 'Repeated actions in a queue, where speed matters most.', rule: 'Can be turned off in the ? overlay (WCAG 2.2 SC 2.1.4); never fire in a text field or a dialog.' },
-  { kind: 'Keys inside a widget (arrows, Enter, Space, Escape)', use: 'The widget’s own model: a listbox, a menu, a grid, a toolbar.', rule: 'Not for the registry: they are reserved, so page shortcuts can’t steal them.' },
+  { kind: 'Keys inside a widget (arrows, Enter, Space, Escape)', use: 'The widget’s own model: a listbox, a menu, a grid, a toolbar, a result list.', rule: 'Not for the registry: they are reserved, so page shortcuts can’t steal them.' },
 ] as const;
 
 function KeyboardPowerUsers() {
@@ -150,6 +150,40 @@ useShortcut({
         />
       </DocSection>
 
+      <DocSection
+        title="Moving through a list"
+        intro="A page of results people open one at a time is a ResultList: one tab stop for the whole list, arrow keys inside it."
+      >
+        <Rules
+          items={[
+            <>
+              <code>ResultList</code>: Tab reaches the list (the result you left from, or the first) and the next Tab leaves it for the
+              pagination; ↑ ↓ move, Home and End jump, ↵ opens the link. It remembers the result you left, and a new page or query hands the stop
+              to the first. See <StoryLink id="components-resultlist--focused-item">a focused result</StoryLink>.
+            </>,
+            <>
+              <strong>Page keys and list keys move the same focus.</strong> On the{' '}
+              <StoryLink id="examples-search--results">search page</StoryLink>, j and k (registered with <code>useShortcut</code>) move from
+              anywhere on the page, ↑ ↓ once focus is in the list; focusing a result moves the list’s tab stop with it. The list never takes a
+              character, so j, k and every other single-key shortcut reach the registry, and nothing fires while typing in a field.
+            </>,
+            <>
+              <strong>No typeahead.</strong> Result names are free text the person just searched for, and the search field is one key away (/);
+              typing to jump would also swallow the single-key shortcuts.
+            </>,
+            <>
+              <strong>A list of links, not a listbox.</strong> Results navigate, so they stay links in a native list with a roving tabindex; a
+              plain list doesn’t announce its arrow keys, so the page says them (“↑ ↓ or J K”). Paged lists give each result its place in the
+              whole set (<code>aria-posinset</code>, <code>aria-setsize</code>).
+            </>,
+            <>
+              <strong>Rows with more than one control</strong> (the inbox’s checkbox, link and context menu; a notification’s Mark read) stay a{' '}
+              <code>Table</code>, with j and k from the registry.
+            </>,
+          ]}
+        />
+      </DocSection>
+
       <DocSection title="Keyboard-first components">
         <Rules
           items={[
@@ -161,7 +195,7 @@ useShortcut({
             </>,
             <>Inside a Dialog their popovers portal into the dialog, and Esc closes only the popover.</>,
             <>
-              <code>Toolbar</code> is one tab stop with arrow keys between its buttons; <code>ContextMenu</code> opens with Shift+F10 on the
+              <code>Toolbar</code> is one tab stop with arrow keys between its buttons, as <code>ResultList</code> is between its results; <code>ContextMenu</code> opens with Shift+F10 on the
               focused row and repeats actions that are visible elsewhere; <code>InlineEdit</code> edits one value in place with Enter and Esc;{' '}
               <code>SplitView</code>’s divider resizes with the arrow keys.
             </>,

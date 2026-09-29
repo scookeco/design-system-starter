@@ -60,6 +60,7 @@ export { MultiSelect, type MultiSelectProps, type MultiSelectOption } from './Mu
 export { DatePicker, DateRangePicker, type DatePickerProps, type DateRangePickerProps, type DateRange, type IsoDate } from './DatePicker/DatePicker';
 export { NumberField, type NumberFieldProps } from './NumberField/NumberField';
 export { Toolbar, ToolbarButton, ToolbarSeparator, type ToolbarProps, type ToolbarButtonProps } from './Toolbar/Toolbar';
+export { ResultList, ResultListItem, type ResultListProps, type ResultListItemProps } from './ResultList/ResultList';
 export { ContextMenu, type ContextMenuProps } from './ContextMenu/ContextMenu';
 export { InlineEdit, type InlineEditProps } from './InlineEdit/InlineEdit';
 // AI patterns

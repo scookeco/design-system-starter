@@ -57,6 +57,8 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+  Arrow keys between a page's results come from ResultList, never a
+  hand-rolled roving tabindex.
 - Platform features: what a page needs must be Baseline widely available;
   newer ones only as enhancements that still work when dropped (or behind
   @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
@@ -142,6 +144,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one

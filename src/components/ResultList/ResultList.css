@@ -1,0 +1,67 @@
+@layer components {
+  /* 1. block */
+  .result-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 2. parts */
+  .result-list__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    min-inline-size: 0;
+  }
+
+  .result-list__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+    min-inline-size: 0;
+  }
+
+  /* At least the minimum target height (WCAG 2.2 SC 2.5.8); the system focus ring from base styles. */
+  .result-list__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-target-min);
+    min-inline-size: 0;
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    font: var(--text-body);
+    overflow-wrap: anywhere;
+    text-decoration-line: underline;
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
+  .result-list__meta {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .result-list__description {
+    min-inline-size: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+    overflow-wrap: anywhere;
+  }
+
+  /* 3. variants */
+  .result-list[data-density="compact"] {
+    gap: var(--space-gap-xs);
+  }
+
+  .result-list[data-density="compact"] .result-list__item {
+    gap: 0;
+  }
+
+  /* 4. states */
+  .result-list__link:hover {
+    text-decoration-thickness: var(--focus-ring-width);
+  }
+}

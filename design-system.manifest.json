@@ -4,7 +4,7 @@
   "name": "Design system starter",
   "summary": "Design system starter where design-system drift fails the build.",
   "entry": "src/index.ts",
-  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,\n  import → ImportWizard, search results → SearchPage, notifications →\n  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,\n  billing → BillingPage. Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.\n  The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.\n- Platform features: what a page needs must be Baseline widely available;\n  newer ones only as enhancements that still work when dropped (or behind\n  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,\n  dismissal) stays with Radix and React Aria; motion honours reduced motion.",
+  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,\n  import → ImportWizard, search results → SearchPage, notifications →\n  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,\n  billing → BillingPage. Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.\n  The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.\n  Arrow keys between a page's results come from ResultList, never a\n  hand-rolled roving tabindex.\n- Platform features: what a page needs must be Baseline widely available;\n  newer ones only as enhancements that still work when dropped (or behind\n  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,\n  dismissal) stays with Radix and React Aria; motion honours reduced motion.",
   "commands": [
     {
       "command": "npm run dev",
@@ -4635,6 +4635,10 @@
           {
             "situation": "Searching one list",
             "instead": "`SearchField` on the list page (its results stay in the page and the URL)"
+          },
+          {
+            "situation": "Every match for a query, to work through",
+            "instead": "a search results page with `ResultList` (the palette’s “See all results” row opens it)"
           },
           {
             "situation": "Choosing a value for a form field",
@@ -10208,6 +10212,10 @@
           {
             "situation": "Actions",
             "instead": "`Button` or `Menu`"
+          },
+          {
+            "situation": "A page of results or matches, not fixed destinations",
+            "instead": "`ResultList`"
           }
         ],
         "do": {
@@ -11898,6 +11906,245 @@
       "description": null,
       "partOf": "Reel",
       "propsOf": "Reel"
+    },
+    {
+      "name": "ResultList",
+      "kind": "component",
+      "source": "src/components/ResultList/ResultList.tsx",
+      "status": null,
+      "description": "A list of results people move through one at a time: one tab stop, ↑ ↓ between items, Home and End to the first and last, Enter opens the focused item's link. The list remembers the item you left from, so Tab away and back returns there. Characters are never taken: single-key page shortcuts (j, k) and typing reach the page. A native list of links with a roving tabindex, not a listbox: the items navigate, they aren't options to select.",
+      "docs": "docs/usage/ResultList.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible name of the list (\"Results\", \"Search results\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "ResultListItem elements, best match first."
+        },
+        {
+          "name": "empty",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "Shown in place of the list when there are no items: an EmptyState that says why and what to do. Required."
+        },
+        {
+          "name": "total",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "The set's size when this list is one page of it: each item then says where it sits (aria-posinset, aria-setsize)."
+        },
+        {
+          "name": "start",
+          "type": "number",
+          "required": false,
+          "default": "1",
+          "description": "Position of the first item in the whole set, 1-based (page 2 of 20 starts at 21). Used with `total`."
+        },
+        {
+          "name": "density",
+          "type": "'default' | 'compact'",
+          "required": false,
+          "default": "'default'",
+          "description": "`compact` tightens the space between items, for long lists people scan.",
+          "values": [
+            "default",
+            "compact"
+          ]
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "density": [
+          "default",
+          "compact"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A page of results people work through one at a time, each opening a page of its own: search results, “records like this”, a picker page of matches.",
+          "Where the list is long enough that Tab through every item is a chore: one tab stop for the list, ↑ ↓ inside it, and the next Tab goes on to the pagination."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The app’s or a section’s navigation (a few fixed destinations, one current)",
+            "instead": "`Nav` or `NavTabs`"
+          },
+          {
+            "situation": "Actions on something, in a popup",
+            "instead": "`Menu` (it runs commands; this opens pages)"
+          },
+          {
+            "situation": "Rows with several controls or columns to compare (a checkbox, a menu, amounts)",
+            "instead": "`Table`"
+          },
+          {
+            "situation": "Jumping anywhere by typing, from any page",
+            "instead": "`CommandPalette` (its “See all results” row opens the results page)"
+          },
+          {
+            "situation": "Picking a value for a form field",
+            "instead": "`Combobox` or `Select`"
+          }
+        ],
+        "do": {
+          "caption": "One link per item with the matched text in <strong>, a status Badge beside it and the type on a second line; an EmptyState for no results.",
+          "code": "<ResultList label=\"Results\" empty={<EmptyState reason=\"no-results\" title=\"No results\" />}>\n  <ResultListItem href=\"#r-1042\" meta={<Badge tone=\"success\">Active</Badge>} description=\"Record · Dana Whitfield · Northwind Traders\">\n    <strong>North</strong>wind renewal\n  </ResultListItem>\n  <ResultListItem href=\"#a-12\" description=\"Account · northwind.example\">\n    <strong>North</strong>wind Traders\n  </ResultListItem>\n</ResultList>"
+        },
+        "dont": {
+          "caption": "A hand-built list of links: every result is its own tab stop, the arrow keys do nothing, and each page re-invents the spacing.",
+          "code": "<Stack as=\"ol\" role=\"list\" gap=\"md\" aria-label=\"Results\">\n  <li>\n    <Cluster gap=\"xs\">\n      <Link href=\"#r-1042\">Northwind renewal</Link>\n      <Badge tone=\"success\">Active</Badge>\n    </Cluster>\n    <Text size=\"caption\" tone=\"muted\">\n      Record · Dana Whitfield\n    </Text>\n  </li>\n</Stack>"
+        },
+        "accessibility": [
+          "A native ordered list of links (`ol` › `li` › `a`) with a roving tabindex: exactly one item is tabbable, the one last focused, so Tab away and back returns to it; a new page or query hands the stop to the first item.",
+          "Not `role=\"listbox\"`: listbox options are chosen, not followed, may not contain links, and switch screen readers into forms mode. Not `role=\"grid\"` (the ARIA APG layout grid): one column gains nothing from grid navigation, and a plain list keeps browse-mode reading.",
+          "↑ ↓ move, Home and End jump, Enter opens the link (the browser’s own activation). No wrap at the ends, no typeahead: every character reaches the page, so j and k and the other single-key shortcuts keep working, and nothing fires while typing in a field.",
+          "Arrow keys inside a plain list aren’t announced as available: say so on the page (“↑ ↓ or J K move between results”), as the search page does.",
+          "Paged results pass `total` and `start`: each item carries `aria-posinset` and `aria-setsize`, so screen readers that read them give its place in the whole set (“41 of 240”), not just on this page.",
+          "Each link is at least the minimum target height and shows the system focus ring. Keep `meta` to static content (a Badge): a second control in an item is a Table row."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ResultList",
+        "stories": [
+          {
+            "id": "components-resultlist--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-resultlist--focused-item",
+            "name": "Focused Item"
+          },
+          {
+            "id": "components-resultlist--one-page-of-many",
+            "name": "One Page Of Many"
+          },
+          {
+            "id": "components-resultlist--empty",
+            "name": "Empty"
+          },
+          {
+            "id": "components-resultlist--long-labels",
+            "name": "Long Labels"
+          },
+          {
+            "id": "components-resultlist--compact",
+            "name": "Compact"
+          }
+        ],
+        "composes": [
+          "Link"
+        ],
+        "tokens": [
+          "color.fg.link",
+          "color.fg.muted",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "radius.indicator",
+          "size.target-min",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.gap.xs",
+          "text.body",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "ResultListItem",
+      "kind": "component",
+      "source": "src/components/ResultList/ResultList.tsx",
+      "status": null,
+      "description": "One item in a ResultList: a link to it, with an optional badge beside it and a second line below.",
+      "partOf": "ResultList",
+      "docs": "docs/usage/ResultList.usage.tsx",
+      "props": [
+        {
+          "name": "href",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Where the item goes. Routed through the app's LinkProvider."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The item's name, and the link's accessible name. Mark matched text with <strong>."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A second line: the type and what matched (owner, domain, email)."
+        },
+        {
+          "name": "meta",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Beside the name: a status Badge. Not interactive: the item has one control, its link."
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The link's id, for focusing it from a page shortcut."
+        },
+        {
+          "name": "onClick",
+          "type": "(event: MouseEvent<HTMLAnchorElement>) => void",
+          "required": false,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "ResultListItemProps",
+      "kind": "type-only",
+      "source": "src/components/ResultList/ResultList.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ResultList",
+      "propsOf": "ResultListItem"
+    },
+    {
+      "name": "ResultListProps",
+      "kind": "type-only",
+      "source": "src/components/ResultList/ResultList.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ResultList",
+      "propsOf": "ResultList"
     },
     {
       "name": "RetryIcon",
@@ -15535,6 +15782,10 @@
           {
             "situation": "A single record’s properties",
             "instead": "a definition list: `Stack as=\"dl\"` with `Text as=\"dt\"/\"dd\"`"
+          },
+          {
+            "situation": "Results with one link each and nothing to compare across columns",
+            "instead": "`ResultList`"
           }
         ],
         "do": {

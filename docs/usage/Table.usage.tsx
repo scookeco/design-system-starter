@@ -17,6 +17,7 @@ export const usage: UsageDoc = {
     { situation: 'Items that are mostly visual or have fewer than four attributes worth comparing', instead: 'cards in a `Grid`' },
     { situation: 'Laying out a form or a page', instead: 'layout primitives' },
     { situation: 'A single record’s properties', instead: 'a definition list: `Stack as="dl"` with `Text as="dt"/"dd"`' },
+    { situation: 'Results with one link each and nothing to compare across columns', instead: '`ResultList`' },
   ],
   do: {
     caption: 'A caption names the table, the first cell heads the row, amounts line up on the right.',

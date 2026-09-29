@@ -57,6 +57,8 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+  Arrow keys between a page's results come from ResultList, never a
+  hand-rolled roving tabindex.
 - Platform features: what a page needs must be Baseline widely available;
   newer ones only as enhancements that still work when dropped (or behind
   @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
@@ -142,6 +144,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
@@ -1024,6 +1027,7 @@ States: open, defaultOpen, loading.
 **When not to use**
 
 - Searching one list → `SearchField` on the list page (its results stay in the page and the URL)
+- Every match for a query, to work through → a search results page with `ResultList` (the palette’s “See all results” row opens it)
 - Choosing a value for a form field → `Combobox`
 - The only way to reach something → visible navigation and buttons first; the palette is the fast path
 
@@ -2297,6 +2301,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - Switching views of one record in place → `Tabs`
 - Showing where a page sits in the hierarchy → `Breadcrumbs`
 - Actions → `Button` or `Menu`
+- A page of results or matches, not fixed destinations → `ResultList`
 
 **Do:** A few top-level destinations, grouped, with the current page marked.
 
@@ -2749,6 +2754,93 @@ States: hideLabel, disabled.
 Stories: `components-radiogroup--unselected`, `components-radiogroup--selected`, `components-radiogroup--with-description`, `components-radiogroup--with-error`, `components-radiogroup--horizontal`, `components-radiogroup--disabled-option`, `components-radiogroup--disabled`.
 Composes: Field, Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
+### ResultList
+
+component · `src/components/ResultList/ResultList.tsx` · usage: `docs/usage/ResultList.usage.tsx`
+
+A list of results people move through one at a time: one tab stop, ↑ ↓ between items, Home and End to the first and last, Enter opens the focused item's link. The list remembers the item you left from, so Tab away and back returns there. Characters are never taken: single-key page shortcuts (j, k) and typing reach the page. A native list of links with a roving tabindex, not a listbox: the items navigate, they aren't options to select.
+
+Props:
+- `label: string`: Accessible name of the list ("Results", "Search results"). Required.
+- `children?: ReactNode`: ResultListItem elements, best match first.
+- `empty: ReactNode`: Shown in place of the list when there are no items: an EmptyState that says why and what to do. Required.
+- `total?: number`: The set's size when this list is one page of it: each item then says where it sits (aria-posinset, aria-setsize).
+- `start?: number` = `1`: Position of the first item in the whole set, 1-based (page 2 of 20 starts at 21). Used with `total`.
+- `density?: 'default' | 'compact'` = `'default'`: `compact` tightens the space between items, for long lists people scan.
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: density (default | compact).
+
+#### ResultListItem
+
+component, part of ResultList. One item in a ResultList: a link to it, with an optional badge beside it and a second line below.
+
+Props:
+- `href: string`: Where the item goes. Routed through the app's LinkProvider.
+- `children: ReactNode`: The item's name, and the link's accessible name. Mark matched text with <strong>.
+- `description?: ReactNode`: A second line: the type and what matched (owner, domain, email).
+- `meta?: ReactNode`: Beside the name: a status Badge. Not interactive: the item has one control, its link.
+- `id?: string`: The link's id, for focusing it from a page shortcut.
+- `onClick?: (event: MouseEvent<HTMLAnchorElement>) => void`
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A page of results people work through one at a time, each opening a page of its own: search results, “records like this”, a picker page of matches.
+- Where the list is long enough that Tab through every item is a chore: one tab stop for the list, ↑ ↓ inside it, and the next Tab goes on to the pagination.
+
+**When not to use**
+
+- The app’s or a section’s navigation (a few fixed destinations, one current) → `Nav` or `NavTabs`
+- Actions on something, in a popup → `Menu` (it runs commands; this opens pages)
+- Rows with several controls or columns to compare (a checkbox, a menu, amounts) → `Table`
+- Jumping anywhere by typing, from any page → `CommandPalette` (its “See all results” row opens the results page)
+- Picking a value for a form field → `Combobox` or `Select`
+
+**Do:** One link per item with the matched text in <strong>, a status Badge beside it and the type on a second line; an EmptyState for no results.
+
+```tsx
+<ResultList label="Results" empty={<EmptyState reason="no-results" title="No results" />}>
+  <ResultListItem href="#r-1042" meta={<Badge tone="success">Active</Badge>} description="Record · Dana Whitfield · Northwind Traders">
+    <strong>North</strong>wind renewal
+  </ResultListItem>
+  <ResultListItem href="#a-12" description="Account · northwind.example">
+    <strong>North</strong>wind Traders
+  </ResultListItem>
+</ResultList>
+```
+
+**Don't:** A hand-built list of links: every result is its own tab stop, the arrow keys do nothing, and each page re-invents the spacing.
+
+```tsx
+<Stack as="ol" role="list" gap="md" aria-label="Results">
+  <li>
+    <Cluster gap="xs">
+      <Link href="#r-1042">Northwind renewal</Link>
+      <Badge tone="success">Active</Badge>
+    </Cluster>
+    <Text size="caption" tone="muted">
+      Record · Dana Whitfield
+    </Text>
+  </li>
+</Stack>
+```
+
+**Accessibility**
+
+- A native ordered list of links (`ol` › `li` › `a`) with a roving tabindex: exactly one item is tabbable, the one last focused, so Tab away and back returns to it; a new page or query hands the stop to the first item.
+- Not `role="listbox"`: listbox options are chosen, not followed, may not contain links, and switch screen readers into forms mode. Not `role="grid"` (the ARIA APG layout grid): one column gains nothing from grid navigation, and a plain list keeps browse-mode reading.
+- ↑ ↓ move, Home and End jump, Enter opens the link (the browser’s own activation). No wrap at the ends, no typeahead: every character reaches the page, so j and k and the other single-key shortcuts keep working, and nothing fires while typing in a field.
+- Arrow keys inside a plain list aren’t announced as available: say so on the page (“↑ ↓ or J K move between results”), as the search page does.
+- Paged results pass `total` and `start`: each item carries `aria-posinset` and `aria-setsize`, so screen readers that read them give its place in the whole set (“41 of 240”), not just on this page.
+- Each link is at least the minimum target height and shows the system focus ring. Keep `meta` to static content (a Badge): a second control in an item is a Table row.
+
+Stories: `components-resultlist--default`, `components-resultlist--focused-item`, `components-resultlist--one-page-of-many`, `components-resultlist--empty`, `components-resultlist--long-labels`, `components-resultlist--compact`.
+Composes: Link.
+Tokens read: `color.fg.link`, `color.fg.muted`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `text.body`, `text.caption`.
 
 ### ReviewChanges
 
@@ -3492,6 +3584,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - Items that are mostly visual or have fewer than four attributes worth comparing → cards in a `Grid`
 - Laying out a form or a page → layout primitives
 - A single record’s properties → a definition list: `Stack as="dl"` with `Text as="dt"/"dd"`
+- Results with one link each and nothing to compare across columns → `ResultList`
 
 **Do:** A caption names the table, the first cell heads the row, amounts line up on the right.
 
@@ -5617,6 +5710,15 @@ Before building anything new, walk the ladder from the top and stop at the first
 4. **Primitive: can it not be expressed as a composition at all?**
    The highest bar: domain-agnostic, token-driven. It changes tokens, component styles and the agent rules in the same pull request.
 
+#### Walked: a results list you move through with the arrow keys
+
+How ResultList came to be a component: the search page needed ↑ ↓ between its results.
+
+- **Template?** No: the search page already existed. It could only move with j and k, because true arrow-key movement with one tab stop is behaviour, and pages don’t own keyboard models.
+- **Variant?** None fits. `Nav` is a landmark of fixed destinations with one current page; `Menu` is a popup of commands; `Table` is for rows with columns and several controls; `Toolbar` holds buttons, and its ARIA role says so; `CommandPalette` is a modal combobox with the input keeping focus. Each would change its meaning to carry a page of links.
+- **Component: yes.** A new intent, a page of results opened one at a time, with a small contract (`label`, `empty`, `total`, `start`, one link per item). One use today, search results; the inbox and the notification centre were checked and stay tables, because their rows carry more than one control.
+- **Primitive: no.** It is a composition of a list and links; nothing about layout or tokens is new.
+
 #### Proposing a token
 
 - Pick the tier. Semantic is almost always right; a primitive only for a new raw value; a component token only for a per-part override hook.
@@ -6333,7 +6435,7 @@ useShortcut({
 | ⌘ / Ctrl chords (mod+k) | App-wide commands people use from anywhere, including while typing. | Never a chord the browser owns (copy, paste, find, new tab, zoom…): the registry refuses them. |
 | Sequences (g then i) | Jumps: two letters, the first a verb ("go"). Many jumps, one prefix. | A single key that starts a sequence conflicts with it (g alone would always fire first). |
 | Single keys (j, k, e, ?) | Repeated actions in a queue, where speed matters most. | Can be turned off in the ? overlay (WCAG 2.2 SC 2.1.4); never fire in a text field or a dialog. |
-| Keys inside a widget (arrows, Enter, Space, Escape) | The widget’s own model: a listbox, a menu, a grid, a toolbar. | Not for the registry: they are reserved, so page shortcuts can’t steal them. |
+| Keys inside a widget (arrows, Enter, Space, Escape) | The widget’s own model: a listbox, a menu, a grid, a toolbar, a result list. | Not for the registry: they are reserved, so page shortcuts can’t steal them. |
 
 #### The app’s shortcuts
 
@@ -6352,11 +6454,21 @@ useShortcut({
 
 - The [inbox](src/examples/InboxPage.tsx) is the reference: j/k move and focus follows, e archives and opens the next, and each key mirrors a toolbar button, a row’s context menu and the bulk toolbar. See [its ? overlay](src/examples/InboxPage.tsx).
 
+#### Moving through a list
+
+A page of results people open one at a time is a ResultList: one tab stop for the whole list, arrow keys inside it.
+
+- `ResultList`: Tab reaches the list (the result you left from, or the first) and the next Tab leaves it for the pagination; ↑ ↓ move, Home and End jump, ↵ opens the link. It remembers the result you left, and a new page or query hands the stop to the first. See [a focused result](src/components/ResultList/ResultList.stories.tsx).
+- **Page keys and list keys move the same focus.** On the [search page](src/examples/SearchPage.tsx), j and k (registered with `useShortcut`) move from anywhere on the page, ↑ ↓ once focus is in the list; focusing a result moves the list’s tab stop with it. The list never takes a character, so j, k and every other single-key shortcut reach the registry, and nothing fires while typing in a field.
+- **No typeahead.** Result names are free text the person just searched for, and the search field is one key away (/); typing to jump would also swallow the single-key shortcuts.
+- **A list of links, not a listbox.** Results navigate, so they stay links in a native list with a roving tabindex; a plain list doesn’t announce its arrow keys, so the page says them (“↑ ↓ or J K”). Paged lists give each result its place in the whole set (`aria-posinset`, `aria-setsize`).
+- **Rows with more than one control** (the inbox’s checkbox, link and context menu; a notification’s Mark read) stay a `Table`, with j and k from the registry.
+
 #### Keyboard-first components
 
 - `Combobox` and `MultiSelect` (type to narrow, ↑ ↓ ↵), `DatePicker` and `DateRangePicker` (type each segment or use ↑ ↓; the calendar is a grid), `NumberField` (↑ ↓ step, Page Up/Down by ten): React Aria behind the system’s closed API. Dates and numbers follow `LocaleProvider`, the same locale and time zone as `useFormat()`; values stay ISO dates and integer minor units.
 - Inside a Dialog their popovers portal into the dialog, and Esc closes only the popover.
-- `Toolbar` is one tab stop with arrow keys between its buttons; `ContextMenu` opens with Shift+F10 on the focused row and repeats actions that are visible elsewhere; `InlineEdit` edits one value in place with Enter and Esc; `SplitView`’s divider resizes with the arrow keys.
+- `Toolbar` is one tab stop with arrow keys between its buttons, as `ResultList` is between its results; `ContextMenu` opens with Shift+F10 on the focused row and repeats actions that are visible elsewhere; `InlineEdit` edits one value in place with Enter and Esc; `SplitView`’s divider resizes with the arrow keys.
 
 <!-- docs/guides/Motion.stories.tsx -->
 
@@ -6832,6 +6944,8 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+  Arrow keys between a page's results come from ResultList, never a
+  hand-rolled roving tabindex.
 - Platform features: what a page needs must be Baseline widely available;
   newer ones only as enhancements that still work when dropped (or behind
   @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,

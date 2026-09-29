@@ -15875,6 +15875,140 @@
         }
       ]
     },
+    "ResultList": {
+      "kind": "component",
+      "dir": "src/components/ResultList",
+      "exports": [
+        "ResultList",
+        "ResultListItem"
+      ],
+      "stylesheets": [
+        "src/components/ResultList/ResultList.css"
+      ],
+      "composes": [
+        "Link"
+      ],
+      "composesAll": [
+        "Link"
+      ],
+      "tokens": [
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            },
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            },
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            },
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            },
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "ResultList",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "ReviewChanges": {
       "kind": "component",
       "dir": "src/components/ReviewChanges",

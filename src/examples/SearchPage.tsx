@@ -9,15 +9,17 @@
  *   search   SearchField in a role="search" form: the URL follows once typing pauses (replace)
  *   types    NavTabs with server counts per type: All · Records · Accounts · People (push)
  *   refine   PageLayout's aside: record statuses with counts (replace), shown when records are in view
- *   results  an ordered list, best match first: the name as a link with the matched text in <strong>,
- *            the type and a second line (owner and account, domain, email), a record's status badge
+ *   results  ResultList, best match first: the name as a link with the matched text in <strong>,
+ *            the type and a second line (owner and account, domain, email), a record's status badge;
+ *            one tab stop, ↑ ↓ inside it, each item's place in the whole set for screen readers
  *   paging   Pagination, in the URL
  *
  * Everything that decides what matches is on the server, with the same folding rules as the list
  * and the palette (src/app/model/searchRules.ts), and only what this person may open is returned.
  *
  * Keyboard, like the inbox and the palette: / puts the cursor in the search field, J and K move
- * through the results (focus follows), Enter opens one. Every key is in the ? overlay.
+ * through the results from anywhere on the page (focus follows, and ResultList's tab stop with it),
+ * ↑ ↓ move once focus is in the list, Enter opens one. Every page key is in the ? overlay.
  */
 import { useCallback, useState } from 'react';
 import {
@@ -29,11 +31,12 @@ import {
   Cluster,
   EmptyState,
   Kbd,
-  Link,
   NavTabs,
   PageHeader,
   PageLayout,
   Pagination,
+  ResultList,
+  ResultListItem,
   SearchField,
   Skeleton,
   Stack,
@@ -159,50 +162,59 @@ function SearchContent() {
     >
       Check your connection and try again.
     </Banner>
-  ) : items.length === 0 ? (
-    <EmptyState
-      reason="no-results"
-      title={`No results for “${query.q}”`}
-      description={filtered || url.type ? 'Nothing matches with these filters. Clear them to search everything.' : 'Check the spelling, or search for part of a name.'}
-      action={
-        filtered || url.type ? (
-          <Button variant="secondary" onClick={() => nav.replace({ type: '', status: [], page: 1 })}>
-            Clear filters
-          </Button>
-        ) : undefined
-      }
-      headingLevel={2}
-    />
   ) : (
     <Stack gap="md">
-      <Stack as="ol" role="list" gap="md" aria-label="Results">
-        {items.map((hit) => (
-          <Stack as="li" gap="2xs" key={`${hit.type}-${hit.id}`}>
-            <Cluster gap="xs" align="center">
-              <Link id={resultId(hit)} href={HREF[hit.type](hit.id)}>
-                <Highlighted text={hit.title} ranges={hit.titleMatches} />
-              </Link>
-              {hit.status ? <Badge tone={STATUS[hit.status].tone}>{STATUS[hit.status].label}</Badge> : null}
-            </Cluster>
-            <Text size="caption" tone="muted">
-              {TYPE_LABEL[hit.type].one}
-              {hit.detail ? ' · ' : ''}
-              <Highlighted text={hit.detail} ranges={hit.detailMatches} />
-            </Text>
-          </Stack>
-        ))}
-      </Stack>
-      <Pagination
-        label="Search results pages"
-        page={url.page}
-        pageSize={PAGE_SIZE}
+      <ResultList
+        label="Results"
+        start={(url.page - 1) * PAGE_SIZE + 1}
         total={total}
-        formatNumber={format.number}
-        onPageChange={(page) => {
-          nav.push({ page });
-          setFocused(-1);
-        }}
-      />
+        empty={
+          <EmptyState
+            reason="no-results"
+            title={`No results for “${query.q}”`}
+            description={filtered || url.type ? 'Nothing matches with these filters. Clear them to search everything.' : 'Check the spelling, or search for part of a name.'}
+            action={
+              filtered || url.type ? (
+                <Button variant="secondary" onClick={() => nav.replace({ type: '', status: [], page: 1 })}>
+                  Clear filters
+                </Button>
+              ) : undefined
+            }
+            headingLevel={2}
+          />
+        }
+      >
+        {items.map((hit) => (
+          <ResultListItem
+            key={`${hit.type}-${hit.id}`}
+            id={resultId(hit)}
+            href={HREF[hit.type](hit.id)}
+            meta={hit.status ? <Badge tone={STATUS[hit.status].tone}>{STATUS[hit.status].label}</Badge> : undefined}
+            description={
+              <>
+                {TYPE_LABEL[hit.type].one}
+                {hit.detail ? ' · ' : ''}
+                <Highlighted text={hit.detail} ranges={hit.detailMatches} />
+              </>
+            }
+          >
+            <Highlighted text={hit.title} ranges={hit.titleMatches} />
+          </ResultListItem>
+        ))}
+      </ResultList>
+      {items.length > 0 ? (
+        <Pagination
+          label="Search results pages"
+          page={url.page}
+          pageSize={PAGE_SIZE}
+          total={total}
+          formatNumber={format.number}
+          onPageChange={(page) => {
+            nav.push({ page });
+            setFocused(-1);
+          }}
+        />
+      ) : null}
     </Stack>
   );
 
@@ -238,7 +250,7 @@ function SearchContent() {
           <SearchField id={FIELD_ID} label="Search the workspace" value={text} onValueChange={setText} />
         </Cluster>
         <Text size="caption" tone="muted">
-          <Kbd keys="/" /> search · <Kbd keys="j" /> <Kbd keys="k" /> next and previous result · <Kbd keys="?" /> all shortcuts
+          <Kbd keys="/" /> search · <Kbd keys="arrowdown" /> <Kbd keys="arrowup" /> or <Kbd keys="j" /> <Kbd keys="k" /> next and previous result · <Kbd keys="?" /> all shortcuts
         </Text>
       </Stack>
       <NavTabs
