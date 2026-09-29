@@ -57,6 +57,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 
 ## Guides
@@ -74,6 +78,7 @@ UI rules (design system v0)
 - [Forms](docs/guides/Forms.stories.tsx): Field anatomy, which control, layout, validation, error summary
 - [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): The command palette, the shortcut registry, keyboard-first parts
 - [Motion](docs/guides/Motion.stories.tsx): Durations, easings, what moves, reduced motion
+- [Browser support and the platform](docs/guides/BrowserSupport.stories.tsx): The Baseline rule, platform features in use, overlays and native…
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Dark mode, changing the brand, a second brand
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): When UNSAFE_className/style is acceptable, and its comment
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Propose, what a PR includes, deprecate, versioning
@@ -6412,6 +6417,83 @@ Longhands, with a duration and an easing token. The shorthand and literal durati
 - State still changes instantly: only the movement goes.
 - The visual suite runs with reduced motion and animations disabled, so screenshots never catch a frame mid-transition.
 
+<!-- docs/guides/BrowserSupport.stories.tsx -->
+
+### Browser support and the platform
+
+The system targets evergreen browsers and uses the platform where it makes things simpler, sturdier or more accessible. Anything a page needs to work is Baseline widely available; anything newer is an enhancement the page works without.
+
+#### The rule
+
+- **Required: Baseline widely available.** A feature a page can’t work without has been in every core browser (Chrome, Edge, Firefox, Safari, on desktop and mobile) for 30 months.
+- **Enhancement: newly available, or newer, only with a working fallback.** Either the browser drops the declaration and what’s left still works (the fallback is checked, not assumed), or it sits behind `@supports` or a feature check in script, with today’s behaviour as the other branch.
+- **Behaviour stays where it is proven.** Keyboard, focus, dismissal and what’s announced come from Radix, React Aria or our own tested code until a native version is widely available and does everything they do. An enhancement may change how something looks or moves, never how it behaves.
+- **Motion enhancements honour reduced motion and never reach a screenshot.** Durations come from motion tokens (0ms under reduced motion), and the visual suite captures only settled end states. See [Motion](docs/guides/Motion.stories.tsx).
+- **Every adoption is a row below**, with its status and what happens without it. One exception is on record: `light-dark()`, required by the token output, becomes widely available on 2026-11-13.
+
+Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on webstatus.dev (or in the web-features package) before you use it.
+
+#### What the system uses
+
+**Platform features in use**
+
+| Feature | Where | What it replaces or fixes | Baseline | Without it |
+|---|---|---|---|---|
+| `:has()` | PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main | Data attributes set from props only to describe the markup (`data-nav`, `data-aside`, `data-removable`, `data-assistant`): the CSS reads the markup itself, so the two can’t disagree. | Widely available (2026-06-19) | Required: no fallback. |
+| `@starting-style` with transitions | Entry of Popover, Tooltip, HoverCard, Menu, ContextMenu, Select, the pickers (Combobox, MultiSelect, DatePicker), Dialog, Drawer, CommandPalette and Toast | Nothing: overlays appeared at once. They now fade (a toast rises, a drawer slides from its edge) over motion tokens, with no JavaScript and no change to Radix or React Aria. | Newly available (2024-08-06) | The rule is ignored and the overlay appears at once, as before. Reduced motion makes the duration 0ms. |
+| Same-document view transitions | The example app: route changes and a list’s display switch (table ↔ board), through `withViewTransition` in `src/app/viewTransition.ts` | Nothing: the page swapped at once. Now it cross-fades over `motion.view`. | Newly available (2025-10-14) | The helper checks for `document.startViewTransition` and runs the update directly. It also skips under reduced motion and when `html[data-view-transitions="off"]` (the test harness sets it). |
+| `text-wrap: balance` | Headings, h1 to h4 (reset layer) | Ragged two-line headings with one word on the second line. | Newly available (2024-05-13) | Ignored: headings wrap normally. |
+| `text-wrap: pretty` | Body copy: p, li, dd, blockquote, figcaption (reset layer) | A single word left alone on a paragraph’s or a list item’s last line. | Limited: Chrome, Edge and Safari; not Firefox | Ignored: text wraps normally. |
+| `scrollbar-gutter: stable` | AppShell’s main, SplitView’s panes, CommandPalette’s results, ChatThread | Content shifting sideways when a classic (non-overlay) scrollbar appears: a list loading, results filtering, an answer streaming in. | Newly available (2024-12-11) | Ignored: the shift comes back on platforms with classic scrollbars. Overlay scrollbars (macOS, phones, headless test browsers) never had it. |
+| `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
+| `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
+| Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
+
+#### Overlays: native popover and anchor positioning
+
+Decided per component. Every overlay keeps its behaviour library, which also positions it; what changed is that each one fades in (@starting-style above).
+
+- **Positioning can’t be handed to CSS while Radix renders the overlay.** Radix places the content in a wrapper whose position and transform it writes as inline styles on every update. Anchor positioning would have to override them, which needs `!important` (banned); adopting it means dropping Radix for that component.
+- **A native popover would break Escape inside a Dialog.** Radix closes only the topmost of its own layers on Escape, from a keydown listener on the document. A native popover isn’t one of those layers, so Escape in a popover inside a Dialog would close both.
+- **The top layer fixes nothing here yet.** Overlays portal to the body and stack by the z tokens (Foundations/Layers), so none is clipped or covered today.
+- **Revisit** when the popover attribute is widely available (2027-07) for a stacking bug the z tiers can’t fix, and when anchor positioning and interest invokers are widely available, for Tooltip and HoverCard first.
+
+**Overlay decisions**
+
+| Component | Behaviour from | Popover and anchoring | Why |
+|---|---|---|---|
+| Tooltip | Radix Tooltip | Keep Radix | Open on hover and focus with a delay, a pointer grace area, Escape, aria-describedby. The native version (popover="hint" with interest invokers) isn’t Baseline. |
+| HoverCard | Radix HoverCard | Keep Radix | Open and close delays and a grace area between link and card; the native version is interest invokers, not Baseline. |
+| Popover | Radix Popover | Keep Radix | A non-modal dialog: focus moves in and returns to the trigger, Escape and an outside click close it. popover="auto" would add light dismiss and the top layer, but not focus management, and its Escape isn’t coordinated with a Dialog underneath. |
+| Menu | Radix DropdownMenu | Keep Radix | Roving focus, typeahead, submenus, modal focus while open. None of that is in the platform. |
+| ContextMenu | Radix ContextMenu | Keep Radix | Opens at the pointer, not at an element, so there is no anchor for CSS anchor positioning to name. |
+| Select | Radix Select | Keep Radix | Item-aligned positioning, typeahead, scroll buttons. The native equivalent (a customisable select) isn’t Baseline. |
+| Combobox, MultiSelect, DatePicker | React Aria | Keep React Aria | Combobox and grid keyboard models, virtual focus, announcements and collision handling, all measured in script. |
+| Dialog, Drawer, CommandPalette | Radix Dialog | Keep Radix | Modal: focus trap, the page behind hidden from assistive technology and unclickable, scroll lock, focus return. The dialog element’s showModal() is widely available and does much of this, but moving means re-proving every one of those behaviours for no bug fixed today. A candidate once there is one. |
+| Toast | Radix Toast | Keep Radix | A labelled region with a hotkey, pause on hover and focus, swipe to dismiss, and announcements by tone. The top layer would put toasts above modals, which z.toast already does. |
+
+#### Considered and not adopted
+
+**Features not adopted**
+
+| Feature | Why not |
+|---|---|
+| CSS anchor positioning (`anchor-name`, `position-anchor`, `position-area`, `position-try-fallbacks`) | Not Baseline as a feature; `position-anchor` only reached newly available on 2026-09-14, so it is widely available in 2029. Radix and React Aria position every overlay today, and their positioning can’t be handed to CSS (see the overlay table). |
+| The `popover` attribute (top layer, light dismiss) | Newly available (2025-01-27; widely available in 2027-07). The overlays are already portalled and stacked by the z tokens, and a native popover isn’t one of Radix’s dismissable layers (see the overlay table). |
+| `popover="hint"` and interest invokers (`interestfor`) | Not Baseline: popover="hint" isn’t in Safari, and interest invokers are only in Chrome and Edge. They are the native Tooltip and HoverCard; revisit when they are widely available. |
+| `interpolate-size`, `calc-size()` and `transition-behavior: allow-discrete` for Disclosure and Accordion | interpolate-size and calc-size are Chrome and Edge only. And animating height is what the Motion guide rules out: it moves the page and costs a layout on every frame. Disclosure and Accordion open at once and turn their chevron; there is no script to remove. |
+| `field-sizing: content` on Textarea | Textarea doesn’t grow with its content, and has no script doing it: it has rows and a vertical resize handle, by design. Auto-grow is the Composer’s. |
+| `color-mix()` in component CSS | Colour functions are banned outside the token source (lint), and every colour is a named token whose contrast is tested in light and dark from resolved values. A colour mixed at runtime is one the contrast test can’t see. |
+| Cross-document view transitions, scroll-driven animations | Not Baseline, and nothing needs them: the app is one document, and nothing moves with scrolling. |
+
+#### Adopting a feature
+
+- Name the problem it fixes, in a story or a test. “It’s new” isn’t one.
+- Look up its Baseline status and date, and decide: required (widely available only) or an enhancement (with a fallback).
+- Check the fallback: turn the feature off in the browser, or run the branch without it, and look.
+- Values still come from tokens, and the CSS rules still hold: logical properties, `@layer`, specificity no higher than 0,3,0. If Stylelint rejects a valid new property or value, change its config with a violation fixture for any new rule.
+- Add the row to this page, and say in the pull request which screenshots it changed.
+
 <!-- docs/guides/Theming.stories.tsx -->
 
 ### Theming and adding a brand
@@ -6719,6 +6801,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 
 #### Keeping them current

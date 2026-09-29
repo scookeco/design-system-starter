@@ -46,7 +46,7 @@ Work on a branch. Never commit to `main` directly.
 
 ## Read the Guides first
 
-Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Keyboard and power users, Motion, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents, AI patterns. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
+Before building UI, read the **Guides** in the gallery (`docs/guides/`): Getting started, Principles, Decision ladder, Layout, Page archetypes, Data, Accessibility (and Accessibility conformance), Content, Forms, Keyboard and power users, Motion, Browser support and the platform, Theming and adding a brand, Escape hatches, Contributing and versioning, Testing, Agents, AI patterns. Look values up on the **Foundations** pages, not in `tokens/` by hand. Each component's Docs tab says when to use it and what to use instead.
 
 ## UI rules for coding agents
 
@@ -104,6 +104,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 <!-- agent-rules:end -->
 
@@ -125,4 +129,5 @@ UI rules (design system v0)
 - Form drafts belong to the form (`useDraft`), never the cache: autosaved, guarded on navigation (`useNavigationGuard`), cleared after save and on sign-out.
 - Reversible actions offer Undo (a held write or a compensating one, `undo.ts`) instead of a confirmation; irreversible ones keep the confirming Dialog. Bulk work over "all matching" is a job with truthful status (`jobs.ts`), never "done" at enqueue.
 - History: push to open, replace to refine; Back restores list scroll and focus (`useListRestoration`). Stories script another person's changes with `mockApi({ anotherUser })`, hold the undo window with `undoWindow: 'hold'`, and seed paused jobs with `jobs`.
+- Route changes and a list's display switch cross-fade through `withViewTransition` (`src/app/viewTransition.ts`), never a bare `document.startViewTransition`: it skips unsupported browsers, reduced motion and the test harness (`html[data-view-transitions="off"]`).
 - New screens are rows in `src/examples/routes.tsx` with a guard. A new entity that fits the list, record and form archetypes is an entry in `src/app/registries/entities.ts`.

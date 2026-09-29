@@ -57,6 +57,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 
 ## Guides
@@ -74,6 +78,7 @@ UI rules (design system v0)
 - [Forms](docs/guides/Forms.stories.tsx): Field anatomy, which control, layout, validation, error summary
 - [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): The command palette, the shortcut registry, keyboard-first parts
 - [Motion](docs/guides/Motion.stories.tsx): Durations, easings, what moves, reduced motion
+- [Browser support and the platform](docs/guides/BrowserSupport.stories.tsx): The Baseline rule, platform features in use, overlays and native…
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Dark mode, changing the brand, a second brand
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): When UNSAFE_className/style is acceptable, and its comment
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Propose, what a PR includes, deprecate, versioning
