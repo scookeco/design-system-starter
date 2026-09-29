@@ -64,7 +64,7 @@ Delete one example at a time, and run the loop after each:
 
 | Delete | Also delete | Also edit |
 |---|---|---|
-| AI examples: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` | `AssistantTurns.tsx`, `tests/unit/ai-examples.test.tsx` | Nothing else. Optionally drop the assistant's app layer too: `src/app/api/ai.ts`, `src/app/model/ai.ts`, `src/app/mocks/ai.ts` (and `...aiHandlers` in `handlers.ts`), `src/app/url/chatState.ts`, `tests/unit/ai.test.tsx`, the assistant's verbs in `telemetry.test.tsx`, and the `asRead` test in `writeQueue.test.tsx`. |
+| AI examples: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` | `AssistantTurns.tsx`, `ai-examples.test.tsx` | Nothing else. Optionally drop the assistant's app layer too. In `src/app`, that's `api/ai.ts`, `model/ai.ts`, `mocks/ai.ts` (and `aiHandlers` in `mocks/handlers.ts`) and `url/chatState.ts`. In the tests, that's `ai.test.tsx`, the assistant's verbs and its 429 test in `telemetry.test.tsx`, and the `asRead` test in `writeQueue.test.tsx`. |
 | `InboxPage`, `AdminConsole` | their `describe` blocks in `b2b.test.tsx` | the Inbox and Admin nav items; `g i`, `g m` and "Invite member" in `CommandMenu.tsx`. Keep `src/app/mocks/b2b.ts`: every write's audit event goes through it. |
 | `ImportWizard` | `imports.test.tsx` | the "Import records" palette action |
 | `SearchPage` | `search.test.tsx` | the palette's "See all results" row (`searchHref`) |
@@ -73,7 +73,7 @@ Delete one example at a time, and run the loop after each:
 | `IntegrationsPage`, `BillingPage` | `integrations.test.tsx`, `billing.test.tsx` | nothing else |
 | `DashboardPage` | `Onboarding.tsx` and its stories, `records.ts`, `onboarding.test.tsx` | point `/` and `HOME` in `routes.tsx` at another page; the Home nav item and `g h` |
 | `SetupWizard` | "Setup wizard example" in `examples.test.tsx`; "the setup wizard example" in `wcag22.test.tsx` (the redundant-entry audit stays) | nothing else |
-| `EntityPages` | `entities.test.tsx` | the Accounts and People nav items, `g a`, `g p` and "New account"; records still link to accounts, so render `AccountRef` in `src/app/registries/refs.tsx` without its `Link`, and drop the palette's account and people rows |
+| `EntityPages` | `entities.test.tsx` | the Accounts and People nav items, `g a`, `g p` and "New account"; records still link to accounts, so render `AccountRef` in `src/app/registries/refs.tsx` as plain text, and drop the palette's account and people groups. In the tests, drop "New account" in `command-palette.test.tsx`, expect the account name as text in `registry.test.tsx`, and delete the entity-pages test in `routes.test.tsx` |
 
 The app layer behind a deleted example (`src/app/api`, `model`, `mocks` for billing, reports and so on) can stay until you replace it: no page imports it, so it adds nothing to a page. When you do remove a domain, `npm run typecheck` names its tests. That includes its race test in `refetch.test.tsx` and its verbs in `telemetry.test.tsx`, which lists its model files by name.
 
@@ -117,7 +117,8 @@ No provider is chosen here. This is where one plugs in:
 
 `CLAUDE.md`, `llms.txt`, `llms-full.txt` and `design-system.manifest.json` describe the repo to coding agents.
 
-- After each trim, `repo-docs.test.ts` names every line in `CLAUDE.md` and this README that points at something deleted. That covers the rules block's "Copy the matching golden example" list, the repo map, and "Which example to copy".
+- After each trim, `repo-docs.test.ts` names every line in `CLAUDE.md` and this README that points at something deleted. It checks every repo path in backticks, and the rules block's "Copy the matching golden example" list. That covers "Which example to copy" and most of the repo map.
+- Examples named without a path are not checked. Edit those by hand: the `src/examples/` line of `CLAUDE.md`'s repo map, and this README's `src/examples/` repo-map line.
 - Fix those lines, then run `npm run manifest`. `npm run check` fails until the generated files match.
 
 ## Scripts
