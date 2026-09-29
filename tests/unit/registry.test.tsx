@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RecordEntity } from '../../src/app/api/schemas';
 import { seedAccounts, seedPeople, seedRecords } from '../../src/app/mocks/seed';
-import { FIELD_REGISTRY, FIELD_TYPES, FieldDisplay, FieldInput, fieldReporting, type FieldDef, type FieldRegistry } from '../../src/app/registries/fields';
+import { FIELD_REGISTRY, FIELD_TYPES, FieldDisplay, FieldInput, fieldReporting, type DraftValues, type FieldDef, type FieldRegistry, type FieldType, type FieldValues } from '../../src/app/registries/fields';
 import { RECORD_PROPERTIES } from '../../src/app/registries/recordFields';
 import { createFormatter } from '../../src/format/format';
 import { renderWithApp, setupMockApi } from './app-harness';
@@ -72,5 +72,44 @@ describe('field registry', () => {
     render(<FieldInput field={{ type: 'rating', id: 'score', label: 'Score' }} inputId="score" value="" onChange={() => undefined} context={context} />);
     expect(screen.getByText('Not available')).toBeTruthy();
     expect(report).toHaveBeenCalledWith('rating', 'score');
+  });
+});
+
+/**
+ * A value and a draft for every field type. Keyed on the FieldType union, so a new type without a
+ * sample fails to compile, and gets its own test below.
+ */
+const SAMPLES: { [K in FieldType]: { value: FieldValues[K]; draft: DraftValues[K] } } = {
+  text: { value: record.name, draft: record.name },
+  money: { value: record.amount, draft: '12500.50' },
+  date: { value: record.renewsOn, draft: '2027-01-31' },
+  status: { value: record.status, draft: record.status },
+  person: { value: record.ownerId, draft: record.ownerId },
+  account: { value: record.accountId, draft: record.accountId ?? '' },
+  tags: { value: ['priority', 'renewal'], draft: 'priority, renewal' },
+};
+
+describe('every registry entry renders its view and its edit without throwing', () => {
+  it.each(FIELD_TYPES)('%s', async (type) => {
+    const report = vi.spyOn(fieldReporting, 'report').mockImplementation(() => undefined);
+    const sample = SAMPLES[type];
+    const field = { type, id: `sample-${type}`, label: `Sample ${type}`, get: () => sample.value } as unknown as FieldDef<RecordEntity>;
+    let rendered: ReturnType<typeof renderWithApp> | undefined;
+    expect(() => {
+      rendered = renderWithApp(
+        <>
+          <output data-testid="view">
+            <FieldDisplay field={field} entity={record} format={format} />
+          </output>
+          <FieldInput field={field} inputId={`input-${type}`} value={String(sample.draft)} onChange={() => undefined} context={context} />
+        </>,
+      );
+    }).not.toThrow();
+    // The view shows something (people and accounts once their directory answers); the input is labelled.
+    await waitFor(() => expect(screen.getByTestId('view').textContent).not.toBe(''));
+    expect(screen.getByTestId('view').textContent).not.toContain('Not available');
+    expect(rendered?.container.querySelector(`#input-${type}`)).not.toBeNull();
+    // A known type is never reported as unknown.
+    expect(report).not.toHaveBeenCalled();
   });
 });
