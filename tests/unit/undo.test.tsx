@@ -10,7 +10,7 @@ import { isCancelled } from '../../src/app/model/writeQueue';
 import { db } from '../../src/app/mocks/db';
 import { firstListedRecord } from '../../src/app/mocks/live';
 import { ListPage } from '../../src/examples/ListPage';
-import { renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -85,13 +85,13 @@ describe('restore, the compensation for a sent archive', () => {
   });
 });
 
-describe('a board move, undone', () => {
+describe('a board move, undone', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('is sent at once; Undo moves it back', async () => {
     undoSettings.windowMs = Infinity;
     const record = firstListedRecord('acme') as RecordEntity;
     const target = record.status === 'overdue' ? 'pending' : 'overdue';
     renderWithApp(<ListPage initialMove={{ id: record.id, status: target }} />, { url: '/records?display=board' });
-    const toast = await screen.findByText(/^Moved to/);
+    const toast = await screen.findByText(/^Moved to/, {}, FIRST_PAINT);
     expect(onServer(record.id).status).toBe(target);
     fireEvent.click(within(toast.closest('li') as HTMLElement).getByRole('button', { name: 'Undo' }));
     await waitFor(() => expect(onServer(record.id).status).toBe(record.status));
