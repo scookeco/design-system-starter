@@ -19,6 +19,11 @@ import { Cluster, Disclosure, Stack, Table, TableBody, TableCell, TableHead, Tab
 const SLOTS = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => vars.color.chart.categorical[String(n) as keyof typeof vars.color.chart.categorical]);
 
 export interface ChartDatum {
+  /**
+   * What the datum is (an id, a status, a month), for React's keys. Never the label: a label can be a
+   * placeholder shared by several rows while it loads ("…"), and duplicate keys leave stale rows behind.
+   */
+  key: string;
   label: string;
   value: number;
   /** The value as a person reads it: formatted by the page with useFormat(). */
@@ -51,14 +56,14 @@ export function StackedBarChart({ label, data, share }: { label: string; data: r
         {drawn.map((d) => {
           const w = total === 0 ? 0 : (d.value / total) * room;
           const slot = data.indexOf(d);
-          const rect = <rect key={d.label} x={x} y={0} width={w} height={10} fill={SLOTS[slot] ?? SLOTS[0]} />;
+          const rect = <rect key={d.key} x={x} y={0} width={w} height={10} fill={SLOTS[slot] ?? SLOTS[0]} />;
           x += w + gap;
           return rect;
         })}
       </svg>
       <Cluster as="ul" role="list" aria-label="Legend" gap="md">
         {data.map((d, i) => (
-          <Cluster as="li" key={d.label} gap="xs" align="center" wrap={false}>
+          <Cluster as="li" key={d.key} gap="xs" align="center" wrap={false}>
             <Swatch slot={i} />
             <Text as="span" size="caption">{`${d.label}: ${d.display} (${share(total === 0 ? 0 : d.value / total)})`}</Text>
           </Cluster>
@@ -78,7 +83,7 @@ export function BarChart({ label, data }: { label: string; data: readonly ChartD
   return (
     <Stack as="ol" role="list" gap="sm" aria-label={label}>
       {data.map((d) => (
-        <Stack as="li" key={d.label} gap="2xs">
+        <Stack as="li" key={d.key} gap="2xs">
           <Cluster justify="between" gap="sm" wrap={false}>
             <Text as="span" size="caption">
               {d.label}
@@ -129,7 +134,7 @@ export function ColumnChart({ label, data, top, first, last }: { label: string; 
         ))}
         {data.map((d, i) => {
           const h = (d.value / max) * height;
-          return <rect key={d.label} x={i * column + gap / 2} y={height - h} width={column - gap} height={h} fill={SLOTS[0]} />;
+          return <rect key={d.key} x={i * column + gap / 2} y={height - h} width={column - gap} height={h} fill={SLOTS[0]} />;
         })}
       </svg>
       <Cluster justify="between" gap="sm">
