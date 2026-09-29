@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { isRemovedExample } from './removedExamples';
 
 /** A block of example code: a focusable, labelled region so keyboard users can scroll it. */
 export function Code({ children, label }: { children: string; label: string }) {
@@ -12,8 +13,10 @@ export function Code({ children, label }: { children: string; label: string }) {
 /**
  * A link to another page of the gallery. Pages render inside Storybook's preview iframe,
  * so the link targets the top window. Story ids come from storybook-static/index.json.
+ * A link to a golden example this repo deleted (REMOVED_EXAMPLES) is its text alone.
  */
 export function StoryLink({ id, children }: { id: string; children: ReactNode }) {
+  if (isRemovedExample(id)) return <>{children}</>;
   return (
     <a href={`./?path=/story/${id}`} target="_top">
       {children}

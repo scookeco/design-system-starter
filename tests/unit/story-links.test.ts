@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { findStoryLinkProblems, referencedIds, storyIds, type SourceFile } from '../../scripts/checks/story-links';
+import { findStoryLinkProblems, referencedIds, removedExampleProblems, storyIds, type SourceFile } from '../../scripts/checks/story-links';
+import { REMOVED_EXAMPLES } from '../../docs/ui/removedExamples';
 
 const root = resolve(import.meta.dirname, '../..');
 
@@ -20,7 +21,11 @@ const docs = walk(join(root, 'docs'), (f) => /\.tsx?$/.test(f));
 
 describe('story links in docs/', () => {
   it('every StoryLink and story id in docs/ names a story or Docs tab that exists', () => {
-    expect(findStoryLinkProblems(docs, ids).map((p) => `${p.file}: ${p.problem}`)).toEqual([]);
+    expect(findStoryLinkProblems(docs, ids, REMOVED_EXAMPLES).map((p) => `${p.file}: ${p.problem}`)).toEqual([]);
+  });
+
+  it('lists only examples that are gone and still linked as removed (docs/ui/removedExamples.ts)', () => {
+    expect(removedExampleProblems(REMOVED_EXAMPLES, ids, docs)).toEqual([]);
   });
 
   it('finds the links it checks (positive control)', () => {
@@ -38,5 +43,31 @@ describe('story links in docs/', () => {
       { file: 'ok.tsx', code: '<StoryLink id="guides-forms--forms-guide">Forms</StoryLink>' },
     ];
     expect(findStoryLinkProblems(bad, ids).map((p) => p.file)).toEqual(['dead.tsx', 'row.tsx', 'href.tsx', 'expr.tsx']);
+  });
+
+  it('silences only listed, deleted examples, and checks the list itself (negative controls)', () => {
+    const present = new Set(['examples-list-page--default', 'components-button--docs']);
+    const guide: SourceFile = {
+      file: 'guide.tsx',
+      code: [
+        '<StoryLink id="examples-inbox--conversation-open">the inbox</StoryLink>',
+        '<StoryLink id="examples-inbx--typo">a typo in a title</StoryLink>',
+        '<StoryLink id="examples-list-page--missing">a typo under a present title</StoryLink>',
+        '<StoryLink id="components-button--gone">a system page</StoryLink>',
+      ].join('\n'),
+    };
+    // examples-inbox is listed as removed, so its link is text; the three others are still dead.
+    expect(findStoryLinkProblems([guide], present, ['examples-inbox']).map((p) => p.problem.split(' (')[0])).toEqual([
+      'no story or Docs tab has the id "examples-inbx--typo"',
+      'no story or Docs tab has the id "examples-list-page--missing"',
+      'no story or Docs tab has the id "components-button--gone"',
+    ]);
+    // The list: a system page, an example that still has stories, and an entry nothing links to all fail.
+    expect(removedExampleProblems(['examples-inbox', 'components-button', 'examples-list-page', 'examples-inboxx'], present, [guide])).toEqual([
+      'components-button: only golden examples (examples-…) can be listed as removed',
+      'components-button: still has stories; delete them, or take it off the list',
+      'examples-list-page: still has stories; delete them, or take it off the list',
+      'examples-inboxx: nothing in docs/ links to it; is it misspelt, or no longer needed on the list?',
+    ]);
   });
 });
