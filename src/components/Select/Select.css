@@ -24,6 +24,9 @@
     border-radius: var(--radius-surface);
     background: var(--color-bg-elevated);
     box-shadow: var(--shadow-popover);
+    transition-property: opacity;
+    transition-duration: var(--motion-base);
+    transition-timing-function: var(--ease-enter);
   }
 
   .select__viewport {
@@ -62,5 +65,12 @@
   .select__indicator {
     display: flex;
     color: var(--color-fg-link);
+  }
+
+  /* Entry: fades in from @starting-style. Reduced motion makes the duration 0ms, so it appears at once. */
+  @starting-style {
+    .select__content {
+      opacity: 0;
+    }
   }
 }
