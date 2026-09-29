@@ -22,6 +22,8 @@ describe('date', () => {
     expect(ja.date('2026-09-12')).toBe('2026年9月12日');
     expect(us.date('2026-09-12', 'short')).toBe('Sep 12');
     expect(us.date('2026-09-12', 'long')).toBe('September 12, 2026');
+    expect(us.date('2027-03-01', 'month')).toBe('Mar 2027');
+    expect(de.date('2027-03-01', 'month')).toBe('März 2027');
   });
 
   it('never shifts a calendar date by time zone', () => {
