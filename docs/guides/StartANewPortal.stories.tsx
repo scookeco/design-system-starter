@@ -34,6 +34,7 @@ npm run typecheck   # names every file still importing it: delete those tests or
 npx vitest run      # names the rest: dead links, guide links, README and CLAUDE.md lines
 npm run manifest    # regenerate the agent files
 npm run lint        # imports left unused
+npm run dead-modules  # modules only the deleted example used: delete them, then typecheck again
 `}</Code>
         <Rules
           items={[
@@ -51,7 +52,8 @@ npm run lint        # imports left unused
               A README or <code>CLAUDE.md</code> line naming a deleted file, or telling agents to copy a deleted example, fails the repo docs test.
             </>,
             <>
-              The app layer behind a deleted example can stay until you replace it: no page imports it. The records trio (list, record, create
+              Modules only the deleted example imported (its URL state, its queries) fail the dead-module check, named: delete them. The rest
+              of the app layer behind it can stay until you replace it: the mock server and its tests still use it. The records trio (list, record, create
               and edit), the sign-in page, the error pages and the shell stay: the checks run on them. Rename them into your first resource.
             </>,
           ]}

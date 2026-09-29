@@ -78,13 +78,23 @@ const COMPILER_OPTIONS: ts.CompilerOptions = {
 /** Relative and root-absolute specifiers resolve into the repo; bare ones are packages (the lockfile covers them). */
 const isLocal = (specifier: string) => specifier.startsWith('.') || specifier.startsWith('/');
 
+export interface GraphOptions {
+  /**
+   * Follow type-only imports and re-exports too. The gallery graph skips them (a type changes no
+   * pixel); the dead-module check needs them (a module only types import is still in use).
+   */
+  types?: boolean;
+}
+
 export class ModuleGraph {
   readonly root: string;
+  private readonly types: boolean;
   private readonly modules = new Map<string, ModuleInfo>();
   private readonly resolutionCache: ts.ModuleResolutionCache;
 
-  constructor(root = ROOT) {
+  constructor(root = ROOT, options: GraphOptions = {}) {
     this.root = root;
+    this.types = options.types ?? false;
     this.resolutionCache = ts.createModuleResolutionCache(root, (f) => f, COMPILER_OPTIONS);
   }
 
@@ -148,26 +158,31 @@ export class ModuleGraph {
     for (const statement of source.statements) {
       if (ts.isImportDeclaration(statement) && ts.isStringLiteral(statement.moduleSpecifier)) {
         const clause = statement.importClause;
-        if (clause?.isTypeOnly) continue;
+        if (clause?.isTypeOnly && !this.types) continue;
         const names = new Set<string>();
+        let values = 0;
         let namespace = false;
         if (clause?.name) names.add('default');
         const bindings = clause?.namedBindings;
         if (bindings && ts.isNamespaceImport(bindings)) namespace = true;
         if (bindings && ts.isNamedImports(bindings)) {
-          for (const el of bindings.elements) if (!el.isTypeOnly) names.add((el.propertyName ?? el.name).text);
+          for (const el of bindings.elements) {
+            if (!el.isTypeOnly) values += 1;
+            if (this.types || !el.isTypeOnly) names.add((el.propertyName ?? el.name).text);
+          }
         }
         // `import { type A } from './x'` keeps a bare import under verbatimModuleSyntax: a side-effect edge.
         edge(statement.moduleSpecifier.text, namespace ? '*' : names, 'static');
-        if (names.size > 0 || namespace) barrel = false;
+        // Only value imports make a module more than a barrel (types never run).
+        if (!clause?.isTypeOnly && (values > 0 || namespace || clause?.name)) barrel = false;
         continue;
       }
       if (ts.isExportDeclaration(statement) && statement.moduleSpecifier && ts.isStringLiteral(statement.moduleSpecifier)) {
-        if (statement.isTypeOnly) continue;
+        if (statement.isTypeOnly && !this.types) continue;
         const clause = statement.exportClause;
         let names: ReadonlyMap<string, string> | '*' = '*';
         if (clause && ts.isNamedExports(clause)) {
-          names = new Map(clause.elements.filter((el) => !el.isTypeOnly).map((el) => [el.name.text, (el.propertyName ?? el.name).text]));
+          names = new Map(clause.elements.filter((el) => this.types || !el.isTypeOnly).map((el) => [el.name.text, (el.propertyName ?? el.name).text]));
           if (names.size === 0) continue;
         } else if (clause) {
           barrel = false; // export * as ns from: a namespace object
@@ -189,6 +204,8 @@ export class ModuleGraph {
     info.barrel = barrel;
 
     const visit = (node: ts.Node): void => {
+      // `typeof import('./x')` in a type position: a type-only edge.
+      if (this.types && ts.isImportTypeNode(node) && ts.isLiteralTypeNode(node.argument) && ts.isStringLiteral(node.argument.literal)) edge(node.argument.literal.text, '*', 'static');
       if (ts.isCallExpression(node)) {
         const [arg] = node.arguments;
         if (node.expression.kind === ts.SyntaxKind.ImportKeyword) {

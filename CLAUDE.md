@@ -5,7 +5,8 @@ Reference design system in which drift fails the build. See `README.md` for the 
 ## Commands
 
 ```sh
-npm run check          # tokens:check + manifest:check + typecheck + lint + test + test:rules + build + build:app + size. Must pass.
+npm run check          # tokens:check + manifest:check + typecheck + lint + dead-modules + test + test:rules + build + build:app + size. Must pass.
+npm run dead-modules   # names modules under src/ and docs/ that nothing reaches (what a deleted example left behind); KEEP in scripts/dead-modules.ts for exceptions
 npm run tokens         # regenerate tokens.css, tokens.ts and the token usage map after editing tokens/ or any system CSS
 npm run manifest       # regenerate llms.txt, llms-full.txt and design-system.manifest.json after changing exports, props, JSDoc, stories, usage docs, guides or the rules below
 npm run size           # bundle size budgets (.size-limit.json) + tree-shaking check; needs npm run build first

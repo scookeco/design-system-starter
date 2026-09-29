@@ -47,6 +47,10 @@
       "description": "Lints every file in `fixtures/violations/` and asserts that the expected rule fires."
     },
     {
+      "command": "npm run dead-modules",
+      "description": "Fails on any module under `src/` or `docs/` that no entry point reaches (the app, `src/index.ts`, a story, a test, a script or config), naming each. Exceptions go in `KEEP` in `scripts/dead-modules.ts`, with a reason."
+    },
+    {
       "command": "npm run build",
       "description": "Library build (`dist/index.js`, `dist/styles.css`)."
     },
@@ -80,7 +84,7 @@
     },
     {
       "command": "npm run check",
-      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `build:app`, `size`."
+      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size`."
     }
   ],
   "guides": [
