@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text } from '../../src/index';
 import { Code, StoryLink } from '../ui/Code';
+import { isRemovedExample } from '../ui/removedExamples';
 import { DocPage, DocSection, Rules } from '../ui/DocPage';
 
 const SURFACES = [
@@ -72,7 +73,7 @@ function AiPatterns() {
                 <TableCell>{s.avoid}</TableCell>
                 <TableCell>{s.parts}</TableCell>
                 <TableCell>
-                  <StoryLink id={s.id}>{s.example}</StoryLink>
+                  {isRemovedExample(s.id) ? <Text tone="muted">Not in this repo</Text> : <StoryLink id={s.id}>{s.example}</StoryLink>}
                 </TableCell>
               </TableRow>
             ))}
@@ -170,7 +171,7 @@ apply     moveRecord refuses with can() before sending; the server checks again
                 <TableCell rowHeader>{f.state}</TableCell>
                 <TableCell>{f.says}</TableCell>
                 <TableCell>
-                  <StoryLink id={f.id}>Open</StoryLink>
+                  {isRemovedExample(f.id) ? <Text tone="muted">Not in this repo</Text> : <StoryLink id={f.id}>Open</StoryLink>}
                 </TableCell>
               </TableRow>
             ))}

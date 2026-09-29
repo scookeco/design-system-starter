@@ -65,8 +65,9 @@ npm run lint        # imports left unused
               <code>src/layouts/</code>, <code>src/format/</code>.
             </>,
             <>
-              The checks: <code>scripts/</code>, <code>tests/</code> (the visual harness included), <code>fixtures/violations/</code>,{' '}
-              <code>.storybook/</code> and the CI workflows.
+              The checks: <code>scripts/</code>, <code>fixtures/</code>, <code>.storybook/</code>, the CI workflows, the visual harness in{' '}
+              <code>tests/visual/</code>, and every unit test that checks the system or the repo rather than one example. The only tests
+              you delete are those of an example you deleted.
             </>,
           ]}
         />
@@ -80,7 +81,8 @@ npm run lint        # imports left unused
             </>,
             <>
               Then protect <code>main</code>, requiring <strong>Check (tokens, types, lint, tests, rules, build)</strong> and{' '}
-              <strong>Visual regression and axe</strong>. GitHub offers only checks that have run, so this comes after the first run. See{' '}
+              <strong>Visual regression and axe</strong>. A branch protection rule offers only checks that have run recently, so this comes after
+              the first run. See{' '}
               <StoryLink id="guides-testing--testing-guide">Testing</StoryLink> for how baselines change from then on.
             </>,
           ]}

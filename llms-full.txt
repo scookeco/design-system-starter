@@ -5696,12 +5696,12 @@ npm run lint        # imports left unused
 #### 3. Never delete
 
 - The system: `tokens/`, `src/styles/`, `src/primitives/`, `src/components/`, `src/layouts/`, `src/format/`.
-- The checks: `scripts/`, `tests/` (the visual harness included), `fixtures/violations/`, `.storybook/` and the CI workflows.
+- The checks: `scripts/`, `fixtures/`, `.storybook/`, the CI workflows, the visual harness in `tests/visual/`, and every unit test that checks the system or the repo rather than one example. The only tests you delete are those of an example you deleted.
 
 #### 4. The first pull request
 
 - The copy carries the starter’s Linux baselines, and a rebrand changes them. Run **Update visual baselines** on the first branch: it regenerates every baseline and drops those of deleted stories. Then re-run CI, and merge once it’s green.
-- Then protect `main`, requiring **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**. GitHub offers only checks that have run, so this comes after the first run. See [Testing](docs/guides/Testing.stories.tsx) for how baselines change from then on.
+- Then protect `main`, requiring **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**. A branch protection rule offers only checks that have run recently, so this comes after the first run. See [Testing](docs/guides/Testing.stories.tsx) for how baselines change from then on.
 
 #### 5. The real backend, resource by resource
 

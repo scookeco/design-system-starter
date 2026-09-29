@@ -79,7 +79,12 @@ The app layer behind a deleted example (`src/app/api`, `model`, `mocks` for bill
 
 **Never delete:**
 - The system: `tokens/`, `src/styles/`, `src/primitives/`, `src/components/`, `src/layouts/`, `src/format/`, `src/internal/`, `src/index.ts`.
-- The checks: `scripts/`, `tests/`, `fixtures/violations/` and `fixtures/clean/`, `tests/visual/` (with its fixtures), `.storybook/`, and `.github/workflows/`.
+- The checks:
+  - `scripts/`, `fixtures/`, `.storybook/` and `.github/workflows/`;
+  - `tests/visual/`, with its fixtures;
+  - every test in `tests/unit` that checks the system or the repo rather than one example: tokens, contrast, css, docs, manifest, story links, repo docs, routes, the WCAG 2.2 audits, the app layer's tests, and so on.
+
+  The only tests you delete are those of an example you deleted, as the table lists.
 - The app skeleton the checks run on:
   - `App.tsx`, `routes.tsx`, `ExampleShell.tsx`, `CommandMenu.tsx`, `Permission.tsx`, `ErrorPages.tsx`, `Jobs.tsx`, `Freshness.tsx`;
   - `SignInPage` (the accessible-authentication audit runs on it);
@@ -92,7 +97,11 @@ The copy carries the starter's Linux baselines, and a rebrand or a trim changes 
 1. Push a branch and open a draft pull request. **Check (tokens, types, lint, tests, rules, build)** must pass.
 2. Run **Actions → Update visual baselines** on that branch. It deletes every Linux baseline before regenerating them, so the baselines of deleted stories go too. Then push any commit, or re-run CI, because the bot's push doesn't start it.
 3. Mark the pull request ready. Review the new PNGs, then squash-merge once **Visual regression and axe** is green.
-4. Now add a branch protection rule, or a ruleset, for `main` under **Settings → Branches**: require a pull request, and require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**. GitHub only offers checks that have already run, which is why this step comes after the first CI run. Require the gate, never the "(1/4)" shards.
+4. Now protect `main` under **Settings → Branches** with a branch protection rule:
+   - require a pull request;
+   - require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**.
+
+   The rule's check picker lists only checks that have reported in the past week, which is why this step comes after the first CI run. Require the gate, never the "(1/4)" shards.
 
 After that, "Update visual baselines" is how every intended visual change lands (see Visual baselines).
 
