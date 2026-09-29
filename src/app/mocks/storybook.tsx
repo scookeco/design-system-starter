@@ -37,9 +37,22 @@ const isSettled = (client: QueryClientType) => {
     queries.some((q) => q.state.status !== 'pending') &&
     // A write held in its undo window is waiting on the person, not the server: that's settled.
     client.isMutating() === writeQueues(client).heldCount() &&
-    // A story that polls its jobs has settled when they've ended.
-    !(Number.isFinite(jobSettings.pollMs) && client.getQueryCache().findAll({ queryKey: [], predicate: (q) => q.queryKey[2] === 'jobs' }).some((q) => (q.state.data as { items: Job[] } | undefined)?.items.some(isActiveJob)))
+    (!Number.isFinite(jobSettings.pollMs) || jobsEnded(client))
   );
+};
+
+/**
+ * A story that polls its jobs has settled when it has a job and none is still running. "None
+ * running" alone is also true before the job exists: a story that starts its job from the page (the
+ * list's bulk delete, submitted on mount) has loaded, and looks settled, for the few frames before
+ * it submits. A capture taken then lands mid-job, in whatever chunk a loaded machine had reached.
+ */
+const jobsEnded = (client: QueryClientType) => {
+  const jobs = client
+    .getQueryCache()
+    .findAll({ queryKey: [], predicate: (q) => q.queryKey[2] === 'jobs' })
+    .flatMap((q) => (q.state.data as { items: Job[] } | undefined)?.items ?? []);
+  return jobs.length > 0 && !jobs.some(isActiveJob);
 };
 
 /**
@@ -166,8 +179,9 @@ export interface MockApiParameters {
   /** Jobs already in the person's list when the page opens, each paused in its state (a still frame). */
   jobs?: readonly JobSeed[];
   /**
-   * Poll running jobs every this many ms, so they advance and finish (the story settles once none is
-   * running). Off by default: a seeded job is a still frame.
+   * Poll running jobs every this many ms, so they advance and finish (the story settles once it has a
+   * job, seeded or started from the page, and none is running). Off by default: a seeded job is a
+   * still frame.
    */
   pollJobs?: number;
   /**

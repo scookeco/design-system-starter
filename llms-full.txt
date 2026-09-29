@@ -6143,7 +6143,7 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - The visual suite pins latency and failures to 0 in the story URL, freezes the page clock at the instant the data was seeded for (so “3 days ago” holds), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose (a loading or pending state) is tagged `busy`.
 - Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`, `theyEditFirst` (someone saves first: a real 409) and `dropAfterApply` (the server applies the write, then the connection drops: an unknown outcome). The database is reset before every story, and stored drafts are cleared.
 - Another person’s changes come through the live channel. The toolbar’s **Another user…** pushes an edit, an add or a delete on demand; a story scripts them with `mockApi({ anotherUser: [...] })`, delivered once the page has settled and stayed settled, before the settled signal.
-- `mockApi({ undoWindow })` holds the undo window open (`'hold'`) or shortens it; `mockApi({ jobs })` seeds jobs paused in a state, and `pollJobs` runs them to the end. A write held in its undo window counts as settled; a story that polls jobs settles when none is running.
+- `mockApi({ undoWindow })` holds the undo window open (`'hold'`) or shortens it; `mockApi({ jobs })` seeds jobs paused in a state, and `pollJobs` runs them to the end. A write held in its undo window counts as settled; a story that polls jobs settles once it has a job and none is running.
 
 ```
 const meta = {
@@ -6896,6 +6896,7 @@ PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
 - Stories use fixed data: fixed dates, names and numbers, never `Date.now()` or random values, so screenshots are stable.
 - An open modal (Dialog, Drawer, Select, Menu) is tagged `['modal-open', '!autodocs']`. That relaxes only axe’s `aria-hidden-focus`, which can’t see the focus trap. An open non-modal overlay (Popover, HoverCard) takes only `'!autodocs'`.
 - Write the tags as a literal array: Storybook reads them statically, and a spread is ignored.
+- A story that acts on its own once loaded (submits a form, starts a job) looks settled for the few frames before it acts. Its settled signal must wait for evidence the action happened (the job exists and has ended), not for “nothing is running”, or a loaded machine captures it halfway.
 - Behaviour a screenshot can’t show (focus moving, an announcement, a callback) gets a unit test with Testing Library, queried by role and name.
 
 #### Baselines

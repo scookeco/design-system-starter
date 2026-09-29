@@ -706,7 +706,7 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
             <>
               <code>mockApi({'{ undoWindow }'})</code> holds the undo window open (<code>&apos;hold&apos;</code>) or shortens it;{' '}
               <code>mockApi({'{ jobs }'})</code> seeds jobs paused in a state, and <code>pollJobs</code> runs them to the end. A write held
-              in its undo window counts as settled; a story that polls jobs settles when none is running.
+              in its undo window counts as settled; a story that polls jobs settles once it has a job and none is running.
             </>,
           ]}
         />
