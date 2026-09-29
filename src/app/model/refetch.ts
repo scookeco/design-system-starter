@@ -10,7 +10,8 @@
  * Every write that refetches goes through it (tests/unit/refetch.test.tsx holds a first load past
  * each family's write):
  *   records   updateRecord, renameRecord, moveRecord, archiveRecord, restoreRecord, tag/untag,
- *             createRecord, bulkDeleteRecords (lists, counts)
+ *             createRecord, bulkDeleteRecords (lists, counts); createRecord and createAccount also on
+ *             an unknown outcome (a dropped connection), since the server may have made it
  *   jobs      startBulkDelete, cancelJob, dismissJob (the job list; cancel also lists and counts),
  *             and a poll that sees a job move (lists, counts)
  *   others    addPerson, createAccount, updateAccount, saveView/updateView/deleteView, the admin

@@ -17,14 +17,16 @@
  *   restoreRecord      optimistic   detail + listed copies (preview)  lists, counts   (Undo, once sent)
  *   tagRecord ·        optimistic   detail + listed copies (preview)  lists           (untag is held for the
  *   untagRecord        (undoable)                                                     undo window)
- *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key)
+ *   createRecord       pessimistic  detail (server's answer)   lists, counts        (idempotency key; lists and
+ *                                                              counts again on an unknown outcome)
  *   bulkDeleteRecords  pessimistic  removes deleted details    lists, counts        (listed ids)
  *   startBulkDelete    pessimistic  jobs (appends, queued)     jobs; then the job's polls refetch lists
  *                                                              and counts as it deletes ("all matching")
  *   cancelJob          pessimistic  jobs (the entry)           jobs, lists, counts
  *   dismissJob         pessimistic  jobs (removes)             jobs
  *   addPerson          pessimistic  people (appends)           people
- *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key)
+ *   createAccount      pessimistic  directory (appends), detail  directory       (idempotency key; the directory
+ *                                                                               again on an unknown outcome)
  *   updateAccount      pessimistic  directory entry, detail      directory, nothing else: records hold the id,
  *                                                               so every join re-renders from the directory
  *   saveView           pessimistic  views (appends)                  views
@@ -35,7 +37,7 @@
  * on its first load reads again after the write.
  */
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { ApiError } from '../api/client';
+import { ApiError, NetworkError } from '../api/client';
 import { patchAccount, postAccount, type AccountInput } from '../api/accounts';
 import { deleteJob, postBulkDeleteJob, postCancelJob } from '../api/jobs';
 import { deleteView, patchView, postView } from '../api/views';
@@ -83,6 +85,13 @@ const refuseUnless = (grant: Grant, capability: Capability, subject?: Parameters
 
 /** A 403: this person may not do this (the client refused, or the server did). */
 export const isForbidden = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 403;
+
+/**
+ * The connection failed (a NetworkError: fetch rejected): the request may or may not have reached the server, so
+ * the write may have happened. Reconcile by reading again; a create retried with the same
+ * idempotency key then returns what the server made, never a second one.
+ */
+export const isUnknownOutcome = (error: unknown): error is NetworkError => error instanceof NetworkError;
 
 /** A 409: someone else changed the record since this client read it. */
 export const isConflict = (error: unknown): error is ApiError => error instanceof ApiError && error.status === 409;
@@ -295,7 +304,9 @@ function useTagWrite(id: string, change: 'add' | 'remove') {
 /**
  * createRecord: pessimistic. Carries an idempotency key, so a retry or a double submit makes one
  * record: the caller keeps the same key until the create succeeds. On success: seeds the new
- * record's detail entry, invalidates every list and count.
+ * record's detail entry, invalidates every list and count. On an unknown outcome (the connection
+ * dropped, perhaps after the server made it): refetches lists and counts, so the list shows what the
+ * server has; a retry with the same key returns that record.
  */
 export function useCreateRecord() {
   const tenant = useTenant();
@@ -312,6 +323,7 @@ export function useCreateRecord() {
       client.setQueryData(recordKeys.detail(partition, created.id), created);
       return refetchListsAndCounts(client, partition);
     },
+    onError: (error) => (isUnknownOutcome(error) ? refetchListsAndCounts(client, partition) : undefined),
   });
 }
 
@@ -376,6 +388,8 @@ export function useCreateAccount() {
       refuseUnless(grant, 'account:create');
       return postAccount(tenant, account, idempotencyKey);
     },
+    // The connection dropped: the account may exist now. Read the directory again (same key on retry, one account).
+    onError: (error) => (isUnknownOutcome(error) ? refetchAfterWrite(client, accountKeys.list(partition)) : undefined),
     onSuccess: (created) => {
       client.setQueryData(accountKeys.detail(partition, created.id), created);
       return refetchAfterWrite(client, accountKeys.list(partition), () =>

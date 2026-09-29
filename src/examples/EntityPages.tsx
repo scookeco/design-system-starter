@@ -18,7 +18,7 @@
 import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
 import { Badge, Banner, Button, Card, CardBody, CardHeader, Center, Cluster, currencyDigits, EmptyState, Link, PageHeader, PageLayout, PlusIcon, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Text, useFormat } from '../index';
 import { isConflict } from '../app/model/mutations';
-import { toRow } from '../app/model/projections';
+import { toRows } from '../app/model/projections';
 import { useAccounts, usePeople, useRecordCounts, useRecordList } from '../app/model/queries';
 import type { EntityConfig, EntityDraft } from '../app/registries/entities';
 import { FieldDisplay, FieldInput, isNumericField } from '../app/registries/fields';
@@ -194,7 +194,7 @@ function RelatedRecords({ title, filter }: { title: string; filter: { account?: 
   const format = useFormat();
   const list = useRecordList({ q: '', status: [], view: 'all', sort: 'name', page: 1, pageSize: 10, ...filter });
   const counts = useRecordCounts({ q: '', status: [], ...filter });
-  const rows = (list.data?.items ?? []).map(toRow);
+  const rows = toRows(list.data?.items);
   const total = list.data?.total ?? 0;
   return (
     <Card>

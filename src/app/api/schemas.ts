@@ -217,7 +217,7 @@ export interface RecordQuery {
 export type RecordFilter = Pick<RecordQuery, 'q' | 'status' | 'view' | 'account' | 'owner'>;
 
 /** The list's surfaces over one query (see DISPLAYS in src/app/model/projections.ts). */
-export const DISPLAY_MODES = ['table', 'board'] as const;
+export const DISPLAY_MODES = ['table', 'board', 'scroll'] as const;
 export type Display = (typeof DISPLAY_MODES)[number];
 
 /** The list's optional columns (the name is always shown). A saved view says which are visible, in this order. */

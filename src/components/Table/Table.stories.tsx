@@ -14,7 +14,11 @@ const rows = Array.from({ length: 14 }, (_, i) => ({
   overdue: i % 5 === 0,
 }));
 
-function RecordsTable({ direction = 'ascending', maxHeight, selectable = false }: { direction?: SortDirection; maxHeight?: 'sm'; selectable?: boolean }) {
+/** In `windowed`, these rows stand for rows 101–114 of a 5,000-row table whose other rows aren't rendered. */
+const WINDOW_START = 100;
+const WINDOW_TOTAL = 5000;
+
+function RecordsTable({ direction = 'ascending', maxHeight, selectable = false, windowed = false }: { direction?: SortDirection; maxHeight?: 'sm'; selectable?: boolean; windowed?: boolean }) {
   const [selected, setSelected] = useState<ReadonlySet<number>>(() => new Set(selectable ? [2, 3] : []));
   const toggle = (id: number, on: boolean) =>
     setSelected((current) => {
@@ -27,9 +31,9 @@ function RecordsTable({ direction = 'ascending', maxHeight, selectable = false }
   const [sort, setSort] = useState<SortDirection>(direction);
   const sorted = [...rows].sort((a, b) => (a.amount - b.amount) * (sort === 'ascending' ? 1 : -1));
   return (
-    <Table caption="Records by amount" maxHeight={maxHeight}>
+    <Table caption="Records by amount" maxHeight={maxHeight} {...(windowed ? { rowCount: WINDOW_TOTAL + 1 } : {})}>
       <TableHead>
-        <TableRow>
+        <TableRow {...(windowed ? { 'aria-rowindex': 1 } : {})}>
           {selectable ? (
             <TableHeaderCell>
               <Checkbox
@@ -49,8 +53,8 @@ function RecordsTable({ direction = 'ascending', maxHeight, selectable = false }
         </TableRow>
       </TableHead>
       <TableBody>
-        {sorted.map((row) => (
-          <TableRow key={row.id} selected={selected.has(row.id)}>
+        {sorted.map((row, index) => (
+          <TableRow key={row.id} selected={selected.has(row.id)} {...(windowed ? { 'aria-rowindex': WINDOW_START + index + 2 } : {})}>
             {selectable ? (
               <TableCell>
                 <Checkbox label={`Select ${row.name}`} hideLabel checked={selected.has(row.id)} onCheckedChange={(checked) => toggle(row.id, checked === true)} />
@@ -80,3 +84,9 @@ export const SortedDescending: Story = { args: { direction: 'descending' } };
 export const StickyHeader: Story = { args: { maxHeight: 'sm' } };
 /** Row checkboxes named after their row; selected rows are filled. The header checkbox is indeterminate for a partial selection. */
 export const Selectable: Story = { args: { selectable: true } };
+/**
+ * A window onto a much longer table (the List page's Scroll display renders only the rows in view):
+ * `rowCount` sets aria-rowcount to all 5,001 rows, and each rendered row carries its aria-rowindex,
+ * so a screen reader says where in the whole table a row is. It looks like any other table.
+ */
+export const WindowedRows: Story = { args: { windowed: true } };

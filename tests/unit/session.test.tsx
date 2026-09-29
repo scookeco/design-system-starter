@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished } from 'vitest';
 import type { Tenant } from '../../src/app/api/schemas';
-import { currentSession, setRoles } from '../../src/app/mocks/db';
+import { currentSession, db, setRoles } from '../../src/app/mocks/db';
+import { useCreateRecord } from '../../src/app/model/mutations';
 import { seedRecords } from '../../src/app/mocks/seed';
 import { AppProviders } from '../../src/app/providers';
 import { useAppSession } from '../../src/app/session';
@@ -14,10 +15,12 @@ import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, server, setupMockApi, testClient } from
 afterEach(cleanup);
 setupMockApi();
 
-/** Exposes the session's actions to the test. */
+/** Exposes the session's actions, and a create in the current workspace, to the test. */
 let app: ReturnType<typeof useAppSession> | undefined;
+let writer: ReturnType<typeof useCreateRecord> | undefined;
 function Handle() {
   app = useAppSession();
+  writer = useCreateRecord();
   return null;
 }
 
@@ -76,6 +79,46 @@ describe('tenant boundary', { timeout: PAGE_FLOW_TIMEOUT }, () => {
     // Globex's data lives only under globex keys, and the late acme answer (total 999) reached no key at all.
     expect(client.getQueryCache().findAll({ queryKey: ['globex'] }).length).toBeGreaterThan(0);
     expect(acmeQueries().some((q) => (q.state.data as { total?: number } | undefined)?.total === 999)).toBe(false);
+  });
+
+  it('a write in flight across a switch lands in its own workspace: its answer and refetch never touch the new one', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let posted = 0;
+    server.use(
+      http.post('*/api/t/acme/records', async () => {
+        posted += 1;
+        await gate;
+        return undefined;
+      }),
+    );
+    const globexReads: string[] = [];
+    const onRequest = ({ request }: { request: Request }) => {
+      if (new URL(request.url).pathname.startsWith('/api/t/globex/records')) globexReads.push(request.url);
+    };
+    server.events.on('request:start', onRequest);
+    onTestFinished(() => server.events.removeListener('request:start', onRequest));
+    const { client } = mount('acme');
+    await pager();
+    // An Acme create goes on the wire and is held there.
+    act(() => {
+      void writer?.mutateAsync({ record: { name: 'Crossed the switch' }, idempotencyKey: 'switch-1' }).catch(() => undefined);
+    });
+    await waitFor(() => expect(posted).toBe(1));
+    act(() => app?.switchTenant('globex'));
+    await waitFor(() => expect(pagerText()).toBe(firstPageOf('globex')), FIRST_PAINT);
+    const readsBefore = globexReads.length;
+    // Acme answers now: the record is Acme's, and the refetch it asks for stays in Acme's partition.
+    release();
+    await waitFor(() => expect(client.getMutationCache().getAll().every((m) => m.state.status !== 'pending')).toBe(true));
+    expect(db('acme').records.some((r) => r.name === 'Crossed the switch')).toBe(true);
+    expect(db('globex').records.some((r) => r.name === 'Crossed the switch')).toBe(false);
+    expect(globexReads.length).toBe(readsBefore);
+    expect(client.getQueryCache().findAll({ queryKey: ['globex'] }).some((q) => JSON.stringify(q.state.data ?? null).includes('Crossed the switch'))).toBe(false);
+    expect(screen.queryByText('Crossed the switch')).toBeNull();
+    expect(pagerText()).toBe(firstPageOf('globex'));
   });
 
   it('the account menu switches workspace and the brand follows', async () => {

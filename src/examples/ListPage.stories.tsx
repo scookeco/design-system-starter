@@ -93,3 +93,12 @@ export const JobRunning: Story = { parameters: mockApi({ jobs: [{ state: 'runnin
 export const JobFailed: Story = { parameters: mockApi({ jobs: [{ state: 'failed', done: 30, failures: 1 }] }) };
 /** Cancelled: how far it got, and that what it did stays done. */
 export const JobCancelled: Story = { parameters: mockApi({ jobs: [{ state: 'cancelled', done: 20 }] }) };
+
+// ── Scale: 10,000 records (the mock server's large dataset; the gallery's Dataset toolbar picks it too) ──
+/** Ten thousand records, paged on the server as always: the same page of 10, the same speed. */
+export const TenThousandRecords: Story = { parameters: mockApi({ dataset: 'large' }) };
+/**
+ * The Scroll display, offered once a list is large: all 10,000 in one table, fetched 100 at a time
+ * as they come into view, with only the rows in view rendered (aria-rowcount says 10,001).
+ */
+export const TenThousandRecordsScroll: Story = { parameters: mockApi({ dataset: 'large', url: '/records?display=scroll' }) };

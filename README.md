@@ -61,7 +61,8 @@ src/format/             locale formatting over Intl: LocaleProvider, useFormat (
 src/app/                the app layer the examples use (not the system): api/ (client, zod schemas, live events, jobs),
                         model/ (keys, queries, predicates, projections, mutations, selection, permissions, live, write
                         queues, conflicts, drafts, undo, jobs), session.tsx (memberships, workspace switch, sign-out),
-                        routing/ (route type, matcher, RouteView, AppLink), url/ (useUrlState, navigation guard,
+                        telemetry.ts (the one sink), windowing.ts (useWindowedRows),
+                        routing/ (route type, matcher, RouteView, RenderBoundary, AppLink), url/ (useUrlState, navigation guard,
                         restoration), registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the
                         inbox, members and the audit log; live.ts the live channel; jobs.ts the job runner)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
@@ -211,7 +212,7 @@ The design system draws; `src/app` knows. It is consumer code, like the examples
 - **The query-cache trap, handled**: a record write patches its detail and every cached list page holding it (`patchListedRecord`), then invalidates what the patch can't know. A test proves a detail edit shows in an already-cached list with every list request held open.
 - **Permissions**: capabilities (`record:rename`, `account:edit`, …), roles mapped to them in one place (`ROLE_CAPABILITIES`), and one predicate, `can`, used by the controls, the route guard, every mutation and the mock server (403). Viewers get a narrower projection (no drafts), filtered in the query.
 - **Workspace and session boundaries**: switching workspace cancels the old one's reads and remounts the page; a permission change drops the old scope's partition; sign-out cancels everything and clears the cache.
-- **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`.
+- **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`. Every page renders inside its own error boundary (`RenderBoundary`, from `RouteView`): a renderer that throws costs that page, never the shell, shows the error state with Try again, and is reported.
 - **Schema-driven pages**: `entityType → fields` config (`src/app/registries/entities.ts`) gives accounts and people their list, record and form pages.
 - **The assistant** (`src/app/api/ai.ts`, `src/app/model/ai.ts`, `src/app/mocks/ai.ts`): answers stream as newline-delimited JSON events, each parsed with zod; the mock is scripted and seeded. It has no permissions of its own: it reads what `canSee` allows in the person's workspace, proposes only what `can` allows, and applies nothing itself (apply and undo go through `moveRecord`). Conversations are server state with named verbs.
 - **Saved views**: named filter, sort, columns and display, persisted per person per workspace; the URL stays the truth.
@@ -224,7 +225,9 @@ The design system draws; `src/app` knows. It is consumer code, like the examples
 - **Drafts, undo and jobs**: drafts owned by the form (autosaved, restored, guarded on navigation, cleared on sign-out); Undo instead of "Are you sure?" for what can be undone (a held write or a compensating one), confirmation kept for deletes; bulk work as jobs with truthful status (queued, n of N, partial failure, failed, cancelled) visible on every page.
 - **History**: push to open, replace to refine; Back restores a list's scroll and focus to the row that was opened.
 - **A typed field registry** renders record properties and form fields; exhaustive at compile time, with a runtime fallback that reports and never throws.
-- **A mock API** (MSW) over a seeded database: 240 and 120 records, 12 and 8 accounts for two tenants. The gallery's Latency, Failures and Role toolbars change its behaviour, and failures are real 500 (or 403) responses; the Another user… toolbar pushes a colleague's edit, add or delete through the live channel. The same handlers serve Vitest (`msw/node`).
+- **Instrumentation**: every named mutation reports start and one outcome (success with its duration, failure with its code, cancelled) from the QueryClient's MutationCache to one sink (`src/app/telemetry.ts`), as do render failures. Names, ids and codes only: no personal data.
+- **Scale**: server-side paging at any size; past 1,000 rows the list offers a windowed Scroll display (pages of 100 fetched as they come into view, only the rows in view rendered, still a table with aria-rowcount and row indexes); projections memoised by identity. Unknown outcomes (a dropped connection after the server applied a create) refetch, and the idempotency key makes the retry safe.
+- **A mock API** (MSW) over a seeded database: 240 and 120 records, 12 and 8 accounts for two tenants, or 10,000 Acme records in the large dataset (`mockApi({ dataset: 'large' })`, or the gallery's Dataset toolbar). The gallery's Latency, Failures and Role toolbars change its behaviour, and failures are real 500 (or 403) responses; the Another user… toolbar pushes a colleague's edit, add or delete through the live channel. The same handlers serve Vitest (`msw/node`).
 
 ## Adding a component: walk the decision ladder
 

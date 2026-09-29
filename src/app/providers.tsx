@@ -8,6 +8,7 @@ import type { LiveSource } from './api/live';
 import type { Session, Tenant } from './api/schemas';
 import { useLiveSubscription } from './model/live';
 import { SessionProvider } from './session';
+import { instrumentMutations } from './telemetry';
 import type { UrlHistory } from './url/history';
 import { HistoryProvider } from './url/useUrlState';
 
@@ -53,6 +54,10 @@ function LiveSubscription({ source }: { source: LiveSource | undefined }) {
 
 export function AppProviders({ session, tenant, signedOut, queryClient, history, live, children }: AppProvidersProps) {
   const [ownClient] = useState(createQueryClient);
+  const client = queryClient ?? ownClient;
+  // Every named mutation reports to the telemetry sink from here (src/app/telemetry.ts). Idempotent,
+  // and done while rendering so it's in place before any page's first effect can start a write.
+  instrumentMutations(client);
   const routed = history ? <HistoryProvider history={history}>{children}</HistoryProvider> : children;
   const content = (
     <>
@@ -61,7 +66,7 @@ export function AppProviders({ session, tenant, signedOut, queryClient, history,
     </>
   );
   return (
-    <QueryClientProvider client={queryClient ?? ownClient}>
+    <QueryClientProvider client={client}>
       <SessionProvider session={session} tenant={tenant} signedOut={history ? <HistoryProvider history={history}>{signedOut}</HistoryProvider> : signedOut}>
         {content}
       </SessionProvider>

@@ -3408,6 +3408,7 @@ Props:
 - `caption: string`: Caption: the table's accessible name. Required.
 - `hideCaption?: boolean` = `false`
 - `maxHeight?: ScrollRegionToken`: Cap the height so the sticky header scrolls with the rows. Defaults to no cap.
+- `rowCount?: number`: Only some of the rows are rendered (a windowed list of thousands): how many rows the table has in all, header row included. Sets `aria-rowcount`; give each rendered TableRow its `aria-rowindex` (1 for the header row), so assistive tech says "row 5,002 of 10,001" rather than "of 30".
 - `children: ReactNode`
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
@@ -3523,8 +3524,9 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - `caption` is required and names the scroll region; `hideCaption` keeps it for screen readers only.
 - Sortable headers are buttons, and the sorted column carries `aria-sort`.
 - The scroll container is focusable, so keyboard users can scroll a wide or capped table.
+- A windowed table (only the rows in view rendered, for thousands of rows) passes `rowCount` (every row, the header row included) and an `aria-rowindex` on each rendered `TableRow`, so a row is announced as “row 5,002 of 10,001”, not “of 30”. The windowing itself is app code: the List page example’s Scroll display.
 
-Stories: `components-table--sorted-ascending`, `components-table--sorted-descending`, `components-table--sticky-header`, `components-table--selectable`.
+Stories: `components-table--sorted-ascending`, `components-table--sorted-descending`, `components-table--sticky-header`, `components-table--selectable`, `components-table--windowed-rows`.
 Composes: Icon.
 Tokens read: `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `size.scroll-region.md`, `size.scroll-region.sm`, `space.gap.2xs`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.start`, `text.body`, `text.label`, `z.sticky`.
 
@@ -5737,7 +5739,9 @@ src/app   api/        the client and zod schemas: every response is parsed at th
                       permissions (the role → capability mapping and the one predicate, can),
                       freshness (live), per-record write queues, conflicts, drafts, undo, jobs
           session.tsx the session: memberships, the active workspace, switch, sign out
-          routing/    the route entry type, the matcher, RouteView and AppLink
+          telemetry.ts the one sink: every mutation's start and outcome, render failures
+          windowing.ts useWindowedRows: which rows of a long list to render
+          routing/    the route entry type, the matcher, RouteView, RenderBoundary and AppLink
           url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
@@ -5801,6 +5805,7 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
 - The route table is the master registry: `path → layout + page + guard` (`src/examples/routes.tsx`). A route without a capability doesn’t compile, and a test checks every route has one.
 - Pages are lazy, one chunk per route. The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
 - An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (`LinkProvider` with `AppLink`), so every Link, Nav, NavTabs and Breadcrumbs routes in place.
+- Every page renders inside its own error boundary (`RenderBoundary`, put there by `RouteView`). A renderer that throws, a field registry entry for instance, costs that page and never the shell: the error state shows in its place with Try again, and the failure is reported (see “Instrumentation” below, [a broken renderer](src/examples/App.tsx) and [its error state](src/examples/ErrorPages.tsx)). A test opens every route from a deep link and fails if any boundary caught something.
 
 #### Where state lives
 
@@ -5832,12 +5837,12 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 | `archiveRecord` | Optimistic, held for the undo window | The record and every listed copy, at once | Every list and count | Undo inside the window sends nothing; after it, restoreRecord |
 | `restoreRecord` | Optimistic, queued | The record and every listed copy | Every list and count | Still archived; a toast that stays |
 | `tagRecord · untagRecord` | Optimistic, queued; untag held for the undo window | The record and every listed copy | Every list | The tag is back; legal hold is refused by both sides |
-| `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count | The draft stays; a retry sends the same key, so no duplicate |
+| `createRecord` | Pessimistic, with an idempotency key | The new record’s detail entry | Every list and count (also when the connection drops: the server may have made it) | The draft stays; a retry sends the same key, so no duplicate |
 | `bulkDeleteRecords` | Pessimistic, confirmed (listed ids) | Removes deleted records | Every list and count | Partial: a banner that stays (“50 deleted, 9 failed”) with Retry |
 | `startBulkDelete` | A job, confirmed (“all N matching”) | Appends the job, queued | The person’s jobs; each poll that moves the job then refetches lists and counts | Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed |
 | `cancelJob · dismissJob` | Pessimistic | The job (cancelled), or removes it | The person’s jobs; every list and count (cancel) | A finished job can’t be cancelled; a running one can’t be dismissed |
 | `addPerson` | Pessimistic | Appends to people | People | The dialog stays open with an error |
-| `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory | The form stays, with a banner |
+| `createAccount` | Pessimistic, with an idempotency key | The account’s detail; appends to the directory | The directory (also when the connection drops) | The form stays, with a banner |
 | `updateAccount` | Pessimistic, versioned | The account’s detail and its directory entry | The directory, and nothing else: records hold its id, so every row re-renders from it | A banner; a 409 says someone else changed it |
 | `saveView · updateView · deleteView` | Pessimistic | The person’s views (the default moves on update) | Views | The dialog stays open with the server’s reason |
 | `markRead · markUnread · archive · unarchive (inbox)` | Optimistic: a person’s own frequent triage | The items in every cached inbox view, and the counts | Inbox views | Every view put back as it was; a toast that stays |
@@ -5848,6 +5853,19 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - Edits send the version they were based on as `If-Match`. The server answers `409` with its version if someone changed the record since (and `428` without the header), and the page shows what changed instead of silently overwriting it (see “Versions and conflicts” below).
 - A pending write disables the controls that would start it again. Errors that need action stay on screen until dismissed.
 - See them on the [record page](src/examples/RecordPage.tsx) (rename pending, succeeded, failed and rolled back, conflict; archive pending) and the [create form](src/examples/CreateEditFlow.tsx).
+
+#### Instrumentation
+
+- Mutations are the instrumentation point. Every named mutation reports to one sink (`src/app/telemetry.ts`) from one place, the QueryClient’s MutationCache: **start**, then exactly one of **success** (with its duration), **failure** (with its error code: the server’s, or network, contract) and **cancelled** (Undo inside the window, sign-out). A verb doesn’t opt in: a mutation key named for the verb (`[...partition, 'renameRecord', { id }]`) is all it takes, and a test runs every verb and checks.
+- A stream that resolves however it ended (the assistant keeps what arrived) says its outcome through the mutation’s `meta` (`outcomeMeta`), so a rate-limited answer is a failure, not a success.
+- Render failures report to the same sink, from the route’s error boundary, under the route’s path pattern.
+- No personal data: events carry verb names, ids, codes and durations. Never the variables, what someone typed, a name, an email or an error’s message (a message can quote a value). The sink logs to the console in development; a product points `telemetry.sink` at its tracing; tests capture it (`captureTelemetry`).
+
+```
+{ kind: 'mutation', name: 'renameRecord', phase: 'start',   mutationId: 7, tenant: 'acme', subject: 'r-1001' }
+{ kind: 'mutation', name: 'renameRecord', phase: 'failure', mutationId: 7, tenant: 'acme', subject: 'r-1001',
+  durationMs: 184, code: 'conflict', status: 409 }
+```
 
 #### Keeping the store fresh
 
@@ -5903,6 +5921,14 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - While anything is selected the shell’s sticky footer shows the count (announced politely), Clear selection, and Delete last, disabled when the `canDelete` predicate rules every selected row out.
 - Delete asks with the count in the question. Listed rows go in one request; a partial failure stays on screen (“50 deleted, 9 failed”) with the reasons and Retry. “All N matching” runs as a job, and its partial failure is listed on the job, with Retry failed. See [the partial failure story](src/examples/ListPage.tsx).
 
+#### Scale
+
+- Server-side paging stays the norm, at any size: the server searches, filters, sorts and counts, and the page reads one page of it. Ten thousand records page exactly like two hundred (see [10,000 records, paged](src/examples/ListPage.tsx)).
+- Once a list is large (1,000 rows or more) the list offers a third display, **Scroll**: every matching row in one table, read a server page (100 rows) at a time as rows come into view (`useRecordWindow`), with only the rows in view rendered (`useWindowedRows`, a small hook in `src/app/windowing.ts`; no dependency). Each page is an ordinary list query, so write patches, queues, live events and refetches keep it right (see [the Scroll display](src/examples/ListPage.tsx)).
+- It stays a table, because these are records compared across columns: `rowCount` sets aria-rowcount to every row, and each rendered row has its aria-rowindex ([Table, windowed](src/components/Table/Table.stories.tsx)). ↑ and ↓ move to the same control in the next row, Home and End to the first and last, loading them first; the focused row stays rendered while it scrolls away. The header box selects all N matching, as a filter.
+- Projections are memoised by identity: the cache keeps an unchanged record and page as the same object, so `toRow`, `toRows` and `toBoard` give back the same rows on a render that changed nothing, and an edit re-projects one row. A test proves it by identity.
+- The mock server’s large dataset seeds 10,000 Acme records from the same streams as the default one (its first 240 are the default records): `mockApi({ dataset: 'large' })` in a story, or the gallery’s **Dataset** toolbar (`globals=dataset:large` in the URL) for any data story.
+
 #### Registries: fields as config
 
 - `src/app/registries/entities.ts` maps each entity type to its fields: list columns, record properties, related records, and its create and edit form. Generic list, record and form pages (`src/examples/EntityPages.tsx`) render any entry, so accounts and people have no hand-built pages.
@@ -5921,7 +5947,7 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - Stories and tests talk to a real HTTP mock (MSW) over a seeded, deterministic database: 240 and 120 records for two tenants, the same on every run.
 - The toolbar’s **Latency** and **Failures** controls change how the mock server behaves. Failures are real 500 responses through the real client, so the error states you see are the ones users would.
 - The visual suite pins latency and failures to 0 in the story URL, freezes the page clock at the instant the data was seeded for (so “3 days ago” holds), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose (a loading or pending state) is tagged `busy`.
-- Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`, and `theyEditFirst` (someone saves first: a real 409). The database is reset before every story, and stored drafts are cleared.
+- Per-story server behaviour comes from `src/app/mocks/overrides.ts`: `hold`, `fail`, `emptyWorkspace`, `malformed`, `theyEditFirst` (someone saves first: a real 409) and `dropAfterApply` (the server applies the write, then the connection drops: an unknown outcome). The database is reset before every story, and stored drafts are cleared.
 - Another person’s changes come through the live channel. The toolbar’s **Another user…** pushes an edit, an add or a delete on demand; a story scripts them with `mockApi({ anotherUser: [...] })`, delivered once the page has settled and stayed settled, before the settled signal.
 - `mockApi({ undoWindow })` holds the undo window open (`'hold'`) or shortens it; `mockApi({ jobs })` seeds jobs paused in a state, and `pollJobs` runs them to the end. A write held in its undo window counts as settled; a story that polls jobs settles when none is running.
 

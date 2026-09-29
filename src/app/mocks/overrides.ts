@@ -1,11 +1,13 @@
 /**
  * Per-story (and per-test) server behaviours layered over the default handlers: a request held
- * open forever (loading and pending states), a real error response, an empty workspace, a
- * payload that breaks the contract, and someone else saving first (a conflict).
+ * open forever (loading and pending states), a real error response, a connection that drops after
+ * the server applied the write (an unknown outcome), an empty workspace, a payload that breaks the
+ * contract, and someone else saving first (a conflict).
  */
-import { delay, http, HttpResponse } from 'msw';
+import { delay, getResponse, http, HttpResponse } from 'msw';
 import { TenantSchema } from '../api/schemas';
 import { db } from './db';
+import { handlers } from './handlers';
 import { anotherUser, type RecordChanges } from './live';
 
 type Method = 'get' | 'post' | 'patch' | 'delete';
@@ -17,6 +19,20 @@ export const hold = (method: Method, path: string) => http[method](`${API}${path
 /** Answers with a real error response. */
 export const fail = (method: Method, path: string, status = 500, code = 'server_error', message = 'The server hit a problem. Try again.') =>
   http[method](`${API}${path}`, () => HttpResponse.json({ error: { code, message } }, { status }));
+
+/**
+ * An unknown outcome: the server applies the request (the real handler runs), then the connection
+ * drops before the answer arrives, so the client sees a network error. Once: a retry goes through.
+ */
+export const dropAfterApply = (method: Method, path: string) => {
+  let dropped = false;
+  return http[method](`${API}${path}`, async ({ request }) => {
+    if (dropped) return undefined;
+    dropped = true;
+    await getResponse(handlers, request);
+    return HttpResponse.error();
+  });
+};
 
 /** A workspace with no records yet. */
 export const emptyWorkspace = [

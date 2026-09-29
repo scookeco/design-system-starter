@@ -18,12 +18,12 @@ const MUTATIONS = [
   { verb: 'archiveRecord', presents: 'Optimistic, held for the undo window', patches: 'The record and every listed copy, at once', invalidates: 'Every list and count', failure: 'Undo inside the window sends nothing; after it, restoreRecord' },
   { verb: 'restoreRecord', presents: 'Optimistic, queued', patches: 'The record and every listed copy', invalidates: 'Every list and count', failure: 'Still archived; a toast that stays' },
   { verb: 'tagRecord · untagRecord', presents: 'Optimistic, queued; untag held for the undo window', patches: 'The record and every listed copy', invalidates: 'Every list', failure: 'The tag is back; legal hold is refused by both sides' },
-  { verb: 'createRecord', presents: 'Pessimistic, with an idempotency key', patches: 'The new record’s detail entry', invalidates: 'Every list and count', failure: 'The draft stays; a retry sends the same key, so no duplicate' },
+  { verb: 'createRecord', presents: 'Pessimistic, with an idempotency key', patches: 'The new record’s detail entry', invalidates: 'Every list and count (also when the connection drops: the server may have made it)', failure: 'The draft stays; a retry sends the same key, so no duplicate' },
   { verb: 'bulkDeleteRecords', presents: 'Pessimistic, confirmed (listed ids)', patches: 'Removes deleted records', invalidates: 'Every list and count', failure: 'Partial: a banner that stays (“50 deleted, 9 failed”) with Retry' },
   { verb: 'startBulkDelete', presents: 'A job, confirmed (“all N matching”)', patches: 'Appends the job, queued', invalidates: 'The person’s jobs; each poll that moves the job then refetches lists and counts', failure: 'Nothing was deleted; the selection is kept. Partial failures are listed on the job, with Retry failed' },
   { verb: 'cancelJob · dismissJob', presents: 'Pessimistic', patches: 'The job (cancelled), or removes it', invalidates: 'The person’s jobs; every list and count (cancel)', failure: 'A finished job can’t be cancelled; a running one can’t be dismissed' },
   { verb: 'addPerson', presents: 'Pessimistic', patches: 'Appends to people', invalidates: 'People', failure: 'The dialog stays open with an error' },
-  { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory', failure: 'The form stays, with a banner' },
+  { verb: 'createAccount', presents: 'Pessimistic, with an idempotency key', patches: 'The account’s detail; appends to the directory', invalidates: 'The directory (also when the connection drops)', failure: 'The form stays, with a banner' },
   { verb: 'updateAccount', presents: 'Pessimistic, versioned', patches: 'The account’s detail and its directory entry', invalidates: 'The directory, and nothing else: records hold its id, so every row re-renders from it', failure: 'A banner; a 409 says someone else changed it' },
   { verb: 'saveView · updateView · deleteView', presents: 'Pessimistic', patches: 'The person’s views (the default moves on update)', invalidates: 'Views', failure: 'The dialog stays open with the server’s reason' },
   { verb: 'markRead · markUnread · archive · unarchive (inbox)', presents: 'Optimistic: a person’s own frequent triage', patches: 'The items in every cached inbox view, and the counts', invalidates: 'Inbox views', failure: 'Every view put back as it was; a toast that stays' },
@@ -73,7 +73,9 @@ src/app   api/        the client and zod schemas: every response is parsed at th
                       permissions (the role → capability mapping and the one predicate, can),
                       freshness (live), per-record write queues, conflicts, drafts, undo, jobs
           session.tsx the session: memberships, the active workspace, switch, sign out
-          routing/    the route entry type, the matcher, RouteView and AppLink
+          telemetry.ts the one sink: every mutation's start and outcome, render failures
+          windowing.ts useWindowedRows: which rows of a long list to render
+          routing/    the route entry type, the matcher, RouteView, RenderBoundary and AppLink
           url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
@@ -249,6 +251,14 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (
               <code>LinkProvider</code> with <code>AppLink</code>), so every Link, Nav, NavTabs and Breadcrumbs routes in place.
             </>,
+            <>
+              Every page renders inside its own error boundary (<code>RenderBoundary</code>, put there by <code>RouteView</code>). A
+              renderer that throws, a field registry entry for instance, costs that page and never the shell: the error state shows in
+              its place with Try again, and the failure is reported (see “Instrumentation” below,{' '}
+              <StoryLink id="examples-app--render-error">a broken renderer</StoryLink> and{' '}
+              <StoryLink id="examples-error-pages--render-error">its error state</StoryLink>). A test opens every route from a deep link
+              and fails if any boundary caught something.
+            </>,
           ]}
         />
       </DocSection>
@@ -340,6 +350,37 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
             </>,
           ]}
         />
+      </DocSection>
+
+      <DocSection title="Instrumentation">
+        <Rules
+          items={[
+            <>
+              Mutations are the instrumentation point. Every named mutation reports to one sink (<code>src/app/telemetry.ts</code>) from one
+              place, the QueryClient’s MutationCache: <strong>start</strong>, then exactly one of <strong>success</strong> (with its
+              duration), <strong>failure</strong> (with its error code: the server’s, or network, contract) and{' '}
+              <strong>cancelled</strong> (Undo inside the window, sign-out). A verb doesn’t opt in: a mutation key named for the verb (
+              <code>[...partition, &apos;renameRecord&apos;, {'{ id }'}]</code>) is all it takes, and a test runs every verb and checks.
+            </>,
+            <>
+              A stream that resolves however it ended (the assistant keeps what arrived) says its outcome through the mutation’s{' '}
+              <code>meta</code> (<code>outcomeMeta</code>), so a rate-limited answer is a failure, not a success.
+            </>,
+            <>
+              Render failures report to the same sink, from the route’s error boundary, under the route’s path pattern.
+            </>,
+            <>
+              No personal data: events carry verb names, ids, codes and durations. Never the variables, what someone typed, a name, an
+              email or an error’s message (a message can quote a value). The sink logs to the console in development; a product points{' '}
+              <code>telemetry.sink</code> at its tracing; tests capture it (<code>captureTelemetry</code>).
+            </>,
+          ]}
+        />
+        <Code label="What a rename reports">{`
+{ kind: 'mutation', name: 'renameRecord', phase: 'start',   mutationId: 7, tenant: 'acme', subject: 'r-1001' }
+{ kind: 'mutation', name: 'renameRecord', phase: 'failure', mutationId: 7, tenant: 'acme', subject: 'r-1001',
+  durationMs: 184, code: 'conflict', status: 409 }
+`}</Code>
       </DocSection>
 
       <DocSection title="Keeping the store fresh">
@@ -529,6 +570,41 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
         />
       </DocSection>
 
+      <DocSection title="Scale">
+        <Rules
+          items={[
+            <>
+              Server-side paging stays the norm, at any size: the server searches, filters, sorts and counts, and the page reads one page
+              of it. Ten thousand records page exactly like two hundred (see{' '}
+              <StoryLink id="examples-list-page--ten-thousand-records">10,000 records, paged</StoryLink>).
+            </>,
+            <>
+              Once a list is large (1,000 rows or more) the list offers a third display, <strong>Scroll</strong>: every matching row in
+              one table, read a server page (100 rows) at a time as rows come into view (<code>useRecordWindow</code>), with only the rows
+              in view rendered (<code>useWindowedRows</code>, a small hook in <code>src/app/windowing.ts</code>; no dependency). Each page
+              is an ordinary list query, so write patches, queues, live events and refetches keep it right (see{' '}
+              <StoryLink id="examples-list-page--ten-thousand-records-scroll">the Scroll display</StoryLink>).
+            </>,
+            <>
+              It stays a table, because these are records compared across columns: <code>rowCount</code> sets aria-rowcount to every row,
+              and each rendered row has its aria-rowindex (<StoryLink id="components-table--windowed-rows">Table, windowed</StoryLink>). ↑ and
+              ↓ move to the same control in the next row, Home and End to the first and last, loading them first; the focused row stays
+              rendered while it scrolls away. The header box selects all N matching, as a filter.
+            </>,
+            <>
+              Projections are memoised by identity: the cache keeps an unchanged record and page as the same object, so{' '}
+              <code>toRow</code>, <code>toRows</code> and <code>toBoard</code> give back the same rows on a render that changed nothing,
+              and an edit re-projects one row. A test proves it by identity.
+            </>,
+            <>
+              The mock server’s large dataset seeds 10,000 Acme records from the same streams as the default one (its first 240 are the
+              default records): <code>mockApi({'{ dataset: \'large\' }'})</code> in a story, or the gallery’s <strong>Dataset</strong>{' '}
+              toolbar (<code>globals=dataset:large</code> in the URL) for any data story.
+            </>,
+          ]}
+        />
+      </DocSection>
+
       <DocSection title="Registries: fields as config">
         <Rules
           items={[
@@ -591,8 +667,9 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
             </>,
             <>
               Per-story server behaviour comes from <code>src/app/mocks/overrides.ts</code>: <code>hold</code>, <code>fail</code>,{' '}
-              <code>emptyWorkspace</code>, <code>malformed</code>, and <code>theyEditFirst</code> (someone saves first: a real 409). The
-              database is reset before every story, and stored drafts are cleared.
+              <code>emptyWorkspace</code>, <code>malformed</code>, <code>theyEditFirst</code> (someone saves first: a real 409) and{' '}
+              <code>dropAfterApply</code> (the server applies the write, then the connection drops: an unknown outcome). The database is
+              reset before every story, and stored drafts are cleared.
             </>,
             <>
               Another person’s changes come through the live channel. The toolbar’s <strong>Another user…</strong> pushes an edit, an add

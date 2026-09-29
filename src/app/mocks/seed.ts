@@ -127,14 +127,27 @@ export const seedAccounts = (tenant: Tenant): Account[] => {
   }));
 };
 
-export const seedRecords = (tenant: Tenant): RecordEntity[] => {
+/**
+ * Which database the mock server seeds. `default` is the one every story and test uses. `large`
+ * gives Acme LARGE_DATASET_COUNT records, for the list at scale (paging, the scroll display,
+ * memoised projections). The same streams make them, so the large set's first 240 records are
+ * exactly the default ones, and every run gets the same 10,000.
+ */
+export const DATASETS = ['default', 'large'] as const;
+export type Dataset = (typeof DATASETS)[number];
+export const LARGE_DATASET_COUNT = 10_000;
+
+/** How many records a tenant starts with in a dataset. */
+export const recordCountFor = (tenant: Tenant, dataset: Dataset = 'default') => (dataset === 'large' && tenant === 'acme' ? LARGE_DATASET_COUNT : TENANT_SPECS[tenant].count);
+
+export const seedRecords = (tenant: Tenant, count = TENANT_SPECS[tenant].count): RecordEntity[] => {
   const spec = TENANT_SPECS[tenant];
   const random = seededRandom(spec.seed);
   // Which account a record belongs to comes from a stream of its own (seed + 2): the record stream is untouched.
   const accountRandom = seededRandom(spec.seed + 2);
   const people = seedPeople(tenant);
   const accounts = seedAccounts(tenant);
-  return Array.from({ length: spec.count }, (_, index) => {
+  return Array.from({ length: count }, (_, index) => {
     const name = `${pick(random, PREFIXES)} ${pick(random, SUBJECTS)} ${pick(random, KINDS)}`;
     const status = pickStatus(random);
     // Round amounts to whole units, between 0 and 250,000; drafts may still be zero.

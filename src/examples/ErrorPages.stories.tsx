@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ForbiddenPage, NotFoundPage, ServerErrorPage } from './ErrorPages';
+import { ForbiddenPage, NotFoundPage, RenderErrorPage, ServerErrorPage } from './ErrorPages';
 
 const meta = {
   title: 'Examples/Error pages',
@@ -15,3 +15,5 @@ export const ServerError: StoryObj = { render: () => <ServerErrorPage /> };
 export const Forbidden: StoryObj = {
   render: () => <ForbiddenPage current="/records" reason="You have view-only access, so you can’t create records. Ask a workspace admin for editor access." />,
 };
+/** A page that failed to render: the route's error boundary shows this in its place, inside the shell. */
+export const RenderError: StoryObj = { render: () => <RenderErrorPage current="/records" onRetry={() => undefined} /> };

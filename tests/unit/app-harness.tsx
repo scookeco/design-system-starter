@@ -17,6 +17,7 @@ import { currentSession, resetDb, setRoles } from '../../src/app/mocks/db';
 import { aiHandlers } from '../../src/app/mocks/ai';
 import { handlers } from '../../src/app/mocks/handlers';
 import { AppProviders } from '../../src/app/providers';
+import { telemetry, type TelemetryEvent } from '../../src/app/telemetry';
 import { createMemoryHistory, type MemoryHistory } from '../../src/app/url/history';
 
 export const server = setupServer(...handlers, ...aiHandlers);
@@ -51,6 +52,23 @@ export const PAGE_FLOW_TIMEOUT = 30_000;
  * Later waits in the same test use the default (setup.ts).
  */
 export const FIRST_PAINT = { timeout: 15_000 };
+
+/**
+ * The telemetry sink, replaced for one test file: every event lands in the returned array (emptied
+ * before each test), and the original sink is back afterwards. Call once at the top of the file.
+ */
+export const captureTelemetry = () => {
+  const events: TelemetryEvent[] = [];
+  const original = telemetry.sink;
+  beforeEach(() => {
+    events.length = 0;
+    telemetry.sink = (event) => events.push(event);
+  });
+  afterEach(() => {
+    telemetry.sink = original;
+  });
+  return events;
+};
 
 export const testClient = () => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
 

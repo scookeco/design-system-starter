@@ -27,7 +27,15 @@ export interface RecordRow {
   version: RecordEntity['version'];
 }
 
-export const toRow = (record: RecordEntity): RecordRow => ({
+/**
+ * Projections are memoised by identity, so a list of 10,000 isn't projected again on a render that
+ * changed nothing. The cache keeps an unchanged entity (and an unchanged page) as the same object
+ * (structural sharing), so the same input always gives back the same output object, and an edit
+ * that patches one record re-projects that one row. WeakMaps: nothing outlives the cached data.
+ */
+const rows = new WeakMap<RecordEntity, RecordRow>();
+
+const projectRow = (record: RecordEntity): RecordRow => ({
   id: record.id,
   name: record.name,
   ownerId: record.ownerId,
@@ -42,12 +50,52 @@ export const toRow = (record: RecordEntity): RecordRow => ({
   version: record.version,
 });
 
-/** The list's display modes: one projection (the same rows), two surfaces. A new surface is one entry. */
+/** One record as a list row. The same record object always gives the same row object. */
+export const toRow = (record: RecordEntity): RecordRow => {
+  let row = rows.get(record);
+  if (!row) {
+    row = projectRow(record);
+    rows.set(record, row);
+  }
+  return row;
+};
+
+const pages = new WeakMap<readonly RecordEntity[], readonly RecordRow[]>();
+const NO_ROWS: readonly RecordRow[] = [];
+
+/** A page of records as rows: the same array back while the page is unchanged. */
+export const toRows = (records: readonly RecordEntity[] | undefined): readonly RecordRow[] => {
+  if (!records) return NO_ROWS;
+  let projected = pages.get(records);
+  if (!projected) {
+    projected = records.map(toRow);
+    pages.set(records, projected);
+  }
+  return projected;
+};
+
+/**
+ * A list this long is offered the Scroll display: past a few hundred rows, paging ten at a time
+ * stops being a way to look through them.
+ */
+export const LARGE_LIST = 1_000;
+
+/**
+ * The list's display modes: one projection (the same rows), several surfaces. A new surface is one
+ * entry. Scroll is the table, windowed: every matching row in one scrolling table, fetched a server
+ * page at a time as it comes into view, and only the rows in view rendered. It's offered once the
+ * list is large (`minTotal`); a link that asks for it always gets it.
+ */
 export const DISPLAYS = [
   { value: 'table', label: 'Table' },
   { value: 'board', label: 'Board' },
-] as const satisfies readonly { value: Display; label: string }[];
+  { value: 'scroll', label: 'Scroll', minTotal: LARGE_LIST },
+] as const satisfies readonly { value: Display; label: string; minTotal?: number }[];
 export type { Display };
+
+/** The displays to offer for a list of `total` rows: those it's large enough for, and the current one. */
+export const displaysFor = (total: number, current: Display): { value: Display; label: string }[] =>
+  DISPLAYS.filter((d) => !('minTotal' in d) || total >= d.minTotal || d.value === current).map(({ value, label }) => ({ value, label }));
 
 /** The table's optional columns, in their order, with their headers. The name column is always there. */
 export const COLUMNS: readonly { id: RecordColumn; label: string }[] = [
@@ -71,10 +119,22 @@ export interface BoardColumn {
  * view lets through (narrowed by the status filter when one is set), so a tab, a filter and a
  * column can never disagree about what belongs where.
  */
-export const toBoard = (rows: readonly RecordRow[], view: RecordView, status: readonly RecordStatus[]): BoardColumn[] =>
-  statusOptionsFor(view)
-    .filter((option) => status.length === 0 || status.includes(option.value))
-    .map(({ value }) => ({ status: value, label: STATUS[value].label, tone: STATUS[value].tone, rows: rows.filter((row) => hasStatus(value)({ status: row.statusKey })) }));
+const boards = new WeakMap<readonly RecordRow[], Map<string, readonly BoardColumn[]>>();
+
+export const toBoard = (rows: readonly RecordRow[], view: RecordView, status: readonly RecordStatus[]): readonly BoardColumn[] => {
+  // Memoised on the rows (by identity) and the view and filter (by value): see toRow.
+  const key = `${view}|${status.join(',')}`;
+  const byFilter = boards.get(rows) ?? new Map<string, readonly BoardColumn[]>();
+  boards.set(rows, byFilter);
+  let board = byFilter.get(key);
+  if (!board) {
+    board = statusOptionsFor(view)
+      .filter((option) => status.length === 0 || status.includes(option.value))
+      .map(({ value }) => ({ status: value, label: STATUS[value].label, tone: STATUS[value].tone, rows: rows.filter((row) => hasStatus(value)({ status: row.statusKey })) }));
+    byFilter.set(key, board);
+  }
+  return board;
+};
 
 /**
  * The list's tabs: a label per view. Each view *is* a predicate (VIEW_PREDICATES); a new tab is one

@@ -15,6 +15,7 @@
  *            rename, open by default, delete); the default opens when the URL is bare
  *   views    NavTabs (All · Open · Drafts · Archived) with server counts; each view is a predicate
  *   toolbar  SearchField · Filters Popover (status checkboxes) · Columns Popover   (role="search") | Display: Table · Board
+ *            (· Scroll, once the list is large: every matching row in one windowed table, RecordScrollTable)
  *   chips    one removable Tag per active filter; removing one moves focus to the next chip, or to Filters
  *   content  one of: skeleton rows (loading) · table or board · empty state (first use | no results | error)
  *            The table and the board are two surfaces over ONE query and ONE projection: the same
@@ -49,7 +50,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useState, type FormEven
 import { Badge, Banner, Button, Center, Checkbox, Cluster, Dialog, DownloadIcon, EmptyState, Link, NavTabs, PageHeader, Pagination, PlusIcon, Popover, SearchField, SegmentedControl, SettingsIcon, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tag, Text, TextField, Tooltip, useFormat, useToast } from '../index';
 import { MOVABLE_STATUSES, type BulkDeleteResult, type MovableStatus, type RecordStatus, type SortKey } from '../app/api/schemas';
 import { useBulkDeleteRecords, useCreateRecord, useMoveRecord, useStartBulkDelete, type BulkSelection } from '../app/model/mutations';
-import { COLUMNS, DISPLAYS, statusOptionsFor, toBoard, toRow, VIEWS, type Display, type RecordRow } from '../app/model/projections';
+import { COLUMNS, displaysFor, statusOptionsFor, toBoard, toRows, VIEWS, type Display, type RecordRow } from '../app/model/projections';
 import {
   deletableCount,
   EMPTY_SELECTION,
@@ -76,6 +77,7 @@ import { LiveListNotice } from './Freshness';
 import { JobBanner } from './Jobs';
 import { gated, PermissionNote } from './Permission';
 import { RecordBoard } from './RecordBoard';
+import { RecordScrollTable, ScrollSummary } from './RecordScrollTable';
 import { SavedViewsBar, type SavedViewDialog } from './SavedViews';
 
 /** A real list pages 25 or 50 rows; the example pages 10 so the gallery stays readable. */
@@ -183,12 +185,15 @@ function ListPageContent({
   const [dialogOpen, setDialogOpen] = useState(initialDialogOpen);
   const [draftName, setDraftName] = useState('');
   const [nameError, setNameError] = useState<string | undefined>();
+  // One key per name until the create succeeds: a retry after a failure (or a dropped connection
+  // after the server already made it) sends the same key, so it never makes a second record.
+  const idempotency = useRef<{ name: string; key: string } | undefined>(undefined);
 
   const statusOptions = statusOptionsFor(query.view);
   const shown = new Set(url.columns);
   // The default saved view applies only when the list opened with nothing in its URL.
   const [openedBare] = useState(() => listCodec.serialise(url) === '');
-  const rows = (list.data?.items ?? []).map(toRow);
+  const rows = toRows(list.data?.items);
   const total = list.data?.total ?? 0;
   const filtered = query.q.trim() !== '' || query.status.length > 0;
   const sort = sortOf(query.sort);
@@ -283,10 +288,12 @@ function ListPageContent({
       setNameError('Enter a name for the record.');
       return;
     }
+    if (idempotency.current?.name !== name) idempotency.current = { name, key: crypto.randomUUID() };
     createRecord.mutate(
-      { record: { name }, idempotencyKey: crypto.randomUUID() },
+      { record: { name }, idempotencyKey: idempotency.current.key },
       {
         onSuccess: () => {
+          idempotency.current = undefined;
           setDialogOpen(false);
           setDraftName('');
           setNameError(undefined);
@@ -401,7 +408,7 @@ function ListPageContent({
                       <Checkbox key={value} label={label} checked={query.status.includes(value)} onCheckedChange={(checked) => toggleStatus(value, checked === true)} />
                     ))}
                   </Popover>
-                  {url.display === 'table' ? (
+                  {url.display !== 'board' ? (
                     <Popover
                       label="Columns"
                       trigger={
@@ -423,11 +430,11 @@ function ListPageContent({
                     </Popover>
                   ) : null}
                 </Cluster>
-                {/* Two surfaces, one query: switching is navigation (push), so Back returns to the other one. */}
+                {/* Surfaces over one query: switching is navigation (push), so Back returns to the other one. Scroll joins once the list is large. */}
                 <SegmentedControl
                   label="Display"
                   hideLabel
-                  options={DISPLAYS}
+                  options={displaysFor(total, url.display)}
                   value={url.display}
                   onValueChange={(display) => nav.push({ display: display as Display })}
                 />
@@ -555,6 +562,17 @@ function ListPageContent({
                 onMove={moveRecord}
                 onOpen={restoration.remember}
               />
+            ) : url.display === 'scroll' ? (
+              <RecordScrollTable
+                query={{ view: query.view, q: query.q, status: query.status, sort: query.sort }}
+                total={total}
+                shown={shown}
+                sort={sort}
+                onSort={toggleSort}
+                selection={selection}
+                onSelectionChange={onSelectionChange}
+                onOpen={restoration.remember}
+              />
             ) : (
               <Table caption="Records" hideCaption maxHeight="md">
                 <TableHead>
@@ -624,7 +642,9 @@ function ListPageContent({
               </Table>
             )}
 
-            {list.isSuccess && total > 0 ? (
+            {url.display === 'scroll' && list.isSuccess && total > 0 ? (
+              <ScrollSummary total={total} />
+            ) : list.isSuccess && total > 0 ? (
               <Pagination
                 label="Records pages"
                 page={query.page}

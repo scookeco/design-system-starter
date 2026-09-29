@@ -279,13 +279,14 @@
     },
     {
       "title": "App",
-      "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
+      "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. A page that throws while rendering shows the error state in its place, inside the shell (RenderErrorPage), and is reported to the telemetry sink; if even that fails, the app-wide boundary shows the error page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
       "path": "src/examples/App.tsx",
       "stories": [
         "examples-app--records",
         "examples-app--record-from-link",
         "examples-app--unknown-path",
-        "examples-app--guarded-route"
+        "examples-app--guarded-route",
+        "examples-app--render-error"
       ]
     },
     {
@@ -392,7 +393,8 @@
       "stories": [
         "examples-error-pages--not-found",
         "examples-error-pages--server-error",
-        "examples-error-pages--forbidden"
+        "examples-error-pages--forbidden",
+        "examples-error-pages--render-error"
       ]
     },
     {
@@ -451,7 +453,9 @@
         "examples-list-page--job-queued",
         "examples-list-page--job-running",
         "examples-list-page--job-failed",
-        "examples-list-page--job-cancelled"
+        "examples-list-page--job-cancelled",
+        "examples-list-page--ten-thousand-records",
+        "examples-list-page--ten-thousand-records-scroll"
       ]
     },
     {
@@ -15320,6 +15324,13 @@
           ]
         },
         {
+          "name": "rowCount",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "Only some of the rows are rendered (a windowed list of thousands): how many rows the table has in all, header row included. Sets `aria-rowcount`; give each rendered TableRow its `aria-rowindex` (1 for the header row), so assistive tech says \"row 5,002 of 10,001\" rather than \"of 30\"."
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "required": true,
@@ -15375,7 +15386,8 @@
         "accessibility": [
           "`caption` is required and names the scroll region; `hideCaption` keeps it for screen readers only.",
           "Sortable headers are buttons, and the sorted column carries `aria-sort`.",
-          "The scroll container is focusable, so keyboard users can scroll a wide or capped table."
+          "The scroll container is focusable, so keyboard users can scroll a wide or capped table.",
+          "A windowed table (only the rows in view rendered, for thousands of rows) passes `rowCount` (every row, the header row included) and an `aria-rowindex` on each rendered `TableRow`, so a row is announced as “row 5,002 of 10,001”, not “of 30”. The windowing itself is app code: the List page example’s Scroll display."
         ]
       },
       "unit": {
@@ -15396,6 +15408,10 @@
           {
             "id": "components-table--selectable",
             "name": "Selectable"
+          },
+          {
+            "id": "components-table--windowed-rows",
+            "name": "Windowed Rows"
           }
         ],
         "composes": [
