@@ -43,7 +43,10 @@ export function RouteView({ routes, notFound, guard, renderError }: RouteViewPro
   );
   if (!renderError) return <>{guarded}</>;
   return (
-    // Keyed by the path too: a failure on one record doesn't follow the person to the next.
+    // Keyed by the path too: a render failure on one record doesn't follow the person to the next.
+    // A page whose code failed to load is shared by every route that uses it (/ and /home), and the
+    // next route renders before this boundary forgets the failure: it shows the error again, and
+    // Try again recovers.
     <RenderBoundary key={pathname} region={route.path} fallback={(retry, failure) => renderError(route, retry, failure)}>
       {guarded}
     </RenderBoundary>
