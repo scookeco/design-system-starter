@@ -82,7 +82,7 @@ src/app   api/        the client and zod schemas: every response is parsed at th
           session.tsx the session: memberships, the active workspace, switch, sign out
           telemetry.ts the one sink: every mutation's start and outcome, render failures
           windowing.ts useWindowedRows: which rows of a long list to render
-          routing/    the route entry type, the matcher, RouteView, RenderBoundary and AppLink
+          routing/    the route entry type, the matcher, RouteView, RenderBoundary, lazyPage and AppLink
           url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
@@ -252,7 +252,8 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               route without a capability doesn’t compile, and a test checks every route has one.
             </>,
             <>
-              Pages are lazy, one chunk per route. The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
+              Pages are lazy, one chunk per route (<code>lazyPage</code>, not React.lazy). The Suspense fallback is nothing: a page shows
+              its own skeleton once its code is here.
             </>,
             <>
               An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (
@@ -265,6 +266,14 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               <StoryLink id="examples-app--render-error">a broken renderer</StoryLink> and{' '}
               <StoryLink id="examples-error-pages--render-error">its error state</StoryLink>). A test opens every route from a deep link
               and fails if any boundary caught something.
+            </>,
+            <>
+              A page whose code fails to load (the connection dropped, or a deploy replaced the file) shows the same error state, saying
+              so: <StoryLink id="examples-error-pages--load-error">“This page couldn’t load”</StoryLink>, reported with the code{' '}
+              <code>PageLoadError</code>. Try again fetches the code again: React.lazy keeps a failed import forever, so the route table
+              uses <code>lazyPage</code>, whose failure is forgotten by Try again (or by leaving the page). If Try again fails too, a
+              deploy may have removed the old code, so the next step is{' '}
+              <StoryLink id="examples-error-pages--load-error-repeated">Reload the page</StoryLink>, with focus moved to it.
             </>,
           ]}
         />

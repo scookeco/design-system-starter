@@ -5762,7 +5762,7 @@ src/app   api/        the client and zod schemas: every response is parsed at th
           session.tsx the session: memberships, the active workspace, switch, sign out
           telemetry.ts the one sink: every mutation's start and outcome, render failures
           windowing.ts useWindowedRows: which rows of a long list to render
-          routing/    the route entry type, the matcher, RouteView, RenderBoundary and AppLink
+          routing/    the route entry type, the matcher, RouteView, RenderBoundary, lazyPage and AppLink
           url/        useUrlState, the navigation guard, the list page's URL codec, restoration
           registries/ the field registry, which fields a record has, entityType → fields
           mocks/      the mock API (MSW), its seeded database and gallery wiring
@@ -5824,9 +5824,10 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
 #### Routes
 
 - The route table is the master registry: `path → layout + page + guard` (`src/examples/routes.tsx`). A route without a capability doesn’t compile, and a test checks every route has one.
-- Pages are lazy, one chunk per route. The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
+- Pages are lazy, one chunk per route (`lazyPage`, not React.lazy). The Suspense fallback is nothing: a page shows its own skeleton once its code is here.
 - An unknown path renders the 404 page, the table’s own fallback. The app hands the design system its router link once (`LinkProvider` with `AppLink`), so every Link, Nav, NavTabs and Breadcrumbs routes in place.
 - Every page renders inside its own error boundary (`RenderBoundary`, put there by `RouteView`). A renderer that throws, a field registry entry for instance, costs that page and never the shell: the error state shows in its place with Try again, and the failure is reported (see “Instrumentation” below, [a broken renderer](src/examples/App.tsx) and [its error state](src/examples/ErrorPages.tsx)). A test opens every route from a deep link and fails if any boundary caught something.
+- A page whose code fails to load (the connection dropped, or a deploy replaced the file) shows the same error state, saying so: [“This page couldn’t load”](src/examples/ErrorPages.tsx), reported with the code `PageLoadError`. Try again fetches the code again: React.lazy keeps a failed import forever, so the route table uses `lazyPage`, whose failure is forgotten by Try again (or by leaving the page). If Try again fails too, a deploy may have removed the old code, so the next step is [Reload the page](src/examples/ErrorPages.tsx), with focus moved to it.
 
 #### Where state lives
 

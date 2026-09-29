@@ -62,7 +62,7 @@ src/app/                the app layer the examples use (not the system): api/ (c
                         model/ (keys, queries, predicates, projections, mutations, selection, permissions, live, write
                         queues, conflicts, drafts, undo, jobs), session.tsx (memberships, workspace switch, sign-out),
                         telemetry.ts (the one sink), windowing.ts (useWindowedRows),
-                        routing/ (route type, matcher, RouteView, RenderBoundary, AppLink), url/ (useUrlState, navigation guard,
+                        routing/ (route type, matcher, RouteView, RenderBoundary, lazyPage, AppLink), url/ (useUrlState, navigation guard,
                         restoration), registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the
                         inbox, members and the audit log; live.ts the live channel; jobs.ts the job runner)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
@@ -219,7 +219,7 @@ The design system draws; `src/app` knows. It is consumer code, like the examples
 - **The query-cache trap, handled**: a record write patches its detail and every cached list page holding it (`patchListedRecord`), then invalidates what the patch can't know. A test proves a detail edit shows in an already-cached list with every list request held open.
 - **Permissions**: capabilities (`record:rename`, `account:edit`, …), roles mapped to them in one place (`ROLE_CAPABILITIES`), and one predicate, `can`, used by the controls, the route guard, every mutation and the mock server (403). Viewers get a narrower projection (no drafts), filtered in the query.
 - **Workspace and session boundaries**: switching workspace cancels the old one's reads and remounts the page; a permission change drops the old scope's partition; sign-out cancels everything and clears the cache.
-- **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`. Every page renders inside its own error boundary (`RenderBoundary`, from `RouteView`): a renderer that throws costs that page, never the shell, shows the error state with Try again, and is reported.
+- **Route table** (`src/examples/routes.tsx`): path → layout + page + guard, lazy pages, a 404 fallback, links through `LinkProvider`. Every page renders inside its own error boundary (`RenderBoundary`, from `RouteView`): a renderer that throws costs that page, never the shell, shows the error state with Try again, and is reported. A page whose code fails to load says so, and Try again fetches it again (`lazyPage`: React.lazy keeps a failed import forever); if that fails too, it offers Reload the page.
 - **Schema-driven pages**: `entityType → fields` config (`src/app/registries/entities.ts`) gives accounts and people their list, record and form pages.
 - **The assistant** (`src/app/api/ai.ts`, `src/app/model/ai.ts`, `src/app/mocks/ai.ts`): answers stream as newline-delimited JSON events, each parsed with zod; the mock is scripted and seeded. It has no permissions of its own: it reads what `canSee` allows in the person's workspace, proposes only what `can` allows, and applies nothing itself (apply and undo go through `moveRecord`). Conversations are server state with named verbs.
 - **Saved views**: named filter, sort, columns and display, persisted per person per workspace; the URL stays the truth.
