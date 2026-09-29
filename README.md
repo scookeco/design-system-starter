@@ -66,7 +66,7 @@ src/app/                the app layer the examples use (not the system): api/ (c
                         restoration), registries/ (field registry, entityType → fields), mocks/ (MSW; b2b.ts serves the
                         inbox, members and the audit log; live.ts the live channel; jobs.ts the job runner)
 src/internal/           closed-API helpers (Closed<>, UNSAFE_ escape hatch)
-src/examples/           golden example pages, one per archetype (and four AI examples), the schema-driven entity pages, and the app's route table
+src/examples/           golden example pages, one per archetype (four AI examples; import, search, notifications, reports, integrations, billing), the schema-driven entity pages, and the app's route table
                         (routes.tsx) and assembly (App.tsx); also a consumer lint target
 src/index.ts            public entry point
 docs/                   Storybook-only pages: foundations/ (generated from the token source), guides/, usage/ (Docs tab sections); docs-only helpers in ui/
@@ -200,6 +200,13 @@ Signed-in pages render inside `AppShell` and fill its slots; they never rebuild 
 | AI-proposed changes (AI) | `src/examples/AiReviewChanges.tsx` | an agent's steps, a proposal limited to what the person could do, `ReviewChanges`, apply and undo through `moveRecord`, partial failure |
 | Chat page (AI) | `src/examples/AssistantChatPage.tsx` | history with the open conversation in the URL, new chat, rename, delete, the composer in the sticky footer, every answer state |
 | Error / 403 / 404 | `src/examples/ErrorPages.tsx` | a signed-in 404 and 403 inside the shell and a server error in AuthLayout: EmptyState as the h1, Try again, a way home |
+| Import (CSV) | `src/examples/ImportWizard.tsx` | FocusedLayout and Stepper: upload with limits up front, columns mapped to fields from the field registry, every row checked with the server's rules (problems by row, field and fix, downloadable), the import as a job (progress, partial failure listing each row, Retry failed) |
+| Search results | `src/examples/SearchPage.tsx` | records, accounts and people in one ranked list: type tabs and a status facet with server counts, matched text in bold, pagination, all in the URL; j/k and /; the palette's "See all results" opens it |
+| Notification centre | `src/examples/NotificationsPage.tsx`, `Notifications.tsx` | the bell in the header (unread count, latest in a popover, Mark all read), All and Unread with counts, a type filter, optimistic mark read, live arrivals with "Show N new" |
+| Reports (charts) | `src/examples/ReportsPage.tsx`, `charts.tsx` | one Card per question with the answer in words, small SVG charts from `color.chart.*` only (stacked bar with a legend, bars, columns), each with its numbers as a table; no chart library |
+| Catalogue (integrations) | `src/examples/IntegrationsPage.tsx` | connected and available apps as Cards, pessimistic connect and confirmed disconnect, settings in a Drawer from the URL with a versioned save, disabled with the reason for non-admins |
+| Billing and usage | `src/examples/BillingPage.tsx` | plan and next invoice, a Meter per limit in words, invoices, a change-plan Dialog whose plans that don't fit are disabled with the reason; money in integer minor units |
+| First-run checklist | `src/examples/Onboarding.tsx` (on the dashboard) | for admins, inside the app: steps the server works out from the workspace, Progress in words, Dismiss with Undo and a way back |
 
 `src/examples/ExampleShell.tsx` is the app's shell composition (one nav config, one account menu, and inside the app the command palette and the ? overlay from `CommandMenu.tsx`) that each page passes its location and content to. The list, record and create examples read and write through the app layer in `src/app` (below); `src/app/model/status.ts` holds the one status-to-tone map. `src/examples/records.ts` keeps a few static rows for the dashboard.
 

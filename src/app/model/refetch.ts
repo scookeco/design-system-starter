@@ -18,9 +18,13 @@
  *             writes, inbox triage, the assistant's conversations (model/ai.ts), counts after a live
  *             event. Optimistic writes still cancel in onMutate too: that covers a read already in
  *             flight; this covers one that starts while the write is.
+ *   demos     startImport, retryJob (model/imports.ts), markAllRead (model/notifications.ts),
+ *             connect/disconnect/updateIntegrationSettings, changePlan, dismiss/restoreOnboarding
  *
  * Left out on purpose:
  *   a live event marks lists stale without refetching them (live.ts, refetchType 'none');
+ *   markNotificationsRead does the same, so a row just read stays on an Unread list until the
+ *   person moves on (it cancels in-flight reads in onMutate);
  *   "Show N new" refetches lists already on screen, which have data, so invalidating restarts them.
  */
 import type { QueryClient, QueryKey } from '@tanstack/react-query';

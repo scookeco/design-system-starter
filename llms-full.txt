@@ -24,8 +24,10 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
-  Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,
+  import → ImportWizard, search results → SearchPage, notifications →
+  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,
+  billing → BillingPage. Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.
@@ -5707,7 +5709,13 @@ Most pages are one of a few archetypes. Each has one golden example: copy it, sw
 | Settings | Personal or workspace preferences, grouped by category. | [Settings page](src/examples/SettingsPage.tsx)`src/examples/SettingsPage.tsx` | A grouped sub-nav in PageLayout’s nav slot, one card per category with its own Save, a success banner. |
 | Sign-in (signed out) | Any signed-out page: sign-in, sign-up, password reset, a verification code. | [Sign in](src/examples/SignInPage.tsx)`src/examples/SignInPage.tsx` | AuthLayout; SSO first, an emailed link, a password as the secondary route; a failed-sign-in banner; a verification-code step. |
 | Wizard | A task whose later steps depend on earlier ones: first-run setup, a multi-step create. | [Setup wizard](src/examples/SetupWizard.tsx)`src/examples/SetupWizard.tsx` | FocusedLayout with an exit, Progress and Stepper; validation per step; focus to each step’s h1; a review step with Edit. |
-| Dashboard | A home or overview page: how things are, and what needs attention. | [Dashboard](src/examples/DashboardPage.tsx)`src/examples/DashboardPage.tsx` | A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table. |
+| Dashboard | A home or overview page: how things are, and what needs attention. | [Dashboard](src/examples/DashboardPage.tsx)`src/examples/DashboardPage.tsx` | A date range (SegmentedControl) in the PageHeader, Stat tiles in a Switcher, usage Meters, recent activity, a needs-attention table. Inside the app, a first-run checklist for admins (steps worked out on the server, Progress in words, Dismiss with Undo): see the Onboarding stories. |
+| Import (CSV) | Bringing rows of data in from a file: records, contacts, a price list. | [Import wizard](src/examples/ImportWizard.tsx)`src/examples/ImportWizard.tsx` | FocusedLayout and Stepper: FileUpload with its limits, columns mapped to fields from the field registry, every row checked with the server’s rules (each problem by row, field and fix, downloadable), then the import as a job: truthful progress, a partial failure listing each row with Retry failed. |
+| Search results | Everything that matches, across types, when the palette’s five rows aren’t enough. | [Search](src/examples/SearchPage.tsx)`src/examples/SearchPage.tsx` | SearchField, type tabs and a status facet with server counts, matched text in bold, pagination, all in the URL; j/k through the results and / to search; first-use, no-results and no-results-with-filters states. The palette’s “See all results” opens it. |
+| Notification centre | A feed of events that concern the person, to catch up on (a queue to work through is the inbox). | [Notifications](src/examples/NotificationsPage.tsx)`src/examples/NotificationsPage.tsx` | The bell in the header with the unread count and a popover; All and Unread tabs with counts, a type filter; mark read optimistically, Mark all read as a named mutation; new ones live, with “Show N new” (rows never move under the cursor). |
+| Reports (charts) | Questions about the data answered with charts: shares, rankings, values over time. | [Reports](src/examples/ReportsPage.tsx)`src/examples/ReportsPage.tsx` | One Card per question: the answer in words, a small SVG chart drawn from the chart tokens only (stacked bar with a legend, bars, columns with gridlines), and “Show the numbers” as a table. No chart library. |
+| Catalogue (integrations) | Things a workspace turns on or connects: apps, add-ons, templates. | [Integrations](src/examples/IntegrationsPage.tsx)`src/examples/IntegrationsPage.tsx` | Connected, then available, as Cards with one action each; connect and disconnect as pessimistic writes (disconnect confirmed); settings in a Drawer opened from the URL, a versioned save with a conflict banner; disabled with the reason for non-admins. |
+| Billing and usage | The plan, what’s used against its limits, invoices, and changing plan. | [Billing and usage](src/examples/BillingPage.tsx)`src/examples/BillingPage.tsx` | Meters in words (nearing a limit said, not coloured), an invoices table, money in integer minor units through useFormat; a change-plan Dialog whose plans that don’t fit are disabled with the reason (the server’s own rule), pending and refused states in the dialog. |
 | Assistant beside a page (AI) | People ask questions about the record or page they are on, with it still in view. | [Record copilot](src/examples/RecordCopilot.tsx)`src/examples/RecordCopilot.tsx` | The existing record page with an AssistantPanel in the shell (WithAssistant): answers that cite fields and activity, sources that link into the record, tool activity, Stop, Retry, Edit, Feedback, a refusal and each failure in its own words. |
 | Inline AI in a form (AI) | A field the AI can draft (a description, a reply), beside writing it by hand. | [Create with AI](src/examples/CreateWithAi.tsx)`src/examples/CreateWithAi.tsx` | Suggest beside the field, disabled with a reason per role; ghost text (Tab or Accept, Esc or Dismiss); accepted text marked “Drafted with AI” until edited; one Undo back to what was there. |
 | AI-proposed changes (AI) | An agent would change data: many records, or any write at all. | [AI bulk changes](src/examples/AiReviewChanges.tsx)`src/examples/AiReviewChanges.tsx` | The agent’s steps, a proposal limited to what the person could do, ReviewChanges (accept or reject each, apply), apply and undo through the named mutation, partial failure, a refusal for a viewer. |
@@ -5855,6 +5863,13 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 | `saveView · updateView · deleteView` | Pessimistic | The person’s views (the default moves on update) | Views | The dialog stays open with the server’s reason |
 | `markRead · markUnread · archive · unarchive (inbox)` | Optimistic: a person’s own frequent triage | The items in every cached inbox view, and the counts | Inbox views | Every view put back as it was; a toast that stays |
 | `inviteMember · changeRole · removeMember` | Pessimistic: it changes what someone else can do | Members (the answer) | Members, the audit log | The dialog stays open with the server’s reason (last admin, your own role, already a member) |
+| `startImport · retryJob` | A job (an idempotency key on start) | Appends the job, queued | The person’s jobs; each poll that moves it refetches lists and counts | Nothing imported; the wizard keeps the file and mapping. Rows that fail are listed on the job, with Retry failed |
+| `markNotificationsRead` | Optimistic: a person’s own frequent action | The items and unread counts in every cached list (a row just read stays on Unread) | Notification lists (stale, not refetched on screen) | Every list put back as it was; a toast that stays |
+| `markAllRead` | Pessimistic: the server marks what the page hasn’t loaded | Every cached list: all read, unread 0 | Notification lists | Nothing changed; a toast that stays |
+| `connectIntegration · disconnectIntegration` | Pessimistic (disconnect confirmed: its settings go) | The catalogue entry (the answer) | The catalogue, the first-run checklist | The card is as it was; a toast with the server’s reason |
+| `updateIntegrationSettings` | Pessimistic, versioned (If-Match) | The catalogue entry | The catalogue | A 409 shows “Someone else changed these settings” with Reload; the choices stay |
+| `changePlan` | Pessimistic, versioned, confirmed in a dialog | Billing (the answer) | Billing | The dialog stays open with the reason (a plan that can’t hold what’s in use, a stale version) |
+| `dismissOnboarding · restoreOnboarding` | Pessimistic, undoable (Undo sends restore) | The checklist | The checklist | The checklist stays; a toast that stays |
 
 - An optimistic write cancels in-flight reads first, so a late response can’t land on top of it.
 - After a write, refetch what it changed with `refetchAfterWrite` (`src/app/model/refetch.ts`), never `invalidateQueries` alone: a list still on its first load read the server before the write, and invalidating joins that read instead of sending a new one. Patch the cache inside its callback, after the cancel.
@@ -5881,6 +5896,7 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - Live events (`src/app/api/live.ts`) arrive per workspace: record updated, created, deleted. They’re parsed at the boundary like any response, and the server filters them by the recipient’s grant, so a viewer never hears about a draft.
 - One handler reconciles them (`src/app/model/live.ts`) with the mutations’ policy: an update patches the record and every listed copy in place, a delete removes the row, a create is counted, not inserted. Events are idempotent by version, so a late or replayed one, or the echo of this person’s own write, changes nothing.
 - Rows never reorder under the cursor: lists are marked stale but the one on screen isn’t refetched. The list says “3 new records since you opened this list” with **Show 3 new**, or “Updated just now by Priya Natarajan” after an in-place change. See [new records](src/examples/ListPage.tsx), [an edited row](src/examples/ListPage.tsx) and [a record deleted while open](src/examples/RecordPage.tsx).
+- A `notification.created` event (the bell, the notification centre) touches only the notifications: the counts move at once, lists are marked stale without refetching the one on screen, and the page offers “Show N new” ([new while open](src/examples/NotificationsPage.tsx)). Stories push one with `mockApi({ anotherUser: [{ kind: 'notify' }] })`.
 - The subscription lives inside the workspace boundary: switching workspace or signing out unsubscribes.
 
 #### Versions and conflicts
@@ -5915,6 +5931,7 @@ Components never write the cache. They call a mutation from `src/app/model/mutat
 - A bulk action over “all N matching” runs as a job: the server answers `202` with the job, queued, and the page never says “done” until the job does (`src/app/model/jobs.ts`).
 - Status is truthful and in words: queued, running “20 of 59”, succeeded (a partial failure lists each failed item with its reason), failed (the job stopped, and says why), cancelled (between chunks; what was done stays done).
 - The list shows the latest job with Progress and what to do next: Cancel job while it runs, Retry N failed and Dismiss once it ends. The shell’s header shows the person’s jobs on every page, so a job survives navigation (see [a running job](src/examples/ListPage.tsx) and [jobs on another page](src/examples/RecordPage.tsx)).
+- A job has a kind: a bulk delete, or an import (the CSV import wizard, [a partial failure](src/examples/ImportWizard.tsx)). Cancel and Retry failed ask the capability that started it (`JOB_CAPABILITY`), and a retry is a new job for what failed.
 
 #### History, scroll and focus
 
@@ -6321,7 +6338,8 @@ useShortcut({
 | CtrlK | Open or close the command palette | Everywhere, even in a text field (allowInInputs) |
 | ? | Show every shortcut active on this page | Everywhere outside a text field |
 | GthenH | Go to Home (g r Records, g a Accounts, g p People, g i Inbox, g m Members, g s Settings) | Everywhere; only pages this role may open |
-| J | Next item (k: previous) | Lists worked one item at a time: the inbox |
+| J | Next item (k: previous) | Lists worked one item at a time: the inbox, search results |
+| / | Put the cursor in the search field | The search results page |
 | E | Archive the open item, or the selection | The inbox |
 | U | Mark read or unread | The inbox |
 | X | Select the open item for bulk triage | The inbox |
@@ -6668,8 +6686,10 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
-  Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,
+  import → ImportWizard, search results → SearchPage, notifications →
+  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,
+  billing → BillingPage. Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.

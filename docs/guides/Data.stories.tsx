@@ -28,6 +28,13 @@ const MUTATIONS = [
   { verb: 'saveView · updateView · deleteView', presents: 'Pessimistic', patches: 'The person’s views (the default moves on update)', invalidates: 'Views', failure: 'The dialog stays open with the server’s reason' },
   { verb: 'markRead · markUnread · archive · unarchive (inbox)', presents: 'Optimistic: a person’s own frequent triage', patches: 'The items in every cached inbox view, and the counts', invalidates: 'Inbox views', failure: 'Every view put back as it was; a toast that stays' },
   { verb: 'inviteMember · changeRole · removeMember', presents: 'Pessimistic: it changes what someone else can do', patches: 'Members (the answer)', invalidates: 'Members, the audit log', failure: 'The dialog stays open with the server’s reason (last admin, your own role, already a member)' },
+  { verb: 'startImport · retryJob', presents: 'A job (an idempotency key on start)', patches: 'Appends the job, queued', invalidates: 'The person’s jobs; each poll that moves it refetches lists and counts', failure: 'Nothing imported; the wizard keeps the file and mapping. Rows that fail are listed on the job, with Retry failed' },
+  { verb: 'markNotificationsRead', presents: 'Optimistic: a person’s own frequent action', patches: 'The items and unread counts in every cached list (a row just read stays on Unread)', invalidates: 'Notification lists (stale, not refetched on screen)', failure: 'Every list put back as it was; a toast that stays' },
+  { verb: 'markAllRead', presents: 'Pessimistic: the server marks what the page hasn’t loaded', patches: 'Every cached list: all read, unread 0', invalidates: 'Notification lists', failure: 'Nothing changed; a toast that stays' },
+  { verb: 'connectIntegration · disconnectIntegration', presents: 'Pessimistic (disconnect confirmed: its settings go)', patches: 'The catalogue entry (the answer)', invalidates: 'The catalogue, the first-run checklist', failure: 'The card is as it was; a toast with the server’s reason' },
+  { verb: 'updateIntegrationSettings', presents: 'Pessimistic, versioned (If-Match)', patches: 'The catalogue entry', invalidates: 'The catalogue', failure: 'A 409 shows “Someone else changed these settings” with Reload; the choices stay' },
+  { verb: 'changePlan', presents: 'Pessimistic, versioned, confirmed in a dialog', patches: 'Billing (the answer)', invalidates: 'Billing', failure: 'The dialog stays open with the reason (a plan that can’t hold what’s in use, a stale version)' },
+  { verb: 'dismissOnboarding · restoreOnboarding', presents: 'Pessimistic, undoable (Undo sends restore)', patches: 'The checklist', invalidates: 'The checklist', failure: 'The checklist stays; a toast that stays' },
 ] as const;
 
 const ROLES = [
@@ -406,6 +413,12 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               <StoryLink id="examples-list-page--live-row-updated">an edited row</StoryLink> and{' '}
               <StoryLink id="examples-record-page--deleted-elsewhere">a record deleted while open</StoryLink>.
             </>,
+            <>
+              A <code>notification.created</code> event (the bell, the notification centre) touches only the notifications: the counts move
+              at once, lists are marked stale without refetching the one on screen, and the page offers “Show N new” (
+              <StoryLink id="examples-notifications--new-while-open">new while open</StoryLink>). Stories push one with{' '}
+              <code>mockApi({'{ anotherUser: [{ kind: \'notify\' }] }'})</code>.
+            </>,
             <>The subscription lives inside the workspace boundary: switching workspace or signing out unsubscribes.</>,
           ]}
         />
@@ -525,6 +538,11 @@ role ──(ROLE_CAPABILITIES, src/app/model/permissions.ts)──▶ capabiliti
               ends. The shell’s header shows the person’s jobs on every page, so a job survives navigation (see{' '}
               <StoryLink id="examples-list-page--job-running">a running job</StoryLink> and{' '}
               <StoryLink id="examples-record-page--jobs-follow-you">jobs on another page</StoryLink>).
+            </>,
+            <>
+              A job has a kind: a bulk delete, or an import (the CSV import wizard,{' '}
+              <StoryLink id="examples-import-wizard--imported-with-failures">a partial failure</StoryLink>). Cancel and Retry failed ask the
+              capability that started it (<code>JOB_CAPABILITY</code>), and a retry is a new job for what failed.
             </>,
           ]}
         />
