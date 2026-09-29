@@ -71,6 +71,7 @@ import { AccountRef, PersonRef } from '../app/registries/refs';
 import { listCodec, type ListUrlState } from '../app/url/listState';
 import { useListRestoration } from '../app/url/restoration';
 import { useDebouncedUrlText, useUrlState } from '../app/url/useUrlState';
+import { withViewTransition } from '../app/viewTransition';
 import { useCan, usePermission } from '../app/session';
 import { ExampleShell } from './ExampleShell';
 import { LiveListNotice } from './Freshness';
@@ -430,13 +431,14 @@ function ListPageContent({
                     </Popover>
                   ) : null}
                 </Cluster>
-                {/* Surfaces over one query: switching is navigation (push), so Back returns to the other one. Scroll joins once the list is large. */}
+                {/* Surfaces over one query: switching is navigation (push), so Back returns to the other one. Scroll joins once the list is large.
+                    The switch cross-fades where the platform allows (withViewTransition). */}
                 <SegmentedControl
                   label="Display"
                   hideLabel
                   options={displaysFor(total, url.display)}
                   value={url.display}
-                  onValueChange={(display) => nav.push({ display: display as Display })}
+                  onValueChange={(display) => withViewTransition(() => nav.push({ display: display as Display }))}
                 />
               </Cluster>
               {query.status.length > 0 ? (

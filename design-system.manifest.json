@@ -19137,6 +19137,20 @@
       ],
       "modes": {}
     },
+    "motion.view": {
+      "cssVar": "--motion-view",
+      "tier": "semantic",
+      "type": "duration",
+      "description": "The cross-fade when a whole view changes: a route, a list's display (view transitions).",
+      "value": "150ms",
+      "chain": [
+        "motion.view",
+        "duration.150"
+      ],
+      "modes": {
+        "reduced-motion": "0ms"
+      }
+    },
     "radius.control": {
       "cssVar": "--radius-control",
       "tier": "semantic",

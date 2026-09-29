@@ -242,6 +242,7 @@ export const vars = {
     "fast": "var(--motion-fast)",
     "base": "var(--motion-base)",
     "slow": "var(--motion-slow)",
+    "view": "var(--motion-view)",
     "spin": "var(--motion-spin)",
     "pulse": "var(--motion-pulse)"
   },

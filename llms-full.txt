@@ -6374,6 +6374,7 @@ From the token source. The reduced-motion column is what each token becomes unde
 | `--motion-fast` | `100ms` | 0ms | Hover and press feedback, colour changes. |
 | `--motion-base` | `200ms` | 0ms | Small moves: menus and popovers opening. |
 | `--motion-slow` | `300ms` | 0ms | Larger moves: dialogs, drawers, toasts entering. |
+| `--motion-view` | `150ms` | 0ms | The cross-fade when a whole view changes: a route, a list's display (view transitions). |
 | `--motion-spin` | `1000ms` | Unchanged | One revolution of a loading spinner. Not reduced: the spinner is the only progress cue. |
 | `--motion-pulse` | `1000ms` | 0ms | One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading. |
 
@@ -6980,6 +6981,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `motion.pulse` `var(--motion-pulse)`: `1000ms` (reduced-motion `0ms`). One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading.
 - `motion.slow` `var(--motion-slow)`: `300ms` (reduced-motion `0ms`). Larger moves: dialogs, drawers, toasts entering.
 - `motion.spin` `var(--motion-spin)`: `1000ms`. One revolution of a loading spinner. Not reduced: the spinner is the only progress cue.
+- `motion.view` `var(--motion-view)`: `150ms` (reduced-motion `0ms`). The cross-fade when a whole view changes: a route, a list's display (view transitions).
 - `radius.control` `var(--radius-control)`: `6px`. Buttons, inputs, selects.
 - `radius.indicator` `var(--radius-indicator)`: `2px`. Checkbox boxes and other small marks.
 - `radius.pill` `var(--radius-pill)`: `9999px`. Badges and pills.
