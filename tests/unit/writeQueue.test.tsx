@@ -25,7 +25,7 @@ const onServer = () => db('acme').records.find((r) => r.id === ID) as RecordEnti
  * Every PATCH to the record waits at its own gate (released in order by the test), and the server
  * notes the If-Match it was sent and how many were in flight at once. Then the real handler answers.
  */
-const gatedPatches = () => {
+const gatedPatches = (onSeen?: (count: number) => void) => {
   const gates: (() => void)[] = [];
   const seen: { ifMatch: string | null; inFlight: number }[] = [];
   let inFlight = 0;
@@ -33,6 +33,7 @@ const gatedPatches = () => {
     http.patch('*/api/t/:tenant/records/:id', async ({ request }) => {
       inFlight += 1;
       seen.push({ ifMatch: request.headers.get('If-Match'), inFlight });
+      onSeen?.(seen.length);
       await new Promise<void>((resolve) => gates.push(resolve));
       inFlight -= 1;
       return undefined;
@@ -113,18 +114,26 @@ describe('per-record write queue', () => {
   });
 
   it('B never starts before A settles, whichever way A goes', async () => {
-    const { seen, releaseNext } = gatedPatches();
+    // Recorded at the moment B's request reaches the server: had A settled by then?
+    let aSettled = false;
+    let bArrivedAfterA: boolean | undefined;
+    const { seen, releaseNext } = gatedPatches((count) => {
+      if (count === 2) bArrivedAfterA = aSettled;
+    });
     const { write } = setup();
     const a = write('A', { name: 'First' });
+    void a.then(
+      () => (aSettled = true),
+      () => (aSettled = true),
+    );
     const b = write('B', { name: 'Second' });
     await waitFor(() => expect(seen).toHaveLength(1));
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(seen).toHaveLength(1);
     await releaseNext();
     await a;
     await releaseNext();
     await b;
     expect(seen).toHaveLength(2);
+    expect(bArrivedAfterA).toBe(true);
   });
 
   it('a pushed change while a write is pending becomes the base; the pending write replays on it', async () => {
