@@ -7,6 +7,9 @@
  *                     change that. Never a silent redirect home.
  *   Error (any state) in AuthLayout, because the app, and so the shell, may be what failed to load:
  *                     what happened in plain words, Try again, and a way home.
+ *   Render error      one page failed to render (RouteView's error boundary caught it): the same
+ *                     error state, but inside the shell, which still works. Try again renders the
+ *                     page afresh; the nav goes anywhere else.
  *
  * Neither page blames the person or shows a stack trace. No CSS file, no className, no style.
  */
@@ -67,5 +70,34 @@ export function ServerErrorPage({ reference = 'ERR-7F3A-2C' }: ServerErrorPagePr
         }
       />
     </AuthLayout>
+  );
+}
+
+export interface RenderErrorPageProps {
+  /** The primary nav item the page belongs under, so the shell still shows where they are. */
+  current?: string;
+  /** Render the page again (the boundary's retry). */
+  onRetry: () => void;
+}
+
+/** A page that failed to render, in its place inside the shell: RouteView's `renderError`. */
+export function RenderErrorPage({ current = '', onRetry }: RenderErrorPageProps) {
+  return (
+    <ExampleShell current={current}>
+      <Center max="lg" gutters="lg">
+        <EmptyState
+          reason="error"
+          headingLevel={1}
+          title="This page couldn’t be shown"
+          description="Part of it failed to load on our side. Nothing you did caused this, and nothing was lost. Try again, or go somewhere else from the menu."
+          action={
+            <Cluster gap="md" justify="center">
+              <Button onClick={onRetry}>Try again</Button>
+              <Link href="/home">Go to Home</Link>
+            </Cluster>
+          }
+        />
+      </Center>
+    </ExampleShell>
   );
 }
