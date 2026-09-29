@@ -90,7 +90,8 @@ export function RecordScrollTable({ query, total, shown, sort, onSort, selection
     if (!move || !cell || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     event.preventDefault();
     const next = move(index, total);
-    setFocused(next);
+    // The row holding focus stays pinned until the target's control takes it (its onFocus), so focus is
+    // never dropped while the target's page loads.
     setPendingFocus({ index: next, column: (cell as HTMLTableCellElement).cellIndex });
     win.scrollToIndex(next);
   };
@@ -150,6 +151,8 @@ export function RecordScrollTable({ query, total, shown, sort, onSort, selection
               selected={isSelected(selection, row.id)}
               onKeyDown={onRowKeyDown(slot.index)}
               onFocus={() => setFocused(slot.index)}
+              // Focus left the row: it no longer needs pinning (moving to another row pins that one).
+              onBlur={() => setFocused((current) => (current === slot.index ? undefined : current))}
             >
               <TableCell>
                 <Checkbox
