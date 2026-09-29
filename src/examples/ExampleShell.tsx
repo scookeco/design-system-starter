@@ -13,6 +13,7 @@ import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
 import { CommandMenu } from './CommandMenu';
 import { JobsIndicator } from './Jobs';
+import { NotificationsIndicator } from './Notifications';
 
 const NAV: readonly NavSection[] = [
   {
@@ -58,13 +59,15 @@ export interface ExampleShellProps {
   initialShortcutsOpen?: boolean;
   /** Open the jobs popover on first render (gallery and tests). */
   jobsOpen?: boolean;
+  /** Open the notifications popover on first render (gallery and tests). */
+  notificationsOpen?: boolean;
   children: ReactNode;
 }
 
 const HELP_ITEMS: readonly MenuEntry[] = [{ label: 'Help centre' }, { label: 'Contact support' }];
 const HELP = <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={HELP_ITEMS} />;
 
-export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, jobsOpen = false, children }: ExampleShellProps) {
+export function ExampleShell({ current, trail, footer, assistant, initialPaletteQuery, initialShortcutsOpen = false, jobsOpen = false, notificationsOpen = false, children }: ExampleShellProps) {
   const app = useOptionalAppSession();
   const injected = useContext(AssistantSlot);
   const panel = assistant ?? injected;
@@ -87,6 +90,8 @@ export function ExampleShell({ current, trail, footer, assistant, initialPalette
             />
             {/* Freshness and concurrency: the person's long-running jobs, on every page (nothing when there are none). */}
             <JobsIndicator defaultOpen={jobsOpen} />
+            {/* Demo examples: the bell, with the unread count, on every page. */}
+            <NotificationsIndicator defaultOpen={notificationsOpen} />
           </>
         ) : undefined
       }

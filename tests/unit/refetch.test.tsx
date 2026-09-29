@@ -17,6 +17,7 @@ import { useInviteMember, useMembers } from '../../src/app/model/admin';
 import { useArchiveInbox, useInbox } from '../../src/app/model/inbox';
 import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
 import { useStartImport } from '../../src/app/model/imports';
+import { useMarkAllNotificationsRead, useNotifications } from '../../src/app/model/notifications';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -220,5 +221,13 @@ describe('a write while the list is still on its first load shows on the list', 
     const rows = [{ row: 2, cells: { name: 'Raced import' } }];
     await race(read, () => result.current.start.mutate({ rows, file: 'race.csv', idempotencyKey: 'race-import' }), 'POST', '/jobs/import');
     await waitFor(() => expect(itemsOf(result.current.jobs.data).map((j) => j.label)).toContain('Import 1 row from race.csv'));
+  });
+
+  it('notifications: markAllRead', async () => {
+    const read = holdFirstRead('/notifications');
+    const { result } = renderHook(() => ({ list: useNotifications({ view: 'all', kind: '' }), markAll: useMarkAllNotificationsRead() }), { wrapper: wrapperFor(testClient()) });
+    await race(read, () => result.current.markAll.mutate(), 'POST', '/notifications/read-all');
+    await waitFor(() => expect(result.current.list.data?.counts.unread).toBe(0));
+    expect(result.current.list.data?.items.every((n) => n.read)).toBe(true);
   });
 });

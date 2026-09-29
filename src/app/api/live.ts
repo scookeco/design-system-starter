@@ -14,6 +14,7 @@
  */
 import { z } from 'zod';
 import { reporting, ContractError } from './client';
+import { NotificationSchema } from './notifications';
 import { RecordSchema, type Tenant } from './schemas';
 
 export const LiveEventSchema = z.discriminatedUnion('type', [
@@ -23,6 +24,8 @@ export const LiveEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('record.created'), record: RecordSchema, by: z.string().min(1) }),
   /** A record this person could see is gone (deleted, or moved out of their view). */
   z.object({ type: z.literal('record.deleted'), id: z.string().min(1), by: z.string().min(1) }),
+  /** Demo examples: a notification for this person (the bell and the notification centre). */
+  z.object({ type: z.literal('notification.created'), notification: NotificationSchema }),
 ]);
 export type LiveEvent = z.infer<typeof LiveEventSchema>;
 

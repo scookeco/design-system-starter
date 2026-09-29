@@ -7,6 +7,7 @@
  */
 import { AUDIT_ACTIONS, type AuditAction } from '../api/admin';
 import { INBOX_VIEWS, type InboxView } from '../api/inbox';
+import { NOTIFICATION_KINDS, NOTIFICATION_VIEWS, type NotificationKind, type NotificationView } from '../api/notifications';
 import type { UrlCodec } from './useUrlState';
 
 export interface InboxUrlState {
@@ -76,3 +77,30 @@ export const membersCodec: UrlCodec<{ invite: boolean }> = {
   parse: (search) => ({ invite: new URLSearchParams(search).get('invite') === '1' }),
   serialise: (state) => (state.invite ? 'invite=1' : ''),
 };
+
+// ── Demo examples: the notification centre ──────────────────────────────────────────────────
+// /notifications?view=unread&kind=mention
+
+export interface NotificationsUrlState {
+  view: NotificationView;
+  kind: NotificationKind | '';
+}
+
+export const notificationsCodec: UrlCodec<NotificationsUrlState> = {
+  parse: (search) => {
+    const params = new URLSearchParams(search);
+    const view = params.get('view');
+    const kind = params.get('kind');
+    return {
+      view: (NOTIFICATION_VIEWS as readonly (string | null)[]).includes(view) ? (view as NotificationView) : 'all',
+      kind: (NOTIFICATION_KINDS as readonly (string | null)[]).includes(kind) ? (kind as NotificationKind) : '',
+    };
+  },
+  serialise: (state) => {
+    const params = new URLSearchParams();
+    if (state.view !== 'all') params.set('view', state.view);
+    if (state.kind) params.set('kind', state.kind);
+    return params.toString();
+  },
+};
+// ── end Demo examples ────────────────────────────────────────────────────────────────────────
