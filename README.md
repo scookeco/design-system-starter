@@ -62,10 +62,11 @@ Delete one example at a time, and run the loop after each:
    - `repo-docs.test.ts` lists lines in this README and in `CLAUDE.md` that name deleted files, or tell agents to copy a deleted example. Edit or delete those lines.
    - `manifest.test.ts`: run `npm run manifest`.
 5. **Run `npm run lint`** for imports left unused, usually icons.
+6. **Run `npm run dead-modules`** (also part of `npm run check`). It names every module under `src/` and `docs/` that nothing reaches any more, which after a trim is what only the deleted example imported. Delete them, then run steps 3 to 5 again. After the AI examples it names `src/app/url/chatState.ts`; after `ReportsPage`, `src/app/api/reports.ts` and `src/app/model/reports.ts`; after `SearchPage`, `src/app/model/workspaceSearch.ts`.
 
 | Delete | Also delete | Also edit |
 |---|---|---|
-| AI examples: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` | `AssistantTurns.tsx`, `ai-examples.test.tsx` | Nothing else. Optionally drop the assistant's app layer too. In `src/app`, that's `api/ai.ts`, `model/ai.ts`, `mocks/ai.ts` (and `aiHandlers` in `mocks/handlers.ts`) and `url/chatState.ts`. In the tests, that's `ai.test.tsx`, the assistant's verbs and its 429 test in `telemetry.test.tsx`, and the `asRead` test in `writeQueue.test.tsx`. |
+| AI examples: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` | `AssistantTurns.tsx`, `ai-examples.test.tsx` | Nothing else. Optionally drop the rest of the assistant's app layer too. In `src/app`, that's `api/ai.ts`, `model/ai.ts` and `mocks/ai.ts` (and `aiHandlers` in `mocks/handlers.ts`). In the tests, that's `ai.test.tsx`, the assistant's verbs and its 429 test in `telemetry.test.tsx`, and the `asRead` test in `writeQueue.test.tsx`. |
 | `InboxPage`, `AdminConsole` | their `describe` blocks in `b2b.test.tsx` | the Inbox and Admin nav items; `g i`, `g m` and "Invite member" in `CommandMenu.tsx`. Keep `src/app/mocks/b2b.ts`: every write's audit event goes through it. |
 | `ImportWizard` | `imports.test.tsx` | the "Import records" palette action |
 | `SearchPage` | `search.test.tsx` | the palette's "See all results" row (`searchHref`) |
@@ -76,7 +77,7 @@ Delete one example at a time, and run the loop after each:
 | `SetupWizard` | "Setup wizard example" in `examples.test.tsx`; "the setup wizard example" in `wcag22.test.tsx` (the redundant-entry audit stays) | nothing else |
 | `EntityPages` | `entities.test.tsx` | the Accounts and People nav items, `g a`, `g p` and "New account"; records still link to accounts, so render `AccountRef` in `src/app/registries/refs.tsx` as plain text, and drop the palette's account and people groups. In the tests, drop "New account" in `command-palette.test.tsx`, expect the account name as text in `registry.test.tsx`, and delete the entity-pages test in `routes.test.tsx` |
 
-The app layer behind a deleted example (`src/app/api`, `model`, `mocks` for billing, reports and so on) can stay until you replace it: no page imports it, so it adds nothing to a page. When you do remove a domain, `npm run typecheck` names its tests. That includes its race test in `refetch.test.tsx` and its verbs in `telemetry.test.tsx`, which lists its model files by name.
+Step 6 removes what only the example's page imported. The rest of a domain's app layer (`src/app/api`, `model`, `mocks` for billing, reports and so on) can stay until you replace it: the mock server and the domain's tests still import it, and no page does, so it adds nothing to a page. When you do remove a domain, `npm run typecheck` names its tests. That includes its race test in `refetch.test.tsx` and its verbs in `telemetry.test.tsx`, which lists its model files by name.
 
 **Never delete:**
 - The system: `tokens/`, `src/styles/`, `src/primitives/`, `src/components/`, `src/layouts/`, `src/format/`, `src/internal/`, `src/index.ts`.
@@ -146,6 +147,7 @@ No provider is chosen here. This is where one plugs in:
 | `npm run lint` | ESLint (`lint:js`) and Stylelint (`lint:css`), zero warnings allowed. |
 | `npm test` | Vitest: token, contrast, CSS-structure and component tests. |
 | `npm run test:rules` | Lints every file in `fixtures/violations/` and asserts that the expected rule fires. |
+| `npm run dead-modules` | Fails on any module under `src/` or `docs/` that no entry point reaches (the app, `src/index.ts`, a story, a test, a script or config), naming each. Exceptions go in `KEEP` in `scripts/dead-modules.ts`, with a reason. |
 | `npm run build` | Library build (`dist/index.js`, `dist/styles.css`). |
 | `npm run build:app` | App build into `dist-app/` (`vite.app.config.ts`), without the mock API unless `VITE_API_MOCKS=true`. `npm run preview:app` serves it. |
 | `npm run size` | Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`. |
@@ -154,7 +156,7 @@ No provider is chosen here. This is where one plugs in:
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
 | `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
-| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `build:app`, `size`. |
+| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size`. |
 
 ## Repo map
 
@@ -166,6 +168,7 @@ scripts/check-tree-shaking.ts  single-component imports pull in only what they c
 scripts/manifest.ts     the files for coding agents (manifest, llms.txt, llms-full.txt) and --check mode; collector in manifest-collect.ts
 scripts/checks/         token, contrast, chart palette, token usage and CSS checks (used by Vitest)
 scripts/test-rules.ts   proves every lint and type rule fires
+scripts/dead-modules.ts fails on modules under src/ and docs/ that no entry point reaches (graph from affected-stories.ts)
 scripts/eslint/         local ESLint rules (drag-needs-alternative)
 src/styles/             index.css (layer order) · reset · generated tokens.css · base · utilities
 src/tokens/tokens.ts    generated, typed var() map (semantic + component tiers)
@@ -230,6 +233,7 @@ Drift gets in wherever something is copied by hand between two links. Each link 
 | Every exported component, layout and primitive has a usage doc, attached to a story title, with every section filled and live examples that render | Vitest (matched by identity against `src/index.ts` exports, with negative controls) | `tests/unit/docs.test.tsx`, `scripts/checks/docs-coverage.ts` |
 | Foundations show the real tokens and the tested contrast pairs | Generated from the token source through the checks' own model | `docs/foundations/`, `scripts/checks/token-model.ts`, `scripts/checks/contrast-pairs.ts` |
 | Links in the docs lead somewhere: every `StoryLink` and story id in `docs/` names a story or Docs tab that exists | Vitest: ids computed from every CSF file with Storybook's csf-tools, with negative controls | `tests/unit/story-links.test.ts`, `scripts/checks/story-links.ts` |
+| No orphaned modules: everything under `src/` and `docs/` is reached from the app, the library entry, a story, a test, a script or config (so a trim leaves nothing behind) | `dead-modules` over the import graph of `test:visual:changed` (type-only imports included, barrels by name); exceptions listed with a reason, stale ones fail | `scripts/dead-modules.ts`, `tests/unit/dead-modules.test.ts` |
 | Docs tabs are accessible | axe (WCAG 2.2 A/AA) on every Docs tab | `tests/visual/stories.spec.ts` |
 | The library stays small, and one import doesn't pull in the rest | size-limit budgets; tree-shaking check per exported unit | `.size-limit.json`, `scripts/check-tree-shaking.ts` |
 | Agents know the rules | UI rules block, extracted between markers into `llms.txt` and the manifest | `CLAUDE.md` |
