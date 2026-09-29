@@ -52,13 +52,13 @@ export const LongLabels: Story = {
   args: {
     children: [
       <ResultListItem key="long-1" href="#long-1" meta={<Badge tone="success">Active</Badge>} description="Record · Dana Whitfield · Northwind Traders International Holdings (Europe, Middle East and Africa)">
-        <strong>Northwind</strong> Traders International Holdings: multi-year enterprise renewal with expanded seats, premium support and a data residency addendum
+        <strong>Northwind</strong> Traders International Holdings: multi-year enterprise renewal with expanded seats, premium support, a data residency addendum for the European entities, a revised order form and the procurement portal’s supplier questionnaire
       </ResultListItem>,
       <ResultListItem key="long-2" href="#long-2" description="Person · priya.northcott-hargreaves@northwind-traders-international.example">
         Priya <strong>North</strong>cott-Hargreaves
       </ResultListItem>,
-      <ResultListItem key="long-3" href="#long-3" description="Account · a-very-long-subdomain.northwind-traders-international-holdings.example">
-        <strong>Northwind</strong>TradersInternationalHoldingsWithoutSpaces
+      <ResultListItem key="long-3" href="#long-3" description="Account · a-very-long-subdomain.northwind-traders-international-holdings-europe-middle-east-and-africa-regional-procurement.example">
+        <strong>Northwind</strong>TradersInternationalHoldingsEuropeMiddleEastAndAfricaRegionalProcurementAndSupplierManagementAccountWithoutSpaces
       </ResultListItem>,
     ],
   },
