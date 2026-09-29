@@ -12,7 +12,7 @@ import { AppProviders } from '../../src/app/providers';
 import { useAppSession } from '../../src/app/session';
 import { createMemoryHistory } from '../../src/app/url/history';
 import { ListPage } from '../../src/examples/ListPage';
-import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -36,12 +36,20 @@ describe('live updates: one reconcile step', () => {
     const { client, listed, detail, result } = await loaded(first.id);
     const listState = () => client.getQueryState(recordKeys.list(ACME, QUERY));
 
+    // Every list read from here on. A refetch would start inside the event's invalidation, not later.
+    let listReads = 0;
+    const onRequest = ({ request }: { request: Request }) => {
+      if (request.method === 'GET' && new URL(request.url).pathname.endsWith('/records')) listReads += 1;
+    };
+    server.events.on('request:start', onRequest);
     act(() => void anotherUser('acme', { kind: 'edit', id: first.id, changes: { name: 'Edited elsewhere' } }));
 
     expect(detail()).toMatchObject({ name: 'Edited elsewhere', version: first.version + 1 });
     expect(listed()).toMatchObject({ name: 'Edited elsewhere' });
     // Stale, so the next focus or mount refetches, but not refetched now: nothing reorders under the cursor.
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await act(async () => undefined);
+    server.events.removeListener('request:start', onRequest);
+    expect(listReads).toBe(0);
     expect(listState()).toMatchObject({ isInvalidated: true, fetchStatus: 'idle' });
     expect(result.current.live.lastBy).toBe(OTHER_PERSON.acme);
   });
