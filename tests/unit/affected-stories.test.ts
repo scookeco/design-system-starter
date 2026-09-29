@@ -23,6 +23,14 @@ import {
  * are written out; `npm run test:visual:changed -- --self-check` compares the graph with the built one.
  */
 
+/**
+ * Budget for building the real repo's graph: parsing every module the gallery reaches (about 600) with
+ * TypeScript, then walking it. Quiet, that takes well under a second; with Playwright running beside
+ * it, the CSS-scope test once timed out at Vitest's 5 s default. Given per test (and per hook that
+ * builds the graph), never globally: the fixture tests here stay on the default.
+ */
+const REAL_GRAPH_TIMEOUT = 20_000;
+
 const write = (root: string, files: Record<string, string>) => {
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(root, file)), { recursive: true });
@@ -76,6 +84,17 @@ describe('the module graph', () => {
     expect(closure('glob.tsx')).toEqual(['doc.md', 'glob.tsx', 'pages/one.ts']);
   });
 
+  it('follows type-only imports, re-exports and `typeof import()` only when asked (the dead-module check asks)', () => {
+    write(root, {
+      'typed.tsx': "import type { T } from './t';\nexport type U = T | typeof import('./pages/one');\nexport type { A } from './a';\n",
+    });
+    const typed = new ModuleGraph(root, { types: true });
+    expect([...typed.closure('typed.tsx')].sort()).toEqual(['a.css', 'a.ts', 'pages/one.ts', 't.ts', 'typed.tsx']);
+    expect(closure('typed.tsx')).toEqual(['typed.tsx']);
+    // A barrel is still a barrel when it re-exports types: names are routed, not the whole of it.
+    expect([...typed.closure('by-name.tsx')].sort()).toEqual(['a.css', 'a.ts', 'b.ts', 'base.css', 'by-name.tsx', 'global.css', 'index.ts']);
+  });
+
   it('records what it cannot resolve instead of dropping it', () => {
     graph.closure('broken.ts');
     expect(graph.info('broken.ts').problems).toEqual(['broken.ts: cannot resolve "./missing"', 'broken.ts: import() of a computed specifier']);
@@ -86,7 +105,7 @@ describe('the gallery: which stories a change reaches', () => {
   let gallery: Gallery;
   beforeAll(async () => {
     gallery = loadGallery(storyFiles(await storyGlobs()));
-  });
+  }, REAL_GRAPH_TIMEOUT);
 
   // Index entries as storybook-static/index.json lists them (ids are only labels here).
   const entry = (id: string, type: IndexEntry['type'], title: string, importPath: string): IndexEntry => ({ id, type, title, name: id, importPath: `./${importPath}` });
@@ -208,7 +227,7 @@ describe('CSS scope (what lets barrels be followed by name)', () => {
       .filter((f) => !f.startsWith('src/styles/'));
     expect(sheets.length).toBeGreaterThan(50);
     expect(cssScopeProblems(gallery.graph, sheets, [...gallery.reachable])).toEqual([]);
-  });
+  }, REAL_GRAPH_TIMEOUT);
 
   it('reports a foreign selector, a shared block, a shared or borrowed keyframes name and a class rendered without its stylesheet (negative controls)', () => {
     const root = mkdtempSync(join(tmpdir(), 'affected-css-'));
