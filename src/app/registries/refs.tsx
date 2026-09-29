@@ -5,6 +5,7 @@
  */
 import { Avatar, Cluster, Link, Text } from '../../index';
 import { useAccountRef, usePerson } from '../model/queries';
+import { ACCOUNT } from './entities';
 
 /** Shown while the directory loads, or for an id it doesn't have (someone deleted, a stale link). */
 const Pending = ({ children }: { children: string }) => (
@@ -33,7 +34,7 @@ export function AccountRef({ id, plain = false }: { id: string | null; plain?: b
   if (id === null) return <Pending>No account</Pending>;
   if (account.isPending) return <Pending>…</Pending>;
   if (!account.data) return <Pending>Unknown account</Pending>;
-  return plain ? <>{account.data.name}</> : <Link href={`/accounts/${account.data.id}`}>{account.data.name}</Link>;
+  return plain ? <>{account.data.name}</> : <Link href={`${ACCOUNT.path}/${account.data.id}`}>{account.data.name}</Link>;
 }
 
 /** A person's name as a string, for text that isn't markup (a header's description line). */

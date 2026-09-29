@@ -19,6 +19,7 @@ import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kb
 import { getRecord } from '../app/api/records';
 import type { Capability } from '../app/api/schemas';
 import { recordKeys } from '../app/model/keys';
+import { ACCOUNT, PERSON } from '../app/registries/entities';
 import { useAccounts, usePeople } from '../app/model/queries';
 import { useRecentItems, type RecentItem } from '../app/model/recent';
 import { MIN_SEARCH_LENGTH, useRecordSearch } from '../app/model/search';
@@ -29,7 +30,7 @@ import { useTenant } from '../app/tenant';
 import { searchHref } from '../app/url/searchState';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
-import { ROUTES } from './routes';
+import { HOME, ROUTES } from './routes';
 
 /** "g then …" jumps. A page's keys show on its palette row and in the ? overlay. */
 export const GO_KEYS: Readonly<Record<string, string>> = {
@@ -166,7 +167,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         label: account.name,
         description: `Account · ${account.domain}`,
         icon: BuildingIcon,
-        onSelect: () => open({ kind: 'account', id: account.id, href: `/accounts/${account.id}` }),
+        onSelect: () => open({ kind: 'account', id: account.id, href: `${ACCOUNT.path}/${account.id}` }),
       }))
     : [];
   const personItems: CommandItem[] = can('record:read')
@@ -175,7 +176,7 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         label: person.name,
         description: `Person · ${person.email}`,
         icon: UsersIcon,
-        onSelect: () => open({ kind: 'person', id: person.id, href: `/people/${person.id}` }),
+        onSelect: () => open({ kind: 'person', id: person.id, href: `${PERSON.path}/${person.id}` }),
       }))
     : [];
 
@@ -232,7 +233,7 @@ const sessionActions = (app: AppSession, navigate: (href: string) => void): Comm
       keywords: ['workspace'],
       onSelect: () => {
         app.switchTenant(m.tenant);
-        navigate('/home');
+        navigate(HOME);
       },
     })),
   { id: 'action:sign-out', label: 'Sign out', keywords: ['log out'], onSelect: () => void app.signOut() },
