@@ -41,7 +41,7 @@
   }
 
   /* With an assistant: a third column at main's inline end, under the header. */
-  .app-shell__frame[data-assistant] {
+  .app-shell__frame:has(> .app-shell__assistant) {
     grid-template:
       "sidebar header header" auto
       "sidebar main assistant" minmax(0, 1fr)
@@ -176,7 +176,7 @@
       grid-template-columns: var(--size-rail) minmax(0, 1fr);
     }
 
-    .app-shell__frame[data-sidebar="collapsed"][data-assistant] {
+    .app-shell__frame[data-sidebar="collapsed"]:has(> .app-shell__assistant) {
       grid-template-columns: var(--size-rail) minmax(0, 1fr) auto;
     }
 
@@ -220,7 +220,7 @@
     }
 
     /* The assistant's launcher joins the header row, at its inline end. */
-    .app-shell__frame[data-assistant] {
+    .app-shell__frame:has(> .app-shell__assistant) {
       grid-template:
         "header assistant" auto
         "main main" minmax(0, 1fr)

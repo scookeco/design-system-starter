@@ -150,7 +150,7 @@ export function AppShell({
         <a className="app-shell__skip" href={`#${mainId}`} onClick={skipToMain}>
           {skipLinkLabel}
         </a>
-        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'} data-assistant={assistant ? 'true' : undefined}>
+        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
           <div className="app-shell__sidebar" id={sidebarId}>
             <div className="app-shell__brand">{brand}</div>
             <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>

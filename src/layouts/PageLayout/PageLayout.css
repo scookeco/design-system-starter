@@ -18,16 +18,16 @@
     min-inline-size: 0;
   }
 
-  /* 3. variants: which regions are present */
-  .page-layout__grid[data-nav="true"] {
+  /* 3. variants: which regions are present, read from the regions themselves */
+  .page-layout__grid:has(> .page-layout__nav) {
     grid-template-columns: var(--size-sidebar-sm) minmax(0, 1fr);
   }
 
-  .page-layout__grid[data-aside="true"] {
+  .page-layout__grid:has(> .page-layout__aside) {
     grid-template-columns: minmax(0, 1fr) var(--size-sidebar-lg);
   }
 
-  .page-layout__grid[data-nav="true"][data-aside="true"] {
+  .page-layout__grid:has(> .page-layout__nav):has(> .page-layout__aside) {
     grid-template-columns: var(--size-sidebar-sm) minmax(0, 1fr) var(--size-sidebar-lg);
   }
 
@@ -35,9 +35,9 @@
   @container page-layout (inline-size < 40rem) {
     /* The nav + aside pair needs its own selector: at 0,3,0 the three-column rule above would
        otherwise outrank a 0,2,0 selector here and never stack. */
-    .page-layout__grid[data-nav],
-    .page-layout__grid[data-aside],
-    .page-layout__grid[data-nav][data-aside] {
+    .page-layout__grid:has(> .page-layout__nav),
+    .page-layout__grid:has(> .page-layout__aside),
+    .page-layout__grid:has(> .page-layout__nav):has(> .page-layout__aside) {
       grid-template-columns: minmax(0, 1fr);
     }
   }
