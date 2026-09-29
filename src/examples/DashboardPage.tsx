@@ -12,6 +12,9 @@
  *   work     a table of what needs attention, each row linking to its record
  *
  * Every number follows the date range; the usage meters don't (limits are per billing month).
+ *
+ * Inside the app (the app layer's providers), someone who sets the workspace up also gets the
+ * first-run checklist under the header (Onboarding.tsx), and a way back to it once dismissed.
  */
 import { useState } from 'react';
 import {
@@ -41,7 +44,9 @@ import {
   type Formatter,
   type StatDelta,
 } from '../index';
+import { useOptionalAppSession } from '../app/session';
 import { ExampleShell } from './ExampleShell';
+import { OnboardingChecklist, OnboardingRestore } from './Onboarding';
 import { isOpen } from '../app/model/predicates';
 import { STATUS } from '../app/model/status';
 import { SAMPLE_RECORDS } from './records';
@@ -115,6 +120,7 @@ export interface DashboardPageProps {
 
 export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
   const format = useFormat();
+  const app = useOptionalAppSession();
   const [range, setRange] = useState<DateRange>(initialRange);
   const comparison = RANGES.find((r) => r.value === range)?.comparison;
 
@@ -135,6 +141,9 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
               />
             }
           />
+
+          {/* Demo examples: the first-run checklist, in the app only (it reads the mock API). */}
+          {app ? <OnboardingChecklist /> : null}
 
           <Switcher as="section" aria-label="Key numbers" threshold="sm" gap="md">
             {STATS[range].map((stat) => (
@@ -196,6 +205,7 @@ export function DashboardPage({ initialRange = '30d' }: DashboardPageProps) {
               ))}
             </TableBody>
           </Table>
+          {app ? <OnboardingRestore /> : null}
         </Stack>
       </Center>
     </ExampleShell>

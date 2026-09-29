@@ -525,6 +525,20 @@
       ]
     },
     {
+      "title": "Onboarding",
+      "summary": "The first-run checklist on the dashboard (customer-facing), composed from system components (src/app/model/onboarding.ts). Only people who set the workspace up see it.",
+      "path": "src/examples/Onboarding.tsx",
+      "stories": [
+        "examples-onboarding--checklist",
+        "examples-onboarding--nothing-done",
+        "examples-onboarding--all-done",
+        "examples-onboarding--dismissed",
+        "examples-onboarding--as-editor",
+        "examples-onboarding--loading",
+        "examples-onboarding--load-error"
+      ]
+    },
+    {
       "title": "Record copilot",
       "summary": "GOLDEN EXAMPLE (AI): a copilot beside a record. The record page is the existing one, untouched; the assistant joins its shell through WithAssistant, as an AssistantPanel in AppShell's assistant slot (a Drawer on narrow screens).",
       "path": "src/examples/RecordCopilot.tsx",

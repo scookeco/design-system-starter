@@ -20,6 +20,7 @@ import { useStartImport } from '../../src/app/model/imports';
 import { useMarkAllNotificationsRead, useNotifications } from '../../src/app/model/notifications';
 import { useConnectIntegration, useIntegrations } from '../../src/app/model/integrations';
 import { useBilling, useChangePlan } from '../../src/app/model/billing';
+import { useDismissOnboarding, useOnboarding } from '../../src/app/model/onboarding';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -245,5 +246,12 @@ describe('a write while the list is still on its first load shows on the list', 
     const { result } = renderHook(() => ({ billing: useBilling(), change: useChangePlan() }), { wrapper: wrapperFor(testClient()) });
     await race(read, () => result.current.change.mutate({ planId: 'business', version: 1 }), 'POST', '/billing/plan');
     await waitFor(() => expect(result.current.billing.data?.planId).toBe('business'));
+  });
+
+  it('onboarding: dismissOnboarding', async () => {
+    const read = holdFirstRead('/onboarding');
+    const { result } = renderHook(() => ({ state: useOnboarding(), dismiss: useDismissOnboarding() }), { wrapper: wrapperFor(testClient()) });
+    await race(read, () => result.current.dismiss.mutate(), 'PATCH', '/onboarding');
+    await waitFor(() => expect(result.current.state.data?.dismissed).toBe(true));
   });
 });
