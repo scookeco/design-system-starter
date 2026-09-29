@@ -9,7 +9,7 @@ import { AiReviewChanges } from '../../src/examples/AiReviewChanges';
 import { AssistantChatPage } from '../../src/examples/AssistantChatPage';
 import { ExampleApp } from '../../src/examples/App';
 import { RecordCopilot } from '../../src/examples/RecordCopilot';
-import { PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
+import { FIRST_PAINT, PAGE_FLOW_TIMEOUT, renderWithApp, server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
 afterEach(cleanup);
 setupMockApi();
@@ -20,10 +20,10 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 };
 
-describe('Record copilot', () => {
+describe('Record copilot', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('answers beside the record, citing its fields, and a citation follows through to its source', async () => {
     renderWithApp(<RecordCopilot recordId="r-1001" initialPrompt="When does this renew?" />);
-    const panel = await screen.findByRole('complementary', { name: 'Assistant' });
+    const panel = await screen.findByRole('complementary', { name: 'Assistant' }, FIRST_PAINT);
     const citation = await within(panel).findByRole('link', { name: 'Source 1: Renews on' });
     expect(within(panel).getByText('Read record: done')).toBeTruthy();
     fireEvent.click(citation);
@@ -34,14 +34,14 @@ describe('Record copilot', () => {
   });
 });
 
-describe('AI bulk changes', () => {
+describe('AI bulk changes', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   const overdueWithRenewal = () => db('acme').records.filter((r) => r.status === 'overdue' && r.tags.includes('renewal'));
 
   it('applies only accepted changes, through moveRecord, and one Undo puts them back', async () => {
     const targets = overdueWithRenewal().map((r) => r.id);
     expect(targets.length).toBeGreaterThan(1);
     renderWithApp(<AiReviewChanges initialRun />);
-    const review = await screen.findByRole('region', { name: /^Proposed changes to/ });
+    const review = await screen.findByRole('region', { name: /^Proposed changes to/ }, FIRST_PAINT);
     expect(db('acme').records.filter((r) => targets.includes(r.id)).every((r) => r.status === 'overdue')).toBe(true);
 
     const first = targets.map((id) => db('acme').records.find((r) => r.id === id)).sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? ''))[0];
@@ -81,10 +81,10 @@ describe('AI bulk changes', () => {
   });
 });
 
-describe('Assistant chat page', () => {
+describe('Assistant chat page', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('opens a conversation from the URL, and a first question in a new chat creates one, named after the question', async () => {
     const { history } = renderWithApp(<AssistantChatPage />, { url: '/assistant?c=c-3' });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Overdue records this month' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Overdue records this month' }, FIRST_PAINT)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'New chat' }));
     expect(history.location().search).toBe('');
     fireEvent.click(await screen.findByRole('button', { name: 'How many records are overdue?' }));
@@ -120,7 +120,7 @@ describe('Assistant chat page', () => {
     };
     server.events.on('response:mocked', onResponse);
     const { history } = renderWithApp(<AssistantChatPage initialPrompt="What can you help with?" />, { url: '/assistant' });
-    await waitFor(() => expect(heldEarly).toBe(true));
+    await waitFor(() => expect(heldEarly).toBe(true), FIRST_PAINT);
     await waitFor(() => expect(created).toBe(true));
     server.events.removeListener('response:mocked', onResponse);
     release();
@@ -128,16 +128,16 @@ describe('Assistant chat page', () => {
     await screen.findByText(/^I can answer/);
     const nav = await screen.findByRole('navigation', { name: 'Conversations' });
     expect(await within(nav).findByRole('link', { name: 'New chat' })).toBeTruthy();
-  }, PAGE_FLOW_TIMEOUT);
+  });
 });
 
-describe('AI routes', () => {
+describe('AI routes', { timeout: PAGE_FLOW_TIMEOUT }, () => {
   it('guards each AI page by what it does: a viewer can chat but gets the 403 page for bulk changes', async () => {
     setRoles('viewer');
     renderWithApp(<ExampleApp />, { url: '/assistant/tidy-overdue' });
-    expect(await screen.findByRole('heading', { level: 1, name: 'You don’t have access to this page' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'You don’t have access to this page' }, FIRST_PAINT)).toBeTruthy();
     cleanup();
     renderWithApp(<ExampleApp />, { url: '/assistant' });
-    expect(await screen.findByRole('heading', { level: 1, name: 'New chat' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'New chat' }, FIRST_PAINT)).toBeTruthy();
   });
 });
