@@ -18,7 +18,7 @@ export interface TagProps extends EscapeHatch {
 /** A compact value: an active filter chip, a label on a record. Removable when onRemove is set. */
 export function Tag({ children, onRemove, removeLabel, removeRef, UNSAFE_className, UNSAFE_style }: TagProps) {
   return (
-    <span className={cx('tag', UNSAFE_className)} style={UNSAFE_style} data-removable={onRemove ? 'true' : undefined}>
+    <span className={cx('tag', UNSAFE_className)} style={UNSAFE_style}>
       <span className="tag__label">{children}</span>
       {onRemove ? (
         <button type="button" className="tag__remove" aria-label={removeLabel ?? `Remove ${children}`} onClick={onRemove} ref={removeRef}>

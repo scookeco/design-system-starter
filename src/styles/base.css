@@ -30,6 +30,16 @@
     font: var(--text-code);
   }
 
+  /*
+   * Same-document view transitions (the example app's route and display changes, through its
+   * withViewTransition helper): the browser's cross-fade, timed by tokens. The app skips the
+   * transition under reduced motion, where motion.view is 0ms anyway.
+   */
+  ::view-transition-group(*) {
+    animation-duration: var(--motion-view);
+    animation-timing-function: var(--ease-standard);
+  }
+
   :focus-visible {
     outline: var(--focus-ring-width) solid var(--color-focus);
     outline-offset: var(--focus-ring-offset);

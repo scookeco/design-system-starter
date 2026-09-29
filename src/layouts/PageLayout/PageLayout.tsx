@@ -31,7 +31,7 @@ export type PageLayoutProps = EscapeHatch &
 export function PageLayout({ children, nav, aside, asideLabel, UNSAFE_className, UNSAFE_style }: PageLayoutProps) {
   return (
     <div className={cx('page-layout', UNSAFE_className)} style={UNSAFE_style}>
-      <div className="page-layout__grid" data-nav={nav ? 'true' : undefined} data-aside={aside ? 'true' : undefined}>
+      <div className="page-layout__grid">
         {nav ? <div className="page-layout__nav">{nav}</div> : null}
         <div className="page-layout__main">{children}</div>
         {aside ? (

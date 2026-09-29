@@ -140,6 +140,15 @@
       },
       "$description": "Larger moves: dialogs, drawers, toasts entering."
     },
+    "view": {
+      "$value": "{duration.150}",
+      "$extensions": {
+        "starter.modes": {
+          "reduced-motion": "{duration.0}"
+        }
+      },
+      "$description": "The cross-fade when a whole view changes: a route, a list's display (view transitions)."
+    },
     "spin": {
       "$value": "{duration.1000}",
       "$description": "One revolution of a loading spinner. Not reduced: the spinner is the only progress cue."

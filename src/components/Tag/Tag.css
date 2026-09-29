@@ -37,7 +37,7 @@
   }
 
   /* 3. variants: the remove button sits flush with the end of the pill */
-  .tag[data-removable="true"] {
+  .tag:has(> .tag__remove) {
     padding-inline-end: 0;
   }
 }

@@ -371,6 +371,7 @@
     --motion-fast: var(--duration-100);
     --motion-base: var(--duration-200);
     --motion-slow: var(--duration-300);
+    --motion-view: var(--duration-150);
     --motion-spin: var(--duration-1000);
     --motion-pulse: var(--duration-1000);
     --ease-standard: var(--easing-standard);
@@ -417,6 +418,7 @@
       --motion-fast: var(--duration-0);
       --motion-base: var(--duration-0);
       --motion-slow: var(--duration-0);
+      --motion-view: var(--duration-0);
       --motion-pulse: var(--duration-0);
     }
   }

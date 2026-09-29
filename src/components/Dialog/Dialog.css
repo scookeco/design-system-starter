@@ -8,6 +8,9 @@
     overflow-y: auto;
     padding: var(--space-inset-md);
     background: var(--color-bg-scrim);
+    transition-property: opacity;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-enter);
   }
 
   .dialog {
@@ -80,5 +83,12 @@
 
   .dialog[data-size="lg"] {
     --dialog-width: var(--size-dialog-lg);
+  }
+
+  /* Entry: the scrim and the content inside it fade in from @starting-style (0ms under reduced motion). */
+  @starting-style {
+    .dialog__overlay {
+      opacity: 0;
+    }
   }
 }

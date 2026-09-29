@@ -9,6 +9,9 @@
     padding-block-start: var(--space-inset-xl);
     padding-inline: var(--space-inset-md);
     background: var(--color-bg-scrim);
+    transition-property: opacity;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-enter);
   }
 
   .command-palette {
@@ -61,6 +64,9 @@
   .command-palette__results {
     flex: 1;
     overflow-y: auto;
+
+    /* Results shrink and grow as you type: keep the scrollbar's room, so options don't shift sideways as it comes and goes. */
+    scrollbar-gutter: stable;
     padding: var(--space-inset-xs);
   }
 
@@ -136,5 +142,12 @@
 
   .command-palette__count {
     margin-inline-start: auto;
+  }
+
+  /* Entry: the scrim and the content inside it fade in from @starting-style (0ms under reduced motion). */
+  @starting-style {
+    .command-palette__overlay {
+      opacity: 0;
+    }
   }
 }

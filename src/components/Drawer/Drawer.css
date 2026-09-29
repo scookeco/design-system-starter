@@ -5,6 +5,9 @@
     inset: 0;
     z-index: var(--z-modal);
     background: var(--color-bg-scrim);
+    transition-property: opacity;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-enter);
   }
 
   .drawer {
@@ -23,6 +26,9 @@
     background: var(--color-bg-elevated);
     color: var(--color-fg-default);
     box-shadow: var(--shadow-modal);
+    transition-property: opacity, translate;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-enter);
   }
 
   /* Focus scrolls clear of the sticky footer, never under it (WCAG 2.4.11). */
@@ -104,5 +110,26 @@
 
   .drawer[data-size="sm"] {
     --drawer-width: var(--size-drawer-sm);
+  }
+
+  /* Entry: the scrim fades in and the sheet slides in from its own edge, from @starting-style (0ms under reduced motion). */
+  @starting-style {
+    .drawer__overlay {
+      opacity: 0;
+    }
+
+    .drawer {
+      opacity: 0;
+      translate: 100% 0;
+    }
+
+    .drawer:dir(rtl),
+    .drawer[data-side="start"] {
+      translate: -100% 0;
+    }
+
+    .drawer[data-side="start"]:dir(rtl) {
+      translate: 100% 0;
+    }
   }
 }

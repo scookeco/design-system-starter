@@ -57,6 +57,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 
 ## Guides
@@ -74,6 +78,7 @@ UI rules (design system v0)
 - [Forms](docs/guides/Forms.stories.tsx): Field anatomy, which control, layout, validation, error summary
 - [Keyboard and power users](docs/guides/KeyboardPowerUsers.stories.tsx): The command palette, the shortcut registry, keyboard-first parts
 - [Motion](docs/guides/Motion.stories.tsx): Durations, easings, what moves, reduced motion
+- [Browser support and the platform](docs/guides/BrowserSupport.stories.tsx): The Baseline rule, platform features in use, overlays and native…
 - [Theming and adding a brand](docs/guides/Theming.stories.tsx): Dark mode, changing the brand, a second brand
 - [Escape hatches](docs/guides/EscapeHatches.stories.tsx): When UNSAFE_className/style is acceptable, and its comment
 - [Contributing and versioning](docs/guides/Contributing.stories.tsx): Propose, what a PR includes, deprecate, versioning
@@ -983,7 +988,7 @@ States: hideLabel, disabled, required, defaultOpen.
 
 Stories: `components-combobox--empty`, `components-combobox--with-value`, `components-combobox--with-description`, `components-combobox--with-error`, `components-combobox--disabled`, `components-combobox--small`, `components-combobox--large`, `components-combobox--open`, `components-combobox--in-dialog`.
 Composes: Field, Icon, Picker.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `motion.base`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### CommandPalette
 
@@ -1045,7 +1050,7 @@ States: open, defaultOpen, loading.
 
 Stories: `components-commandpalette--open`, `components-commandpalette--filtered`, `components-commandpalette--matched-by-keyword`, `components-commandpalette--no-results`, `components-commandpalette--searching`.
 Composes: Icon, Kbd, Spinner.
-Tokens read: `color.bg.elevated`, `color.bg.scrim`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.linear`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `size.control.lg`, `size.control.md`, `size.dialog.md`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `z.modal`.
+Tokens read: `color.bg.elevated`, `color.bg.scrim`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.enter`, `ease.linear`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.slow`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `size.control.lg`, `size.control.md`, `size.dialog.md`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.lg`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `z.modal`.
 
 ### Composer
 
@@ -1156,7 +1161,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 Stories: `components-contextmenu--default`.
 Composes: Icon, Kbd, Menu.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.base`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
 
 ### CopyButton
 
@@ -1304,7 +1309,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 Stories: `components-datepicker--empty`, `components-datepicker--with-value`, `components-datepicker--with-description`, `components-datepicker--with-error`, `components-datepicker--disabled`, `components-datepicker--small`, `components-datepicker--open`, `components-datepicker--german`, `components-datepicker--in-dialog`.
 Composes: Field, Icon, Picker.
-Tokens read: `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+Tokens read: `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `motion.base`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### Dialog
 
@@ -1385,7 +1390,7 @@ States: open, defaultOpen.
 
 Stories: `components-dialog--closed`, `components-dialog--open`, `components-dialog--small`, `components-dialog--large`, `components-dialog--without-description`.
 Composes: Icon.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.modal`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `text.body`, `text.heading-3`, `z.modal`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ease.enter`, `icon.stroke`, `motion.slow`, `radius.control`, `radius.surface`, `shadow.modal`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `text.body`, `text.heading-3`, `z.modal`.
 
 ### Disclosure
 
@@ -1561,7 +1566,7 @@ States: hideTitle, open, defaultOpen.
 
 Stories: `components-drawer--closed`, `components-drawer--end-open`, `components-drawer--start-open`, `components-drawer--without-footer`.
 Composes: Icon.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `icon.stroke`, `radius.control`, `shadow.modal`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.end`, `text.body`, `text.heading-3`, `z.modal`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ease.enter`, `icon.stroke`, `motion.slow`, `radius.control`, `shadow.modal`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.scroll-padding.end`, `text.body`, `text.heading-3`, `z.modal`.
 
 ### EmptyState
 
@@ -1851,7 +1856,7 @@ States: open, defaultOpen.
 - The content isn’t focusable and isn’t announced. Keep it non-interactive and duplicated at the destination.
 
 Stories: `components-hovercard--closed`, `components-hovercard--open`, `components-hovercard--open-top`.
-Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `space.gap.xs`, `space.inset.md`, `text.body`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `ease.enter`, `motion.base`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `space.gap.xs`, `space.inset.md`, `text.body`, `z.dropdown`.
 
 ### InlineEdit
 
@@ -2095,7 +2100,7 @@ States: open, defaultOpen.
 
 Stories: `components-menu--closed`, `components-menu--open`, `components-menu--with-shortcuts`, `components-menu--account-menu`.
 Composes: Icon, Kbd.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.base`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.caption`, `text.code`, `z.dropdown`.
 
 ### Message
 
@@ -2266,7 +2271,7 @@ States: hideLabel, disabled, required, defaultOpen.
 
 Stories: `components-multiselect--empty`, `components-multiselect--with-values`, `components-multiselect--wrapping`, `components-multiselect--with-error`, `components-multiselect--disabled`, `components-multiselect--open`.
 Composes: Field, Icon, Picker, Tag.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.base`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### Nav
 
@@ -2323,7 +2328,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 Stories: `components-nav--with-icons`, `components-nav--no-current-page`, `components-nav--grouped-sub-nav`.
 Composes: Icon, Kbd, Link, Tooltip.
-Tokens read: `color.action.primary`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
+Tokens read: `color.action.primary`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
 
 ### NavTabs
 
@@ -2449,7 +2454,7 @@ States: hideLabel, disabled, required, hideStepper.
 
 Stories: `components-numberfield--empty`, `components-numberfield--with-value`, `components-numberfield--currency`, `components-numberfield--percent`, `components-numberfield--german-currency`, `components-numberfield--with-error`, `components-numberfield--disabled`, `components-numberfield--without-stepper`.
 Composes: Field, Icon, Picker.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `motion.base`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### PageHeader
 
@@ -2631,7 +2636,7 @@ States: open, defaultOpen.
 - Focus moves into it on open and back to the trigger on close; Escape closes it.
 
 Stories: `components-popover--closed`, `components-popover--open`, `components-popover--open-aligned-end`.
-Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.sm`, `space.inset.md`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.border.default`, `color.fg.default`, `ease.enter`, `motion.base`, `radius.surface`, `shadow.popover`, `size.overlay-max`, `size.sidebar.sm`, `space.gap.sm`, `space.inset.md`, `z.dropdown`.
 
 ### Progress
 
@@ -2979,7 +2984,7 @@ States: hideLabel, disabled, required, defaultOpen.
 
 Stories: `components-select--placeholder`, `components-select--with-value`, `components-select--with-description`, `components-select--with-error`, `components-select--disabled`, `components-select--small`, `components-select--large`, `components-select--open`.
 Composes: Field, Icon.
-Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
+Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.base`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
 ### Skeleton
 
@@ -3983,7 +3988,7 @@ Signature: `() => (toast: ToastInput) => void`
 
 Stories: `components-toast--success`, `components-toast--warning`, `components-toast--danger`, `components-toast--info`, `components-toast--neutral`, `components-toast--with-action`, `components-toast--imperative`.
 Composes: Button, Icon, Spinner.
-Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.label`, `z.toast`.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.enter`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.slow`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.label`, `z.toast`.
 
 ### Toggle
 
@@ -4122,7 +4127,7 @@ component, part of Toolbar. A divider between groups of toolbar controls.
 
 Stories: `components-toolbar--default`, `components-toolbar--toggles`, `components-toolbar--vertical`.
 Composes: Icon, Kbd, Tooltip.
-Tokens read: `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
+Tokens read: `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.fast`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `text.label`, `z.tooltip`.
 
 ### Tooltip
 
@@ -4183,7 +4188,7 @@ States: open, defaultOpen.
 
 Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-tooltip--open-bottom`, `components-tooltip--with-shortcut`.
 Composes: Kbd.
-Tokens read: `color.bg.inverse`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `z.tooltip`.
+Tokens read: `color.bg.inverse`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.inverse`, `ease.enter`, `motion.fast`, `radius.control`, `radius.indicator`, `shadow.popover`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `text.code`, `z.tooltip`.
 
 ## Primitives reference
 
@@ -4983,7 +4988,7 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 
 Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
 Composes: Button, Drawer, Icon, Kbd, Link, Nav, Spinner, Toast, Tooltip.
-Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `space.scroll-padding.toast`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.enter`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `space.scroll-padding.toast`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
 
 ### AssistantPanel
 
@@ -5042,7 +5047,7 @@ States: open, defaultOpen, defaultDrawerOpen.
 
 Stories: `layouts-assistantpanel--open`, `layouts-assistantpanel--closed`, `layouts-assistantpanel--with-header-actions`, `layouts-assistantpanel--narrow`, `layouts-assistantpanel--narrow-open`.
 Composes: Button, Drawer, Icon, Spinner.
-Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.focus`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `shadow.modal`, `size.assistant.default`, `size.assistant.max`, `size.assistant.min`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.sticky`.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.hover`, `color.bg.scrim`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.focus`, `ease.enter`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.slow`, `motion.spin`, `radius.control`, `radius.pill`, `shadow.modal`, `size.assistant.default`, `size.assistant.max`, `size.assistant.min`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `text.body`, `text.body-lg`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.sticky`.
 
 ### AuthLayout
 
@@ -6369,6 +6374,7 @@ From the token source. The reduced-motion column is what each token becomes unde
 | `--motion-fast` | `100ms` | 0ms | Hover and press feedback, colour changes. |
 | `--motion-base` | `200ms` | 0ms | Small moves: menus and popovers opening. |
 | `--motion-slow` | `300ms` | 0ms | Larger moves: dialogs, drawers, toasts entering. |
+| `--motion-view` | `150ms` | 0ms | The cross-fade when a whole view changes: a route, a list's display (view transitions). |
 | `--motion-spin` | `1000ms` | Unchanged | One revolution of a loading spinner. Not reduced: the spinner is the only progress cue. |
 | `--motion-pulse` | `1000ms` | 0ms | One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading. |
 
@@ -6397,9 +6403,38 @@ Longhands, with a duration and an easing token. The shorthand and literal durati
 }
 ```
 
+#### Entering
+
+Overlays fade in from @starting-style: the surface declares its transition, and the starting style is where it comes from. No script, and the behaviour library underneath doesn’t know.
+
+```
+.popover {
+  transition-property: opacity;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-enter);
+}
+
+@starting-style {
+  .popover { opacity: 0; }
+}
+```
+
+- Fade with `opacity`; a toast also rises from below its own height and a drawer slides in from its edge (`translate`, flipped for right-to-left).
+- Leaving is instant. The person asked for it to go, and the page behind is what they want next.
+- A browser without `@starting-style` ignores it and the overlay appears at once: the fallback is the old behaviour.
+
+#### View transitions
+
+When a whole view changes (the example app’s routes, a list switching between table and board), the page cross-fades instead of jumping.
+
+- Only through `withViewTransition` in `src/app/viewTransition.ts`. It runs the update inside `document.startViewTransition` when the browser has it and the person hasn’t asked for reduced motion, and directly otherwise.
+- How it looks is the system’s: `src/styles/base.css` times every view-transition group with `motion.view` and `ease.standard`. Nothing names its own transition yet; the whole page cross-fades.
+- Only a move to another path cross-fades. A tab, a page of results or a filter changes the query string and swaps at once.
+- Focus, the URL and announcements behave the same with or without it; it only changes what the swap looks like.
+
 #### What moves, and what never does
 
-- Hover and press feedback, colour changes: `motion.fast`. Menus and popovers opening: `motion.base`. Dialogs, drawers and toasts entering: `motion.slow`.
+- Hover and press feedback, colour changes: `motion.fast`. Menus and popovers opening: `motion.base`. Dialogs, drawers and toasts entering: `motion.slow`. A whole view changing (a route, a list’s display): `motion.view`.
 - Animate `opacity`, `transform` and colours. Never animate layout (width, height, top, margins): it jitters the page and costs a layout on every frame.
 - Never animate the focus ring, text people are reading, or a value changing in a table or a Stat: show the new value at once.
 - No parallax, no scroll-jacking, nothing that plays on its own for more than five seconds without a way to pause it.
@@ -6410,7 +6445,84 @@ Longhands, with a duration and an easing token. The shorthand and literal durati
 - The token build writes a `prefers-reduced-motion: reduce` block into tokens.css, so every transition built from tokens collapses to zero without a media query in the component.
 - The skeleton pulse stops; the spinner keeps turning, because it is the only sign that work is in progress.
 - State still changes instantly: only the movement goes.
-- The visual suite runs with reduced motion and animations disabled, so screenshots never catch a frame mid-transition.
+- The visual suite runs with reduced motion, animations disabled and view transitions off (`html[data-view-transitions="off"]`, set by the harness), so screenshots never catch a frame mid-transition. `tests/visual/motion.spec.ts` turns motion back on and checks what moves, for how long, and that each switch stops it.
+
+<!-- docs/guides/BrowserSupport.stories.tsx -->
+
+### Browser support and the platform
+
+The system targets evergreen browsers and uses the platform where it makes things simpler, sturdier or more accessible. Anything a page needs to work is Baseline widely available; anything newer is an enhancement the page works without.
+
+#### The rule
+
+- **Required: Baseline widely available.** A feature a page can’t work without has been in every core browser (Chrome, Edge, Firefox, Safari, on desktop and mobile) for 30 months.
+- **Enhancement: newly available, or newer, only with a working fallback.** Either the browser drops the declaration and what’s left still works (the fallback is checked, not assumed), or it sits behind `@supports` or a feature check in script, with today’s behaviour as the other branch.
+- **Behaviour stays where it is proven.** Keyboard, focus, dismissal and what’s announced come from Radix, React Aria or our own tested code until a native version is widely available and does everything they do. An enhancement may change how something looks or moves, never how it behaves.
+- **Motion enhancements honour reduced motion and never reach a screenshot.** Durations come from motion tokens (0ms under reduced motion), and the visual suite captures only settled end states. See [Motion](docs/guides/Motion.stories.tsx).
+- **Every adoption is a row below**, with its status and what happens without it. One exception is on record: `light-dark()`, required by the token output, becomes widely available on 2026-11-13.
+
+Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on webstatus.dev (or in the web-features package) before you use it.
+
+#### What the system uses
+
+**Platform features in use**
+
+| Feature | Where | What it replaces or fixes | Baseline | Without it |
+|---|---|---|---|---|
+| `:has()` | PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main | Data attributes set from props only to describe the markup (`data-nav`, `data-aside`, `data-removable`, `data-assistant`): the CSS reads the markup itself, so the two can’t disagree. | Widely available (2026-06-19) | Required: no fallback. |
+| `@starting-style` with transitions | Entry of Popover, Tooltip, HoverCard, Menu, ContextMenu, Select, the pickers (Combobox, MultiSelect, DatePicker), Dialog, Drawer, CommandPalette and Toast | Nothing: overlays appeared at once. They now fade (a toast rises, a drawer slides from its edge) over motion tokens, with no JavaScript and no change to Radix or React Aria. | Newly available (2024-08-06) | The rule is ignored and the overlay appears at once, as before. Reduced motion makes the duration 0ms. |
+| Same-document view transitions | The example app: route changes and a list’s display switch (table ↔ board), through `withViewTransition` in `src/app/viewTransition.ts` | Nothing: the page swapped at once. Now it cross-fades over `motion.view`. | Newly available (2025-10-14) | The helper checks for `document.startViewTransition` and runs the update directly. It also skips under reduced motion and when `html[data-view-transitions="off"]` (the test harness sets it). |
+| `text-wrap: balance` | Headings, h1 to h4 (reset layer) | Ragged two-line headings with one word on the second line. | Newly available (2024-05-13) | Ignored: headings wrap normally. |
+| `text-wrap: pretty` | Body copy: p, li, dd, blockquote, figcaption (reset layer) | A single word left alone on a paragraph’s or a list item’s last line. | Limited: Chrome, Edge and Safari; not Firefox | Ignored: text wraps normally. |
+| `scrollbar-gutter: stable` | AppShell’s main, SplitView’s panes, CommandPalette’s results, ChatThread | Content shifting sideways when a classic (non-overlay) scrollbar appears: a list loading, results filtering, an answer streaming in. | Newly available (2024-12-11) | Ignored: the shift comes back on platforms with classic scrollbars. Overlay scrollbars (macOS, phones, headless test browsers) never had it. |
+| `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
+| `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
+| Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
+
+#### Overlays: native popover and anchor positioning
+
+Decided per component. Every overlay keeps its behaviour library, which also positions it; what changed is that each one fades in (@starting-style above).
+
+- **Positioning can’t be handed to CSS while Radix renders the overlay.** Radix places the content in a wrapper whose position and transform it writes as inline styles on every update. Anchor positioning would have to override them, which needs `!important` (banned); adopting it means dropping Radix for that component.
+- **A native popover would break Escape inside a Dialog.** Radix closes only the topmost of its own layers on Escape, from a keydown listener on the document. A native popover isn’t one of those layers, so Escape in a popover inside a Dialog would close both.
+- **The top layer fixes nothing here yet.** Overlays portal to the body and stack by the z tokens (Foundations/Layers), so none is clipped or covered today.
+- **Revisit** when the popover attribute is widely available (2027-07) for a stacking bug the z tiers can’t fix, and when anchor positioning and interest invokers are widely available, for Tooltip and HoverCard first.
+
+**Overlay decisions**
+
+| Component | Behaviour from | Popover and anchoring | Why |
+|---|---|---|---|
+| Tooltip | Radix Tooltip | Keep Radix | Open on hover and focus with a delay, a pointer grace area, Escape, aria-describedby. The native version (popover="hint" with interest invokers) isn’t Baseline. |
+| HoverCard | Radix HoverCard | Keep Radix | Open and close delays and a grace area between link and card; the native version is interest invokers, not Baseline. |
+| Popover | Radix Popover | Keep Radix | A non-modal dialog: focus moves in and returns to the trigger, Escape and an outside click close it. popover="auto" would add light dismiss and the top layer, but not focus management, and its Escape isn’t coordinated with a Dialog underneath. |
+| Menu | Radix DropdownMenu | Keep Radix | Roving focus, typeahead, submenus, modal focus while open. None of that is in the platform. |
+| ContextMenu | Radix ContextMenu | Keep Radix | Opens at the pointer, not at an element, so there is no anchor for CSS anchor positioning to name. |
+| Select | Radix Select | Keep Radix | Item-aligned positioning, typeahead, scroll buttons. The native equivalent (a customisable select) isn’t Baseline. |
+| Combobox, MultiSelect, DatePicker | React Aria | Keep React Aria | Combobox and grid keyboard models, virtual focus, announcements and collision handling, all measured in script. |
+| Dialog, Drawer, CommandPalette | Radix Dialog | Keep Radix | Modal: focus trap, the page behind hidden from assistive technology and unclickable, scroll lock, focus return. The dialog element’s showModal() is widely available and does much of this, but moving means re-proving every one of those behaviours for no bug fixed today. A candidate once there is one. |
+| Toast | Radix Toast | Keep Radix | A labelled region with a hotkey, pause on hover and focus, swipe to dismiss, and announcements by tone. The top layer would put toasts above modals, which z.toast already does. |
+
+#### Considered and not adopted
+
+**Features not adopted**
+
+| Feature | Why not |
+|---|---|
+| CSS anchor positioning (`anchor-name`, `position-anchor`, `position-area`, `position-try-fallbacks`) | Not Baseline as a feature; `position-anchor` only reached newly available on 2026-09-14, so it is widely available in 2029. Radix and React Aria position every overlay today, and their positioning can’t be handed to CSS (see the overlay table). |
+| The `popover` attribute (top layer, light dismiss) | Newly available (2025-01-27; widely available in 2027-07). The overlays are already portalled and stacked by the z tokens, and a native popover isn’t one of Radix’s dismissable layers (see the overlay table). |
+| `popover="hint"` and interest invokers (`interestfor`) | Not Baseline: popover="hint" isn’t in Safari, and interest invokers are only in Chrome and Edge. They are the native Tooltip and HoverCard; revisit when they are widely available. |
+| `interpolate-size`, `calc-size()` and `transition-behavior: allow-discrete` for Disclosure and Accordion | interpolate-size and calc-size are Chrome and Edge only. And animating height is what the Motion guide rules out: it moves the page and costs a layout on every frame. Disclosure and Accordion open at once and turn their chevron; there is no script to remove. |
+| `field-sizing: content` on Textarea | Textarea doesn’t grow with its content, and has no script doing it: it has rows and a vertical resize handle, by design. Auto-grow is the Composer’s. |
+| `color-mix()` in component CSS | Colour functions are banned outside the token source (lint), and every colour is a named token whose contrast is tested in light and dark from resolved values. A colour mixed at runtime is one the contrast test can’t see. |
+| Cross-document view transitions, scroll-driven animations | Not Baseline, and nothing needs them: the app is one document, and nothing moves with scrolling. |
+
+#### Adopting a feature
+
+- Name the problem it fixes, in a story or a test. “It’s new” isn’t one.
+- Look up its Baseline status and date, and decide: required (widely available only) or an enhancement (with a fallback).
+- Check the fallback: turn the feature off in the browser, or run the branch without it, and look.
+- Values still come from tokens, and the CSS rules still hold: logical properties, `@layer`, specificity no higher than 0,3,0. If Stylelint rejects a valid new property or value, change its config with a violation fixture for any new rule.
+- Add the row to this page, and say in the pull request which screenshots it changed.
 
 <!-- docs/guides/Theming.stories.tsx -->
 
@@ -6631,7 +6743,7 @@ Coding agents read the system from three files at the repo root, generated from 
 
 #### The three files
 
-- `llms.txt` is the entry point, small enough to read whole at the start of every session (under 16 KB). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
+- `llms.txt` is the entry point, small enough to read whole at the start of every session (a test keeps it within a byte budget). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
 - `llms-full.txt` adds every component’s props, variants and states, its usage doc (with the do and don’t code), its stories and tokens, then every guide as Markdown and every semantic token with its light and dark value. Give it to an agent that takes a whole document as context.
 - `design-system.manifest.json` holds the same facts as data, for tools and targeted lookups. Its schema, `design-system.manifest.schema.json`, documents every field.
 
@@ -6719,6 +6831,10 @@ UI rules (design system v0)
   every shortcut mirrors a visible control and shows its keys there (Tooltip
   shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts
   reported; single-key shortcuts can be turned off in the ? overlay.
+- Platform features: what a page needs must be Baseline widely available;
+  newer ones only as enhancements that still work when dropped (or behind
+  @supports), each listed on Guides/Browser support. Behaviour (keyboard, focus,
+  dismissal) stays with Radix and React Aria; motion honours reduced motion.
 ```
 
 #### Keeping them current
@@ -6894,6 +7010,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `motion.pulse` `var(--motion-pulse)`: `1000ms` (reduced-motion `0ms`). One half-cycle of the skeleton pulse. Stops under reduced motion: skeletons don't need to move to read as loading.
 - `motion.slow` `var(--motion-slow)`: `300ms` (reduced-motion `0ms`). Larger moves: dialogs, drawers, toasts entering.
 - `motion.spin` `var(--motion-spin)`: `1000ms`. One revolution of a loading spinner. Not reduced: the spinner is the only progress cue.
+- `motion.view` `var(--motion-view)`: `150ms` (reduced-motion `0ms`). The cross-fade when a whole view changes: a route, a list's display (view transitions).
 - `radius.control` `var(--radius-control)`: `6px`. Buttons, inputs, selects.
 - `radius.indicator` `var(--radius-indicator)`: `2px`. Checkbox boxes and other small marks.
 - `radius.pill` `var(--radius-pill)`: `9999px`. Badges and pills.

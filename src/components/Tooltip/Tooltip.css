@@ -9,11 +9,21 @@
     color: var(--color-fg-inverse);
     font: var(--text-caption);
     box-shadow: var(--shadow-popover);
+    transition-property: opacity;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-enter);
   }
 
   .tooltip__with-shortcut {
     display: inline-flex;
     align-items: center;
     gap: var(--space-gap-sm);
+  }
+
+  /* Entry: fades in from @starting-style. Reduced motion makes the duration 0ms, so it appears at once. */
+  @starting-style {
+    .tooltip {
+      opacity: 0;
+    }
   }
 }

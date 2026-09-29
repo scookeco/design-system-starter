@@ -12,5 +12,15 @@
     background: var(--color-bg-elevated);
     color: var(--color-fg-default);
     box-shadow: var(--shadow-popover);
+    transition-property: opacity;
+    transition-duration: var(--motion-base);
+    transition-timing-function: var(--ease-enter);
+  }
+
+  /* Entry: fades in from @starting-style. Reduced motion makes the duration 0ms, so it appears at once. */
+  @starting-style {
+    .popover {
+      opacity: 0;
+    }
   }
 }

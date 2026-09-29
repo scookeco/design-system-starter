@@ -28,6 +28,9 @@
     background: var(--color-bg-elevated);
     color: var(--color-fg-default);
     box-shadow: var(--shadow-popover);
+    transition-property: opacity, translate;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-enter);
   }
 
   .toast__icon {
@@ -80,5 +83,13 @@
 
   .toast[data-tone="info"] {
     --toast-accent: var(--color-status-info-fg);
+  }
+
+  /* Entry: rises into place and fades in, from @starting-style (0ms under reduced motion). */
+  @starting-style {
+    .toast {
+      opacity: 0;
+      translate: 0 100%;
+    }
   }
 }

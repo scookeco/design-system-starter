@@ -78,6 +78,9 @@
     background: var(--color-bg-elevated);
     color: var(--color-fg-default);
     box-shadow: var(--shadow-popover);
+    transition-property: opacity;
+    transition-duration: var(--motion-base);
+    transition-timing-function: var(--ease-enter);
   }
 
   /* A calendar is as wide as its grid, not as its field. */
@@ -137,5 +140,12 @@
     padding: var(--space-inset-sm);
     color: var(--color-fg-muted);
     font: var(--text-body);
+  }
+
+  /* Entry: fades in from @starting-style. Reduced motion makes the duration 0ms, so it appears at once. */
+  @starting-style {
+    .picker__popover {
+      opacity: 0;
+    }
   }
 }

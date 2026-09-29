@@ -16,6 +16,7 @@
  * (useNavigationGuard, below).
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { withViewTransition } from '../viewTransition';
 import { browserHistory, type UrlHistory } from './history';
 
 /** Parses a query string into state (never throws: unknown or invalid values fall back to defaults) and back. */
@@ -60,6 +61,17 @@ const guardFor = (history: UrlHistory): Guard => {
 };
 const notifyGuard = (guard: Guard) => guard.listeners.forEach((listener) => listener());
 
+/**
+ * Go to an href. A move to another path (a route change) cross-fades where the platform allows
+ * (withViewTransition); a change of the query string alone (a tab, a page) doesn't.
+ */
+const go = (history: UrlHistory, href: string, replace: boolean) => {
+  const write = () => (replace ? history.replace(href) : history.push(href));
+  const pathname = href.split(/[?#]/, 1)[0] || history.location().pathname;
+  if (pathname === history.location().pathname) write();
+  else withViewTransition(write);
+};
+
 /** Navigate to a path: push (a new entry) by default, replace to rewrite this one. Held while a guard is armed. */
 export function useNavigate() {
   const history = useHistory();
@@ -71,8 +83,7 @@ export function useNavigate() {
         notifyGuard(guard);
         return;
       }
-      if (replace) history.replace(href);
-      else history.push(href);
+      go(history, href, replace);
     },
     [history],
   );
@@ -117,8 +128,7 @@ export function useNavigationGuard(when: boolean): NavigationGuard {
     guard.pending = undefined;
     notifyGuard(guard);
     if (!target) return;
-    if (target.replace) history.replace(target.href);
-    else history.push(target.href);
+    go(history, target.href, target.replace);
   }, [guard, history]);
   return { pending, proceed, stay };
 }

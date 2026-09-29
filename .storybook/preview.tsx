@@ -222,7 +222,7 @@ const preview: Preview = {
           'Foundations',
           ['Colour', 'Data visualisation', 'Typography', 'Spacing, sizing and radius', 'Breakpoints and layout grid', 'Elevation and motion', 'Layers', 'Focus and target size', 'Icons'],
           'Guides',
-          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Data', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Forms', 'Keyboard and power users', 'Motion', 'Theming and adding a brand', 'Escape hatches', 'Contributing and versioning', 'Testing', 'Agents'],
+          ['Getting started', 'Principles', 'Decision ladder', 'Layout', 'Page archetypes', 'Data', 'Accessibility', 'Accessibility conformance', 'Accessibility statement', 'Content', 'Forms', 'Keyboard and power users', 'Motion', 'Browser support and the platform', 'Theming and adding a brand', 'Escape hatches', 'Contributing and versioning', 'Testing', 'Agents'],
           'Components',
           'Primitives',
           'Layouts',

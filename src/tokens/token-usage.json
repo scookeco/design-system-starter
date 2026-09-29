@@ -696,6 +696,23 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Toast",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.linear",
           "readBy": [
             {
@@ -766,6 +783,23 @@
           "readBy": [
             {
               "unit": "Button",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Toast",
               "how": "css"
             }
           ]
@@ -1567,6 +1601,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.linear",
           "readBy": [
             {
@@ -1611,6 +1654,15 @@
           "readBy": [
             {
               "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Drawer",
               "how": "css"
             }
           ]
@@ -5060,6 +5112,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Picker",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -5082,6 +5143,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Picker",
               "how": "css"
             }
           ]
@@ -5424,6 +5494,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.linear",
           "readBy": [
             {
@@ -5459,6 +5538,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "CommandPalette",
               "how": "css"
             }
           ]
@@ -6409,10 +6497,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Menu",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Menu",
               "how": "css"
             }
           ]
@@ -7245,6 +7351,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Picker",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -7271,6 +7386,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Picker",
               "how": "css"
             }
           ]
@@ -7623,10 +7747,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8033,10 +8175,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Drawer",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Drawer",
               "how": "css"
             }
           ]
@@ -10392,6 +10552,24 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "HoverCard",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "HoverCard",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "radius.surface",
           "readBy": [
             {
@@ -11900,10 +12078,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Menu",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Menu",
               "how": "css"
             }
           ]
@@ -13016,6 +13212,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Picker",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -13047,6 +13252,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Picker",
               "how": "css"
             }
           ]
@@ -13428,6 +13642,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -13463,6 +13686,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Tooltip",
               "how": "css"
             }
           ]
@@ -13945,6 +14177,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Picker",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -13967,6 +14208,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Picker",
               "how": "css"
             }
           ]
@@ -14701,6 +14951,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Picker",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "focus.ring.offset",
           "readBy": [
             {
@@ -14723,6 +14982,15 @@
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Picker",
               "how": "css"
             }
           ]
@@ -14987,6 +15255,24 @@
         },
         {
           "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
           "readBy": [
             {
               "unit": "Popover",
@@ -16933,10 +17219,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Select",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Select",
               "how": "css"
             }
           ]
@@ -17305,10 +17609,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -22118,6 +22440,15 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Toast",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.linear",
           "readBy": [
             {
@@ -22162,6 +22493,15 @@
           "readBy": [
             {
               "unit": "Button",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "Toast",
               "how": "css"
             }
           ]
@@ -22703,10 +23043,28 @@
           ]
         },
         {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Tooltip",
               "how": "css"
             }
           ]
@@ -22944,6 +23302,24 @@
         },
         {
           "token": "color.fg.inverse",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
           "readBy": [
             {
               "unit": "Tooltip",
@@ -24125,6 +24501,18 @@
         }
       }
     },
+    "ease.enter": {
+      "cssVar": "--ease-enter",
+      "tier": "semantic",
+      "type": "cubicBezier",
+      "description": "Things arriving: decelerates into place.",
+      "value": "cubic-bezier(0, 0, 0, 1)",
+      "chain": [
+        "ease.enter",
+        "easing.decelerate"
+      ],
+      "modes": {}
+    },
     "ease.linear": {
       "cssVar": "--ease-linear",
       "tier": "semantic",
@@ -24196,6 +24584,26 @@
         "stroke.regular"
       ],
       "modes": {}
+    },
+    "motion.base": {
+      "cssVar": "--motion-base",
+      "tier": "semantic",
+      "type": "duration",
+      "description": "Small moves: menus and popovers opening.",
+      "value": "200ms",
+      "chain": [
+        "motion.base",
+        "duration.200"
+      ],
+      "modes": {
+        "reduced-motion": {
+          "value": "0ms",
+          "chain": [
+            "motion.base",
+            "duration.0"
+          ]
+        }
+      }
     },
     "motion.fast": {
       "cssVar": "--motion-fast",
