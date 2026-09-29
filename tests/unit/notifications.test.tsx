@@ -107,9 +107,9 @@ describe('the notification centre and the bell', { timeout: PAGE_FLOW_TIMEOUT },
     const { counts } = await listNotifications('acme', ALL);
     renderWithApp(<NotificationsPage />, { url: '/notifications' });
     const bell = await screen.findByRole('button', { name: `Notifications: ${String(counts.unread)} unread` }, FIRST_PAINT);
-    expect(bell.textContent).toContain(`${String(counts.unread)} unread`);
+    expect(bell.textContent).toBe(String(counts.unread));
     fireEvent.click(screen.getByRole('button', { name: 'Mark all read' }));
-    await screen.findByRole('button', { name: 'Notifications' });
+    await screen.findByRole('button', { name: 'Notifications: 0 unread' });
     expect(screen.getByRole('heading', { level: 1, name: 'Notifications' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Mark all read' })).toBeNull();
   });

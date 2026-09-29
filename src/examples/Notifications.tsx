@@ -51,7 +51,7 @@ export interface NotificationsIndicatorProps {
   defaultOpen?: boolean;
 }
 
-/** The bell in the header: the unread count as text (never a dot alone), and the latest in a popover. */
+/** The bell in the header: the unread count as a number beside it (never a dot alone), and the latest in a popover. */
 export function NotificationsIndicator({ defaultOpen = false }: NotificationsIndicatorProps) {
   const format = useFormat();
   const unread = useNotifications(BELL_QUERY);
@@ -65,8 +65,9 @@ export function NotificationsIndicator({ defaultOpen = false }: NotificationsInd
       align="end"
       defaultOpen={defaultOpen}
       trigger={
-        <Button variant="ghost" icon={BellIcon} aria-label={count > 0 ? `Notifications: ${format.number(count)} unread` : 'Notifications'}>
-          {count > 0 ? `${format.number(count)} unread` : 'Notifications'}
+        // Compact for the header: the bell and the count; the name says what the number is (and contains it).
+        <Button variant="ghost" icon={BellIcon} aria-label={`Notifications: ${format.number(count)} unread`}>
+          {format.number(count)}
         </Button>
       }
     >
