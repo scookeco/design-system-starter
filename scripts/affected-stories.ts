@@ -588,6 +588,32 @@ export const cssScopeProblems = (graph: ModuleGraph, stylesheets: readonly strin
       }
     }
   }
+  // Global names belong to one stylesheet. Keyframes apply wherever they're named, so a stylesheet
+  // may only use its own (another sheet's change, or load order, would reach it otherwise). A
+  // container name only matches on an element its owner styles, so using another's is fine
+  // (AssistantPanel queries AppShell's), but two sheets may not define the same one.
+  const GLOBAL_NAMES: readonly [RegExp, RegExp][] = [
+    [/@keyframes\s+([\w-]+)/g, /animation(?:-name)?\s*:\s*([^;}]+)/g],
+    [/container(?:-name)?\s*:\s*([a-z][\w-]*)(?=\s*[/;])/g, /(?!)/g],
+    [/@property\s+(--[\w-]+)/g, /(?!)/g],
+  ];
+  const definedIn = new Map<string, string>();
+  for (const file of stylesheets) {
+    const css = readFileSync(resolve(graph.root, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const [define, use] of GLOBAL_NAMES) {
+      const own = new Set([...css.matchAll(define)].map((m) => m[1] ?? ''));
+      for (const name of own) {
+        const other = definedIn.get(name);
+        if (other && other !== file) problems.push(`${file}: "${name}" is also defined by ${other}`);
+        definedIn.set(name, file);
+      }
+      for (const m of css.matchAll(use)) {
+        for (const name of (m[1] ?? '').split(/[\s,]+/).filter((n) => /^[a-z][\w-]*$/.test(n) && !own.has(n) && !['none', 'infinite', 'linear', 'alternate', 'both', 'forwards', 'backwards', 'reverse', 'paused', 'running', 'ease', 'ease-in', 'ease-out', 'ease-in-out', 'normal'].includes(n))) {
+          problems.push(`${file}: uses "${name}", which it doesn't define`);
+        }
+      }
+    }
+  }
   for (const [file, list] of selectors) {
     for (const selector of list) {
       if (!classesIn(selector).some((c) => owner.get(blockOf(c)) === file)) problems.push(`${file}: "${selector}" names no block this stylesheet owns`);

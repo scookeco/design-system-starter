@@ -131,7 +131,9 @@ const visualStories = run.filter((e) => e.type === 'story' && !e.tags?.includes(
 const fixtures = run.filter((e) => e.type === 'story' && isFixture(e));
 const docs = run.filter((e) => e.type === 'docs');
 // Per story: a screenshot and an axe run in each theme, and one WCAG 2.2 pass. Per fixture: one WCAG 2.2 test. Per Docs tab: axe.
-const tests = visualStories.length * 5 + fixtures.length + docs.length;
+// Plus the page-less "every check has a fixture" test, which always runs.
+const count = (stories: number, fixtureCount: number, docsCount: number) => stories * 5 + fixtureCount + docsCount + 1;
+const tests = run.length === 0 ? 0 : count(visualStories.length, fixtures.length, docs.length);
 const plural = (n: number, one: string, many = `${one}s`) => `${String(n)} ${n === 1 ? one : many}`;
 
 console.log(`\nVisual checks for changes since ${base} (merge base ${mergeBase.slice(0, 7)}), including uncommitted and untracked files`);
@@ -145,7 +147,7 @@ if (everything) {
   const storyFilesHit = [...affected.files.keys()];
   console.log(`  → ${plural(storyFilesHit.length, 'affected story file')} → ${plural(visualStories.length, 'story', 'stories')}, ${plural(docs.length, 'Docs tab')}${fixtures.length ? `, ${plural(fixtures.length, 'WCAG 2.2 fixture')}` : ''}`);
 }
-console.log(`  → ${plural(tests, 'test')} (full run: ${String(index.filter((e) => e.type === 'story' && !e.tags?.includes('no-visual')).length * 5 + index.filter(isFixture).length + index.filter((e) => e.type === 'docs').length)})`);
+console.log(`  → ${plural(tests, 'test')} (full run: ${String(count(index.filter((e) => e.type === 'story' && !e.tags?.includes('no-visual')).length, index.filter(isFixture).length, index.filter((e) => e.type === 'docs').length))})`);
 if (!everything && affected.files.size > 0) {
   const rows = [...affected.files].map(([file, via]) => {
     const inFile = run.filter((e) => e.importPath.replace(/^\.\//, '') === file);

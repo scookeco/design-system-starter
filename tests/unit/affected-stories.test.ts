@@ -204,18 +204,20 @@ describe('CSS scope (what lets barrels be followed by name)', () => {
     expect(cssScopeProblems(gallery.graph, sheets, [...gallery.reachable])).toEqual([]);
   });
 
-  it('reports a foreign selector, a shared block and a class rendered without its stylesheet (negative controls)', () => {
+  it('reports a foreign selector, a shared block, a shared or borrowed keyframes name and a class rendered without its stylesheet (negative controls)', () => {
     const root = mkdtempSync(join(tmpdir(), 'affected-css-'));
     try {
       write(root, {
-        'X/X.css': '@layer components {\n  .x { color: red; }\n  .x__part:hover { color: blue; }\n  @keyframes spin { to { rotate: 1turn; } }\n}\n',
-        'Y/Y.css': '.y { color: red; }\n.x__part { color: green; }\n.z .y__icon { color: red; }\n',
+        'X/X.css': '@layer components {\n  .x { color: red; animation-name: x-spin; }\n  .x__part:hover { color: blue; }\n  @keyframes x-spin { to { rotate: 1turn; } }\n}\n',
+        'Y/Y.css': '.y { color: red; animation-name: spin; }\n.x__part { color: green; }\n.z .y__icon { color: red; }\n@keyframes x-spin { to { rotate: 1turn; } }\n',
         'X/X.tsx': "import './X.css';\nexport const X = () => <div className={cx('x', 'x__part')} />;\n",
         'Z.tsx': "export const Z = () => <div className=\"y\" data-variant={v === 'x' ? 1 : 0} />;\n",
       });
       const graph = new ModuleGraph(root);
       expect(cssScopeProblems(graph, ['X/X.css', 'Y/Y.css'], ['X/X.tsx', 'Z.tsx'])).toEqual([
         'Y/Y.css: block "x" is already styled at the top level by X/X.css',
+        'Y/Y.css: "x-spin" is also defined by X/X.css',
+        'Y/Y.css: uses "spin", which it doesn\'t define',
         'Y/Y.css: ".x__part" names no block this stylesheet owns',
         'Z.tsx: renders "y" but never imports Y/Y.css',
       ]);
