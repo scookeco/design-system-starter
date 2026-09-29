@@ -40,6 +40,7 @@ import { ApiError, ContractError } from '../api/client';
 import type { Capability } from '../api/schemas';
 import type { MovableStatus } from '../api/schemas';
 import { useGrant, usePartition } from '../session';
+import { outcomeMeta, type ReportedOutcome } from '../telemetry';
 import { useTenant } from '../tenant';
 import type { Partition } from './keys';
 import { isConflict, isForbidden, useMoveRecord } from './mutations';
@@ -215,6 +216,11 @@ export function useAssistant({ context, conversationId, initialTurns = [] }: Use
 
   const stream = useMutation({
     mutationKey: [...partition, 'assistant'],
+    // The stream keeps what arrived, so it resolves even when the answer failed or was stopped: the
+    // finished turn says which, for the telemetry sink (src/app/telemetry.ts).
+    meta: outcomeMeta((turn: AssistantTurn) =>
+      turn.status === 'error' ? { phase: 'failure', code: turn.failure?.kind ?? 'unknown' } : turn.status === 'stopped' ? { phase: 'cancelled' } : undefined,
+    ),
     /** Streams one answer into the turn `answerId`, and resolves with the finished turn. */
     mutationFn: async ({ prompt, answerId, time, stored }: { prompt: string; answerId: string; time: string; stored: string | undefined }): Promise<AssistantTurn> => {
       const abort = new AbortController();
@@ -298,9 +304,12 @@ export function useDraftSuggestion() {
 
   const stream = useMutation({
     mutationKey: [...partition, 'draftSuggestion'],
-    mutationFn: async (name: string) => {
+    // Like the assistant's answers, a suggestion resolves however it ended; it says how.
+    meta: outcomeMeta((outcome: ReportedOutcome) => outcome),
+    mutationFn: async (name: string): Promise<ReportedOutcome> => {
       const abort = new AbortController();
       controller.current = abort;
+      let outcome: ReportedOutcome = { phase: 'success' };
       try {
         if (!can(grant, 'record:create')) throw new ApiError(403, 'forbidden', DENIAL_REASONS['record:create']);
         await streamAssistant(
@@ -313,23 +322,31 @@ export function useDraftSuggestion() {
             } else if (event.type === 'refusal') {
               setFailure({ kind: 'forbidden', message: event.message });
               setStatus('error');
+              outcome = { phase: 'failure', code: 'forbidden' };
             } else if (event.type === 'error') {
-              setFailure({ kind: event.code === 'content_filter' ? 'content_filter' : 'server', message: event.message });
+              const kind = event.code === 'content_filter' ? 'content_filter' : 'server';
+              setFailure({ kind, message: event.message });
               setStatus('error');
+              outcome = { phase: 'failure', code: kind };
             }
           },
           abort.signal,
         );
         setStatus((current) => (current === 'error' ? current : 'complete'));
       } catch (error) {
-        if (isAbort(error) || abort.signal.aborted) setStatus('stopped');
-        else {
-          setFailure(failureOf(error));
+        if (isAbort(error) || abort.signal.aborted) {
+          setStatus('stopped');
+          outcome = { phase: 'cancelled' };
+        } else {
+          const failure = failureOf(error);
+          setFailure(failure);
           setStatus('error');
+          outcome = { phase: 'failure', code: failure.kind };
         }
       } finally {
         controller.current = undefined;
       }
+      return outcome;
     },
   });
 
@@ -371,8 +388,10 @@ export type MoveOutcome = { ok: true } | { ok: false; reason: string };
  * One change failing doesn't stop the rest; each reports its own outcome.
  */
 export function useApplyProposal() {
+  const partition = usePartition();
   const move = useMoveRecord();
   const apply = useMutation({
+    mutationKey: [...partition, 'applyProposal'],
     mutationFn: async ({ ids, moves }: { ids: readonly string[]; moves: readonly ProposedMove[] }) => {
       const outcomes: Record<string, MoveOutcome> = {};
       const applied: AppliedMove[] = [];
@@ -391,6 +410,7 @@ export function useApplyProposal() {
     },
   });
   const undo = useMutation({
+    mutationKey: [...partition, 'undoProposal'],
     mutationFn: async (applied: readonly AppliedMove[]) => {
       const failed: string[] = [];
       for (const record of applied) {

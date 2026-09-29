@@ -65,13 +65,17 @@ const refuseUnless = (grant: Grant) => {
   if (!can(grant, 'workspace:read')) throw new ApiError(403, 'forbidden', DENIAL_REASONS['workspace:read']);
 };
 
+/** Each triage action's verb: the name its mutation reports as. */
+const TRIAGE_VERBS = { read: 'markRead', unread: 'markUnread', archive: 'archiveInbox', unarchive: 'unarchiveInbox' } as const satisfies Record<TriageAction, string>;
+
 function useTriage(action: TriageAction) {
   const tenant = useTenant();
   const partition = usePartition();
   const grant = useGrant();
   const client = useQueryClient();
   return useMutation({
-    mutationKey: [...partition, 'triageInbox', { action }],
+    // Named for the verb, so each reports as itself (markRead, archiveInbox…: src/app/telemetry.ts).
+    mutationKey: [...partition, TRIAGE_VERBS[action]],
     mutationFn: (ids: readonly string[]) => {
       refuseUnless(grant);
       return postTriage(tenant, ids, action);
