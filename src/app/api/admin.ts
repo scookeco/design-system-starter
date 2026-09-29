@@ -47,6 +47,11 @@ export const AUDIT_ACTIONS = [
   'record.restored',
   'record.tagged',
   'record.untagged',
+  // Demo examples: the workspace's integrations and its plan.
+  'integration.connected',
+  'integration.disconnected',
+  'integration.updated',
+  'plan.changed',
 ] as const;
 export const AuditActionSchema = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditActionSchema>;
@@ -60,7 +65,7 @@ export const AuditEventSchema = z.object({
   at: z.iso.datetime({ offset: true }),
   actor: z.object({ type: z.enum(['person', 'system', 'api-key']), id: z.string().min(1), label: z.string().min(1) }),
   action: AuditActionSchema,
-  target: z.object({ type: z.enum(['member', 'record', 'account', 'workspace', 'api-key']), id: z.string().min(1), label: z.string().min(1) }),
+  target: z.object({ type: z.enum(['member', 'record', 'account', 'workspace', 'api-key', 'integration']), id: z.string().min(1), label: z.string().min(1) }),
   outcome: z.enum(['success', 'denied']),
   /** Where the request came from; null for system events. */
   ip: z.string().nullable(),

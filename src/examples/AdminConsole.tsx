@@ -50,6 +50,10 @@ export const AUDIT_LABELS: Record<AuditAction, string> = {
   'record.restored': 'Record restored',
   'record.tagged': 'Tag added',
   'record.untagged': 'Tag removed',
+  'integration.connected': 'App connected',
+  'integration.disconnected': 'App disconnected',
+  'integration.updated': 'App settings changed',
+  'plan.changed': 'Plan changed',
 };
 
 const ROLE_DESCRIPTIONS: Record<Role, string> = {

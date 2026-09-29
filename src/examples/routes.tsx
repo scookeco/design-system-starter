@@ -79,6 +79,7 @@ const ImportRecords = page(async () => noParams((await import('./ImportWizard'))
 const Search = page(async () => noParams((await import('./SearchPage')).SearchPage));
 const Notifications = page(async () => noParams((await import('./NotificationsPage')).NotificationsPage));
 const Reports = page(async () => noParams((await import('./ReportsPage')).ReportsPage));
+const Integrations = page(async () => noParams((await import('./IntegrationsPage')).IntegrationsPage));
 // ── end Demo examples ────────────────────────────────────────────────────────────────────────
 
 export const ROUTES: readonly Route[] = [
@@ -119,5 +120,6 @@ export const ROUTES: readonly Route[] = [
   { path: '/search', layout: 'shell', page: Search, guard: 'workspace:read', nav: '', title: 'Search' },
   { path: '/notifications', layout: 'shell', page: Notifications, guard: 'workspace:read', nav: '', title: 'Notifications' },
   { path: '/reports', layout: 'shell', page: Reports, guard: 'record:read', nav: '/reports', title: 'Reports' },
+  { path: '/integrations', layout: 'shell', page: Integrations, guard: 'workspace:read', nav: '/settings', title: 'Integrations' },
   // ── end Demo examples ──
 ];

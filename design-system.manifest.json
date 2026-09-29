@@ -434,6 +434,22 @@
       ]
     },
     {
+      "title": "Integrations",
+      "summary": "An integrations catalogue (customer-facing): the apps a workspace can connect, connect and disconnect as pessimistic writes, and each app's settings in a Drawer. The archetype for any catalogue of things a workspace turns on: apps, add-ons, templates. No CSS file, no className, no style.",
+      "path": "src/examples/IntegrationsPage.tsx",
+      "stories": [
+        "examples-integrations--default",
+        "examples-integrations--nothing-connected",
+        "examples-integrations--as-editor",
+        "examples-integrations--settings-open",
+        "examples-integrations--settings-saving",
+        "examples-integrations--settings-conflict",
+        "examples-integrations--confirm-disconnect",
+        "examples-integrations--loading",
+        "examples-integrations--load-error"
+      ]
+    },
+    {
       "title": "List page",
       "summary": "The list page archetype.",
       "path": "src/examples/ListPage.tsx",
@@ -536,6 +552,22 @@
         "examples-record-page--edited-elsewhere",
         "examples-record-page--deleted-elsewhere",
         "examples-record-page--jobs-follow-you"
+      ]
+    },
+    {
+      "title": "Reports",
+      "summary": "Reports (charts over the workspace's data). A report answers one question per chart, says the answer in words, and gives the exact numbers as a table. No chart library: the charts (charts.tsx) are small SVGs drawn from the chart tokens. No CSS file, no className, no style.",
+      "path": "src/examples/ReportsPage.tsx",
+      "stories": [
+        "examples-reports--default",
+        "examples-reports--numbers-shown",
+        "examples-reports--twelve-months",
+        "examples-reports--as-viewer",
+        "examples-reports--other-workspace",
+        "examples-reports--nothing-to-report",
+        "examples-reports--loading",
+        "examples-reports--load-error",
+        "examples-reports--narrow"
       ]
     },
     {

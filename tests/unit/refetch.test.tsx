@@ -18,6 +18,7 @@ import { useArchiveInbox, useInbox } from '../../src/app/model/inbox';
 import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
 import { useStartImport } from '../../src/app/model/imports';
 import { useMarkAllNotificationsRead, useNotifications } from '../../src/app/model/notifications';
+import { useConnectIntegration, useIntegrations } from '../../src/app/model/integrations';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -229,5 +230,12 @@ describe('a write while the list is still on its first load shows on the list', 
     await race(read, () => result.current.markAll.mutate(), 'POST', '/notifications/read-all');
     await waitFor(() => expect(result.current.list.data?.counts.unread).toBe(0));
     expect(result.current.list.data?.items.every((n) => n.read)).toBe(true);
+  });
+
+  it('integrations: connectIntegration', async () => {
+    const read = holdFirstRead('/integrations');
+    const { result } = renderHook(() => ({ list: useIntegrations(), connect: useConnectIntegration() }), { wrapper: wrapperFor(testClient()) });
+    await race(read, () => result.current.connect.mutate('almanac'), 'POST', '/integrations/almanac/connect');
+    await waitFor(() => expect(itemsOf(result.current.list.data).find((i) => i.id === 'almanac')?.status).toBe('connected'));
   });
 });
