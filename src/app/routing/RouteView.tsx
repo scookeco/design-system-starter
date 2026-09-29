@@ -1,15 +1,17 @@
 /**
- * Renders the route the URL matches: guarded, lazily loaded, or the 404 when nothing matches.
+ * Renders the route the URL matches: guarded, lazily loaded (lazyPage), or the 404 when nothing matches.
  * The Suspense fallback is deliberately nothing: pages show their own skeletons once their code is
  * here, and a route that loads in a few milliseconds shouldn't flash a spinner.
  *
  * Every page renders inside its own error boundary (RenderBoundary): a renderer that throws shows
  * `renderError` in the page's place, reported to the telemetry sink under the route's path pattern,
- * and the rest of the app keeps working. Moving to another path starts a fresh boundary.
+ * and the rest of the app keeps working. Moving to another path starts a fresh boundary. A page whose
+ * code failed to load shows `renderError` too, told so (`failure.cause` is `load`): its Try again
+ * fetches the code again, and a second failure in a row is `repeated` (offer a full reload).
  */
 import { Suspense, type ReactNode } from 'react';
 import { usePathname } from '../url/useUrlState';
-import { RenderBoundary } from './RenderBoundary';
+import { RenderBoundary, type RenderFailure } from './RenderBoundary';
 import { matchRoute, type Route } from './routes';
 
 export interface RouteViewProps {
@@ -19,10 +21,11 @@ export interface RouteViewProps {
   /** The route guard: given the matched route and its page, renders the page or the 403 page in its place. */
   guard: (route: Route, page: ReactNode) => ReactNode;
   /**
-   * Rendered in the page's place when it throws while rendering: the error state, inside the shell,
-   * with `retry` (render the page again). Without one, the error goes on up to the nearest boundary.
+   * Rendered in the page's place when it throws while rendering, or its code failed to load: the
+   * error state, inside the shell, with `retry` (render the page again, fetching its code again if
+   * that is what failed) and what failed. Without one, the error goes on up to the nearest boundary.
    */
-  renderError?: (route: Route, retry: () => void) => ReactNode;
+  renderError?: (route: Route, retry: () => void, failure: RenderFailure) => ReactNode;
 }
 
 export function RouteView({ routes, notFound, guard, renderError }: RouteViewProps) {
@@ -40,8 +43,11 @@ export function RouteView({ routes, notFound, guard, renderError }: RouteViewPro
   );
   if (!renderError) return <>{guarded}</>;
   return (
-    // Keyed by the path too: a failure on one record doesn't follow the person to the next.
-    <RenderBoundary key={pathname} region={route.path} fallback={(retry) => renderError(route, retry)}>
+    // Keyed by the path too: a render failure on one record doesn't follow the person to the next.
+    // A page whose code failed to load is shared by every route that uses it (/ and /home), and the
+    // next route renders before this boundary forgets the failure: it shows the error again, and
+    // Try again recovers.
+    <RenderBoundary key={pathname} region={route.path} fallback={(retry, failure) => renderError(route, retry, failure)}>
       {guarded}
     </RenderBoundary>
   );

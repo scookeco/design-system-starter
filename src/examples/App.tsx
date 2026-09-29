@@ -3,7 +3,9 @@
  * with AppLink), the route table decides what renders for each URL, every route passes its guard
  * (the same `can` as buttons and mutations), and an unknown path gets the 404 page. A page that
  * throws while rendering shows the error state in its place, inside the shell (RenderErrorPage), and
- * is reported to the telemetry sink; if even that fails, the app-wide boundary shows the error page.
+ * is reported to the telemetry sink; so does a page whose code failed to load, where Try again fetches
+ * it again and a second failure offers a full reload. If the shell itself fails, the app-wide
+ * boundary shows the error page.
  * Mount it inside AppProviders, which a product does once at its root with the session it loaded.
  */
 import { LinkProvider } from '../index';
@@ -27,7 +29,7 @@ export function ExampleApp() {
               {page}
             </Guard>
           )}
-          renderError={(route, retry) => <RenderErrorPage current={route.nav} onRetry={retry} />}
+          renderError={(route, retry, failure) => <RenderErrorPage current={route.nav} onRetry={retry} cause={failure.cause} repeated={failure.repeated} />}
         />
       </RenderBoundary>
     </LinkProvider>

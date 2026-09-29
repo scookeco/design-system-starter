@@ -17,3 +17,9 @@ export const Forbidden: StoryObj = {
 };
 /** A page that failed to render: the route's error boundary shows this in its place, inside the shell. */
 export const RenderError: StoryObj = { render: () => <RenderErrorPage current="/records" onRetry={() => undefined} /> };
+/** A page whose code failed to load (a dropped connection, a deploy): Try again fetches it again. */
+export const LoadError: StoryObj = { render: () => <RenderErrorPage current="/records" cause="load" onRetry={() => undefined} /> };
+/** Try again failed too: the next step is a full reload, and focus moves to it (the pressed Try again is gone). */
+export const LoadErrorRepeated: StoryObj = {
+  render: () => <RenderErrorPage current="/records" cause="load" repeated onRetry={() => undefined} onReload={() => undefined} />,
+};

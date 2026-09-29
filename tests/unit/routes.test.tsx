@@ -77,7 +77,7 @@ const deepLink = (path: string) =>
     .replace(/^\/settings\/:section/, '/settings/notifications')
     .replace(/:(\w+)/g, (_, name: string) => PARAMS[name] ?? name);
 
-const NOT_A_PAGE = ['Page not found', 'You don’t have access to this page', 'This page couldn’t be shown'];
+const NOT_A_PAGE = ['Page not found', 'You don’t have access to this page', 'This page couldn’t be shown', 'This page couldn’t load', 'This page still couldn’t load'];
 
 /** Mounted at `url`: waits for the page's h1 and for its reads to settle, and returns the h1's text. */
 const openDeepLink = async (url: string, role: 'admin' | 'viewer') => {

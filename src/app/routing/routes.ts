@@ -26,7 +26,7 @@ export interface Route {
   /** "/records/:id". Segments starting with ":" are params; everything else matches exactly. */
   path: string;
   layout: RouteLayout;
-  /** Lazy by default (React.lazy), so each route is its own chunk. */
+  /** Lazy by default (lazyPage, which can load again after a failed import), so each route is its own chunk. */
   page: ComponentType<RouteProps>;
   /** Required: a route with no capability doesn't compile (deny by default). */
   guard: Capability;

@@ -285,7 +285,7 @@
     },
     {
       "title": "App",
-      "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. A page that throws while rendering shows the error state in its place, inside the shell (RenderErrorPage), and is reported to the telemetry sink; if even that fails, the app-wide boundary shows the error page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
+      "summary": "The app, assembled. The router link goes to the design system once (LinkProvider with AppLink), the route table decides what renders for each URL, every route passes its guard (the same `can` as buttons and mutations), and an unknown path gets the 404 page. A page that throws while rendering shows the error state in its place, inside the shell (RenderErrorPage), and is reported to the telemetry sink; so does a page whose code failed to load, where Try again fetches it again and a second failure offers a full reload. If the shell itself fails, the app-wide boundary shows the error page. Mount it inside AppProviders, which a product does once at its root with the session it loaded.",
       "path": "src/examples/App.tsx",
       "stories": [
         "examples-app--records",
@@ -415,7 +415,9 @@
         "examples-error-pages--not-found",
         "examples-error-pages--server-error",
         "examples-error-pages--forbidden",
-        "examples-error-pages--render-error"
+        "examples-error-pages--render-error",
+        "examples-error-pages--load-error",
+        "examples-error-pages--load-error-repeated"
       ]
     },
     {

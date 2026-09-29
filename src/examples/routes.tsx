@@ -3,14 +3,18 @@
  * the capability that guards it. Adding a screen is adding a row. The nav, the guard and the 404
  * all read from here; nothing else knows the list of pages.
  */
-import { lazy, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { ACCOUNT, PERSON } from '../app/registries/entities';
+import { lazyPage } from '../app/routing/lazyPage';
 import type { Route, RouteProps } from '../app/routing/routes';
 import type { RecordSection } from './RecordPage';
 import type { SettingsSection } from './SettingsPage';
 
-/** A lazily loaded page: its module is fetched the first time the route matches. */
-const page = (load: () => Promise<ComponentType<RouteProps>>) => lazy(async () => ({ default: await load() }));
+/**
+ * A lazily loaded page: its module is fetched the first time the route matches. If that fails (the
+ * network, a deploy), the error state's Try again fetches it again (lazyPage; React.lazy can't).
+ */
+const page = (load: () => Promise<ComponentType<RouteProps>>) => lazyPage(load);
 
 /** A page that takes nothing from the path. */
 const noParams = (Page: ComponentType) => () => <Page />;
