@@ -25,8 +25,22 @@ export const Mentions: Story = { parameters: mockApi({ url: '/notifications?kind
 export const NewWhileOpen: Story = {
   parameters: mockApi({ url: '/notifications', anotherUser: [{ kind: 'notify' }, { kind: 'notify', notification: 'assignment' }] }),
 };
-/** The bell's popover: the latest unread, Mark all read, and the way to this page. */
-export const BellOpen: Story = { args: { initialBellOpen: true }, parameters: mockApi({ url: '/notifications' }) };
+/**
+ * The bell's popover: the latest unread, Mark all read, and the way to this page. Shown over a
+ * filter with nothing in it, so no link on the page sits under the popover (the WCAG 2.2 target
+ * check measures what the popover covers too).
+ */
+export const BellOpen: Story = {
+  args: { initialBellOpen: true },
+  parameters: {
+    ...mockApi({ url: '/notifications?kind=approval' }),
+    ...mswOverrides(
+      http.get('*/api/t/:tenant/notifications', ({ request }) =>
+        new URL(request.url).searchParams.get('kind') === 'approval' ? HttpResponse.json({ items: [], counts: { all: 24, unread: 7 } }) : undefined,
+      ),
+    ),
+  },
+};
 export const AllCaughtUp: Story = { parameters: { ...mockApi({ url: '/notifications?view=unread' }), ...none() } };
 export const FirstUse: Story = { parameters: { ...mockApi({ url: '/notifications' }), ...none() } };
 /** A viewer hears nothing about drafts: those notifications are left out, like the drafts. */

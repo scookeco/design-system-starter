@@ -82,7 +82,7 @@ export function NotificationsIndicator({ defaultOpen = false }: NotificationsInd
           ) : null}
         </Cluster>
         {latest.length > 0 ? (
-          <Stack as="ul" role="list" gap="sm">
+          <Stack as="ul" role="list" gap="md">
             {latest.map((n) => (
               <LatestItem key={n.id} notification={n} onOpen={() => markRead.mutate({ ids: [n.id], read: true })} />
             ))}
