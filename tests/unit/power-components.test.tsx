@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Combobox, DatePicker, InlineEdit, LocaleProvider, NumberField, SplitView, Toolbar, ToolbarButton } from '../../src/index';
+import { Combobox, DatePicker, InlineEdit, LocaleProvider, NumberField, ResultList, ResultListItem, SearchField, SplitView, Toolbar, ToolbarButton } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -124,6 +124,110 @@ describe('Toolbar', () => {
     const stops = [toolbar, ...toolbar.querySelectorAll<HTMLElement>('*')].filter((el) => el.tabIndex === 0);
     expect(stops).toHaveLength(1);
     expect(screen.getAllByRole('button').every((b) => b.tabIndex === -1)).toBe(true);
+  });
+});
+
+describe('ResultList', () => {
+  const NAMES = ['Northwind renewal', 'Northwind Traders', 'Priya Northcott', 'Northern licences'];
+  const results = (names: readonly string[] = NAMES, props: Partial<Parameters<typeof ResultList>[0]> = {}, onClick = vi.fn()) => (
+    <>
+      <SearchField label="Search" value="" onValueChange={() => undefined} />
+      <ResultList label="Results" empty={<p>No results</p>} {...props}>
+        {names.map((name) => (
+          <ResultListItem key={name} href={`/r/${name}`} description="Record" onClick={onClick}>
+            {name}
+          </ResultListItem>
+        ))}
+      </ResultList>
+      <button type="button">After</button>
+    </>
+  );
+  const links = () => screen.getAllByRole('link');
+  const stop = () => links().filter((link) => link.tabIndex === 0);
+
+  it('is one tab stop: only the first link is tabbable, and the list itself is not', () => {
+    render(results());
+    const list = screen.getByRole('list', { name: 'Results' });
+    expect([list, ...list.querySelectorAll<HTMLElement>('*')].filter((el) => el.tabIndex === 0)).toEqual([links()[0]]);
+    expect(links().slice(1).every((link) => link.tabIndex === -1)).toBe(true);
+  });
+
+  it('moves with ↑ ↓, jumps with Home and End, and stops at the ends', () => {
+    render(results());
+    const [first, second, , last] = links();
+    act(() => first?.focus());
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'ArrowDown' })).toBe(false);
+    expect(document.activeElement).toBe(second);
+    expect(stop()).toEqual([second]);
+    fireEvent.keyDown(second as HTMLElement, { key: 'End' });
+    expect(document.activeElement).toBe(last);
+    fireEvent.keyDown(last as HTMLElement, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(last);
+    fireEvent.keyDown(last as HTMLElement, { key: 'Home' });
+    expect(document.activeElement).toBe(first);
+    fireEvent.keyDown(first as HTMLElement, { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(first);
+    expect(stop()).toEqual([first]);
+  });
+
+  it('remembers the item you left from, and hands the stop to the first item when that one goes', () => {
+    const { rerender } = render(results());
+    act(() => links()[0]?.focus());
+    fireEvent.keyDown(links()[0] as HTMLElement, { key: 'ArrowDown' });
+    fireEvent.keyDown(links()[1] as HTMLElement, { key: 'ArrowDown' });
+    act(() => screen.getByRole('button', { name: 'After' }).focus());
+    expect(stop().map((link) => link.textContent)).toEqual(['Priya Northcott']);
+    rerender(results(['Priya Northcott', 'Northwind renewal', 'Acme pilot']));
+    expect(stop().map((link) => link.textContent)).toEqual(['Priya Northcott']);
+    rerender(results(['Acme pilot', 'Acme renewal']));
+    expect(stop().map((link) => link.textContent)).toEqual(['Acme pilot']);
+  });
+
+  it('moves the stop with focus from outside the keys: a click, or a page shortcut focusing a link', () => {
+    render(results());
+    act(() => links()[2]?.focus());
+    expect(stop()).toEqual([links()[2]]);
+  });
+
+  it('opens with the link itself: a real href, Enter left to the browser, clicks reach onClick', () => {
+    const onClick = vi.fn((event: { preventDefault: () => void }) => event.preventDefault());
+    render(results(NAMES, {}, onClick));
+    const [first] = links();
+    expect(first?.getAttribute('href')).toBe('/r/Northwind renewal');
+    act(() => first?.focus());
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'Enter' })).toBe(true);
+    fireEvent.click(first as HTMLElement);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('never takes characters or modified keys, and ignores keys from a field beside it', () => {
+    render(results());
+    const [first] = links();
+    act(() => first?.focus());
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'j' })).toBe(true);
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'n' })).toBe(true);
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'ArrowDown', shiftKey: true })).toBe(true);
+    expect(fireEvent.keyDown(first as HTMLElement, { key: 'End', metaKey: true })).toBe(true);
+    expect(document.activeElement).toBe(first);
+    const field = screen.getByRole('searchbox', { name: 'Search' });
+    act(() => field.focus());
+    expect(fireEvent.keyDown(field, { key: 'ArrowDown' })).toBe(true);
+    expect(fireEvent.keyDown(field, { key: 'j' })).toBe(true);
+    expect(document.activeElement).toBe(field);
+    expect(stop()).toEqual([first]);
+  });
+
+  it('says where each item sits in the whole set when it is one page of it', () => {
+    render(results(NAMES, { start: 41, total: 240 }));
+    const items = within(screen.getByRole('list', { name: 'Results' })).getAllByRole('listitem');
+    expect(items.map((item) => item.getAttribute('aria-posinset'))).toEqual(['41', '42', '43', '44']);
+    expect(items.every((item) => item.getAttribute('aria-setsize') === '240')).toBe(true);
+  });
+
+  it('renders its empty content, not an empty list, when there are no items', () => {
+    render(results([]));
+    expect(screen.getByText('No results')).toBeTruthy();
+    expect(screen.queryByRole('list', { name: 'Results' })).toBeNull();
   });
 });
 

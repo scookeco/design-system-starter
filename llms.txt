@@ -142,6 +142,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
