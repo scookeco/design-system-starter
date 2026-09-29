@@ -37,7 +37,7 @@ const BEM_LITE = '^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z
 export default {
   extends: ['stylelint-config-standard'],
   plugins: ['stylelint-declaration-strict-value', 'stylelint-use-logical'],
-  ignoreFiles: ['src/styles/tokens.css', 'dist/**', 'storybook-static/**', 'fixtures/**'],
+  ignoreFiles: ['src/styles/tokens.css', 'dist/**', 'dist-app/**', 'storybook-static/**', 'fixtures/**'],
   reportDescriptionlessDisables: true,
   reportNeedlessDisables: true,
   reportInvalidScopeDisables: true,

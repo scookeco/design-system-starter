@@ -349,6 +349,12 @@ export const NON_VISUAL: readonly string[] = [
   '.gitignore',
   'src/**/*.test.ts',
   'src/**/*.test.tsx',
+  // The app entry: its page, its build config and its static files (MSW's worker). The gallery
+  // loads none of them (its own worker is in .storybook/public); src/main.tsx and src/bootstrap.tsx
+  // are gallery-shaped source nothing in the gallery imports.
+  'index.html',
+  'vite.app.config.ts',
+  'public/**',
 ];
 
 /** Gallery source: if the graph doesn't reach one of these, nothing the gallery loads imports it. */
