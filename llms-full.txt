@@ -6743,7 +6743,7 @@ Coding agents read the system from three files at the repo root, generated from 
 
 #### The three files
 
-- `llms.txt` is the entry point, small enough to read whole at the start of every session (under 16 KB). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
+- `llms.txt` is the entry point, small enough to read whole at the start of every session (a test keeps it within a byte budget). It follows the llms.txt convention: the name, a summary, the agent rules, then one line per guide, foundation page, component, primitive, layout, utility and golden example, each linking to its file.
 - `llms-full.txt` adds every component’s props, variants and states, its usage doc (with the do and don’t code), its stories and tokens, then every guide as Markdown and every semantic token with its light and dark value. Give it to an agent that takes a whole document as context.
 - `design-system.manifest.json` holds the same facts as data, for tools and targeted lookups. Its schema, `design-system.manifest.schema.json`, documents every field.
 
