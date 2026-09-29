@@ -185,6 +185,9 @@ function ListPageContent({
   const [dialogOpen, setDialogOpen] = useState(initialDialogOpen);
   const [draftName, setDraftName] = useState('');
   const [nameError, setNameError] = useState<string | undefined>();
+  // One key per name until the create succeeds: a retry after a failure (or a dropped connection
+  // after the server already made it) sends the same key, so it never makes a second record.
+  const idempotency = useRef<{ name: string; key: string } | undefined>(undefined);
 
   const statusOptions = statusOptionsFor(query.view);
   const shown = new Set(url.columns);
@@ -285,10 +288,12 @@ function ListPageContent({
       setNameError('Enter a name for the record.');
       return;
     }
+    if (idempotency.current?.name !== name) idempotency.current = { name, key: crypto.randomUUID() };
     createRecord.mutate(
-      { record: { name }, idempotencyKey: crypto.randomUUID() },
+      { record: { name }, idempotencyKey: idempotency.current.key },
       {
         onSuccess: () => {
+          idempotency.current = undefined;
           setDialogOpen(false);
           setDraftName('');
           setNameError(undefined);

@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { seedAccounts, seedPeople, seedRecords } from '../../src/app/mocks/seed';
 import { handlers } from '../../src/app/mocks/handlers';
 import { listInbox } from '../../src/app/api/inbox';
+import { dropAfterApply } from '../../src/app/mocks/overrides';
 import { useInviteMember, useMembers } from '../../src/app/model/admin';
 import { useArchiveInbox, useInbox } from '../../src/app/model/inbox';
 import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSaveView, useStartBulkDelete, useUpdateAccount } from '../../src/app/model/mutations';
@@ -111,6 +112,21 @@ describe('a write while the list is still on its first load shows on the list', 
     const before = seedRecords('acme').filter((r) => r.status !== 'archived').length;
     await waitFor(() => expect(result.current.list.data?.total).toBe(before + 1));
     expect(result.current.list.data?.items.map((r) => r.name)).toContain('Aaron race order');
+  });
+
+  it('records: createRecord whose answer never arrived (an unknown outcome) still reads again', async () => {
+    const read = holdFirstRead('/records');
+    server.use(dropAfterApply('post', '/records'));
+    const { result } = renderHook(
+      () => ({ list: useRecordList({ q: '', status: [], view: 'all', sort: 'name', page: 1, pageSize: 10 }), create: useCreateRecord() }),
+      { wrapper: wrapperFor(testClient()) },
+    );
+    await read.arrived();
+    result.current.create.mutate({ record: { name: 'Aaron dropped answer' }, idempotencyKey: 'race-drop' });
+    // The server made it; the client only saw the connection drop. Its reconcile read goes after the held one.
+    await waitFor(() => expect(result.current.create.isError).toBe(true));
+    read.release();
+    await waitFor(() => expect(result.current.list.data?.items.map((r) => r.name)).toContain('Aaron dropped answer'));
   });
 
   it('views: saveView', async () => {
