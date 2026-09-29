@@ -74,12 +74,28 @@ export const toRows = (records: readonly RecordEntity[] | undefined): readonly R
   return projected;
 };
 
-/** The list's display modes: one projection (the same rows), two surfaces. A new surface is one entry. */
+/**
+ * A list this long is offered the Scroll display: past a few hundred rows, paging ten at a time
+ * stops being a way to look through them.
+ */
+export const LARGE_LIST = 1_000;
+
+/**
+ * The list's display modes: one projection (the same rows), several surfaces. A new surface is one
+ * entry. Scroll is the table, windowed: every matching row in one scrolling table, fetched a server
+ * page at a time as it comes into view, and only the rows in view rendered. It's offered once the
+ * list is large (`minTotal`); a link that asks for it always gets it.
+ */
 export const DISPLAYS = [
   { value: 'table', label: 'Table' },
   { value: 'board', label: 'Board' },
-] as const satisfies readonly { value: Display; label: string }[];
+  { value: 'scroll', label: 'Scroll', minTotal: LARGE_LIST },
+] as const satisfies readonly { value: Display; label: string; minTotal?: number }[];
 export type { Display };
+
+/** The displays to offer for a list of `total` rows: those it's large enough for, and the current one. */
+export const displaysFor = (total: number, current: Display): { value: Display; label: string }[] =>
+  DISPLAYS.filter((d) => !('minTotal' in d) || total >= d.minTotal || d.value === current).map(({ value, label }) => ({ value, label }));
 
 /** The table's optional columns, in their order, with their headers. The name column is always there. */
 export const COLUMNS: readonly { id: RecordColumn; label: string }[] = [
