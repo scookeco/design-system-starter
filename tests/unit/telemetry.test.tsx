@@ -173,7 +173,9 @@ describe('every named mutation reports start and one outcome', () => {
     const declared = declaredVerbs();
     const reported = new Set(all.map((e) => e.name));
     expect([...declared].filter((name) => !reported.has(name))).toEqual([]);
-    expect(declared.size).toBeGreaterThanOrEqual(33);
+    // Positive control: the scanner finds every verb this test drove, so it can't pass by finding none.
+    // (Deleting a domain module? Drop it from declaredVerbs' list and its verbs from useEveryVerb.)
+    expect([...reported].filter((name) => !declared.has(name))).toEqual([]);
     // Ids are fine; what a person typed or who they are never is.
     const serialised = JSON.stringify(events);
     for (const personal of ['Pat Quinlan', 'pat.quinlan@example.com', 'Quinlan Holdings', 'Renamed for the test', 'Renewals', 'Hardware lease', 'Telemetry lease', 'How many records']) {

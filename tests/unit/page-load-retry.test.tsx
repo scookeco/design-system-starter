@@ -6,8 +6,8 @@
  * same way and only a full reload got out. If Try again fails too, the next step is Reload the page.
  *
  * The route table gets extra rows in front of the real ones, each with a scripted import: the
- * listed outcomes in order, then the real dashboard. One row per test, because a page's loader
- * (and what it has loaded) lives as long as the module.
+ * listed outcomes in order, then a stand-in page (not an example, so a portal can delete any of
+ * them). One row per test, because a page's loader (and what it has loaded) lives as long as the module.
  */
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { ComponentType } from 'react';
@@ -28,7 +28,7 @@ const script = vi.hoisted(() => ({
 }));
 
 vi.mock('../../src/examples/routes', async (importOriginal) => {
-  const original = await importOriginal<{ ROUTES: readonly Route[] }>();
+  const original = await importOriginal<typeof import('../../src/examples/routes')>();
   const { lazyPage } = await import('../../src/app/routing/lazyPage');
   const flaky = (path: string): Route => ({
     path,
@@ -38,11 +38,11 @@ vi.mock('../../src/examples/routes', async (importOriginal) => {
     page: lazyPage<RouteProps>(async () => {
       script.loads[path] = (script.loads[path] ?? 0) + 1;
       if (script.outcomes[path]?.shift() === 'fail') throw script.failure();
-      const { DashboardPage } = await import('../../src/examples/DashboardPage');
-      return (() => <DashboardPage />) as ComponentType<RouteProps>;
+      const { PageHeader } = await import('../../src/index');
+      return (() => <PageHeader title="The loaded page" />) as ComponentType<RouteProps>;
     }),
   });
-  return { ROUTES: [...Object.keys(script.outcomes).map(flaky), ...original.ROUTES] };
+  return { ...original, ROUTES: [...Object.keys(script.outcomes).map(flaky), ...original.ROUTES] };
 });
 
 setupMockApi();
@@ -77,7 +77,7 @@ describe('a page whose code fails to load', { timeout: PAGE_FLOW_TIMEOUT }, () =
 
     // The connection is back: Try again imports the page's code again, and the page renders.
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Home' }, FIRST_PAINT)).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'The loaded page' }, FIRST_PAINT)).toBeTruthy();
     expect(script.loads['/flaky/once']).toBe(2);
     expect(events.filter((e) => e.kind === 'render')).toHaveLength(1);
   });
