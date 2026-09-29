@@ -72,26 +72,36 @@ export const openStory = async (page: Page, id: string, theme: (typeof THEMES)[n
  * Wait until the document height has not changed for several frames. Slow runners can still be
  * laying out tall pages when capture starts, and a full-page screenshot of a page that is still
  * growing never matches its own next capture.
+ *
+ * With `boxes`, every element matching that selector must also keep its scroll and client size:
+ * a box that overflows for a frame while its content lays out is, to axe, a scrollable region.
  */
-export const waitForStableHeight = (page: Page) =>
+export const waitForStableHeight = (page: Page, boxes?: string) =>
   page.evaluate(
-    () =>
+    (selector) =>
       new Promise<void>((resolve) => {
-        let last = -1;
+        const measure = () =>
+          [document.documentElement.scrollHeight, ...(selector ? [...document.querySelectorAll(selector)] : []).map((el) => `${String(el.scrollHeight)}/${String(el.clientHeight)}/${String(el.scrollWidth)}/${String(el.clientWidth)}`)].join(' ');
+        let last = '';
         let steady = 0;
         const started = performance.now();
         const tick = () => {
-          const height = document.documentElement.scrollHeight;
-          steady = height === last ? steady + 1 : 0;
-          last = height;
+          const now = measure();
+          steady = now === last ? steady + 1 : 0;
+          last = now;
           if (steady >= 10 || performance.now() - started > 10_000) resolve();
           else requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       }),
+    boxes,
   );
 
-/** A Docs tab: the page, then every inline story on it, rendered. */
+/**
+ * A Docs tab: the page, then every inline story on it, rendered and laid out. On the first frame
+ * some previews still overflow their box (a Disabled story by 30px): axe, running then, reports a
+ * scrollable region with nothing focusable in it, so wait until every preview keeps its size.
+ */
 export const openDocs = async (page: Page, id: string) => {
   await page.goto(`/iframe.html?id=${encodeURIComponent(id)}&viewMode=docs&globals=theme:light`);
   await page.waitForFunction(() => document.body.classList.contains('sb-show-main'));
@@ -99,6 +109,7 @@ export const openDocs = async (page: Page, id: string) => {
   await page.waitForFunction(() => [...document.querySelectorAll('#storybook-docs .sb-story')].every((el) => el.childElementCount > 0));
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.evaluate(() => document.fonts.ready);
+  await waitForStableHeight(page, '#storybook-docs .docs-story');
 };
 
 /** Storybook's a11y addon also runs axe after render; wait our turn (up to ~30s) instead of colliding. */
