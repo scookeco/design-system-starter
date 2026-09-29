@@ -13,7 +13,7 @@
  * as a viewer's list query never returns one.
  */
 import { z } from 'zod';
-import { reporting, ContractError } from './client';
+import { apiUrl, reporting, ContractError } from './client';
 import { NotificationSchema } from './notifications';
 import { RecordSchema, type Tenant } from './schemas';
 
@@ -48,7 +48,7 @@ export const parseLiveEvent = (data: unknown): LiveEvent | undefined => {
 /** The production source: Server-Sent Events, one stream per workspace, reconnecting on its own. */
 export const eventSourceLive = (): LiveSource => ({
   subscribe: (tenant, onMessage) => {
-    const source = new EventSource(`/api/t/${tenant}/events`);
+    const source = new EventSource(apiUrl(`/t/${tenant}/events`));
     source.onmessage = (message: MessageEvent<string>) => {
       try {
         onMessage(JSON.parse(message.data));

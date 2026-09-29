@@ -58,7 +58,22 @@ export const reporting = {
   },
 };
 
-const url = (path: string) => new URL(`/api${path}`, globalThis.location?.origin ?? 'http://localhost').toString();
+/**
+ * Where the API lives: the one setting a portal changes to reach its backend. `/api` on the page's
+ * own origin by default. An absolute base (`https://api.example.com/v1`) reaches another origin, which
+ * then needs CORS, and `credentials: 'include'` in request() if it signs in with cookies. The mock
+ * API answers `…/api/…` on any origin, so stories and tests keep the default. Requests, the
+ * assistant's stream and the live event source all build their URLs with `apiUrl`.
+ */
+const apiConfig: { baseUrl: string } = { baseUrl: '/api' };
+
+/** Point the client at the backend once, before the app mounts (a test restores the default after). */
+export const configureApi = (config: { baseUrl: string }) => {
+  apiConfig.baseUrl = config.baseUrl.replace(/\/+$/, '');
+};
+
+/** The absolute URL of an API path (`/t/acme/records`), under the configured base. */
+export const apiUrl = (path: string) => new URL(`${apiConfig.baseUrl}${path}`, globalThis.location?.origin ?? 'http://localhost').toString();
 
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -77,7 +92,7 @@ export const etag = (version: number) => `"${String(version)}"`;
 
 /** Fetch, then parse: `schema` decides what counts as a valid answer. */
 export async function request<S extends z.ZodType>(schema: S, path: string, options: RequestOptions = {}): Promise<z.infer<S>> {
-  const response = await fetch(url(path), {
+  const response = await fetch(apiUrl(path), {
     method: options.method ?? 'GET',
     headers: {
       Accept: 'application/json',

@@ -8,7 +8,7 @@
  * grant can do (see src/app/mocks/ai.ts).
  */
 import { z } from 'zod';
-import { ApiError, ContractError, reporting, request } from './client';
+import { ApiError, apiUrl, ContractError, reporting, request } from './client';
 import { ErrorBodySchema, MOVABLE_STATUSES, RecordStatusSchema, type Tenant } from './schemas';
 
 /** Where a source comes from, so a citation can click through to it. */
@@ -73,15 +73,13 @@ export class StreamInterrupted extends Error {
   }
 }
 
-const url = (tenant: Tenant) => new URL(`/api/t/${tenant}/ai/respond`, globalThis.location?.origin ?? 'http://localhost').toString();
-
 /**
  * Ask, and hand each event to `onEvent` as it arrives. Resolves when the stream ends; rejects with
  * ApiError for a refused request (403, 429 with its message), ContractError for a malformed event,
  * StreamInterrupted when the connection drops, and the abort reason when `signal` aborts.
  */
 export async function streamAssistant(tenant: Tenant, body: AiRequest, onEvent: (event: AiEvent) => void, signal?: AbortSignal): Promise<void> {
-  const response = await fetch(url(tenant), {
+  const response = await fetch(apiUrl(`/t/${tenant}/ai/respond`), {
     method: 'POST',
     headers: { Accept: 'application/x-ndjson', 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
