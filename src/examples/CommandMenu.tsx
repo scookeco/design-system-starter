@@ -15,7 +15,7 @@
  */
 import { useQueries } from '@tanstack/react-query';
 import { useState } from 'react';
-import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, UploadIcon, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
+import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, TrendUpIcon, UploadIcon, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
 import { getRecord } from '../app/api/records';
 import type { Capability } from '../app/api/schemas';
 import { recordKeys } from '../app/model/keys';
@@ -51,6 +51,8 @@ const SECTION_ICONS: Readonly<Record<string, IconDefinition>> = {
   '/settings': SettingsIcon,
   '/inbox': InboxIcon,
   '/admin': ShieldIcon,
+  '/reports': TrendUpIcon,
+  '/search': SearchIcon,
 };
 
 interface PaletteAction {

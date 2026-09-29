@@ -4,6 +4,7 @@
  * gallery and the tests serve them like every other route.
  */
 import { notificationHandlers } from './notifications';
+import { reportHandlers } from './reports';
 import { searchHandlers } from './search';
 
-export const demoHandlers = [...searchHandlers, ...notificationHandlers];
+export const demoHandlers = [...searchHandlers, ...notificationHandlers, ...reportHandlers];

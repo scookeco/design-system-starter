@@ -175,7 +175,7 @@ function SearchContent() {
     />
   ) : (
     <Stack gap="md">
-      <Stack as="ol" gap="md" aria-label="Results">
+      <Stack as="ol" role="list" gap="md" aria-label="Results">
         {items.map((hit) => (
           <Stack as="li" gap="2xs" key={`${hit.type}-${hit.id}`}>
             <Cluster gap="xs" align="center">

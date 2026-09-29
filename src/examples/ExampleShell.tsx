@@ -7,7 +7,7 @@
  * (src/app/session.tsx). Static example pages render outside it and get a fixed menu.
  */
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { AppShell, Avatar, Breadcrumbs, BuildingIcon, Button, FileIcon, HomeIcon, InboxIcon, Menu, Nav, SettingsIcon, ShieldIcon, UsersIcon, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
+import { AppShell, Avatar, Breadcrumbs, BuildingIcon, Button, FileIcon, HomeIcon, InboxIcon, Menu, Nav, SettingsIcon, ShieldIcon, TrendUpIcon, UsersIcon, type BreadcrumbLink, type MenuEntry, type NavSection } from '../index';
 import { useOptionalAppSession, type AppSession } from '../app/session';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
@@ -23,6 +23,8 @@ const NAV: readonly NavSection[] = [
       { label: 'Records', href: '/records', icon: FileIcon },
       { label: 'Accounts', href: '/accounts', icon: BuildingIcon },
       { label: 'People', href: '/people', icon: UsersIcon },
+      // Demo examples: reports (charts from the chart tokens).
+      { label: 'Reports', href: '/reports', icon: TrendUpIcon },
     ],
   },
   {
