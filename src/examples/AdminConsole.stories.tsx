@@ -35,4 +35,4 @@ export const AuditFiltered: Story = {
 export const AuditRowExpanded: Story = { args: { section: 'audit', initialExpanded: ['acme-e0140', 'acme-e0139'] } };
 export const AuditNoResults: Story = { args: { section: 'audit' }, parameters: mockApi({ url: '/admin/audit?actor=system&action=api_key.revoked' }) };
 /** An editor opening the audit log's URL: the route guard's 403 page, from the same `can`. */
-export const AuditForbidden: Story = { tags: ['!data'], render: () => <ExampleApp />, parameters: mockApi({ url: '/admin/audit', role: 'editor' }) };
+export const AuditForbidden: Story = { render: () => <ExampleApp />, parameters: mockApi({ url: '/admin/audit', role: 'editor' }) };

@@ -74,6 +74,14 @@ const Audit = page(async () => {
   return () => <AdminConsole section="audit" />;
 });
 // ── end B2B power features ──────────────────────────────────────────────────────────────────
+// ── Demo examples (PR 16): import, search, notifications, reports, integrations, billing ──────
+const ImportRecords = page(async () => noParams((await import('./ImportWizard')).ImportWizard));
+const Search = page(async () => noParams((await import('./SearchPage')).SearchPage));
+const Notifications = page(async () => noParams((await import('./NotificationsPage')).NotificationsPage));
+const Reports = page(async () => noParams((await import('./ReportsPage')).ReportsPage));
+const Integrations = page(async () => noParams((await import('./IntegrationsPage')).IntegrationsPage));
+const Billing = page(async () => noParams((await import('./BillingPage')).BillingPage));
+// ── end Demo examples ────────────────────────────────────────────────────────────────────────
 
 export const ROUTES: readonly Route[] = [
   { path: '/', layout: 'shell', page: Dashboard, guard: 'workspace:read', nav: '/home' },
@@ -108,4 +116,12 @@ export const ROUTES: readonly Route[] = [
   { path: '/admin', layout: 'shell', page: Members, guard: 'workspace:read', nav: '/admin/members', title: 'Members' },
   { path: '/admin/audit', layout: 'shell', page: Audit, guard: 'audit:read', nav: '/admin/members', title: 'Audit log' },
   // ── end B2B power features ──
+  // ── Demo examples (PR 16). Import sits outside /records, so /records/:id never reads it as an id. ──
+  { path: '/import/records', layout: 'focused', page: ImportRecords, guard: 'record:create', nav: '', title: 'Import records' },
+  { path: '/search', layout: 'shell', page: Search, guard: 'workspace:read', nav: '', title: 'Search' },
+  { path: '/notifications', layout: 'shell', page: Notifications, guard: 'workspace:read', nav: '', title: 'Notifications' },
+  { path: '/reports', layout: 'shell', page: Reports, guard: 'record:read', nav: '/reports', title: 'Reports' },
+  { path: '/integrations', layout: 'shell', page: Integrations, guard: 'workspace:read', nav: '/settings', title: 'Integrations' },
+  { path: '/billing', layout: 'shell', page: Billing, guard: 'workspace:read', nav: '/settings', title: 'Billing and usage' },
+  // ── end Demo examples ──
 ];

@@ -8,10 +8,12 @@
  * `mockApi({ anotherUser: [...] })` pushes its changes once the page has loaded.
  */
 import type { LiveEvent, LiveSource } from '../api/live';
+import type { NotificationKind } from '../api/notifications';
 import type { RecordEntity, RecordStatus, Tenant } from '../api/schemas';
 import { canSee } from '../model/permissions';
 import { db, grantFor, touch } from './db';
 import { WORKSPACES } from '../workspaces';
+import { pushNotification } from './notifications';
 import { SEED_EPOCH } from './seed';
 
 const listeners = new Map<Tenant, Set<(data: unknown) => void>>();
@@ -63,7 +65,9 @@ export type AnotherUserChange =
   | { kind: 'edit'; id?: string; changes?: RecordChanges; silent?: boolean }
   /** Add a record (default: a pending one, so every role sees it). */
   | { kind: 'add'; name?: string; status?: RecordStatus }
-  | { kind: 'delete'; id?: string };
+  | { kind: 'delete'; id?: string }
+  /** Demo examples: notify the signed-in person (default: a mention on a pending record). Nothing about a record changes. */
+  | { kind: 'notify'; notification?: NotificationKind; recordId?: string; body?: string };
 
 const ADDED_NAMES = ['Regional hosting agreement', 'Pilot security retainer', 'Annual catering order', 'Framework licensing schedule'];
 
@@ -80,6 +84,12 @@ export const firstListedRecord = (tenant: Tenant): RecordEntity | undefined => {
 export function anotherUser(tenant: Tenant, change: AnotherUserChange): string | undefined {
   const partition = db(tenant);
   const by = OTHER_PERSON[tenant];
+
+  if (change.kind === 'notify') {
+    const notification = pushNotification(tenant, { by, ...(change.notification ? { kind: change.notification } : {}), ...(change.recordId ? { recordId: change.recordId } : {}), ...(change.body ? { body: change.body } : {}) });
+    if (notification) sendRaw(tenant, { type: 'notification.created', notification } satisfies LiveEvent);
+    return notification?.id;
+  }
 
   if (change.kind === 'add') {
     const record = touch({

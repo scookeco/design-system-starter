@@ -4,7 +4,7 @@
   "name": "Design system starter",
   "summary": "Design system starter where design-system drift fails the build.",
   "entry": "src/index.ts",
-  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.\n  Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.\n  The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
+  "rules": "UI rules (design system v0)\n- Style only with semantic tokens. No hex, rgb, px, ms or other raw values;\n  allowed literals are inherit, currentColor, transparent, none, auto, 0, 1px, 100%.\n- Compose system components and layout primitives, imported from src/index.ts.\n  Never import radix-ui outside src/components or src/primitives, or\n  react-aria-components and @internationalized/* outside src/components.\n- Never restyle a system component with className or style. Need a new look?\n  Propose a variant. UNSAFE_className / UNSAFE_style are escape hatches that need\n  a lint disable with a reason, an owner and a removal condition.\n- Before creating a component, walk the decision ladder: template → variant →\n  component → primitive. Stop at the first yes.\n- Missing token? Add a semantic token in tokens/ (with a dark value for colours),\n  run npm run tokens. Never write a literal instead.\n- New pages start from PageHeader (the one h1, status, actions) inside the right\n  layout: AppShell for signed-in pages (fill its slots; never rebuild the frame),\n  AuthLayout for signed-out pages, FocusedLayout for multi-step tasks; PageLayout\n  for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,\n  record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,\n  sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,\n  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,\n  import → ImportWizard, search results → SearchPage, notifications →\n  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,\n  billing → BillingPage. Not other screens.\n- Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router\n  once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.\n- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.\n  The set is on Foundations/Icons.\n- CSS: inside a declared @layer, BEM-lite classes, logical properties only,\n  variants as closed data-* attributes, state via aria/native attributes,\n  specificity ≤ 0,3,0, no !important, no ids.\n- Every new variant, size or state gets a story. Every new exported component,\n  layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to\n  use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails\n  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.\n- A story that renders an open modal is tagged ['modal-open', '!autodocs'].\n- WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),\n  focus never hidden behind sticky content (scroll containers use\n  space.scroll-padding.*), password fields as TextField type=\"password\" with\n  autoComplete (username, current-password or new-password, one-time-code),\n  never block paste, pass AppShell's help from the shell composition, never\n  ask twice in a multi-step flow, and any drag declares data-drag-alternative.\n- Never add an eslint-disable or stylelint-disable without a reason after \"--\".\n- Format every number, date, amount and list with useFormat() (LocaleProvider\n  sets locale and time zone). Money is integer minor units + currency code.\n- AI: render model output with StreamingText (never raw HTML), cite sources\n  with Citation + SourcesList, mark unaccepted AI content with AiMarker, and\n  never let AI write without ReviewChanges (or an explicit accept) and an Undo.\n  The assistant acts only through the person's own can() and named mutations.\n- Keyboard shortcuts go through useShortcut (never a bare keydown listener):\n  every shortcut mirrors a visible control and shows its keys there (Tooltip\n  shortcut, MenuItem.shortcut, Kbd). Reserved keys are refused and conflicts\n  reported; single-key shortcuts can be turned off in the ? overlay.",
   "commands": [
     {
       "command": "npm run dev",
@@ -312,6 +312,21 @@
       ]
     },
     {
+      "title": "Billing and usage",
+      "summary": "Billing and usage (customer-facing). The plan, what the workspace has used this period against the plan's limits, its invoices, and a change-plan dialog. Money is integer minor units with a currency code, formatted with useFormat(); no amount is ever built by hand. No CSS file, no className, no style.",
+      "path": "src/examples/BillingPage.tsx",
+      "stories": [
+        "examples-billing-and-usage--default",
+        "examples-billing-and-usage--other-currency",
+        "examples-billing-and-usage--as-editor",
+        "examples-billing-and-usage--change-plan",
+        "examples-billing-and-usage--change-plan-pending",
+        "examples-billing-and-usage--change-plan-refused",
+        "examples-billing-and-usage--loading",
+        "examples-billing-and-usage--load-error"
+      ]
+    },
+    {
       "title": "Command palette",
       "summary": "The app's command palette and global shortcuts: the shell composition mounts this once (in AppShell's actions slot), so every signed-in page gets ⌘K / Ctrl+K, the \"g then …\" jumps and the ? overlay.",
       "path": "src/examples/CommandMenu.tsx",
@@ -398,6 +413,24 @@
       ]
     },
     {
+      "title": "Import wizard",
+      "summary": "The import wizard (a CSV of records into the workspace). The wizard archetype (SetupWizard) with real data: later steps depend on earlier ones, and the last one is a job. No CSS file, no className, no style.",
+      "path": "src/examples/ImportWizard.tsx",
+      "stories": [
+        "examples-import-wizard--upload",
+        "examples-import-wizard--upload-missing",
+        "examples-import-wizard--upload-empty-file",
+        "examples-import-wizard--file-chosen",
+        "examples-import-wizard--map-columns",
+        "examples-import-wizard--mapping-problems",
+        "examples-import-wizard--review",
+        "examples-import-wizard--importing",
+        "examples-import-wizard--imported-with-failures",
+        "examples-import-wizard--imported",
+        "examples-import-wizard--as-viewer-denied"
+      ]
+    },
+    {
       "title": "Inbox",
       "summary": "An inbox with triage. The archetype for working through a queue one item at a time: a SplitView (the list and the open item side by side, one pane on a narrow screen), the open item and the tab in the URL, and keyboard triage from the shortcut registry:",
       "path": "src/examples/InboxPage.tsx",
@@ -413,6 +446,22 @@
         "examples-inbox--loading",
         "examples-inbox--load-error",
         "examples-inbox--empty"
+      ]
+    },
+    {
+      "title": "Integrations",
+      "summary": "An integrations catalogue (customer-facing): the apps a workspace can connect, connect and disconnect as pessimistic writes, and each app's settings in a Drawer. The archetype for any catalogue of things a workspace turns on: apps, add-ons, templates. No CSS file, no className, no style.",
+      "path": "src/examples/IntegrationsPage.tsx",
+      "stories": [
+        "examples-integrations--default",
+        "examples-integrations--nothing-connected",
+        "examples-integrations--as-editor",
+        "examples-integrations--settings-open",
+        "examples-integrations--settings-saving",
+        "examples-integrations--settings-conflict",
+        "examples-integrations--confirm-disconnect",
+        "examples-integrations--loading",
+        "examples-integrations--load-error"
       ]
     },
     {
@@ -459,6 +508,37 @@
       ]
     },
     {
+      "title": "Notifications",
+      "summary": "The notification centre. Events that concern the signed-in person, newest first, read or unread; the bell in the header (Notifications.tsx) is its summary on every page. Different from the inbox: the inbox is work to triage one item at a time; this is a feed to catch up on. No CSS file, no className, no style.",
+      "path": "src/examples/NotificationsPage.tsx",
+      "stories": [
+        "examples-notifications--default",
+        "examples-notifications--unread",
+        "examples-notifications--mentions",
+        "examples-notifications--new-while-open",
+        "examples-notifications--bell-open",
+        "examples-notifications--all-caught-up",
+        "examples-notifications--first-use",
+        "examples-notifications--as-viewer",
+        "examples-notifications--loading",
+        "examples-notifications--load-error"
+      ]
+    },
+    {
+      "title": "Onboarding",
+      "summary": "The first-run checklist on the dashboard (customer-facing), composed from system components (src/app/model/onboarding.ts). Only people who set the workspace up see it.",
+      "path": "src/examples/Onboarding.tsx",
+      "stories": [
+        "examples-onboarding--checklist",
+        "examples-onboarding--nothing-done",
+        "examples-onboarding--all-done",
+        "examples-onboarding--dismissed",
+        "examples-onboarding--as-editor",
+        "examples-onboarding--loading",
+        "examples-onboarding--load-error"
+      ]
+    },
+    {
       "title": "Record copilot",
       "summary": "GOLDEN EXAMPLE (AI): a copilot beside a record. The record page is the existing one, untouched; the assistant joins its shell through WithAssistant, as an AssistantPanel in AppShell's assistant slot (a Drawer on narrow screens).",
       "path": "src/examples/RecordCopilot.tsx",
@@ -501,6 +581,39 @@
         "examples-record-page--edited-elsewhere",
         "examples-record-page--deleted-elsewhere",
         "examples-record-page--jobs-follow-you"
+      ]
+    },
+    {
+      "title": "Reports",
+      "summary": "Reports (charts over the workspace's data). A report answers one question per chart, says the answer in words, and gives the exact numbers as a table. No chart library: the charts (charts.tsx) are small SVGs drawn from the chart tokens. No CSS file, no className, no style.",
+      "path": "src/examples/ReportsPage.tsx",
+      "stories": [
+        "examples-reports--default",
+        "examples-reports--numbers-shown",
+        "examples-reports--twelve-months",
+        "examples-reports--as-viewer",
+        "examples-reports--other-workspace",
+        "examples-reports--nothing-to-report",
+        "examples-reports--loading",
+        "examples-reports--load-error",
+        "examples-reports--narrow"
+      ]
+    },
+    {
+      "title": "Search",
+      "summary": "Search results (the whole workspace: records, accounts and people). The command palette answers \"take me to X\" in five rows; this page answers \"show me everything that matches\", and the palette's \"See all results\" row opens it with the query. No CSS file, no className, no style.",
+      "path": "src/examples/SearchPage.tsx",
+      "stories": [
+        "examples-search--start",
+        "examples-search--results",
+        "examples-search--matches-in-detail",
+        "examples-search--refined",
+        "examples-search--no-results",
+        "examples-search--no-results-with-filters",
+        "examples-search--as-viewer",
+        "examples-search--loading",
+        "examples-search--load-error",
+        "examples-search--narrow"
       ]
     },
     {
@@ -2111,6 +2224,15 @@
         "warning",
         "danger"
       ]
+    },
+    {
+      "name": "BellIcon",
+      "kind": "utility",
+      "source": "src/components/Icon/icons.ts",
+      "status": null,
+      "description": null,
+      "partOf": "Icon",
+      "docs": "docs/usage/Icons.usage.tsx"
     },
     {
       "name": "Box",
@@ -5935,12 +6057,13 @@
       "kind": "type-only",
       "source": "src/format/format.ts",
       "status": null,
-      "description": null,
-      "definition": "type DateStyle = 'short' | 'medium' | 'long'",
+      "description": "short \"Sep 12\" · medium \"Sep 12, 2026\" · long \"September 12, 2026\" · month \"Sep 2026\" (a chart's axis, a billing period).",
+      "definition": "type DateStyle = 'short' | 'medium' | 'long' | 'month'",
       "values": [
         "short",
         "medium",
-        "long"
+        "long",
+        "month"
       ]
     },
     {
@@ -8977,6 +9100,7 @@
           "Format every number, date, amount, list and file size a person reads with `useFormat()`: `format.money(minor, currency)`, `format.date(iso)`, `format.relative(iso)`. One named format per concept keeps every screen consistent.",
           "Money arrives as integer minor units plus an ISO 4217 code. Format the account’s currency in the reader’s locale: a German reader billed in USD sees `12.500,50 $`.",
           "An ISO date with no time (`2026-09-30`) is a calendar date and never shifts by zone; a timestamp is an instant, shown in the provider’s time zone.",
+          "Dates come in four styles: `short` (“Sep 12”), `medium` (the default, “Sep 12, 2026”), `long` (“September 12, 2026”) and `month` (“Sep 2026”, for a chart’s months or a billing period). Pass the first of the month as a calendar date: `format.date('2027-03-01', 'month')`.",
           "Outside React (tests, exports), `createFormatter({ locale, timeZone })` gives the same formats.",
           "Turning typed money into minor units: multiply by `10 ** currencyDigits(code)` (2 for USD, 0 for JPY, 3 for BHD) and round."
         ],

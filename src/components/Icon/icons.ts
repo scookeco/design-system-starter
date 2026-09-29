@@ -73,6 +73,7 @@ export const UsersIcon: IconDefinition = {
 export const BuildingIcon: IconDefinition = { name: 'building', path: 'M4.5 17.5v-14h8v14M12.5 8h3v9.5M2.5 17.5h15M7 6.5h3M7 9.5h3M7 12.5h3' };
 export const SettingsIcon: IconDefinition = { name: 'settings', path: 'M3 6h14M3 14h14M7 3.5v5M13 11.5v5' };
 export const ShieldIcon: IconDefinition = { name: 'shield', path: 'M10 2.5l6 2.5v5c0 3.5-2.5 6-6 7.5-3.5-1.5-6-4-6-7.5V5z' };
+export const BellIcon: IconDefinition = { name: 'bell', path: 'M5 14V9a5 5 0 0110 0v5l1.5 2h-13zM10 4V2.5M8 17.5a2 2 0 004 0' };
 
 // Data
 export const TrendUpIcon: IconDefinition = { name: 'trend-up', path: 'M3 14l5-5 3 3 6-6M12 6h5v5' };

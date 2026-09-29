@@ -13,6 +13,7 @@ export const usage: UsageDoc = {
     'Format every number, date, amount, list and file size a person reads with `useFormat()`: `format.money(minor, currency)`, `format.date(iso)`, `format.relative(iso)`. One named format per concept keeps every screen consistent.',
     'Money arrives as integer minor units plus an ISO 4217 code. Format the account’s currency in the reader’s locale: a German reader billed in USD sees `12.500,50 $`.',
     'An ISO date with no time (`2026-09-30`) is a calendar date and never shifts by zone; a timestamp is an instant, shown in the provider’s time zone.',
+    'Dates come in four styles: `short` (“Sep 12”), `medium` (the default, “Sep 12, 2026”), `long` (“September 12, 2026”) and `month` (“Sep 2026”, for a chart’s months or a billing period). Pass the first of the month as a calendar date: `format.date(\'2027-03-01\', \'month\')`.',
     'Outside React (tests, exports), `createFormatter({ locale, timeZone })` gives the same formats.',
     'Turning typed money into minor units: multiply by `10 ** currencyDigits(code)` (2 for USD, 0 for JPY, 3 for BHD) and round.',
   ],

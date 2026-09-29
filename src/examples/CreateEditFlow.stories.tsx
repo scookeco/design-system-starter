@@ -30,10 +30,10 @@ export const QuickCreateOpen: Story = { tags: ['modal-open'], args: { initialQui
 
 /**
  * The route guard for a viewer: the page is replaced by the 403 page, from the same `can` the New
- * record button and the create mutation use. Nothing on it queries, so it isn't a data story.
+ * record button and the create mutation use. The page queries nothing, but the shell's header does
+ * (jobs, the notifications bell), so it's still a data story.
  */
 export const AsViewerDenied: Story = {
-  tags: ['!data'],
   parameters: mockApi({ role: 'viewer' }),
   render: (args) => (
     <Guard capability="record:create" current="/records">

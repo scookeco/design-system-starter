@@ -26,7 +26,7 @@ Work on a branch. Never commit to `main` directly.
 - `src/layouts/`: `AppShell` (every signed-in page), `PageLayout` (a page's nav · main · aside), `AuthLayout` (signed-out pages), `FocusedLayout` (multi-step tasks), `AssistantPanel` (an assistant in AppShell's `assistant` slot), `SplitView` (a list and its selected item). Import components and primitives; nothing below imports them.
 - `src/format/`: locale formatting over Intl (`LocaleProvider`, `useFormat`). Part of the system; exported from `src/index.ts`.
 - `src/app/`: the **app layer** the examples use, NOT the design system: `api/` (client + zod schemas; every response is parsed at the boundary), `model/` (cache keys `[tenant, scope, resource, params]`, queries, named predicates, projections, named mutations, selection, `permissions.ts`), `session.tsx` (memberships, workspace switch, sign-out, `useCan`), `telemetry.ts` (the one sink: every mutation's start and outcome, render failures), `windowing.ts` (`useWindowedRows`), `routing/` (route type, matcher, `RouteView`, `RenderBoundary`, `AppLink`), `url/` (`useUrlState`), `registries/` (field registry, `entities.ts`: entityType → fields), `mocks/` (MSW handlers, seeded db, story wiring). TanStack Query, zod and MSW are devDependencies and may only be imported here and in examples.
-- `src/examples/`: **golden examples**, one per archetype: `ListPage` (table and `RecordBoard`, `SavedViews`), `RecordPage`, `CreateEditFlow`, `EntityPages` (schema-driven list, record and form for any entity config), `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `InboxPage` (a queue with keyboard triage), `AdminConsole` (members, audit log), `ErrorPages` (404, 403, error); AI: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` (sharing `AssistantTurns`). `ExampleShell` is the app's shell composition (with `CommandMenu`: the ⌘K palette, "g then …" jumps and the ? overlay); `routes.tsx` is the route table and `App.tsx` assembles it. Data pages read and write through `src/app`.
+- `src/examples/`: **golden examples**, one per archetype: `ListPage` (table and `RecordBoard`, `SavedViews`), `RecordPage`, `CreateEditFlow`, `EntityPages` (schema-driven list, record and form for any entity config), `SettingsPage`, `SignInPage`, `SetupWizard`, `DashboardPage`, `InboxPage` (a queue with keyboard triage), `AdminConsole` (members, audit log), `ErrorPages` (404, 403, error), `ImportWizard` (CSV import as a job), `SearchPage`, `NotificationsPage` (with the header's bell in `Notifications`), `ReportsPage` (SVG charts from the chart tokens in `charts.tsx`), `IntegrationsPage` (a catalogue), `BillingPage`, `Onboarding` (the dashboard's first-run checklist); AI: `RecordCopilot`, `CreateWithAi`, `AiReviewChanges`, `AssistantChatPage` (sharing `AssistantTurns`). `ExampleShell` is the app's shell composition (with `CommandMenu`: the ⌘K palette, "g then …" jumps and the ? overlay); `routes.tsx` is the route table and `App.tsx` assembles it. Data pages read and write through `src/app`.
 - `src/index.ts`: public entry point. Consumer code imports from here only.
 - `fixtures/violations/`: one deliberate violation per rule. Excluded from lint; checked by `npm run test:rules`.
 - `tests/visual/fixtures/`: one story per WCAG 2.2 check that the check must fail (tags `check-fixture`, `expect:<check>`, `!dev`, `no-visual`).
@@ -35,7 +35,7 @@ Work on a branch. Never commit to `main` directly.
 ## Budgets and gallery tools
 
 - `npm run check` ends with bundle budgets: library JS, library CSS and a single `import { Button }` (`.size-limit.json`), and a check that importing any one export pulls in only the units it composes. A budget fails when the library grows: find why before raising the limit, and raise it only in the change that needs it (README, "Bundle size budgets").
-- Charts use `color.chart.*` only (categorical slots in order, sequential, diverging), never status colours, and never colour alone. The rules and numbers are on Foundations/Data visualisation.
+- Charts use `color.chart.*` only (categorical slots in order, sequential, diverging), never status colours, and never colour alone. The rules and numbers are on Foundations/Data visualisation; `src/examples/charts.tsx` (the reports example) draws them as small SVGs with no chart library.
 - The gallery's Width toolbar shows layouts at narrow, medium and wide container widths; the Tokens panel lists what a component reads.
 
 ## Machine-readable docs
@@ -71,8 +71,10 @@ UI rules (design system v0)
   for a page's sub-nav or aside. Copy the matching golden example: list → ListPage,
   record → RecordPage, create/edit → CreateEditFlow, settings → SettingsPage,
   sign-in → SignInPage, wizard → SetupWizard, dashboard → DashboardPage,
-  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages.
-  Not other screens.
+  queue/inbox → InboxPage, admin console → AdminConsole, error/404 → ErrorPages,
+  import → ImportWizard, search results → SearchPage, notifications →
+  NotificationsPage, reports/charts → ReportsPage, catalogue → IntegrationsPage,
+  billing → BillingPage. Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
 - Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.
@@ -114,7 +116,7 @@ UI rules (design system v0)
 - "What counts as X" is one named predicate in `src/app/model/predicates.ts`, used by filters, counts, badges, guards and the mock server alike.
 - View, search, filters, sort and page live in the URL (`useUrlState`): push for navigation, replace for refinements.
 - New field types go in the field registry (`src/app/registries/fields.tsx`); new fields are config (`recordFields.ts`).
-- Stories that read the mock API spread `mockApiMeta` and write `tags: ['!autodocs', 'data']` literally (Storybook reads tags statically); a story holding a request open adds `busy`; a story that queries nothing (a 403 or 404 route) removes it with `'!data'`. Server behaviour per story comes from `src/app/mocks/overrides.ts`; the role from `mockApi({ role })`. Don't put a doc comment on a story meta that spreads `mockApiMeta`: Storybook turns it into docs parameters that replace the spread ones.
+- Stories that read the mock API spread `mockApiMeta` and write `tags: ['!autodocs', 'data']` literally (Storybook reads tags statically); a story holding a request open adds `busy`; a story that queries nothing removes it with `'!data'` (an in-app 403 still queries: the shell's header reads jobs and notifications). Server behaviour per story comes from `src/app/mocks/overrides.ts`; the role from `mockApi({ role })`. Don't put a doc comment on a story meta that spreads `mockApiMeta`: Storybook turns it into docs parameters that replace the spread ones.
 - Records reference accounts and people by id. Show a name through `PersonRef`/`AccountRef` (or a `person`/`account` field), never a copied string.
 - Keys lead with the partition (`usePartition()`: tenant, then permission scope). A record write patches its detail and every cached list page holding it (`patchListedRecord`), then invalidates.
 - Permissions: capabilities in `CAPABILITIES`, roles mapped in `ROLE_CAPABILITIES` (the only place), one predicate `can` (command palette rows ask it too: a page by its route guard, an action by its button's capability). Controls ask it (page actions disabled with a visible reason, menu items hidden), routes are guarded by it, every mutation refuses with it before sending, and every mock route declares its capability. Never branch on a role name.

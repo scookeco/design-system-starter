@@ -242,6 +242,16 @@ const audit = (tenant: Tenant, s: B2bState, event: Omit<AuditEvent, 'id' | 'at' 
 export const auditRecord = (tenant: Tenant, action: AuditAction, record: Pick<RecordEntity, 'id' | 'name'>, changes: AuditEvent['changes'] = [], outcome: AuditEvent['outcome'] = 'success') =>
   audit(tenant, state(tenant), { action, target: { type: 'record', id: record.id, label: record.name }, outcome, changes });
 
+/**
+ * Demo examples: a workspace write (an integration connected, the plan changed), audited from its
+ * mock handler like the member writes, into the same log.
+ */
+export const auditWorkspace = (tenant: Tenant, action: AuditAction, target: AuditEvent['target'], changes: AuditEvent['changes'] = [], outcome: AuditEvent['outcome'] = 'success') =>
+  audit(tenant, state(tenant), { action, target, outcome, changes });
+
+/** Demo examples: how many members and open invitations the workspace has (the first-run checklist's "Invite your team"). */
+export const memberCount = (tenant: Tenant) => state(tenant).members.length;
+
 const memberLabel = (tenant: Tenant, member: Member) => seedPeople(tenant).find((p) => p.id === member.personId)?.name ?? member.email;
 
 // ---- handlers --------------------------------------------------------------------------------

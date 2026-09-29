@@ -27,6 +27,7 @@ import { usePartition, useSession } from '../session';
 import { useTenant } from '../tenant';
 import { recordKeys, type Partition } from './keys';
 import { patchListedRecord } from './mutations';
+import { reconcileNotification } from './notifications';
 import { refetchAfterWrite } from './refetch';
 import { confirmRecord } from './writeQueue';
 
@@ -81,6 +82,11 @@ const storeFor = (client: QueryClient) => {
  * echoed back by the server, is already in the lists their mutation invalidated, so it isn't "new".
  */
 export function reconcileLiveEvent(client: QueryClient, partition: Partition, event: LiveEvent, self: string, now = Date.now()) {
+  // Demo examples: a notification touches only the notifications (the bell's count, the centre), never records.
+  if (event.type === 'notification.created') {
+    reconcileNotification(client, partition, event.notification);
+    return;
+  }
   const store = storeFor(client);
   const touched = (current: LiveActivity): LiveActivity => ({ ...current, lastAt: now, lastBy: event.by });
   const lists = recordKeys.lists(partition);

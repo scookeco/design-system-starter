@@ -10,7 +10,16 @@
  *   follow-up  as a job deletes records, lists and counts refetch; failed items can be retried
  *              as a new job; a finished job is dismissed when the person has read it
  */
-import type { Job } from '../api/schemas';
+import type { Capability, Job, JobKind } from '../api/schemas';
+
+/** What a job's own actions (cancel, retry) need, by kind: the capability that started it. */
+export const JOB_CAPABILITY: Record<JobKind, Capability> = { 'bulk-delete': 'record:delete', import: 'record:create' };
+
+/** What stays true after a job is cancelled, in its own words. */
+export const JOB_CANCELLED_NOTE: Record<JobKind, string> = {
+  'bulk-delete': 'What was deleted before you cancelled stays deleted; nothing else was touched.',
+  import: 'Records imported before you cancelled stay imported; the rest weren’t.',
+};
 
 /** How often running jobs are polled. Stories set Infinity (a still frame); tests shorten it. */
 export const jobSettings = { pollMs: 1_000 };

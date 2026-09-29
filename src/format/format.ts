@@ -16,7 +16,8 @@ export interface LocaleSettings {
 /** An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30"). */
 export type DateInput = string | number | Date;
 
-export type DateStyle = 'short' | 'medium' | 'long';
+/** short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period). */
+export type DateStyle = 'short' | 'medium' | 'long' | 'month';
 
 export interface Formatter extends LocaleSettings {
   /** A calendar date: "Sep 12, 2026" (medium). ISO date-only strings are calendar dates and never shift by zone. */
@@ -74,6 +75,7 @@ const DATE_STYLE: Record<DateStyle, Intl.DateTimeFormatOptions> = {
   short: { day: 'numeric', month: 'short' },
   medium: { day: 'numeric', month: 'short', year: 'numeric' },
   long: { day: 'numeric', month: 'long', year: 'numeric' },
+  month: { month: 'short', year: 'numeric' },
 };
 
 /** Largest unit first. Each step: the unit, and how many seconds it holds. */

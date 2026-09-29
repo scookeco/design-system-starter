@@ -15,7 +15,7 @@
  */
 import { useQueries } from '@tanstack/react-query';
 import { useState } from 'react';
-import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
+import { BuildingIcon, Button, CommandPalette, FileIcon, HomeIcon, InboxIcon, Kbd, PlusIcon, SearchIcon, SettingsIcon, ShieldIcon, ShortcutHelp, Tooltip, TrendUpIcon, UploadIcon, UsersIcon, useShortcut, type CommandGroup, type CommandItem, type IconDefinition } from '../index';
 import { getRecord } from '../app/api/records';
 import type { Capability } from '../app/api/schemas';
 import { recordKeys } from '../app/model/keys';
@@ -26,6 +26,7 @@ import { STATUS } from '../app/model/status';
 import { routeTitle, type Route } from '../app/routing/routes';
 import { useAppSession, useCan, usePartition, type AppSession } from '../app/session';
 import { useTenant } from '../app/tenant';
+import { searchHref } from '../app/url/searchState';
 import { useNavigate } from '../app/url/useUrlState';
 import { WORKSPACES } from '../app/workspaces';
 import { ROUTES } from './routes';
@@ -50,6 +51,8 @@ const SECTION_ICONS: Readonly<Record<string, IconDefinition>> = {
   '/settings': SettingsIcon,
   '/inbox': InboxIcon,
   '/admin': ShieldIcon,
+  '/reports': TrendUpIcon,
+  '/search': SearchIcon,
 };
 
 interface PaletteAction {
@@ -67,6 +70,8 @@ export const PALETTE_ACTIONS: readonly PaletteAction[] = [
   { id: 'action:new-record', label: 'New record', keywords: ['create', 'add'], icon: PlusIcon, capability: 'record:create', href: '/records/new' },
   { id: 'action:new-account', label: 'New account', keywords: ['create', 'add', 'customer'], icon: PlusIcon, capability: 'account:create', href: '/accounts/new' },
   { id: 'action:invite', label: 'Invite member', keywords: ['add', 'user', 'team'], icon: UsersIcon, capability: 'members:manage', href: '/admin/members?invite=1' },
+  // Demo examples: the import wizard is a focused page, so it isn't in Jump to; this is its way in.
+  { id: 'action:import', label: 'Import records', keywords: ['csv', 'upload', 'spreadsheet'], icon: UploadIcon, capability: 'record:create', href: '/import/records' },
 ];
 
 /** Pages the palette can jump to: routes without params, in the shell, deduplicated by title. */
@@ -195,6 +200,8 @@ function Palette({ initialQuery, onClose, onShowShortcuts }: { initialQuery: str
         { id: 'accounts', label: 'Accounts', items: accountItems },
         { id: 'people', label: 'People', items: personItems },
         { id: 'actions', label: 'Actions', items: actions },
+        // Demo examples: everything that matches, on the search results page.
+        ...(searching ? [{ id: 'search', label: 'Search', filter: 'none' as const, items: [{ id: 'search:all', label: `See all results for “${query.trim()}”`, icon: SearchIcon, onSelect: () => navigate(searchHref(query)) }] }] : []),
       ]
     : [
         { id: 'recent', label: 'Recent', items: recentItems },

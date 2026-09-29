@@ -125,9 +125,13 @@ export const JOB_STATES = ['queued', 'running', 'succeeded', 'failed', 'cancelle
 export const JobStateSchema = z.enum(JOB_STATES);
 export type JobState = z.infer<typeof JobStateSchema>;
 
+/** What a job does: delete records matching a filter, or import rows from a file (the CSV import wizard). */
+export const JOB_KINDS = ['bulk-delete', 'import'] as const;
+export type JobKind = (typeof JOB_KINDS)[number];
+
 export const JobSchema = z.object({
   id: z.string().min(1),
-  kind: z.literal('bulk-delete'),
+  kind: z.enum(JOB_KINDS),
   state: JobStateSchema,
   /** What it's doing, in words ("Delete 59 records matching Drafts"). */
   label: z.string().min(1),

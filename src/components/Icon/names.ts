@@ -44,6 +44,7 @@ export const iconsByName = {
   building: icon.BuildingIcon,
   settings: icon.SettingsIcon,
   shield: icon.ShieldIcon,
+  bell: icon.BellIcon,
   'trend-up': icon.TrendUpIcon,
   'trend-down': icon.TrendDownIcon,
   sparkle: icon.SparkleIcon,
