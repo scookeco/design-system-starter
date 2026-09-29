@@ -95,6 +95,25 @@ describe('the search page', { timeout: PAGE_FLOW_TIMEOUT }, () => {
     await screen.findByRole('group', { name: 'Record status' });
   });
 
+  it('keeps the results one tab stop that ↑ ↓ and j k move alike, with each result’s place in the set', async () => {
+    renderWithApp(<SearchPage />, { url: '/search?q=north' });
+    const results = await screen.findByRole('list', { name: 'Results' }, FIRST_PAINT);
+    const links = within(results).getAllByRole('link');
+    expect(links.length).toBeGreaterThan(2);
+    expect(links.filter((link) => link.tabIndex === 0)).toEqual([links[0]]);
+    const items = within(results).getAllByRole('listitem');
+    expect(items[0]?.getAttribute('aria-posinset')).toBe('1');
+    expect(Number(items[0]?.getAttribute('aria-setsize'))).toBeGreaterThanOrEqual(links.length);
+    act(() => links[0]?.focus());
+    fireEvent.keyDown(links[0] as HTMLElement, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(links[1]);
+    act(() => void fireEvent.keyDown(links[1] as HTMLElement, { key: 'j' }));
+    expect(document.activeElement).toBe(links[2]);
+    expect(links.filter((link) => link.tabIndex === 0)).toEqual([links[2]]);
+    fireEvent.keyDown(links[2] as HTMLElement, { key: 'Home' });
+    expect(document.activeElement).toBe(links[0]);
+  });
+
   it('says there’s nothing, and offers to clear the filters that hid the matches', async () => {
     const { history } = renderWithApp(<SearchPage />, { url: '/search?q=lease&type=person' });
     fireEvent.click(await screen.findByRole('button', { name: 'Clear filters' }, FIRST_PAINT));
