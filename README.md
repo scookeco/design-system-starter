@@ -247,7 +247,7 @@ Stop at the first yes:
    - `Name.tsx`: props typed with `Closed<…>` (no `className`/`style`), a required accessible name, variants as closed unions, and state via aria/native attributes. Wrap Radix here if you need behaviour. Never expose `asChild`.
    - `Name.css`: inside `@layer components`, BEM-lite classes, in the order block, parts, variants, states. Tokens only.
    - `Name.stories.tsx`: one story per variant, size and state. The visual and axe suite picks them up automatically.
-   - `docs/usage/Name.usage.tsx`: the usage section of its Docs tab (see Documentation below).
+   - `docs/usage/<Name>.usage.tsx`: the usage section of its Docs tab (see Documentation below).
    - Export it from `src/components/index.ts`.
 4. **A new primitive?** The highest bar: domain-agnostic, token-driven, impossible to express as a composition. It changes tokens, component styles and `CLAUDE.md` in the same PR.
 
