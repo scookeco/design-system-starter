@@ -144,3 +144,13 @@ export const semanticColoursFrom = (ramp: string) =>
     .filter(([, t]) => t.tier === 'semantic' && t.type === 'color')
     .map(([path, t]) => ({ path, light: t.chain.at(-1) ?? '', dark: t.modes.dark?.chain.at(-1) ?? '' }))
     .filter((t) => t.light.startsWith(ramp) || t.dark.startsWith(ramp));
+
+/**
+ * The primitive ramp a semantic colour's light value resolves into ("color.indigo." for
+ * color.action.primary in the starter). The brand is whatever ramp the primary action is drawn
+ * from, so a rebrand shows up here without editing the page that reads it.
+ */
+export const rampOf = (path: string) => {
+  const primitive = (usageMap.tokens as Record<string, UsageToken>)[path]?.chain.at(-1) ?? '';
+  return primitive.slice(0, primitive.lastIndexOf('.') + 1);
+};
