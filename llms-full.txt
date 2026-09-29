@@ -6810,17 +6810,24 @@ The gallery is the test fixture. Every state gets a story, and every story is sc
 |---|---|---|
 | Unit (Vitest) | Token source and aliases, contrast in light and dark, CSS structure, the token usage map, component behaviour (names, roles, keyboard, focus), the examples, docs coverage. | `npm test` |
 | Lint rules | Every ESLint and Stylelint rule fires on its violation fixture, every import boundary is proved, and the clean controls pass. | `npm run test:rules` |
-| Visual | A full-page screenshot of every story in light and dark, against Linux baselines. | `npm run test:visual` |
+| Visual | A full-page screenshot of every story in light and dark, against Linux baselines. | `npm run test:visual` (`npm run test:visual:changed` while iterating) |
 | axe | WCAG 2.2 A and AA rules on every story in both themes, and on every Docs tab. | `npm run test:visual` |
 | WCAG 2.2 checks | Target size, focus not obscured, accessible authentication and consistent help on every story; each check proved by a fixture story that must fail it. | `npm run test:wcag22` |
 | Budgets | Library JS and CSS size, one component’s cost, and that one import pulls in only what it composes. | `npm run size` (inside `npm run check`) |
 
 ```
 npm run check                      # tokens, types, lint, unit, rules, build, budgets
-npm run build-storybook
-PLAYWRIGHT_PORT=6107 npx playwright test --grep "Components/Slider"   # your stories while iterating
-PLAYWRIGHT_PORT=6107 npx playwright test                              # everything, once at the end
+PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # while iterating: the stories your changes reach
+PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
 ```
+
+#### Targeted runs
+
+- The full visual run is about 3,500 tests and takes 20 to 25 minutes. Between steps, run `npm run test:visual:changed`: screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since `origin/main` with uncommitted and untracked files included (`-- --base HEAD` for only what you haven’t committed).
+- It prints the plan first: changed files, the story files they reach, the stories and tests that follows, and why. `-- --dry-run` stops there. It builds Storybook itself when the build is older than the sources.
+- It follows imports, not guesses: a component change runs its stories, its Docs tab and every story that composes it (the examples included); an app-layer module runs the examples that use it; a guide runs only that guide; a unit test runs nothing.
+- Some changes run everything, and the plan says why: tokens, global styles, Storybook or Playwright config, dependencies, anything every story loads (the preview’s decorators, the mock seed’s clock), and any file it can’t classify.
+- It is for iterating, not for merging. Run the full suite once at the end, and CI runs every story on every ready pull request.
 
 #### A story for every state
 

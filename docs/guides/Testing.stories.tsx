@@ -7,7 +7,7 @@ import { inline } from '../ui/inline';
 const SUITES = [
   { suite: 'Unit (Vitest)', covers: 'Token source and aliases, contrast in light and dark, CSS structure, the token usage map, component behaviour (names, roles, keyboard, focus), the examples, docs coverage.', run: '`npm test`' },
   { suite: 'Lint rules', covers: 'Every ESLint and Stylelint rule fires on its violation fixture, every import boundary is proved, and the clean controls pass.', run: '`npm run test:rules`' },
-  { suite: 'Visual', covers: 'A full-page screenshot of every story in light and dark, against Linux baselines.', run: '`npm run test:visual`' },
+  { suite: 'Visual', covers: 'A full-page screenshot of every story in light and dark, against Linux baselines.', run: '`npm run test:visual` (`npm run test:visual:changed` while iterating)' },
   { suite: 'axe', covers: 'WCAG 2.2 A and AA rules on every story in both themes, and on every Docs tab.', run: '`npm run test:visual`' },
   { suite: 'WCAG 2.2 checks', covers: 'Target size, focus not obscured, accessible authentication and consistent help on every story; each check proved by a fixture story that must fail it.', run: '`npm run test:wcag22`' },
   { suite: 'Budgets', covers: 'Library JS and CSS size, one component’s cost, and that one import pulls in only what it composes.', run: '`npm run size` (inside `npm run check`)' },
@@ -40,10 +40,35 @@ function Testing() {
         </Table>
         <Code label="Before a pull request">{`
 npm run check                      # tokens, types, lint, unit, rules, build, budgets
-npm run build-storybook
-PLAYWRIGHT_PORT=6107 npx playwright test --grep "Components/Slider"   # your stories while iterating
-PLAYWRIGHT_PORT=6107 npx playwright test                              # everything, once at the end
+PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # while iterating: the stories your changes reach
+PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
 `}</Code>
+      </DocSection>
+      <DocSection title="Targeted runs">
+        <Rules
+          items={[
+            <>
+              The full visual run is about 3,500 tests and takes 20 to 25 minutes. Between steps, run <code>npm run test:visual:changed</code>: screenshots, axe
+              and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since <code>origin/main</code> with uncommitted and untracked
+              files included (<code>-- --base HEAD</code> for only what you haven’t committed).
+            </>,
+            <>
+              It prints the plan first: changed files, the story files they reach, the stories and tests that follows, and why.{' '}
+              <code>-- --dry-run</code> stops there. It builds Storybook itself when the build is older than the sources.
+            </>,
+            <>
+              It follows imports, not guesses: a component change runs its stories, its Docs tab and every story that composes it (the examples
+              included); an app-layer module runs the examples that use it; a guide runs only that guide; a unit test runs nothing.
+            </>,
+            <>
+              Some changes run everything, and the plan says why: tokens, global styles, Storybook or Playwright config, dependencies, anything every
+              story loads (the preview’s decorators, the mock seed’s clock), and any file it can’t classify.
+            </>,
+            <>
+              It is for iterating, not for merging. Run the full suite once at the end, and CI runs every story on every ready pull request.
+            </>,
+          ]}
+        />
       </DocSection>
       <DocSection title="A story for every state">
         <Rules

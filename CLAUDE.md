@@ -12,7 +12,10 @@ npm run size           # bundle size budgets (.size-limit.json) + tree-shaking c
 npm run dev            # Storybook gallery; restart it after npm ci or a pull (a running one goes stale)
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
 npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
+npm run test:visual:changed   # the same checks for only the stories your changes reach (since origin/main, uncommitted included); -- --dry-run for the plan
 ```
+
+Verify between steps with `npm run typecheck`, `npm run lint`, `npx vitest run` and `npm run test:visual:changed`; run the full `npm run check` and `npm run test:visual` once at the end.
 
 Work on a branch. Never commit to `main` directly.
 

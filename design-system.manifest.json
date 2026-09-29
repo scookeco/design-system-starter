@@ -67,6 +67,10 @@
       "description": "Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures."
     },
     {
+      "command": "npm run test:visual:changed",
+      "description": "Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See \"Targeted visual runs\"."
+    },
+    {
       "command": "npm run check",
       "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `test`, `test:rules`, `build`, `size`."
     }
