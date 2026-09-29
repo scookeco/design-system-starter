@@ -7,7 +7,8 @@
  *              code) or cancelled (a write dropped before it was sent: Undo inside the window,
  *              sign-out). A verb doesn't opt in; being a mutation with a name is enough.
  *   rendering  a route (or region) whose renderer threw, from the error boundary that caught it
- *              (src/app/routing/RenderBoundary.tsx).
+ *              (src/app/routing/RenderBoundary.tsx). A page whose code failed to load reports the
+ *              same way, with the code `PageLoadError` (src/app/routing/lazyPage.ts).
  *
  * Events carry names, ids and codes, never what a person typed or who they are: no names, emails,
  * record contents or error messages (a message can quote a value). Mutation variables are never
@@ -44,7 +45,7 @@ export interface RenderEvent {
   phase: 'failure';
   /** Which boundary caught it: the route's path pattern (/records/:id), never the URL itself. */
   region: string;
-  /** The error's class (TypeError, Error), not its message. */
+  /** The error's class (TypeError, Error; PageLoadError when a page's code failed to load), not its message. */
   code: string;
 }
 
