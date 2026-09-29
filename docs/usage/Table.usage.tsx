@@ -62,5 +62,6 @@ export const usage: UsageDoc = {
     '`caption` is required and names the scroll region; `hideCaption` keeps it for screen readers only.',
     'Sortable headers are buttons, and the sorted column carries `aria-sort`.',
     'The scroll container is focusable, so keyboard users can scroll a wide or capped table.',
+    'A windowed table (only the rows in view rendered, for thousands of rows) passes `rowCount` (every row, the header row included) and an `aria-rowindex` on each rendered `TableRow`, so a row is announced as “row 5,002 of 10,001”, not “of 30”. The windowing itself is app code: the List page example’s Scroll display.',
   ],
 };

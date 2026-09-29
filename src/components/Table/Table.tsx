@@ -11,6 +11,12 @@ export interface TableProps extends EscapeHatch {
   hideCaption?: boolean;
   /** Cap the height so the sticky header scrolls with the rows. Defaults to no cap. */
   maxHeight?: ScrollRegionToken;
+  /**
+   * Only some of the rows are rendered (a windowed list of thousands): how many rows the table has in
+   * all, header row included. Sets `aria-rowcount`; give each rendered TableRow its `aria-rowindex`
+   * (1 for the header row), so assistive tech says "row 5,002 of 10,001" rather than "of 30".
+   */
+  rowCount?: number;
   children: ReactNode;
 }
 
@@ -18,7 +24,7 @@ export interface TableProps extends EscapeHatch {
  * Data table: native table semantics, sticky header, tabular numbers.
  * The scroll container is a focusable, labelled region so keyboard users can scroll it.
  */
-export function Table({ caption, hideCaption = false, maxHeight, children, UNSAFE_className, UNSAFE_style }: TableProps) {
+export function Table({ caption, hideCaption = false, maxHeight, rowCount, children, UNSAFE_className, UNSAFE_style }: TableProps) {
   const captionId = useId();
   return (
     <div
@@ -28,7 +34,7 @@ export function Table({ caption, hideCaption = false, maxHeight, children, UNSAF
       tabIndex={0}
       style={tokenStyle({ '--table-max-height': maxHeight ? vars.size['scroll-region'][maxHeight] : undefined }, UNSAFE_style)}
     >
-      <table className="table__table">
+      <table className="table__table" aria-rowcount={rowCount}>
         <caption id={captionId} className={hideCaption ? 'visually-hidden' : 'table__caption'}>
           {caption}
         </caption>
