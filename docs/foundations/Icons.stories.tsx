@@ -36,7 +36,7 @@ function IconsPage() {
             'Icons are decorative (aria-hidden). Meaning comes from the visible label or the control’s accessible name.',
             'An icon-only button needs an aria-label and a Tooltip with the same words.',
             'Status icons pair with text: a Badge or Banner never relies on colour or icon alone.',
-            'Pass the icon as a value (icon={InboxIcon}), never by name: looking an icon up by name bundles the whole set. iconsByName and IconName are deprecated, for data that names icons.',
+            'Pass the icon as a value (icon={InboxIcon}), never by name: looking an icon up by name bundles the whole set. Data that names an icon stores the value.',
             'Need a new icon? Add it to src/components/Icon/icons.ts and to the list in names.ts, on the same grid and stroke, as a design-system change.',
           ]}
         />

@@ -28,8 +28,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
-- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
-  (iconsByName is deprecated). The set is on Foundations/Icons.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.
+  The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.
@@ -5407,7 +5407,6 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `GridItemToken` (`src/tokens/tokens.ts`): `type GridItemToken = keyof typeof vars.size['grid-item']`
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
 - `IconDefinition` (`src/components/Icon/icons.ts`): `interface IconDefinition { readonly name: string; readonly path: string; }` An icon from the system set: pass it to a component's `icon` prop.
-- `IconName` (`src/components/Icon/names.ts`): `type IconName = keyof typeof iconsByName` An icon's name in the set.
 - `InsetToken` (`src/tokens/tokens.ts`): `type InsetToken = keyof typeof vars.space.inset`
 - `IsoDate` (`src/components/DatePicker/DatePicker.tsx`): `type IsoDate = string` A calendar date as the system passes it: ISO "2026-09-25", no time, no zone.
 - `KeyPlatform` (`src/components/Kbd/Kbd.tsx`): `type KeyPlatform = 'mac' | 'other'` Where a shortcut is shown: Apple keyboards name modifiers with symbols (⌘ ⇧ ⌥ ⌃), everyone else with words (Ctrl, Shift, Alt). `mod` is the platform's command key: ⌘ on a Mac, Ctrl elsewhere.
@@ -6489,7 +6488,7 @@ export const Separator = Divider;
 
 A semantic token deprecates the same way: keep the old token as an alias of the new one for the deprecation window.
 
-**When the old way can’t stay an alias, deprecate the lookup instead.** Icons used to be passed by name (`icon="archive"`). A component that accepts a name has to carry every icon to look it up, so the `icon` props now take the icon itself, and the names live on in one deprecated module that no system component imports:
+**When the old way can’t stay an alias, deprecate the lookup instead.** Icons used to be passed by name (`icon="archive"`). A component that accepts a name has to carry every icon to look it up, so the `icon` props took the icon itself, and the names lived on for a while in one deprecated module that no system component imported:
 
 ```
 // Before: every component that drew an icon bundled all of them.
@@ -6499,11 +6498,11 @@ A semantic token deprecates the same way: keep the old token as an alias of the 
 import { ArchiveIcon } from 'src/index';
 <ToolbarButton icon={ArchiveIcon}>Archive</ToolbarButton>
 
-// Data that names icons, until it stores the values: deprecated, and it bundles the whole set.
+// Data that named icons, until it stored the values: deprecated, and it bundled the whole set.
 /** @deprecated */ iconsByName.archive
 ```
 
-`IconName` and `iconsByName` are removed once nothing uses them. Every call site in this repository has moved; the tree-shaking check (`npm run size`) fails if a component pulls in an icon it doesn’t draw.
+`IconName` and `iconsByName` left the public API in a later pull request, once nothing used them. The tree-shaking check (`npm run size`) fails if a component pulls in an icon it doesn’t draw.
 
 #### 4. Versioning
 
@@ -6639,8 +6638,8 @@ UI rules (design system v0)
   Not other screens.
 - Links go through Link (or Nav, NavTabs, Breadcrumbs); the app injects its router
   once with LinkProvider. NavTabs for sections that are routes, Tabs for panels in place.
-- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name
-  (iconsByName is deprecated). The set is on Foundations/Icons.
+- Icons are values: icon={InboxIcon}, imported from src/index.ts, never a name.
+  The set is on Foundations/Icons.
 - CSS: inside a declared @layer, BEM-lite classes, logical properties only,
   variants as closed data-* attributes, state via aria/native attributes,
   specificity ≤ 0,3,0, no !important, no ids.

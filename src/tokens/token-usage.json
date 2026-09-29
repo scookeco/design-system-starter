@@ -10459,9 +10459,7 @@
     "Icon": {
       "kind": "component",
       "dir": "src/components/Icon",
-      "exports": [
-        "iconsByName"
-      ],
+      "exports": [],
       "stylesheets": [
         "src/components/Icon/Icon.css"
       ],
