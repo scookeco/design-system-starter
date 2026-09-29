@@ -312,6 +312,21 @@
       ]
     },
     {
+      "title": "Billing and usage",
+      "summary": "Billing and usage (customer-facing). The plan, what the workspace has used this period against the plan's limits, its invoices, and a change-plan dialog. Money is integer minor units with a currency code, formatted with useFormat(); no amount is ever built by hand. No CSS file, no className, no style.",
+      "path": "src/examples/BillingPage.tsx",
+      "stories": [
+        "examples-billing-and-usage--default",
+        "examples-billing-and-usage--other-currency",
+        "examples-billing-and-usage--as-editor",
+        "examples-billing-and-usage--change-plan",
+        "examples-billing-and-usage--change-plan-pending",
+        "examples-billing-and-usage--change-plan-refused",
+        "examples-billing-and-usage--loading",
+        "examples-billing-and-usage--load-error"
+      ]
+    },
+    {
       "title": "Command palette",
       "summary": "The app's command palette and global shortcuts: the shell composition mounts this once (in AppShell's actions slot), so every signed-in page gets ⌘K / Ctrl+K, the \"g then …\" jumps and the ? overlay.",
       "path": "src/examples/CommandMenu.tsx",

@@ -19,6 +19,7 @@ import { useAddPerson, useCreateAccount, useCreateRecord, useRenameRecord, useSa
 import { useStartImport } from '../../src/app/model/imports';
 import { useMarkAllNotificationsRead, useNotifications } from '../../src/app/model/notifications';
 import { useConnectIntegration, useIntegrations } from '../../src/app/model/integrations';
+import { useBilling, useChangePlan } from '../../src/app/model/billing';
 import { useAccounts, useJobs, usePeople, useRecordList, useSavedViews } from '../../src/app/model/queries';
 import { server, setupMockApi, testClient, wrapperFor } from './app-harness';
 
@@ -237,5 +238,12 @@ describe('a write while the list is still on its first load shows on the list', 
     const { result } = renderHook(() => ({ list: useIntegrations(), connect: useConnectIntegration() }), { wrapper: wrapperFor(testClient()) });
     await race(read, () => result.current.connect.mutate('almanac'), 'POST', '/integrations/almanac/connect');
     await waitFor(() => expect(itemsOf(result.current.list.data).find((i) => i.id === 'almanac')?.status).toBe('connected'));
+  });
+
+  it('billing: changePlan', async () => {
+    const read = holdFirstRead('/billing');
+    const { result } = renderHook(() => ({ billing: useBilling(), change: useChangePlan() }), { wrapper: wrapperFor(testClient()) });
+    await race(read, () => result.current.change.mutate({ planId: 'business', version: 1 }), 'POST', '/billing/plan');
+    await waitFor(() => expect(result.current.billing.data?.planId).toBe('business'));
   });
 });

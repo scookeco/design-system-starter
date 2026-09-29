@@ -80,6 +80,7 @@ const Search = page(async () => noParams((await import('./SearchPage')).SearchPa
 const Notifications = page(async () => noParams((await import('./NotificationsPage')).NotificationsPage));
 const Reports = page(async () => noParams((await import('./ReportsPage')).ReportsPage));
 const Integrations = page(async () => noParams((await import('./IntegrationsPage')).IntegrationsPage));
+const Billing = page(async () => noParams((await import('./BillingPage')).BillingPage));
 // ── end Demo examples ────────────────────────────────────────────────────────────────────────
 
 export const ROUTES: readonly Route[] = [
@@ -121,5 +122,6 @@ export const ROUTES: readonly Route[] = [
   { path: '/notifications', layout: 'shell', page: Notifications, guard: 'workspace:read', nav: '', title: 'Notifications' },
   { path: '/reports', layout: 'shell', page: Reports, guard: 'record:read', nav: '/reports', title: 'Reports' },
   { path: '/integrations', layout: 'shell', page: Integrations, guard: 'workspace:read', nav: '/settings', title: 'Integrations' },
+  { path: '/billing', layout: 'shell', page: Billing, guard: 'workspace:read', nav: '/settings', title: 'Billing and usage' },
   // ── end Demo examples ──
 ];
