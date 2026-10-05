@@ -101,7 +101,7 @@ PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, w
             </>,
             <>
               Make them with the change: <code>npm run test:visual:docker -- --update</code> rewrites the baselines of the stories your change reaches,
-              and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them and starts CI.
+              and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them (re-run CI after, unless a BASELINES_TOKEN secret is set).
             </>,
             <>
               Review every changed image in the pull request, and say in the description which existing stories changed and why. A Playwright upgrade

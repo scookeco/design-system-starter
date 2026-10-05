@@ -6,8 +6,12 @@ name: Update visual baselines
 #
 # Run it on a branch. By default it rewrites the baselines of the stories the branch's changes reach,
 # against main; "full" deletes every Linux baseline and regenerates them all (after a Playwright bump,
-# or to drop the baselines of deleted stories). It commits to the branch, then starts CI on it: a push
-# made with GITHUB_TOKEN starts no workflow, but a dispatch does.
+# or to drop the baselines of deleted stories). It commits to the branch.
+#
+# A push made with GITHUB_TOKEN starts no workflow, and a dispatched run's checks don't count for a
+# pull request's required checks. So with a BASELINES_TOKEN secret (a fine-grained token with
+# contents: write on this repo) it pushes with that, and the pull request's CI starts as for any push.
+# Without one, re-run the pull request's CI after it commits.
 on:
   workflow_dispatch:
     inputs:
@@ -18,7 +22,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: visual-baselines-${{ github.ref }}
@@ -48,6 +51,8 @@ jobs:
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
+          # The push below uses this token: a personal one starts CI on the branch, GITHUB_TOKEN doesn't.
+          token: ${{ secrets.BASELINES_TOKEN || github.token }}
       - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: npm ci
       - name: Regenerate every Linux baseline
@@ -72,14 +77,13 @@ jobs:
           git commit -m "Update Linux visual baselines"
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
-      # The bot's push started nothing; dispatch CI on the branch so its checks run on the new commit.
-      - name: Start CI on ${{ github.ref_name }}
+      - name: Say how CI starts
         if: steps.commit.outputs.pushed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.ref_name }}
+          HAS_TOKEN: ${{ secrets.BASELINES_TOKEN != '' }}
         run: |
-          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
-            -d "{\"ref\":\"$BRANCH\"}"
+          if [ "$HAS_TOKEN" = "true" ]; then
+            echo "::notice title=Baselines committed::Pushed with BASELINES_TOKEN, so CI starts on the branch as for any push."
+          else
+            echo "::notice title=Baselines committed::Pushed with GITHUB_TOKEN, which starts no workflow. Re-run the pull request's CI, or push any commit."
+          fi

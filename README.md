@@ -17,7 +17,7 @@ npm run check                     # everything CI runs except the visual job
 **First step after pushing a fresh clone:** GitHub only lets you dispatch a `workflow_dispatch` workflow once it exists on the default branch. Until Linux baselines exist, the CI visual job passes with a notice. It skips the screenshots, but axe still runs. So:
 
 1. Open a PR for this starter and merge it into `main`. The visual job shows "No visual baselines yet".
-2. Create a branch (for example `chore/visual-baselines`) and generate the Linux baselines. With Docker: `npm run test:visual:docker -- --full`, then commit them. Without it: push the branch and run **Actions → Update visual baselines** on it with **full** ticked; it commits them and starts CI on the branch. Use a branch rather than `main`, because a protected `main` rejects the bot's push.
+2. Create a branch (for example `chore/visual-baselines`) and generate the Linux baselines. With Docker: `npm run test:visual:docker -- --full`, then commit them. Without it: push the branch and run **Actions → Update visual baselines** on it with **full** ticked; it commits them (then re-run CI, unless a `BASELINES_TOKEN` secret is set; see Visual baselines). Use a branch rather than `main`, because a protected `main` rejects the bot's push.
 3. Open a PR from that branch, and merge once the visual job is green. From then on, any screenshot difference, or a new story with no baseline, fails the visual job.
 
 ## Start a new portal
@@ -97,7 +97,7 @@ Step 6 removes what only the example's page imported. The rest of a domain's app
 The copy carries the starter's Linux baselines, and a rebrand or a trim changes screenshots. So the first pull request does this:
 
 1. Push a branch and open a draft pull request. **Check (tokens, types, lint, tests, rules, build)** must pass.
-2. Regenerate every Linux baseline: `npm run test:visual:docker -- --full` and commit, or run **Actions → Update visual baselines** on the branch with **full** ticked (it commits, then starts CI). Both delete every Linux baseline first, so the baselines of deleted stories go too.
+2. Regenerate every Linux baseline: `npm run test:visual:docker -- --full` and commit, or run **Actions → Update visual baselines** on the branch with **full** ticked. Both delete every Linux baseline first, so the baselines of deleted stories go too.
 3. Mark the pull request ready. Review the new PNGs, then squash-merge once **Visual regression and axe** is green.
 4. Now protect `main` under **Settings → Branches** with a branch protection rule:
    - require a pull request;
@@ -431,7 +431,7 @@ Where the facts come from:
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every pull request, on pushes to `main`, every night, and when the baseline workflow dispatches it:
+`.github/workflows/ci.yml` runs on every pull request, on pushes to `main`, every night, and by hand (Run workflow):
 
 | Job | Runs | What it does |
 |---|---|---|
@@ -446,7 +446,7 @@ Where the facts come from:
 - **Superseded runs are cancelled.** A new push to a pull request cancels the run it replaces; runs on `main` are never cancelled.
 - **Require the gate, not the shards, in branch protection.** A matrix job skipped by its `if` never expands, so a check named "(1/4)" would never report.
 - **Keep the `ui` filter complete.** Anything new that feeds the gallery (a folder of stories, a script the gallery imports) goes into the filter in the same change, or pull requests that touch only it skip the visual job.
-- The **Update visual baselines** workflow is the fallback for anyone without Docker. It runs in the same image, rewrites the baselines of the stories the branch reaches (or every baseline, with **full**), commits them, and dispatches CI on the branch, because a push made with `GITHUB_TOKEN` starts no workflow.
+- The **Update visual baselines** workflow is the fallback for anyone without Docker. It runs in the same image, rewrites the baselines of the stories the branch reaches (or every baseline, with **full**) and commits them. A push made with `GITHUB_TOKEN` starts no workflow, and a dispatched run's checks don't count for a pull request, so add a `BASELINES_TOKEN` secret (a fine-grained token with `contents: write` on this repo) and it pushes with that, starting CI as any push does; without it, re-run the pull request's CI after it commits.
 
 ## Visual baselines
 

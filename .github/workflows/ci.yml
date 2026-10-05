@@ -9,7 +9,7 @@ on:
   # Nightly: the full visual suite, the backstop for pull requests that only run what they reach.
   schedule:
     - cron: '17 6 * * *'
-  # Started by the baseline workflow after it commits (a push made with GITHUB_TOKEN starts nothing).
+  # By hand, to check a branch outside a pull request (its checks don't count for a pull request's).
   workflow_dispatch:
 
 permissions:
