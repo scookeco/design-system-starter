@@ -205,6 +205,29 @@ describe('AppShell', () => {
   });
 });
 
+describe('AppShell header span', () => {
+  const shell = (headerSpan?: 'main' | 'full') =>
+    render(
+      <AppShell brand="Acme" headerSpan={headerSpan} sidebarStorageKey={null} nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    ).container;
+
+  it('keeps the brand atop the sidebar by default', () => {
+    const c = shell();
+    expect(c.querySelector('.app-shell__frame')?.hasAttribute('data-header')).toBe(false);
+    expect(c.querySelector('.app-shell__sidebar > .app-shell__brand')?.textContent).toBe('Acme');
+    expect(c.querySelector('.app-shell__header > .app-shell__brand')).toBeNull();
+  });
+
+  it('moves the brand into a header that spans the frame', () => {
+    const c = shell('full');
+    expect(c.querySelector('.app-shell__frame')?.getAttribute('data-header')).toBe('full');
+    expect(c.querySelector('.app-shell__header > .app-shell__brand')?.textContent).toBe('Acme');
+    expect(c.querySelector('.app-shell__sidebar > .app-shell__brand')).toBeNull();
+  });
+});
+
 describe('AppShell icon rail', () => {
   const shell = (props: Partial<Parameters<typeof AppShell>[0]> = {}) => (
     <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />} {...props}>

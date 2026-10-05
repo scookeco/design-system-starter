@@ -102,6 +102,24 @@ export const WithAssistant: Story = {
     ),
   },
 };
+/** The header across the whole frame, brand first; the sidebar (nav only) and main below it. */
+export const FullWidthHeader: Story = {
+  args: {
+    headerSpan: 'full',
+    help: <Menu align="end" trigger={<Button variant="ghost">Help</Button>} items={[{ label: 'Help centre' }, { label: 'Contact support' }]} />,
+  },
+};
+export const FullWidthHeaderCollapsed: Story = { args: { ...FullWidthHeader.args, defaultSidebarCollapsed: true } };
+export const FullWidthHeaderNarrow: Story = {
+  args: FullWidthHeader.args,
+  decorators: [
+    (Story) => (
+      <DemoNarrow>
+        <Story />
+      </DemoNarrow>
+    ),
+  ],
+};
 export const UserMenuOpen: Story = { tags: ['modal-open', '!autodocs'], args: { userMenu: userMenu(true) } };
 export const NarrowCollapsed: Story = {
   decorators: [
