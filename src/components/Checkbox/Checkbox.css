@@ -57,4 +57,89 @@
   .checkbox__box:disabled + .checkbox__text {
     color: var(--color-fg-disabled);
   }
+
+  /*
+   * Tile: the whole box is the target (the checkbox's ::after covers it), for a set of choices laid
+   * out as tiles. Checked fills it and makes the outline solid; unchecked is outlined, dashed, so a
+   * gap in a set shows without colour. A category colours the outline, label and fill.
+   */
+  .checkbox[data-variant="tile"] {
+    --tile-fg: var(--color-fg-default);
+    --tile-bg: var(--color-bg-selected);
+    --tile-border: var(--color-border-strong);
+
+    position: relative;
+    align-items: center;
+    padding: var(--space-inset-sm);
+    border: 1px dashed var(--tile-border);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-surface);
+    color: var(--tile-fg);
+  }
+
+  .checkbox[data-category="1"] {
+    --tile-fg: var(--color-category-1-fg);
+    --tile-bg: var(--color-category-1-bg);
+    --tile-border: var(--color-category-1-border);
+  }
+
+  .checkbox[data-category="2"] {
+    --tile-fg: var(--color-category-2-fg);
+    --tile-bg: var(--color-category-2-bg);
+    --tile-border: var(--color-category-2-border);
+  }
+
+  .checkbox[data-category="3"] {
+    --tile-fg: var(--color-category-3-fg);
+    --tile-bg: var(--color-category-3-bg);
+    --tile-border: var(--color-category-3-border);
+  }
+
+  .checkbox[data-category="4"] {
+    --tile-fg: var(--color-category-4-fg);
+    --tile-bg: var(--color-category-4-bg);
+    --tile-border: var(--color-category-4-border);
+  }
+
+  .checkbox[data-category="5"] {
+    --tile-fg: var(--color-category-5-fg);
+    --tile-bg: var(--color-category-5-bg);
+    --tile-border: var(--color-category-5-border);
+  }
+
+  .checkbox[data-category="6"] {
+    --tile-fg: var(--color-category-6-fg);
+    --tile-bg: var(--color-category-6-bg);
+    --tile-border: var(--color-category-6-border);
+  }
+
+  .checkbox[data-variant="tile"] .checkbox__text {
+    color: inherit;
+  }
+
+  /*
+   * The whole tile is the target: the box's own ::after covers it, so a click anywhere is a click
+   * on the checkbox, and nothing sits over the focused control (WCAG 2.4.11).
+   */
+  :where(.checkbox[data-variant="tile"]) .checkbox__box::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .checkbox[data-variant="tile"] .checkbox__label {
+    font: var(--text-label);
+  }
+
+  /* Checked: filled and solid. Matches the native control as well as the system's own. */
+  .checkbox[data-variant="tile"]:has([data-state="checked"], :checked) {
+    border-style: solid;
+    background: var(--tile-bg);
+  }
+
+  /* The focus ring goes round the whole tile, the target, not only the box inside it. */
+  .checkbox[data-variant="tile"]:has(:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
 }

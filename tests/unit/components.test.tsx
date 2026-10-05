@@ -295,6 +295,24 @@ describe('CardLink', () => {
   });
 });
 
+describe('Checkbox tile', () => {
+  it('marks the tile and its category on the root, and stays one labelled checkbox', () => {
+    render(<Checkbox variant="tile" category={3} label="Order form" defaultChecked />);
+    const box = screen.getByRole('checkbox', { name: 'Order form' });
+    const root = box.closest('.checkbox');
+    expect(root?.getAttribute('data-variant')).toBe('tile');
+    expect(root?.getAttribute('data-category')).toBe('3');
+    expect(box.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('leaves a default checkbox unmarked, and ignores a category without the tile', () => {
+    render(<Checkbox label="Include drafts" category={2} />);
+    const root = screen.getByRole('checkbox', { name: 'Include drafts' }).closest('.checkbox');
+    expect(root?.hasAttribute('data-variant')).toBe(false);
+    expect(root?.hasAttribute('data-category')).toBe(false);
+  });
+});
+
 describe('FocusedLayout', () => {
   const layout = (width?: 'sm' | 'md' | 'lg'): Element => {
     const frame = render(<FocusedLayout brand="Acme" task="Set up" exit={<Button variant="ghost">Exit setup</Button>} width={width} footer={<Button>Next</Button>}>Step</FocusedLayout>).container.firstElementChild;
