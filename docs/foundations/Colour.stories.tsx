@@ -126,7 +126,10 @@ function ColourPage() {
   for (const { path } of colorRoles) {
     // Chart colours have their own page and rules (Foundations/Data visualisation).
     if (path.startsWith('color.chart.')) continue;
-    const key = path.startsWith('color.status.') ? `status.${path.split('.')[2] ?? ''}` : group(path);
+    // Statuses and categories are sets of fg, bg and border: one table per member.
+    const key = path.startsWith('color.status.') || path.startsWith('color.category.')
+      ? `${path.split('.')[1] ?? ''}.${path.split('.')[2] ?? ''}`
+      : group(path);
     groups.set(key, [...(groups.get(key) ?? []), path]);
   }
   const ramps = new Map<string, { path: string; value: string }[]>();
@@ -141,12 +144,16 @@ function ColourPage() {
     >
       <DocSection
         title="Semantic roles"
-        intro="Use these, through var(--color-…) in system CSS. Each pair is checked in tests/unit/contrast.test.ts: 4.5:1 for text, 3:1 for control boundaries and focus. Chart colours have their own page: Foundations, Data visualisation."
+        intro="Use these, through var(--color-…) in system CSS. Each pair is checked in tests/unit/contrast.test.ts: 4.5:1 for text, 3:1 for control boundaries and focus. Statuses say how something is (success, warning, danger); categories say what kind of thing it is (a band in a diagram, a record type), in the chart's series order. Never use one for the other. Chart colours have their own page: Foundations, Data visualisation."
       >
         {[...groups].map(([key, paths]) => (
           <RoleTable
             key={key}
-            name={key.startsWith('status.') ? `Status: ${key.slice('status.'.length)}` : (GROUP_NAMES[key] ?? key)}
+            name={
+              key.startsWith('status.') ? `Status: ${key.slice('status.'.length)}`
+              : key.startsWith('category.') ? `Category ${key.slice('category.'.length)}`
+              : (GROUP_NAMES[key] ?? key)
+            }
             paths={paths}
           />
         ))}
