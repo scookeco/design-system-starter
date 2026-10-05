@@ -58,6 +58,8 @@ const meta = {
   component: AppShell,
   args: {
     brand: 'Acme',
+    // The rail's mark, as the Figma frame draws it: the brand's initial while collapsed.
+    brandMark: 'A',
     nav,
     breadcrumbs: <Breadcrumbs items={[{ label: 'Home', href: '/home' }]} current="Records" />,
     userMenu: userMenu(),

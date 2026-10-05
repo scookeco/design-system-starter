@@ -228,6 +228,27 @@ describe('AppShell header span', () => {
   });
 });
 
+describe('AppShell brand mark', () => {
+  const shell = (props: { brandMark?: string; headerSpan?: 'main' | 'full' }) =>
+    render(
+      <AppShell brand="Acme" {...props} sidebarStorageKey={null} nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home' }] }]} />}>
+        <p>Page</p>
+      </AppShell>,
+    ).container;
+
+  it('sits after the brand in the sidebar, hidden from assistive tech, which reads the brand', () => {
+    const mark = shell({ brandMark: 'A' }).querySelector('.app-shell__sidebar > .app-shell__brand + .app-shell__brand-mark');
+    expect(mark?.textContent).toBe('A');
+    expect(mark?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('is left out without one, and when the header spans the frame', () => {
+    expect(shell({}).querySelector('.app-shell__brand-mark')).toBeNull();
+    cleanup();
+    expect(shell({ brandMark: 'A', headerSpan: 'full' }).querySelector('.app-shell__brand-mark')).toBeNull();
+  });
+});
+
 describe('AppShell icon rail', () => {
   const shell = (props: Partial<Parameters<typeof AppShell>[0]> = {}) => (
     <AppShell brand="Acme" nav={<Nav label="Main" sections={[{ items: [{ label: 'Home', href: '/home', icon: HomeIcon }] }]} />} {...props}>

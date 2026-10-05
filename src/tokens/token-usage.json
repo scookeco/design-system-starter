@@ -1025,6 +1025,10 @@
           "token": "size.target-min",
           "readBy": [
             {
+              "unit": "AppShell",
+              "how": "css"
+            },
+            {
               "unit": "Button",
               "how": "css"
             },

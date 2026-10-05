@@ -70,6 +70,11 @@
     font: var(--text-heading-4);
   }
 
+  /* The brand's short mark: only in the icon rail, where the name doesn't fit. */
+  .app-shell__brand-mark {
+    display: none;
+  }
+
   /* Pinned to the foot of the sidebar, at its inline end. */
   .app-shell__collapse {
     display: flex;
@@ -196,6 +201,14 @@
       inline-size: 1px;
       block-size: 1px;
       white-space: nowrap;
+    }
+
+    .app-shell__frame[data-sidebar="collapsed"] .app-shell__brand-mark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-block-size: var(--size-target-min);
+      font: var(--text-heading-4);
     }
 
     .app-shell__frame[data-sidebar="collapsed"] .app-shell__collapse {

@@ -34,6 +34,12 @@ const writeCollapsed = (key: string | null, collapsed: boolean) => {
 export interface AppShellProps extends EscapeHatch {
   /** Product name or mark: at the top of the sidebar, or at the header's inline start when the header spans the frame. */
   brand: ReactNode;
+  /**
+   * A short mark for the icon rail: an initial or a logo, shown in the brand's place while the
+   * sidebar is collapsed. Decorative: the brand stays the name assistive tech reads. Without it,
+   * the rail shows no brand. Not used when the header spans the frame (the brand stays there).
+   */
+  brandMark?: ReactNode;
   /** Primary navigation: a <Nav label="Main">. It renders its own labelled nav landmark. */
   nav: ReactNode;
   /** Page trail in the header: <Breadcrumbs>. Omit on top-level pages. */
@@ -106,6 +112,7 @@ export interface AppShellProps extends EscapeHatch {
  */
 export function AppShell({
   brand,
+  brandMark,
   nav,
   breadcrumbs,
   actions,
@@ -165,6 +172,11 @@ export function AppShell({
         >
           <div className="app-shell__sidebar" id={sidebarId}>
             {headerSpan === 'full' ? null : <div className="app-shell__brand">{brand}</div>}
+            {headerSpan === 'full' || !brandMark ? null : (
+              <div className="app-shell__brand-mark" aria-hidden="true">
+                {brandMark}
+              </div>
+            )}
             <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>
             <div className="app-shell__collapse">
               <Tooltip content={collapsed ? expandSidebarLabel : collapseSidebarLabel} side="right">
