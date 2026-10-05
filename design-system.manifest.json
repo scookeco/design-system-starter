@@ -3744,6 +3744,32 @@
           "required": false,
           "default": null,
           "description": null
+        },
+        {
+          "name": "variant",
+          "type": "'default' | 'tile'",
+          "required": false,
+          "default": "'default'",
+          "description": "`tile`: the whole box is the target, for a set of choices laid out as tiles (document types, plans). The checked tile fills, so the set reads at a glance. Default `default`.",
+          "values": [
+            "default",
+            "tile"
+          ]
+        },
+        {
+          "name": "category",
+          "type": "1 | 2 | 3 | 4 | 5 | 6",
+          "required": false,
+          "default": null,
+          "description": "A tile's category (1–6, color.category.*): what kind of thing it is, as in a diagram's bands. Never a status. Only with `variant=\"tile\"`.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
         }
       ],
       "inherits": [],
@@ -3753,7 +3779,20 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {},
+      "variants": {
+        "variant": [
+          "default",
+          "tile"
+        ],
+        "category": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
       "states": [
         "hideLabel",
         "disabled",
@@ -3763,7 +3802,9 @@
         "whenToUse": [
           "An independent yes/no inside a form that is saved with the form.",
           "Several independent choices from a short list; `indeterminate` for a “select all” parent.",
-          "Row selection in a table: `hideLabel`, with a label naming the row (“Select Hardware lease”), so the name still says what is ticked."
+          "Row selection in a table: `hideLabel`, with a label naming the row (“Select Hardware lease”), so the name still says what is ticked.",
+          "`variant=\"tile\"` for a set of choices laid out as tiles (document types, add-ons): the whole tile is the target, and a checked one fills.",
+          "`category` (1–6) on tiles when the choices are of different kinds, as a diagram’s bands are: the tile takes that category’s colours."
         ],
         "whenNotToUse": [
           {
@@ -3773,6 +3814,14 @@
           {
             "situation": "Exactly one of several options",
             "instead": "`RadioGroup`"
+          },
+          {
+            "situation": "Colouring tiles by status (warning, danger) to mean a kind of thing",
+            "instead": "`category`: statuses say something is wrong"
+          },
+          {
+            "situation": "Restyling Checkbox into a tile",
+            "instead": "`variant=\"tile\"`"
           }
         ],
         "do": {
@@ -3785,7 +3834,8 @@
         },
         "accessibility": [
           "`label` is required and clicking it toggles the box; `description` is linked to the control.",
-          "The mixed state is exposed as `aria-checked=\"mixed\"`, not only drawn."
+          "The mixed state is exposed as `aria-checked=\"mixed\"`, not only drawn.",
+          "A tile is still one checkbox with its label: the checkbox’s own hit area covers the tile, so all of it is the target and nothing sits over the focused control, and the focus ring goes round the tile. Checked is a fill and a solid outline, unchecked a dashed one, so the state never rests on colour alone."
         ]
       },
       "unit": {
@@ -3818,6 +3868,14 @@
           {
             "id": "components-checkbox--hidden-label",
             "name": "Hidden Label"
+          },
+          {
+            "id": "components-checkbox--tiles",
+            "name": "Tiles"
+          },
+          {
+            "id": "components-checkbox--tile-categories",
+            "name": "Tile Categories"
           }
         ],
         "composes": [
@@ -3825,22 +3883,47 @@
         ],
         "tokens": [
           "color.action.primary",
+          "color.bg.selected",
           "color.bg.subtle",
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
           "color.fg.default",
           "color.fg.disabled",
           "color.fg.muted",
           "color.fg.on-action",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
           "icon.stroke",
+          "radius.control",
           "radius.indicator",
           "size.icon.md",
           "size.icon.sm",
           "space.gap.2xs",
           "space.gap.xs",
+          "space.inset.sm",
           "text.body",
-          "text.caption"
+          "text.caption",
+          "text.label"
         ]
       }
     },

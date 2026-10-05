@@ -23,13 +23,29 @@ export interface CheckboxProps extends EscapeHatch {
   required?: boolean;
   name?: string;
   value?: string;
+  /**
+   * `tile`: the whole box is the target, for a set of choices laid out as tiles (document types,
+   * plans). The checked tile fills, so the set reads at a glance. Default `default`.
+   */
+  variant?: 'default' | 'tile';
+  /**
+   * A tile's category (1–6, color.category.*): what kind of thing it is, as in a diagram's bands.
+   * Never a status. Only with `variant="tile"`.
+   */
+  category?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
-export function Checkbox({ label, hideLabel = false, description, UNSAFE_className, UNSAFE_style, ...rootProps }: CheckboxProps) {
+export function Checkbox({ label, hideLabel = false, description, variant = 'default', category, UNSAFE_className, UNSAFE_style, ...rootProps }: CheckboxProps) {
   const id = useId();
   const descriptionId = description ? `${id}-description` : undefined;
+  const tile = variant === 'tile';
   return (
-    <div className={cx('checkbox', UNSAFE_className)} style={UNSAFE_style}>
+    <div
+      className={cx('checkbox', UNSAFE_className)}
+      style={UNSAFE_style}
+      data-variant={tile ? 'tile' : undefined}
+      data-category={tile && category ? String(category) : undefined}
+    >
       <CheckboxPrimitive.Root {...rootProps} id={id} className="checkbox__box" aria-describedby={descriptionId}>
         <CheckboxPrimitive.Indicator className="checkbox__indicator">
           {rootProps.checked === 'indeterminate' ? <Icon icon={MinusIcon} /> : <Icon icon={CheckIcon} />}

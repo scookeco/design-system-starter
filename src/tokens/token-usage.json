@@ -4201,6 +4201,15 @@
           ]
         },
         {
+          "token": "color.bg.selected",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.subtle",
           "readBy": [
             {
@@ -4229,6 +4238,168 @@
         },
         {
           "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
           "readBy": [
             {
               "unit": "Checkbox",
@@ -4273,10 +4444,46 @@
           ]
         },
         {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
               "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Checkbox",
               "how": "css"
             }
           ]
@@ -4331,6 +4538,15 @@
           ]
         },
         {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -4341,6 +4557,15 @@
         },
         {
           "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Checkbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
           "readBy": [
             {
               "unit": "Checkbox",
@@ -24300,6 +24525,366 @@
           "chain": [
             "color.border.strong",
             "color.gray.400"
+          ]
+        }
+      }
+    },
+    "color.category.1.bg": {
+      "cssVar": "--color-category-1-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#eff6ff",
+      "chain": [
+        "color.category.1.bg",
+        "color.blue.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#172554",
+          "chain": [
+            "color.category.1.bg",
+            "color.blue.950"
+          ]
+        }
+      }
+    },
+    "color.category.1.border": {
+      "cssVar": "--color-category-1-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#2563eb",
+      "chain": [
+        "color.category.1.border",
+        "color.blue.600"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#60a5fa",
+          "chain": [
+            "color.category.1.border",
+            "color.blue.400"
+          ]
+        }
+      }
+    },
+    "color.category.1.fg": {
+      "cssVar": "--color-category-1-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#1e40af",
+      "chain": [
+        "color.category.1.fg",
+        "color.blue.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#93c5fd",
+          "chain": [
+            "color.category.1.fg",
+            "color.blue.300"
+          ]
+        }
+      }
+    },
+    "color.category.2.bg": {
+      "cssVar": "--color-category-2-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#fff7ed",
+      "chain": [
+        "color.category.2.bg",
+        "color.orange.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#431407",
+          "chain": [
+            "color.category.2.bg",
+            "color.orange.950"
+          ]
+        }
+      }
+    },
+    "color.category.2.border": {
+      "cssVar": "--color-category-2-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#ea580c",
+      "chain": [
+        "color.category.2.border",
+        "color.orange.600"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#fb923c",
+          "chain": [
+            "color.category.2.border",
+            "color.orange.400"
+          ]
+        }
+      }
+    },
+    "color.category.2.fg": {
+      "cssVar": "--color-category-2-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#9a3412",
+      "chain": [
+        "color.category.2.fg",
+        "color.orange.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#fdba74",
+          "chain": [
+            "color.category.2.fg",
+            "color.orange.300"
+          ]
+        }
+      }
+    },
+    "color.category.3.bg": {
+      "cssVar": "--color-category-3-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#f0fdfa",
+      "chain": [
+        "color.category.3.bg",
+        "color.teal.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#042f2e",
+          "chain": [
+            "color.category.3.bg",
+            "color.teal.950"
+          ]
+        }
+      }
+    },
+    "color.category.3.border": {
+      "cssVar": "--color-category-3-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#0d9488",
+      "chain": [
+        "color.category.3.border",
+        "color.teal.600"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#2dd4bf",
+          "chain": [
+            "color.category.3.border",
+            "color.teal.400"
+          ]
+        }
+      }
+    },
+    "color.category.3.fg": {
+      "cssVar": "--color-category-3-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#115e59",
+      "chain": [
+        "color.category.3.fg",
+        "color.teal.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#5eead4",
+          "chain": [
+            "color.category.3.fg",
+            "color.teal.300"
+          ]
+        }
+      }
+    },
+    "color.category.4.bg": {
+      "cssVar": "--color-category-4-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#fefce8",
+      "chain": [
+        "color.category.4.bg",
+        "color.yellow.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#422006",
+          "chain": [
+            "color.category.4.bg",
+            "color.yellow.950"
+          ]
+        }
+      }
+    },
+    "color.category.4.border": {
+      "cssVar": "--color-category-4-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#a16207",
+      "chain": [
+        "color.category.4.border",
+        "color.yellow.700"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#facc15",
+          "chain": [
+            "color.category.4.border",
+            "color.yellow.400"
+          ]
+        }
+      }
+    },
+    "color.category.4.fg": {
+      "cssVar": "--color-category-4-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#854d0e",
+      "chain": [
+        "color.category.4.fg",
+        "color.yellow.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#fde047",
+          "chain": [
+            "color.category.4.fg",
+            "color.yellow.300"
+          ]
+        }
+      }
+    },
+    "color.category.5.bg": {
+      "cssVar": "--color-category-5-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#fdf4ff",
+      "chain": [
+        "color.category.5.bg",
+        "color.fuchsia.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#4a044e",
+          "chain": [
+            "color.category.5.bg",
+            "color.fuchsia.950"
+          ]
+        }
+      }
+    },
+    "color.category.5.border": {
+      "cssVar": "--color-category-5-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#c026d3",
+      "chain": [
+        "color.category.5.border",
+        "color.fuchsia.600"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#e879f9",
+          "chain": [
+            "color.category.5.border",
+            "color.fuchsia.400"
+          ]
+        }
+      }
+    },
+    "color.category.5.fg": {
+      "cssVar": "--color-category-5-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#86198f",
+      "chain": [
+        "color.category.5.fg",
+        "color.fuchsia.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#f0abfc",
+          "chain": [
+            "color.category.5.fg",
+            "color.fuchsia.300"
+          ]
+        }
+      }
+    },
+    "color.category.6.bg": {
+      "cssVar": "--color-category-6-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#ecfdf5",
+      "chain": [
+        "color.category.6.bg",
+        "color.emerald.50"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#022c22",
+          "chain": [
+            "color.category.6.bg",
+            "color.emerald.950"
+          ]
+        }
+      }
+    },
+    "color.category.6.border": {
+      "cssVar": "--color-category-6-border",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#059669",
+      "chain": [
+        "color.category.6.border",
+        "color.emerald.600"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#34d399",
+          "chain": [
+            "color.category.6.border",
+            "color.emerald.400"
+          ]
+        }
+      }
+    },
+    "color.category.6.fg": {
+      "cssVar": "--color-category-6-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "value": "#065f46",
+      "chain": [
+        "color.category.6.fg",
+        "color.emerald.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#6ee7b7",
+          "chain": [
+            "color.category.6.fg",
+            "color.emerald.300"
           ]
         }
       }
