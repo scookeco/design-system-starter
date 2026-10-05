@@ -1,12 +1,21 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { docsPages, MODAL_OPEN_EXCEPTIONS, openDocs, openStory, runAxe, stories, THEMES } from './storybook';
+import { docsPages, MODAL_OPEN_EXCEPTIONS, openDocs, openStory, runAxe, STEPS, stories, THEMES } from './storybook';
+import { runChecks } from './wcag22-run';
 
 /**
- * One screenshot test and one axe test per story per theme, plus one axe test per Docs tab,
- * generated from the built Storybook's index.json, so a new story or Docs tab is covered
- * without touching this file.
+ * One test per story per theme, generated from the built Storybook's index.json, so a new story or
+ * Docs tab is covered without touching this file. Each test loads the story once and runs, in order:
+ *
+ *   @visual   the full-page screenshot
+ *   @a11y     axe (both themes: colour contrast differs between them)
+ *   @wcag22   the WCAG 2.2 checks beyond axe (light only: none depends on colour). Last, because
+ *             the focus-not-obscured check tabs through the page, opening tooltips and scrolling.
+ *
+ * One load instead of five per story (two screenshots, two axe runs, one WCAG 2.2 pass), with the
+ * same checks. Failures are soft, so a screenshot diff still reports the axe result after it.
+ * `--grep @a11y` (or VISUAL_STEPS=a11y) runs that step alone: see STEPS in ./storybook.
  */
 
 /** True when the baseline directory the config resolves to already holds screenshots. */
@@ -15,29 +24,42 @@ const hasBaselines = (snapshotPath: string) => {
   return existsSync(dir) && readdirSync(dir).some((f) => f.endsWith('.png'));
 };
 
+const violations = (results: Awaited<ReturnType<typeof runAxe>>) =>
+  results.violations.map((v) => `${v.id} (${v.impact ?? 'n/a'}): ${v.help}\n  ${v.nodes.map((n) => n.target.join(' ')).join('\n  ')}`);
+
 for (const story of stories) {
   for (const theme of THEMES) {
-    test(`${story.title} / ${story.name} [${theme}] @visual`, async ({ page }, testInfo) => {
-      const name = `${story.id}--${theme}.png`;
-      const updating = testInfo.config.updateSnapshots === 'all' || testInfo.config.updateSnapshots === 'changed';
-      if (!updating && !hasBaselines(testInfo.snapshotPath(name))) {
-        testInfo.annotations.push({
-          type: 'notice',
-          description: `No ${process.platform} baselines yet. Run the "Update visual baselines" workflow (CI) or "npm run test:visual:update" (local).`,
-        });
-        test.skip(true, `no ${process.platform} baselines yet`);
-      }
+    const tags = ['@visual', '@a11y', ...(theme === 'light' ? ['@wcag22'] : [])];
+    test(`${story.title} / ${story.name} [${theme}] ${tags.join(' ')}`, async ({ page }, testInfo) => {
+      // Screenshot, axe and the WCAG 2.2 checks share the test: each keeps its own budget.
+      test.setTimeout(120_000);
       await openStory(page, story.id, theme);
-      // Tall pages (Foundations run to ~5,000px) need longer than the 5s default to produce two
-      // identical full-page captures on a CI runner.
-      await expect(page).toHaveScreenshot(name, { fullPage: true, timeout: 30_000 });
-    });
 
-    test(`${story.title} / ${story.name} [${theme}] @a11y`, async ({ page }) => {
-      await openStory(page, story.id, theme);
-      const results = await runAxe(page, story.tags?.includes('modal-open') ? MODAL_OPEN_EXCEPTIONS : []);
-      const summary = results.violations.map((v) => `${v.id} (${v.impact ?? 'n/a'}): ${v.help}\n  ${v.nodes.map((n) => n.target.join(' ')).join('\n  ')}`);
-      expect(summary, `axe violations in ${story.id} [${theme}]`).toEqual([]);
+      if (STEPS.visual) {
+        const name = `${story.id}--${theme}.png`;
+        const updating = testInfo.config.updateSnapshots === 'all' || testInfo.config.updateSnapshots === 'changed';
+        if (!updating && !hasBaselines(testInfo.snapshotPath(name))) {
+          testInfo.annotations.push({
+            type: 'notice',
+            description: `No ${process.platform} baselines yet, so no screenshot. Run the "Update visual baselines" workflow (CI) or "npm run test:visual:update" (local).`,
+          });
+        } else {
+          // Tall pages (Foundations run to ~5,000px) need longer than the 5s default to produce two
+          // identical full-page captures on a CI runner.
+          await expect.soft(page).toHaveScreenshot(name, { fullPage: true, timeout: 30_000 });
+        }
+      }
+
+      if (STEPS.a11y) {
+        const results = await runAxe(page, story.tags?.includes('modal-open') ? MODAL_OPEN_EXCEPTIONS : []);
+        expect.soft(violations(results), `axe violations in ${story.id} [${theme}]`).toEqual([]);
+      }
+
+      if (STEPS.wcag22 && theme === 'light') {
+        const results = await runChecks(page, story);
+        const summary = Object.entries(results).flatMap(([id, found]) => found.map((v) => `${id}: ${v}`));
+        expect.soft(summary, `WCAG 2.2 violations in ${story.id}`).toEqual([]);
+      }
     });
   }
 }
@@ -49,8 +71,6 @@ for (const story of stories) {
 for (const docs of docsPages) {
   test(`${docs.title} / ${docs.name} [light] @a11y`, async ({ page }) => {
     await openDocs(page, docs.id);
-    const results = await runAxe(page, []);
-    const summary = results.violations.map((v) => `${v.id} (${v.impact ?? 'n/a'}): ${v.help}\n  ${v.nodes.map((n) => n.target.join(' ')).join('\n  ')}`);
-    expect(summary, `axe violations in ${docs.id}`).toEqual([]);
+    expect(violations(await runAxe(page, [])), `axe violations in ${docs.id}`).toEqual([]);
   });
 }

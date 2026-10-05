@@ -394,7 +394,7 @@ export interface Gallery {
 const DOCS_PAGE = '.storybook/DocsPage.tsx';
 const PREVIEW = '.storybook/preview.tsx';
 const USAGE_REGISTRY = 'docs/usage/registry.ts';
-const SPEC_ROOTS = ['playwright.config.ts', 'tests/visual/storybook.ts', 'tests/visual/stories.spec.ts', 'tests/visual/wcag22.spec.ts', 'tests/visual/wcag22-checks.ts', '.storybook/main.ts'];
+const SPEC_ROOTS = ['playwright.config.ts', 'tests/visual/storybook.ts', 'tests/visual/stories.spec.ts', 'tests/visual/wcag22.spec.ts', 'tests/visual/wcag22-run.ts', 'tests/visual/wcag22-checks.ts', '.storybook/main.ts'];
 
 /** Drop the usage-doc glob of the Docs page registry (a tab renders one, re-added by name). */
 const withoutUsageGlob = (from: string, e: ImportEdge) => !(from === USAGE_REGISTRY && e.kind === 'glob');
