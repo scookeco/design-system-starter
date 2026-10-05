@@ -15,15 +15,20 @@ export interface FocusedLayoutProps extends EscapeHatch {
   children: ReactNode;
   /** Action bar (Back · Next). Sticks to the bottom of main while the step scrolls. */
   footer?: ReactNode;
+  /**
+   * The column's measure, for every step of the task alike: `sm` (default) for steps that read
+   * like a form; `md` or `lg` for steps laid out across the width (a grid of choices, a diagram).
+   */
+  width?: 'sm' | 'md' | 'lg';
 }
 
 /**
  * The frame for a focused, multi-step task (a setup wizard, a multi-step create): no sidebar, a
  * header with the task and a way out, one centred column, and a sticky action bar. Only main scrolls.
  */
-export function FocusedLayout({ brand, task, exit, progress, children, footer, UNSAFE_className, UNSAFE_style }: FocusedLayoutProps) {
+export function FocusedLayout({ brand, task, exit, progress, children, footer, width = 'sm', UNSAFE_className, UNSAFE_style }: FocusedLayoutProps) {
   return (
-    <div className={cx('focused-layout', UNSAFE_className)} style={UNSAFE_style}>
+    <div className={cx('focused-layout', UNSAFE_className)} style={UNSAFE_style} data-width={width === 'sm' ? undefined : width}>
       <header className="focused-layout__header">
         <span className="focused-layout__brand">{brand}</span>
         <span className="focused-layout__task">{task}</span>

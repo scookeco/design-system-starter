@@ -10187,6 +10187,24 @@
           ]
         },
         {
+          "token": "size.content.lg",
+          "readBy": [
+            {
+              "unit": "FocusedLayout",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.content.md",
+          "readBy": [
+            {
+              "unit": "FocusedLayout",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.content.sm",
           "readBy": [
             {

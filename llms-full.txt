@@ -5216,13 +5216,17 @@ Props:
 - `progress?: ReactNode`: A Progress bar under the header, across the column.
 - `children: ReactNode`: The content column: Stepper, PageHeader, the step's form.
 - `footer?: ReactNode`: Action bar (Back · Next). Sticks to the bottom of main while the step scrolls.
+- `width?: 'sm' | 'md' | 'lg'` = `'sm'`: The column's measure, for every step of the task alike: `sm` (default) for steps that read like a form; `md` or `lg` for steps laid out across the width (a grid of choices, a diagram).
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: width (sm | md | lg).
 
 **When to use**
 
 - A task that takes over the screen until it is done or abandoned: first-run setup, a multi-step create, a checkout.
 - The header names the task (plain text) and always offers `exit`; the column holds a `Stepper`, the step’s `PageHeader` and its form; `footer` holds Back · Next.
+- Keep the default `width` (`sm`) for steps that read like a form. A step laid out across the width (a grid of choices, a diagram) takes `md` or `lg`; set it on the layout so every step of the task has the same width and the column never jumps between steps.
 - Copy the Setup wizard example.
 
 **When not to use**
@@ -5268,8 +5272,8 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - The exit is required, so a focused task never traps anyone.
 - On a step change, move focus to the new step’s h1 (`PageHeader`’s `headingRef`), as the example does.
 
-Stories: `layouts-focusedlayout--default`, `layouts-focusedlayout--with-action-bar`, `layouts-focusedlayout--with-progress`, `layouts-focusedlayout--narrow`.
-Tokens read: `color.bg.canvas`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `size.content.sm`, `size.control.lg`, `size.viewport.block`, `space.gap.lg`, `space.gap.md`, `space.gap.xl`, `space.inset.lg`, `space.inset.sm`, `space.scroll-padding.end`, `text.heading-4`, `text.label`, `z.sticky`.
+Stories: `layouts-focusedlayout--default`, `layouts-focusedlayout--with-action-bar`, `layouts-focusedlayout--with-progress`, `layouts-focusedlayout--wide`, `layouts-focusedlayout--narrow`.
+Tokens read: `color.bg.canvas`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `size.content.lg`, `size.content.md`, `size.content.sm`, `size.control.lg`, `size.viewport.block`, `space.gap.lg`, `space.gap.md`, `space.gap.xl`, `space.inset.lg`, `space.inset.sm`, `space.scroll-padding.end`, `text.heading-4`, `text.label`, `z.sticky`.
 
 ### PageLayout
 

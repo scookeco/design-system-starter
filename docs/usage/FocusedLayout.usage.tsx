@@ -8,6 +8,7 @@ export const usage: UsageDoc = {
   whenToUse: [
     'A task that takes over the screen until it is done or abandoned: first-run setup, a multi-step create, a checkout.',
     'The header names the task (plain text) and always offers `exit`; the column holds a `Stepper`, the step’s `PageHeader` and its form; `footer` holds Back · Next.',
+    'Keep the default `width` (`sm`) for steps that read like a form. A step laid out across the width (a grid of choices, a diagram) takes `md` or `lg`; set it on the layout so every step of the task has the same width and the column never jumps between steps.',
     'Copy the Setup wizard example.',
   ],
   whenNotToUse: [

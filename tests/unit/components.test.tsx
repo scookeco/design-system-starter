@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { LinkComponentProps } from '../../src/index';
-import { AppShell, Avatar, Badge, Banner, Breadcrumbs, Button, Checkbox, EmptyState, HomeIcon, Link, LinkProvider, Meter, Nav, NavTabs, PageLayout, RadioGroup, SegmentedControl, Select, Skeleton, Spinner, Stack, Stat, Switch, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Textarea, TextField } from '../../src/index';
+import { AppShell, Avatar, FocusedLayout, Badge, Banner, Breadcrumbs, Button, Checkbox, EmptyState, HomeIcon, Link, LinkProvider, Meter, Nav, NavTabs, PageLayout, RadioGroup, SegmentedControl, Select, Skeleton, Spinner, Stack, Stat, Switch, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Textarea, TextField } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -251,6 +251,26 @@ describe('AppShell icon rail', () => {
     expect(onChange).toHaveBeenCalledWith(false);
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeTruthy();
     expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBeNull();
+  });
+});
+
+describe('FocusedLayout', () => {
+  const layout = (width?: 'sm' | 'md' | 'lg'): Element => {
+    const frame = render(<FocusedLayout brand="Acme" task="Set up" exit={<Button variant="ghost">Exit setup</Button>} width={width} footer={<Button>Next</Button>}>Step</FocusedLayout>).container.firstElementChild;
+    if (!frame) throw new Error('FocusedLayout rendered nothing');
+    return frame;
+  };
+
+  it('keeps the default measure without a width attribute', () => {
+    expect(layout().hasAttribute('data-width')).toBe(false);
+    cleanup();
+    expect(layout('sm').hasAttribute('data-width')).toBe(false);
+  });
+
+  it('marks a wider measure on the frame, so the column and its action bar both follow it', () => {
+    expect(layout('lg').getAttribute('data-width')).toBe('lg');
+    cleanup();
+    expect(layout('md').getAttribute('data-width')).toBe('md');
   });
 });
 

@@ -5,6 +5,7 @@ import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { Progress } from '../../components/Progress/Progress';
 import { Stepper } from '../../components/Stepper/Stepper';
 import { Cluster } from '../../primitives/Cluster/Cluster';
+import { Grid } from '../../primitives/Grid/Grid';
 import { FocusedLayout } from './FocusedLayout';
 import { CloseIcon } from '../../components/Icon/icons';
 
@@ -45,6 +46,25 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const WithActionBar: Story = { args: { footer } };
 export const WithProgress: Story = { args: { footer, progress: <Progress label="Setup progress" value={2} max={4} valueText="Step 2 of 4" /> } };
+/** A step laid out across the width: a grid of choices. Every step of the task takes the same width. */
+export const Wide: Story = {
+  args: {
+    footer,
+    width: 'lg',
+    children: (
+      <>
+        <Stepper label="Setup steps" steps={steps} current={2} />
+        <PageHeader title="Choose your plan" description="Every plan includes unlimited workspaces." />
+        <Grid min="sm">
+          <DemoBox>Starter</DemoBox>
+          <DemoBox>Team</DemoBox>
+          <DemoBox>Business</DemoBox>
+          <DemoBox>Enterprise</DemoBox>
+        </Grid>
+      </>
+    ),
+  },
+};
 export const Narrow: Story = {
   args: { footer },
   decorators: [
