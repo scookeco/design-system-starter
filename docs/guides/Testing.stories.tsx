@@ -48,7 +48,7 @@ PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, w
         <Rules
           items={[
             <>
-              The full visual run is about 3,500 tests and takes 20 to 25 minutes. Between steps, run <code>npm run test:visual:changed</code>: screenshots, axe
+              The full visual run is about 1,520 tests: one per story per theme, which loads the story once for its screenshot, axe and (light) the WCAG 2.2 checks. Between steps, run <code>npm run test:visual:changed</code>: screenshots, axe
               and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since <code>origin/main</code> with uncommitted and untracked
               files included (<code>-- --base HEAD</code> for only what you haven’t committed).
             </>,

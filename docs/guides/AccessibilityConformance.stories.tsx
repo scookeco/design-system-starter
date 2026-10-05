@@ -115,7 +115,7 @@ PLAYWRIGHT_PORT=6107 npm run test:wcag22
           items={[
             inline('CI runs every Playwright spec in its visual shards, so the story checks gate a pull request with the screenshots and axe.'),
             inline('The story checks make one light-theme pass per story (none depends on colour). Most of the time goes to tabbing through each story twice.'),
-            inline('To add a check: write it in `tests/visual/wcag22-checks.ts`, register it in `tests/visual/wcag22.spec.ts`, and add a fixture story that fails it.'),
+            inline('To add a check: write it in `tests/visual/wcag22-checks.ts`, register it in `tests/visual/wcag22-run.ts`, and add a fixture story that fails it.'),
           ]}
         />
       </DocSection>

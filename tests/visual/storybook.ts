@@ -39,6 +39,17 @@ export const stories = allStories.filter(selected);
 export const docsPages = Object.values(index.entries).filter((e) => e.type === 'docs' && selected(e));
 
 export const THEMES = ['light', 'dark'] as const;
+
+/**
+ * Which steps a story test runs (tests/visual/stories.spec.ts). Each story test carries all its
+ * steps' tags, so `--grep @a11y` alone would still screenshot. The config turns the run's --grep
+ * and --grep-invert into VISUAL_STEPS (playwright.config.ts) before workers start; set it yourself
+ * to choose directly (VISUAL_STEPS=visual,a11y). Unset: every step.
+ */
+export const STEP_NAMES = ['visual', 'a11y', 'wcag22'] as const;
+const wanted = process.env.VISUAL_STEPS === undefined ? undefined : new Set(process.env.VISUAL_STEPS.split(',').map((s) => s.trim()).filter(Boolean));
+for (const step of wanted ?? []) if (!(STEP_NAMES as readonly string[]).includes(step)) throw new Error(`VISUAL_STEPS names "${step}"; the steps are ${STEP_NAMES.join(', ')}.`);
+export const STEPS = Object.fromEntries(STEP_NAMES.map((step) => [step, !wanted || wanted.has(step)])) as Record<(typeof STEP_NAMES)[number], boolean>;
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 /**

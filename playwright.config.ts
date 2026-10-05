@@ -5,6 +5,31 @@ const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 6007);
 const CI = Boolean(process.env.CI);
 
 /**
+ * A story test runs several steps on one page load (tests/visual/stories.spec.ts) and carries every
+ * step's tag, so `--grep @visual` alone would still run axe. Here, in the main process before any
+ * worker starts, a --grep or --grep-invert that names a step's tag (@visual, @a11y, @wcag22) turns
+ * into VISUAL_STEPS, which the workers inherit. A --grep without "@" (a title) leaves every step on.
+ */
+const cliOption = (names: string[]) => {
+  const args = process.argv;
+  for (const [i, arg] of args.entries()) {
+    for (const name of names) {
+      if (arg === name) return args[i + 1];
+      if (arg.startsWith(`${name}=`)) return arg.slice(name.length + 1);
+    }
+  }
+  return undefined;
+};
+if (process.env.VISUAL_STEPS === undefined) {
+  const grep = cliOption(['--grep', '-g']);
+  const invert = cliOption(['--grep-invert']);
+  if (grep?.includes('@') || invert?.includes('@')) {
+    const steps = ['visual', 'a11y', 'wcag22'].filter((step) => (!grep?.includes('@') || new RegExp(grep).test(`@${step}`)) && !(invert?.includes('@') && new RegExp(invert).test(`@${step}`)));
+    process.env.VISUAL_STEPS = steps.join(',');
+  }
+}
+
+/**
  * Visual regression and axe over every story of the built Storybook.
  *
  * Baselines are per platform ({platform} in the path). Linux baselines, produced by

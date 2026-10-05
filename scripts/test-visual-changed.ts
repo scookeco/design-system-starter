@@ -130,9 +130,9 @@ const isFixture = (e: IndexEntry) => e.tags?.includes('check-fixture') === true;
 const visualStories = run.filter((e) => e.type === 'story' && !e.tags?.includes('no-visual'));
 const fixtures = run.filter((e) => e.type === 'story' && isFixture(e));
 const docs = run.filter((e) => e.type === 'docs');
-// Per story: a screenshot and an axe run in each theme, and one WCAG 2.2 pass. Per fixture: one WCAG 2.2 test. Per Docs tab: axe.
-// Plus the page-less "every check has a fixture" test, which always runs.
-const count = (stories: number, fixtureCount: number, docsCount: number) => stories * 5 + fixtureCount + docsCount + 1;
+// Per story: one test per theme (a screenshot and axe in each, the WCAG 2.2 checks in light). Per
+// fixture: one WCAG 2.2 test. Per Docs tab: axe. Plus the page-less "every check has a fixture" test.
+const count = (stories: number, fixtureCount: number, docsCount: number) => stories * 2 + fixtureCount + docsCount + 1;
 const tests = run.length === 0 ? 0 : count(visualStories.length, fixtures.length, docs.length);
 const plural = (n: number, one: string, many = `${one}s`) => `${String(n)} ${n === 1 ? one : many}`;
 
