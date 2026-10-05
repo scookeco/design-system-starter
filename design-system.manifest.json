@@ -76,7 +76,7 @@
     },
     {
       "command": "npm run test:visual:docker",
-      "description": "`test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker (on a Mac, Colima: `brew install colima docker && colima start`)."
+      "description": "`test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker running x86 images (on a Mac, Colima: `brew install colima docker && colima start --vz-rosetta`). A change's few stories take minutes; `--full` takes about an hour under Rosetta, so for that the workflow's **full** is quicker."
     },
     {
       "command": "npm run regen",
