@@ -110,6 +110,38 @@ export const vars = {
         "border": "var(--color-status-neutral-border)"
       }
     },
+    "category": {
+      "1": {
+        "fg": "var(--color-category-1-fg)",
+        "bg": "var(--color-category-1-bg)",
+        "border": "var(--color-category-1-border)"
+      },
+      "2": {
+        "fg": "var(--color-category-2-fg)",
+        "bg": "var(--color-category-2-bg)",
+        "border": "var(--color-category-2-border)"
+      },
+      "3": {
+        "fg": "var(--color-category-3-fg)",
+        "bg": "var(--color-category-3-bg)",
+        "border": "var(--color-category-3-border)"
+      },
+      "4": {
+        "fg": "var(--color-category-4-fg)",
+        "bg": "var(--color-category-4-bg)",
+        "border": "var(--color-category-4-border)"
+      },
+      "5": {
+        "fg": "var(--color-category-5-fg)",
+        "bg": "var(--color-category-5-bg)",
+        "border": "var(--color-category-5-border)"
+      },
+      "6": {
+        "fg": "var(--color-category-6-fg)",
+        "bg": "var(--color-category-6-bg)",
+        "border": "var(--color-category-6-border)"
+      }
+    },
     "focus": "var(--color-focus)",
     "ai": {
       "fg": "var(--color-ai-fg)",

@@ -338,6 +338,165 @@
         }
       }
     },
+    "category": {
+      "$description": "Category identity for things that are kinds, not states: a band in a diagram, a type of record. Assigned in this order, the same hues as the chart's categorical series. Never use a status colour for a category: warning, danger and info say something is wrong or worth reading.",
+      "1": {
+        "fg": {
+          "$value": "{color.blue.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.blue.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.blue.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.400}"
+            }
+          }
+        }
+      },
+      "2": {
+        "fg": {
+          "$value": "{color.orange.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.orange.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.orange.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.orange.400}"
+            }
+          }
+        }
+      },
+      "3": {
+        "fg": {
+          "$value": "{color.teal.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.teal.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.teal.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.teal.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.teal.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.teal.400}"
+            }
+          }
+        }
+      },
+      "4": {
+        "fg": {
+          "$value": "{color.yellow.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.yellow.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.yellow.700}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.400}"
+            }
+          }
+        }
+      },
+      "5": {
+        "fg": {
+          "$value": "{color.fuchsia.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.fuchsia.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.fuchsia.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.fuchsia.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.fuchsia.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.fuchsia.400}"
+            }
+          }
+        }
+      },
+      "6": {
+        "fg": {
+          "$value": "{color.emerald.800}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.emerald.300}"
+            }
+          }
+        },
+        "bg": {
+          "$value": "{color.emerald.50}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.emerald.950}"
+            }
+          }
+        },
+        "border": {
+          "$value": "{color.emerald.600}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.emerald.400}"
+            }
+          }
+        }
+      }
+    },
     "focus": {
       "$value": "{color.indigo.600}",
       "$extensions": {

@@ -10,6 +10,7 @@ export const UI = 3;
 
 const SURFACES = ['color.bg.canvas', 'color.bg.surface', 'color.bg.subtle', 'color.bg.elevated'];
 const STATUSES = ['success', 'warning', 'danger', 'info', 'neutral'];
+const CATEGORIES = ['1', '2', '3', '4', '5', '6'];
 
 export interface ContrastPair {
   fg: string;
@@ -40,6 +41,15 @@ export const pairs: ContrastPair[] = [
   // Banner: body text and links sit on the tone's background.
   ...STATUSES.map((s) => ({ fg: 'color.fg.default', bg: `color.status.${s}.bg`, min: TEXT })),
   ...STATUSES.map((s) => ({ fg: 'color.fg.link', bg: `color.status.${s}.bg`, min: TEXT })),
+  // Categories: the label on its tint and on any surface; the outline of an unfilled one is a boundary (UI).
+  ...CATEGORIES.flatMap((c) => [
+    { fg: `color.category.${c}.fg`, bg: `color.category.${c}.bg`, min: TEXT },
+    { fg: 'color.fg.default', bg: `color.category.${c}.bg`, min: TEXT },
+    ...SURFACES.flatMap((bg) => [
+      { fg: `color.category.${c}.fg`, bg, min: TEXT },
+      { fg: `color.category.${c}.border`, bg, min: UI },
+    ]),
+  ]),
   // AI marker and AI-generated content: the label and body text on the AI tint, the tint's border on surfaces.
   { fg: 'color.ai.fg', bg: 'color.ai.bg', min: TEXT },
   { fg: 'color.fg.default', bg: 'color.ai.bg', min: TEXT },
