@@ -101,10 +101,10 @@ The copy carries the starter's Linux baselines, and a rebrand or a trim changes 
 3. Mark the pull request ready. Review the new PNGs, then squash-merge once **Visual regression and axe** is green.
 4. Now protect `main` under **Settings → Branches** with a branch protection rule:
    - require a pull request;
-   - require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**;
+   - require the status check **Check (tokens, types, lint, tests, rules, build)**. Leave **Visual regression and axe** unrequired: it still runs on a pull request its changes reach, but screenshots are reviewed after merge (the full run on `main` and the **Baselines after merge** workflow, see CI). For a copy with users who'd rather not see `main` red, require it too;
    - leave "Require branches to be up to date before merging" off. With it on, every merge makes every other open pull request rebase and run CI again; the full visual run on `main` and every night is the backstop for two pull requests that pass apart and clash together.
 
-   The rule's check picker lists only checks that have reported in the past week, which is why this step comes after the first CI run. Require the gate, never the "(1/4)" shards.
+   The rule's check picker lists only checks that have reported in the past week, which is why this step comes after the first CI run. If you do require the visual check, require the gate, never the "(1/4)" shards.
 
 After that, every intended visual change lands with its baselines (see Visual baselines).
 
@@ -442,10 +442,10 @@ Where the facts come from:
 | Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`fail-fast: false`) over the same artifact, in the Playwright image the lockfile pins (`mcr.microsoft.com/playwright:v<version>-noble`), the one the baselines are made in. A pull request (or a dispatched run) runs only the stories its changes reach (`test:visual:changed` against its base); `main` and the nightly run run every spec: screenshots, axe and the WCAG 2.2 checks. Each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
 
-- **Drafts while iterating.** Open pull requests as drafts: they run the check job only. Mark the pull request ready for review to run visual and axe (`ready_for_review` triggers it), and merge only once that ready run is green.
+- **Only Check is required.** A pull request merges once **Check** passes. Its visual run (when it isn't a draft and something visual changed) is information: a red screenshot shard there is fine to merge when the change is the one you meant, and the run on `main` turns it into a baselines pull request. An axe or WCAG 2.2 failure is a bug: fix it before merging, since nothing after merge will.
 - **Pull requests run what they reach; `main` runs everything.** The affected set comes from the same graph as `test:visual:changed`, checked against the bundler's on every run. Anything that reaches every story (tokens, global styles, the lockfile, the Playwright config) still runs everything. The full run on `main` and the nightly run catch what two pull requests do together.
 - **Superseded runs are cancelled.** A new push to a pull request cancels the run it replaces; runs on `main` are never cancelled.
-- **Require the gate, not the shards, in branch protection.** A matrix job skipped by its `if` never expands, so a check named "(1/4)" would never report.
+- **If you require the visual check, require the gate, not the shards.** A matrix job skipped by its `if` never expands, so a check named "(1/4)" would never report.
 - **Keep the `ui` filter complete.** Anything new that feeds the gallery (a folder of stories, a script the gallery imports) goes into the filter in the same change, or pull requests that touch only it skip the visual job.
 - **Screenshots on `main` are reviewed after merge.** When the full visual run on `main` (a push or the nightly run) fails, the **Baselines after merge** workflow (`.github/workflows/baselines-after-merge.yml`) regenerates every Linux baseline from that commit in the canonical image. When any changed, it force-pushes them to one rolling branch, `visual-baselines/main`, and opens a pull request to review image by image (with a `BASELINES_TOKEN` secret; without one, it links to open it yourself). An axe or WCAG 2.2 failure changes no PNG, so it opens nothing: `main` stays red until the code is fixed. It can also be run by hand on `main`.
 - The **Update visual baselines** workflow is the fallback for anyone without Docker. It runs in the same image, rewrites the baselines of the stories the branch reaches (or every baseline, with **full**) and commits them. A push made with `GITHUB_TOKEN` starts no workflow, and a dispatched run's checks don't count for a pull request, so add a `BASELINES_TOKEN` secret (a fine-grained token with `contents: write` on this repo) and it pushes with that, starting CI as any push does; without it, re-run the pull request's CI after it commits.

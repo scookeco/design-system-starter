@@ -38,7 +38,8 @@ UI rules (design system v0)
 - Every new variant, size or state gets a story. Every new exported component,
   layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
   use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
-  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
+  without one. npm run check, axe and WCAG 2.2 checks must pass;
+  screenshot changes are reviewed after merge.
 - A story that renders an open modal is tagged ['modal-open', '!autodocs'].
 - WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
   focus never hidden behind sticky content (scroll containers use

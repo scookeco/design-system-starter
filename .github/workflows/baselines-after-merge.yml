@@ -99,7 +99,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A tests/visual/__screenshots__/linux
           if git diff --cached --quiet; then
-            echo "::notice title=No screenshot changed::The visual run failed on axe or the WCAG 2.2 checks, not on a screenshot. Fix the code: main stays red until then."
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "::notice title=No screenshot changed::Every Linux baseline already matches ${SHA::7}."
+            else
+              echo "::notice title=No screenshot changed::The visual run failed on axe or the WCAG 2.2 checks, not on a screenshot. Fix the code: main stays red until then."
+            fi
             exit 0
           fi
           git diff --cached --stat | tail -1
