@@ -36,6 +36,7 @@ jobs:
   # Decides whether anything that can change a rendered pixel (or an axe result) changed, which
   # visual run it gets, and the image it runs in.
   # Anything new that feeds the gallery must be added to the `ui` filter, or it skips the visual job.
+  # A unit test (tests/unit/affected-stories.test.ts) fails if a pattern that runs every story is missing here.
   changes:
     name: Detect UI changes
     runs-on: ubuntu-24.04
@@ -70,6 +71,8 @@ jobs:
               - 'package.json'
               - 'package-lock.json'
               - '.nvmrc'
+              - 'tsconfig.json'
+              - 'vite.config.ts'
               - '.github/workflows/ci.yml'
 
   storybook:
