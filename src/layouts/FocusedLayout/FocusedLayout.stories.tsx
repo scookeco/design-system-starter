@@ -53,7 +53,7 @@ export const Wide: Story = {
     width: 'lg',
     children: (
       <>
-        <Stepper label="Setup steps" steps={steps} current={1} />
+        <Stepper label="Setup steps" steps={steps} current={2} />
         <PageHeader title="Choose your plan" description="Every plan includes unlimited workspaces." />
         <Grid min="sm">
           <DemoBox>Starter</DemoBox>
