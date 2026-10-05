@@ -1009,6 +1009,13 @@
           "description": "Product name or mark: at the top of the sidebar, or at the header's inline start when the header spans the frame."
         },
         {
+          "name": "brandMark",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A short mark for the icon rail: an initial or a logo, shown in the brand's place while the sidebar is collapsed. Decorative: the brand stays the name assistive tech reads. Without it, the rail shows no brand. Not used when the header spans the frame (the brand stays there)."
+        },
+        {
           "name": "nav",
           "type": "ReactNode",
           "required": true,
@@ -1162,6 +1169,7 @@
           "Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.",
           "Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).",
           "Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.",
+          "`brandMark` (an initial or a small logo) for the collapsed icon rail, where the brand’s name doesn’t fit; without it the rail shows no brand. The name stays what assistive tech reads.",
           "`headerSpan=\"full\"` runs the header across the whole frame with the brand first, and puts the sidebar (nav only) and main below it. Choose it when the app also uses `FocusedLayout`: its top bar is the same shape, so the brand, help and account stay put when a task takes over the screen. Set it once, in the shell composition; every page has the same frame.",
           "An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.",
           "People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well."
