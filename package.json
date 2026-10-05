@@ -12,6 +12,7 @@
     "tokens": "node scripts/build-tokens.ts && node scripts/token-usage.ts",
     "tokens:check": "node scripts/build-tokens.ts --check && node scripts/token-usage.ts --check",
     "manifest": "node scripts/manifest.ts",
+    "regen": "npm run tokens && npm run manifest",
     "manifest:check": "node scripts/manifest.ts --check",
     "build": "vite build",
     "build:app": "vite build --config vite.app.config.ts",
@@ -29,7 +30,8 @@
     "test:visual": "npm run build-storybook && playwright test",
     "test:visual:update": "npm run build-storybook && playwright test --grep @visual --update-snapshots=changed",
     "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22",
-    "test:visual:changed": "node scripts/test-visual-changed.ts"
+    "test:visual:changed": "node scripts/test-visual-changed.ts",
+    "test:visual:docker": "node scripts/visual-docker.ts"
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",

@@ -15,9 +15,11 @@ npm run dev:app        # the app itself on the mock API (VITE_API_MOCKS, VITE_AP
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (local baselines are gitignored)
 npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
 npm run test:visual:changed   # the same checks for only the stories your changes reach (since origin/main, uncommitted included); -- --dry-run for the plan
+npm run test:visual:docker -- --update   # test:visual:changed in the CI image: checks and rewrites the committed Linux baselines your change moves
+npm run regen          # tokens + manifest: every generated file (after a merge conflict in one, take either side, then this)
 ```
 
-Verify between steps with `npm run typecheck`, `npm run lint`, `npx vitest run` and `npm run test:visual:changed`; run the full `npm run check` and `npm run test:visual` once at the end.
+Verify between steps with `npm run typecheck`, `npm run lint` and `npx vitest run`. Before pushing, run `npm run check` and `npm run test:visual:docker -- --update`, and commit the Linux baselines it writes with the change: then one push runs CI once. Pull requests run only the stories they reach; `main` and the nightly run check everything. Batch related changes into one pull request.
 
 Work on a branch. Never commit to `main` directly.
 

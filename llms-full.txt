@@ -6919,8 +6919,8 @@ The gallery is the test fixture. Every state gets a story, and every story is sc
 
 ```
 npm run check                      # tokens, types, lint, unit, rules, build, budgets
-PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # while iterating: the stories your changes reach
-PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
+npm run test:visual:docker -- --update             # the stories your changes reach, in the CI image; commit the baselines it writes
+PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, without Docker
 ```
 
 #### Targeted runs
@@ -6942,9 +6942,10 @@ PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
 
 #### Baselines
 
-- Linux baselines are committed and are the source of truth. They come only from the Update visual baselines workflow on the CI image; never edit or delete them by hand.
-- Local baselines (darwin, win32) are gitignored. `npm run test:visual:update` rewrites yours, so you can diff your own change before pushing.
-- After an intended visual change: run the workflow on your branch, re-run CI, and review every changed image in the pull request. Say in the description which existing stories changed and why.
+- Linux baselines are committed and are the source of truth. They are made in the Playwright image the lockfile pins, the one CI compares in, whose screenshots are byte-identical on any machine; never edit or delete them by hand.
+- Make them with the change: `npm run test:visual:docker -- --update` rewrites the baselines of the stories your change reaches, and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them and starts CI.
+- Review every changed image in the pull request, and say in the description which existing stories changed and why. A Playwright upgrade changes every screenshot: regenerate them all (`-- --full`) in the same pull request.
+- Local baselines (darwin, win32) are gitignored. `npm run test:visual:update` rewrites yours, if you want to diff on macOS.
 
 #### The draft workflow
 

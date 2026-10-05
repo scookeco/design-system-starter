@@ -40,8 +40,8 @@ function Testing() {
         </Table>
         <Code label="Before a pull request">{`
 npm run check                      # tokens, types, lint, unit, rules, build, budgets
-PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # while iterating: the stories your changes reach
-PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
+npm run test:visual:docker -- --update             # the stories your changes reach, in the CI image; commit the baselines it writes
+PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, without Docker
 `}</Code>
       </DocSection>
       <DocSection title="Targeted runs">
@@ -96,16 +96,19 @@ PLAYWRIGHT_PORT=6107 npm run test:visual           # everything, once at the end
         <Rules
           items={[
             <>
-              Linux baselines are committed and are the source of truth. They come only from the Update visual baselines workflow on the CI image;
-              never edit or delete them by hand.
+              Linux baselines are committed and are the source of truth. They are made in the Playwright image the lockfile pins, run as x86, the one
+              CI compares in, so a local run's screenshots are CI's byte for byte; never edit or delete them by hand.
             </>,
             <>
-              Local baselines (darwin, win32) are gitignored. <code>npm run test:visual:update</code> rewrites yours, so you can diff your own change
-              before pushing.
+              Make them with the change: <code>npm run test:visual:docker -- --update</code> rewrites the baselines of the stories your change reaches,
+              and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them and starts CI.
             </>,
             <>
-              After an intended visual change: run the workflow on your branch, re-run CI, and review every changed image in the pull request. Say in
-              the description which existing stories changed and why.
+              Review every changed image in the pull request, and say in the description which existing stories changed and why. A Playwright upgrade
+              changes every screenshot: regenerate them all (<code>-- --full</code>) in the same pull request.
+            </>,
+            <>
+              Local baselines (darwin, win32) are gitignored. <code>npm run test:visual:update</code> rewrites yours, if you want to diff on macOS.
             </>,
           ]}
         />
