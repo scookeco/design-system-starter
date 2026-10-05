@@ -18,7 +18,8 @@ export interface IndexEntry {
   tags?: string[];
 }
 
-const indexPath = resolve(import.meta.dirname, '../../storybook-static/index.json');
+// STORYBOOK_STATIC: another build to read (the native reference run's merge-base build).
+const indexPath = resolve(import.meta.dirname, '../..', process.env.STORYBOOK_STATIC ?? 'storybook-static', 'index.json');
 if (!existsSync(indexPath)) {
   throw new Error('storybook-static/index.json not found. Run "npm run build-storybook" first (npm run test:visual does).');
 }

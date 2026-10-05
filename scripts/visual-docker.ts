@@ -1,5 +1,6 @@
 /**
- * npm run test:visual:docker: the visual checks in the CI image, on this machine.
+ * npm run test:visual:canonical (alias test:visual:docker): the visual checks in the CI image, on this
+ * machine: the canonical screenshot environment. Optional; everyday local runs are native (test:visual:changed).
  *
  * Linux baselines are made, and checked in CI, inside mcr.microsoft.com/playwright at the version the
  * lockfile pins, on x86 (linux/amd64). Screenshots depend on the fonts the browser renders with, which
@@ -7,11 +8,11 @@
  * runs the same x86 image (Docker Desktop runs it through Rosetta on Apple silicon), and its PNGs are
  * CI's byte for byte. That is how a change's Linux baselines are written and committed with the change.
  *
- *   npm run test:visual:docker                     the stories your changes reach (test:visual:changed)
- *   npm run test:visual:docker -- --update         and rewrite their baselines where they changed
- *   npm run test:visual:docker -- --full           regenerate every Linux baseline (deletes the old ones first;
+ *   npm run test:visual:canonical                     the stories your changes reach (test:visual:changed)
+ *   npm run test:visual:canonical -- --update         and rewrite their baselines where they changed
+ *   npm run test:visual:canonical -- --full           regenerate every Linux baseline (deletes the old ones first;
  *                                                  about an hour under Rosetta: the workflow's "full" is quicker)
- *   npm run test:visual:docker -- -- <args>        passed on to test:visual:changed (e.g. -- --base <ref>)
+ *   npm run test:visual:canonical -- -- <args>        passed on to test:visual:changed (e.g. -- --base <ref>)
  *
  * New stories get their baselines written on any run; a changed screenshot fails unless --update.
  * node_modules lives in a Docker volume keyed by the lockfile, so the host's (macOS) install is left alone.

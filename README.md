@@ -153,12 +153,13 @@ No provider is chosen here. This is where one plugs in:
 | `npm run build:app` | App build into `dist-app/` (`vite.app.config.ts`), without the mock API unless `VITE_API_MOCKS=true`. `npm run preview:app` serves it. |
 | `npm run size` | Bundle size budgets (size-limit) and the tree-shaking check over `dist/`; run after `build`. |
 | `npm run build-storybook` | Static gallery in `storybook-static/`. |
-| `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
-| `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
-| `npm run test:visual:docker` | `test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker running x86 images: on a Mac, Docker Desktop, which runs them through Rosetta on Apple silicon (Settings → General → "Use Rosetta for x86_64/amd64 emulation on Apple Silicon", on by default). A change's few stories take minutes; `--full` takes about an hour under Rosetta, so for that the workflow's **full** is quicker. |
+| `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks: one page load per story per theme. On a platform without committed baselines (macOS) screenshots are skipped; use `test:visual:changed` for native screenshot feedback. |
+| `npm run test:visual:update` | Rewrite this platform's baselines (only Linux ones are committed: use `test:visual:canonical -- --update`). |
+| `npm run validate` | `check`, then `test:visual:changed`: the fast local gate, native, no Docker. |
+| `npm run test:visual:canonical` (alias `test:visual:docker`) | `test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker running x86 images: on a Mac, Docker Desktop, which runs them through Rosetta on Apple silicon (Settings → General → "Use Rosetta for x86_64/amd64 emulation on Apple Silicon", on by default). A change's few stories take minutes; `--full` takes about an hour under Rosetta, so for that the workflow's **full** is quicker. |
 | `npm run regen` | Every generated file: tokens, token usage, the manifest and the llms files. After a merge conflict in any of them, take either side and run this. |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
-| `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
+| `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base), natively. On Linux screenshots compare with the committed baselines; elsewhere with the merge base rendered on the same machine (see "Native screenshots"). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale, and ends with how long each stage took. See "Targeted visual runs". |
 | `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint:js`, `lint:css`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size` (`scripts/check.ts`). They run concurrently, except `size`, which waits for `build`; each stage's output is printed whole when it ends (a passing one only with `-- --verbose`), then a timing table. About 22s on a 10-core Mac (31s one at a time: `-- --serial`). |
 
 ## Repo map
@@ -451,7 +452,7 @@ Where the facts come from:
 ## Visual baselines
 
 - Screenshots live at `tests/visual/__screenshots__/{platform}/<story-id>--<theme>.png`. Only `linux/` is committed. It is made in the Playwright image the lockfile pins, on x86, the same image CI compares in. Screenshots depend on the fonts the browser renders with, which the image fixes (an `ubuntu-24.04` runner with `playwright install --with-deps` has different ones, and differs by about 1% of pixels), and on the CPU: arm64 rasterises backdrops and shadows a little differently. So the image always runs as `linux/amd64`; on Apple silicon Docker Desktop runs it through Rosetta, and its PNGs are CI's byte for byte.
-- **Make them with the change.** `npm run test:visual:docker -- --update` runs the stories your change reaches in that image and rewrites their Linux baselines; commit them with the change, and one push runs CI once. New stories get their baselines on any run. Without Docker, run the **Update visual baselines** workflow on the branch instead. `npm run test:visual:update` still writes `darwin/` baselines (gitignored) if you want to diff on macOS.
+- **Make them with the change.** `npm run test:visual:canonical -- --update` runs the stories your change reaches in that image and rewrites their Linux baselines; commit them with the change, and one push runs CI once. New stories get their baselines on any run. Without Docker, or for a change that reaches hundreds of stories (emulated x86 manages about a thousand tests an hour), run the **Update visual baselines** workflow on the branch instead: native x86 on GitHub, a few minutes.
 - **A Playwright upgrade changes the image**, and so every screenshot: regenerate them all (`-- --full`) in the same pull request as the bump.
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
 - After an intended visual change: commit the updated PNGs with it (above), and review them in the PR.
@@ -462,14 +463,23 @@ Where the facts come from:
 
 ## Targeted visual runs
 
-The full visual run is about 3,500 tests and takes 20–25 minutes locally. While iterating, `npm run test:visual:changed` runs only what your branch can affect (`npm run test:visual:docker` does the same in the CI image, against the committed Linux baselines). Pull requests run the same affected set in CI; `main` and the nightly run run everything.
+The full visual run is about 1,510 tests (one per story per theme). While iterating, `npm run test:visual:changed` runs only what your branch can affect, natively (`npm run test:visual:canonical` does the same in the CI image, against the committed Linux baselines). Pull requests run the same affected set in CI; `main` and the nightly run run everything.
 
 ```sh
 npm run test:visual:changed                                   # changes since origin/main, uncommitted and untracked included
 npm run test:visual:changed -- --base HEAD                    # only what you haven't committed yet
 npm run test:visual:changed -- --dry-run --verbose            # the plan: changed files → story files → stories, and why
-npm run test:visual:changed -- -- --update-snapshots=changed  # anything after a second -- goes to Playwright
+npm run test:visual:changed -- -- --grep @a11y               # anything after a second -- goes to Playwright
 ```
+
+### Native screenshots
+
+Committed baselines are Linux, made in the Playwright image (`test:visual:canonical`), and they are the only ones CI trusts. A Mac renders text and anti-aliasing differently, so it can't compare against them, and comparing a branch against its own screenshots would catch nothing. So on a platform without committed baselines, `test:visual:changed` first renders the same stories at the merge base, on the same machine with the same browser and specs (`scripts/visual-reference.ts`): a temporary `git worktree`, its Storybook build, `VISUAL_STEPS=visual`. Any difference is the branch's. The reference is cached in `node_modules/.cache/visual-reference/<platform>/<merge base>-<harness hash>/` (the hash covers the Playwright version, its config and `tests/visual/*.ts`), so only stories it lacks are rendered again. A story new on the branch has nothing to compare with and says so.
+
+- Native screenshots are feedback, never baselines: `--update-snapshots` is refused there. Write Linux baselines with `test:visual:canonical -- --update` or the workflow.
+- The worktree shares `node_modules` when the lockfile is unchanged; otherwise it runs `npm ci` for the reference.
+- `-- --no-reference` skips it (axe and the WCAG 2.2 checks only).
+- Measured on an M-series Mac (10 cores), a Stepper change reaching 247 stories (516 tests): 5m 22s on the first run (2m 9s of it the reference), 3m 17s once the reference is cached. The same change in Docker under x86 emulation ran over an hour.
 
 - **How it picks.** `scripts/affected-stories.ts` builds the gallery's module graph from the source (TypeScript's parser and resolver: imports, re-exports, `import()` and the lazy routes, `import.meta.glob`, `?raw`, JSON, CSS `@import`). A story file is affected when it reaches a changed file; its stories run in both themes with axe and the WCAG 2.2 checks. A Docs tab also reaches the Docs page frame and its own usage doc. The graph reaches outside `src/`: Foundations read the token source and `scripts/checks/`, Guides/Agents renders `CLAUDE.md`, so each maps to the pages that read it. A committed baseline that changed runs its story.
 - **Barrels by name.** `import { Badge } from '../../src/index'` reaches Badge and what Badge imports, not everything `src/index.ts` re-exports. Two checks make that safe: the tree-shaking check (one import pulls in only the units it composes), and a unit test that every system stylesheet styles only its own blocks and animates only with its own keyframes, and that whatever renders a block imports its stylesheet (a stylesheet loaded on a page that doesn't render its component can't change that page).
