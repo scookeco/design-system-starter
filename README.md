@@ -17,8 +17,8 @@ npm run check                     # everything CI runs except the visual job
 **First step after pushing a fresh clone:** GitHub only lets you dispatch a `workflow_dispatch` workflow once it exists on the default branch. Until Linux baselines exist, the CI visual job passes with a notice. It skips the screenshots, but axe still runs. So:
 
 1. Open a PR for this starter and merge it into `main`. The visual job shows "No visual baselines yet".
-2. Create a branch (for example `chore/visual-baselines`), push it, and run **Actions → Update visual baselines** on that branch. It commits `tests/visual/__screenshots__/linux/*.png` back to the branch. Use a branch rather than `main`, because a protected `main` rejects the bot's push.
-3. Open a PR from that branch. If CI didn't start, push any commit or re-run it: a push made with `GITHUB_TOKEN` doesn't trigger CI. Merge once the visual job is green. From then on, any screenshot difference, or a new story with no baseline, fails the visual job.
+2. Create a branch (for example `chore/visual-baselines`) and generate the Linux baselines. With Docker: `npm run test:visual:docker -- --full`, then commit them. Without it: push the branch and run **Actions → Update visual baselines** on it with **full** ticked; it commits them (then re-run CI, unless a `BASELINES_TOKEN` secret is set; see Visual baselines). Use a branch rather than `main`, because a protected `main` rejects the bot's push.
+3. Open a PR from that branch, and merge once the visual job is green. From then on, any screenshot difference, or a new story with no baseline, fails the visual job.
 
 ## Start a new portal
 
@@ -97,15 +97,16 @@ Step 6 removes what only the example's page imported. The rest of a domain's app
 The copy carries the starter's Linux baselines, and a rebrand or a trim changes screenshots. So the first pull request does this:
 
 1. Push a branch and open a draft pull request. **Check (tokens, types, lint, tests, rules, build)** must pass.
-2. Run **Actions → Update visual baselines** on that branch. It deletes every Linux baseline before regenerating them, so the baselines of deleted stories go too. Then push any commit, or re-run CI, because the bot's push doesn't start it.
+2. Regenerate every Linux baseline: `npm run test:visual:docker -- --full` and commit, or run **Actions → Update visual baselines** on the branch with **full** ticked. Both delete every Linux baseline first, so the baselines of deleted stories go too.
 3. Mark the pull request ready. Review the new PNGs, then squash-merge once **Visual regression and axe** is green.
 4. Now protect `main` under **Settings → Branches** with a branch protection rule:
    - require a pull request;
-   - require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**.
+   - require the status checks **Check (tokens, types, lint, tests, rules, build)** and **Visual regression and axe**;
+   - leave "Require branches to be up to date before merging" off. With it on, every merge makes every other open pull request rebase and run CI again; the full visual run on `main` and every night is the backstop for two pull requests that pass apart and clash together.
 
    The rule's check picker lists only checks that have reported in the past week, which is why this step comes after the first CI run. Require the gate, never the "(1/4)" shards.
 
-After that, "Update visual baselines" is how every intended visual change lands (see Visual baselines).
+After that, every intended visual change lands with its baselines (see Visual baselines).
 
 ### 5. Plug in the real backend
 
@@ -154,6 +155,8 @@ No provider is chosen here. This is where one plugs in:
 | `npm run build-storybook` | Static gallery in `storybook-static/`. |
 | `npm run test:visual` | Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks. |
 | `npm run test:visual:update` | Rewrite this platform's baselines (local ones are gitignored). |
+| `npm run test:visual:docker` | `test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker running x86 images (on a Mac, Colima: `brew install colima docker && colima start --vz-rosetta`). A change's few stories take minutes; `--full` takes about an hour under Rosetta, so for that the workflow's **full** is quicker. |
+| `npm run regen` | Every generated file: tokens, token usage, the manifest and the llms files. After a merge conflict in any of them, take either side and run this. |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
 | `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
 | `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size`. |
@@ -372,7 +375,7 @@ Stop at the first yes:
    - Export it from `src/components/index.ts`.
 4. **A new primitive?** The highest bar: domain-agnostic, token-driven, impossible to express as a composition. It changes tokens, component styles and `CLAUDE.md` in the same PR.
 
-Then run `npm run check`, run the baseline workflow on the branch, and review the new screenshots in the PR diff.
+Then run `npm run check` and `npm run test:visual:docker -- --update`, commit the new baselines with the change, and review them in the PR diff.
 
 ## Adding a token
 
@@ -428,28 +431,30 @@ Where the facts come from:
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every pull request and on pushes to `main`:
+`.github/workflows/ci.yml` runs on every pull request, on pushes to `main`, every night, and by hand (Run workflow):
 
 | Job | Runs | What it does |
 |---|---|---|
 | Check (tokens, types, lint, tests, rules, build) | always | `npm run check` |
 | Detect UI changes | always | `dorny/paths-filter` sets `ui` when anything that can change a pixel or an axe result changed: `src/**`, `docs/**`, `tokens/**`, `scripts/checks/**` (the Foundations pages import them), `.storybook/**`, `CLAUDE.md` (the Agents guide shows its rules block), `tests/visual/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `.nvmrc` or the workflow itself |
-| Build Storybook | push to `main`, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact |
-| Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`npx playwright test --shard=N/4`, `fail-fast: false`) over the same artifact, running every spec: screenshots, axe and the WCAG 2.2 checks; each shard uploads its own report on failure |
+| Build Storybook | `main`, nightly, dispatched, or a ready (non-draft) pull request where `ui` changed | builds `storybook-static/` once and uploads it as an artifact; a pull request's run builds it through `test:visual:changed -- --self-check`, so a hole in the story graph fails before the graph decides what to test |
+| Visual regression and axe (1/4) … (4/4) | same as Build Storybook | four parallel shards (`fail-fast: false`) over the same artifact, in the Playwright image the lockfile pins (`mcr.microsoft.com/playwright:v<version>-noble`), the one the baselines are made in. A pull request (or a dispatched run) runs only the stories its changes reach (`test:visual:changed` against its base); `main` and the nightly run run every spec: screenshots, axe and the WCAG 2.2 checks. Each shard uploads its own report on failure |
 | Visual regression and axe | always | the gate: passes when every shard passed, or when the shards were skipped (a draft, or nothing visual changed) |
 
 - **Drafts while iterating.** Open pull requests as drafts: they run the check job only. Mark the pull request ready for review to run visual and axe (`ready_for_review` triggers it), and merge only once that ready run is green.
+- **Pull requests run what they reach; `main` runs everything.** The affected set comes from the same graph as `test:visual:changed`, checked against the bundler's on every run. Anything that reaches every story (tokens, global styles, the lockfile, the Playwright config) still runs everything. The full run on `main` and the nightly run catch what two pull requests do together.
 - **Superseded runs are cancelled.** A new push to a pull request cancels the run it replaces; runs on `main` are never cancelled.
 - **Require the gate, not the shards, in branch protection.** A matrix job skipped by its `if` never expands, so a check named "(1/4)" would never report.
 - **Keep the `ui` filter complete.** Anything new that feeds the gallery (a folder of stories, a script the gallery imports) goes into the filter in the same change, or pull requests that touch only it skip the visual job.
-- The **Update visual baselines** workflow is deliberately not sharded: it rewrites every Linux baseline in one commit.
+- The **Update visual baselines** workflow is the fallback for anyone without Docker. It runs in the same image, rewrites the baselines of the stories the branch reaches (or every baseline, with **full**) and commits them. A push made with `GITHUB_TOKEN` starts no workflow, and a dispatched run's checks don't count for a pull request, so add a `BASELINES_TOKEN` secret (a fine-grained token with `contents: write` on this repo) and it pushes with that, starting CI as any push does; without it, re-run the pull request's CI after it commits.
 
 ## Visual baselines
 
-- Screenshots live at `tests/visual/__screenshots__/{platform}/<story-id>--<theme>.png`. Only `linux/` is committed. It is produced by the **Update visual baselines** workflow on `ubuntu-24.04`, the same image CI compares on.
-- Without Docker you can't produce Linux baselines locally, and that's fine. Locally, `npm run test:visual:update` writes `darwin/` baselines (gitignored) so you can diff your own changes before pushing.
+- Screenshots live at `tests/visual/__screenshots__/{platform}/<story-id>--<theme>.png`. Only `linux/` is committed. It is made in the Playwright image the lockfile pins, on x86, the same image CI compares in. Screenshots depend on the fonts the browser renders with, which the image fixes (an `ubuntu-24.04` runner with `playwright install --with-deps` has different ones, and differs by about 1% of pixels), and on the CPU: arm64 rasterises backdrops and shadows a little differently. So the image always runs as `linux/amd64`; on Apple silicon that is Rosetta (`colima start --vz-rosetta`), and its PNGs are CI's byte for byte.
+- **Make them with the change.** `npm run test:visual:docker -- --update` runs the stories your change reaches in that image and rewrites their Linux baselines; commit them with the change, and one push runs CI once. New stories get their baselines on any run. Without Docker, run the **Update visual baselines** workflow on the branch instead. `npm run test:visual:update` still writes `darwin/` baselines (gitignored) if you want to diff on macOS.
+- **A Playwright upgrade changes the image**, and so every screenshot: regenerate them all (`-- --full`) in the same pull request as the bump.
 - In CI, `updateSnapshots: 'none'` applies. While no Linux baselines exist, screenshot tests skip with a notice (each shard reports it). Once any exist, a story without a baseline fails, and so does any pixel difference.
-- After an intended visual change: run the workflow on your branch, re-run CI, and review the updated PNGs in the PR.
+- After an intended visual change: commit the updated PNGs with it (above), and review them in the PR.
 - Stories tagged `no-visual` get no screenshot and no axe run. Only the WCAG 2.2 check fixtures use it: they are deliberate violations.
 - **Data stories are deterministic.** Every Playwright spec (screenshots, axe and the WCAG 2.2 checks) opens stories through `openStory` in `tests/visual/storybook.ts`, which opens every story with `latency:0;failure:0;role:admin` in its globals (a story that sets its own role with `mockApi({ role })` keeps it), freezes the page clock at the instant the mock data was seeded for (`SEED_EPOCH`), and waits for `html[data-queries-settled="true"]` on stories tagged `data`. A story that holds a request open on purpose is tagged `busy` and isn't waited on. Each story gets a fresh mock database and a fresh cache.
 - **Screenshots are byte-stable.** Chromium launches with `--disable-partial-raster` (in `playwright.config.ts`). Without it, a region that repaints after a story settles (a list arriving, a button leaving its pending state, a dialog opening) is re-rasterised on its own, and rounded edges come out a colour level or two different from a full raster. That stays under the comparison threshold, but it churned baseline files on every run.
@@ -457,7 +462,7 @@ Where the facts come from:
 
 ## Targeted visual runs
 
-The full visual run is about 3,500 tests and takes 20–25 minutes locally. While iterating, `npm run test:visual:changed` runs only what your branch can affect, and the full run stays the last step before a pull request (CI always runs everything).
+The full visual run is about 3,500 tests and takes 20–25 minutes locally. While iterating, `npm run test:visual:changed` runs only what your branch can affect (`npm run test:visual:docker` does the same in the CI image, against the committed Linux baselines). Pull requests run the same affected set in CI; `main` and the nightly run run everything.
 
 ```sh
 npm run test:visual:changed                                   # changes since origin/main, uncommitted and untracked included

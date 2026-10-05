@@ -1,11 +1,24 @@
 name: Update visual baselines
 
-# Linux is the source of truth for screenshots. Run this on a branch to regenerate
-# every Linux baseline and commit them back to that branch.
-# Note: a push made with GITHUB_TOKEN does not trigger CI. Re-run CI on the branch
-# (or push any commit) afterwards to see the visual job compare against the new baselines.
+# Linux is the source of truth for screenshots, made in the Playwright image the lockfile pins.
+# The quick way is local: npm run test:visual:docker -- --update writes them into your branch in that
+# image, to commit with the change. This workflow is the same thing for anyone without Docker.
+#
+# Run it on a branch. By default it rewrites the baselines of the stories the branch's changes reach,
+# against main; "full" deletes every Linux baseline and regenerates them all (after a Playwright bump,
+# or to drop the baselines of deleted stories). It commits to the branch.
+#
+# A push made with GITHUB_TOKEN starts no workflow, and a dispatched run's checks don't count for a
+# pull request's required checks. So with a BASELINES_TOKEN secret (a fine-grained token with
+# contents: write on this repo) it pushes with that, and the pull request's CI starts as for any push.
+# Without one, re-run the pull request's CI after it commits.
 on:
   workflow_dispatch:
+    inputs:
+      full:
+        description: Regenerate every Linux baseline, not only the stories this branch reaches
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,24 +28,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
+  image:
+    name: Playwright image
     runs-on: ubuntu-24.04
+    outputs:
+      image: ${{ steps.image.outputs.image }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-node@v7
+      - id: image
+        run: echo "image=mcr.microsoft.com/playwright:v$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)-noble" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.image.outputs.image }}
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@v7
         with:
-          node-version-file: .nvmrc
-          cache: npm
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          # The push below uses this token: a personal one starts CI on the branch, GITHUB_TOKEN doesn't.
+          token: ${{ secrets.BASELINES_TOKEN || github.token }}
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - name: Regenerate Linux baselines
+      - name: Regenerate every Linux baseline
+        if: inputs.full
         run: |
           # Start clean so baselines of deleted stories do not linger.
           rm -rf tests/visual/__screenshots__/linux
           npm run test:visual:update
+      - name: Regenerate the baselines this branch reaches
+        if: ${{ !inputs.full }}
+        run: npm run test:visual:changed -- --base origin/main -- --grep @visual --update-snapshots=changed --pass-with-no-tests
       - name: Commit baselines to ${{ github.ref_name }}
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -43,3 +76,14 @@ jobs:
           fi
           git commit -m "Update Linux visual baselines"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+      - name: Say how CI starts
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          HAS_TOKEN: ${{ secrets.BASELINES_TOKEN != '' }}
+        run: |
+          if [ "$HAS_TOKEN" = "true" ]; then
+            echo "::notice title=Baselines committed::Pushed with BASELINES_TOKEN, so CI starts on the branch as for any push."
+          else
+            echo "::notice title=Baselines committed::Pushed with GITHUB_TOKEN, which starts no workflow. Re-run the pull request's CI, or push any commit."
+          fi
