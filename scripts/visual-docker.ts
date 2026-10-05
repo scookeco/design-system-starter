@@ -4,7 +4,7 @@
  * Linux baselines are made, and checked in CI, inside mcr.microsoft.com/playwright at the version the
  * lockfile pins, on x86 (linux/amd64). Screenshots depend on the fonts the browser renders with, which
  * the image fixes, and on the CPU: arm64 rasterises backdrops and shadows a little differently. So this
- * runs the same x86 image (under Rosetta on Apple silicon: colima start --vz-rosetta), and its PNGs are
+ * runs the same x86 image (Docker Desktop runs it through Rosetta on Apple silicon), and its PNGs are
  * CI's byte for byte. That is how a change's Linux baselines are written and committed with the change.
  *
  *   npm run test:visual:docker                     the stories your changes reach (test:visual:changed)
@@ -46,7 +46,7 @@ const PLATFORM = 'linux/amd64';
 const volume = `ds-node-modules-amd64-${createHash('sha256').update(lockText).digest('hex').slice(0, 12)}`;
 
 if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
-  console.error('Docker isn’t running. Start it (with Colima: colima start --vz-rosetta, for the x86 image), then run this again.');
+  console.error('Docker isn’t running. Start Docker Desktop, then run this again.');
   process.exit(1);
 }
 
