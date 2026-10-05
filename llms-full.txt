@@ -5010,7 +5010,7 @@ layout · `src/layouts/AppShell/AppShell.tsx` · usage: `docs/usage/AppShell.usa
 The app frame every signed-in page renders inside: skip link, sidebar (brand + nav), header (breadcrumbs, actions, account menu) and main. Pages fill its slots; they never rebuild the frame. The toast region is mounted here, once. Wide: a toggle at the foot of the sidebar collapses it to an icon rail (labels move into tooltips; accessible names stay). The choice is remembered in localStorage. Below the size.breakpoint.md container width the sidebar is replaced by a Menu button that opens the nav in a Drawer from the inline start: scrim, focus trap, Escape, focus return.
 
 Props:
-- `brand: ReactNode`: Product name or mark at the top of the sidebar.
+- `brand: ReactNode`: Product name or mark: at the top of the sidebar, or at the header's inline start when the header spans the frame.
 - `nav: ReactNode`: Primary navigation: a <Nav label="Main">. It renders its own labelled nav landmark.
 - `breadcrumbs?: ReactNode`: Page trail in the header: <Breadcrumbs>. Omit on top-level pages.
 - `actions?: ReactNode`: Global actions in the header (search, one global create). Never page navigation.
@@ -5028,8 +5028,11 @@ Props:
 - `sidebarStorageKey?: string | null` = `DEFAULT_STORAGE_KEY`: localStorage key under which the uncontrolled collapsed state is remembered across visits. null turns remembering off (gallery and tests).
 - `collapseSidebarLabel?: string` = `'Collapse sidebar'`: Accessible name and tooltip of the rail toggle while the sidebar is expanded.
 - `expandSidebarLabel?: string` = `'Expand sidebar'`: Accessible name and tooltip of the rail toggle while the sidebar is collapsed.
+- `headerSpan?: 'main' | 'full'` = `'main'`: Where the header sits. `main` (default): beside the sidebar, over main only. `full`: one row across the whole frame, with the brand at its inline start, and the sidebar (nav only) and main side by side below it — the same top bar as FocusedLayout, so the brand, help and account stay put when a task takes over the screen. Narrow, both are the same: a header over main.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: headerSpan (main | full).
 States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 
 **When to use**
@@ -5037,6 +5040,7 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 - Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.
 - Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).
 - Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.
+- `headerSpan="full"` runs the header across the whole frame with the brand first, and puts the sidebar (nav only) and main below it. Choose it when the app also uses `FocusedLayout`: its top bar is the same shape, so the brand, help and account stay put when a task takes over the screen. Set it once, in the shell composition; every page has the same frame.
 - An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.
 - People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well.
 
@@ -5080,7 +5084,7 @@ States: defaultNavOpen, sidebarCollapsed, defaultSidebarCollapsed.
 - The `help` slot always renders after the global actions and right before the account menu, the same relative order on every page (WCAG 2.2 SC 3.2.6 Consistent Help). The WCAG 2.2 checks fail an example page that renders the shell without it.
 - A sticky `footer` reserves `space.scroll-padding.end` in main, so a field that gets focus scrolls clear of the bar instead of under it (SC 2.4.11).
 
-Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
+Stories: `layouts-appshell--default`, `layouts-appshell--sidebar-collapsed`, `layouts-appshell--without-breadcrumbs`, `layouts-appshell--with-global-action`, `layouts-appshell--with-help`, `layouts-appshell--with-action-bar`, `layouts-appshell--with-assistant`, `layouts-appshell--full-width-header`, `layouts-appshell--full-width-header-collapsed`, `layouts-appshell--full-width-header-narrow`, `layouts-appshell--user-menu-open`, `layouts-appshell--narrow-collapsed`, `layouts-appshell--narrow-nav-open`.
 Composes: Button, Drawer, Icon, Kbd, Link, Nav, Spinner, Toast, Tooltip.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.canvas`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.enter`, `ease.linear`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `motion.spin`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `shadow.modal`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.drawer.md`, `size.drawer.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.rail`, `size.sidebar.md`, `size.target-min`, `size.viewport.block`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `space.scroll-padding.end`, `space.scroll-padding.toast`, `text.body`, `text.body-lg`, `text.caption`, `text.code`, `text.heading-3`, `text.heading-4`, `text.label`, `z.modal`, `z.overlay`, `z.sticky`, `z.toast`, `z.tooltip`.
 

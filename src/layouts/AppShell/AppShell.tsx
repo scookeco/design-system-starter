@@ -32,7 +32,7 @@ const writeCollapsed = (key: string | null, collapsed: boolean) => {
 };
 
 export interface AppShellProps extends EscapeHatch {
-  /** Product name or mark at the top of the sidebar. */
+  /** Product name or mark: at the top of the sidebar, or at the header's inline start when the header spans the frame. */
   brand: ReactNode;
   /** Primary navigation: a <Nav label="Main">. It renders its own labelled nav landmark. */
   nav: ReactNode;
@@ -84,6 +84,13 @@ export interface AppShellProps extends EscapeHatch {
   collapseSidebarLabel?: string;
   /** Accessible name and tooltip of the rail toggle while the sidebar is collapsed. */
   expandSidebarLabel?: string;
+  /**
+   * Where the header sits. `main` (default): beside the sidebar, over main only. `full`: one row
+   * across the whole frame, with the brand at its inline start, and the sidebar (nav only) and main
+   * side by side below it — the same top bar as FocusedLayout, so the brand, help and account stay
+   * put when a task takes over the screen. Narrow, both are the same: a header over main.
+   */
+  headerSpan?: 'main' | 'full';
 }
 
 /**
@@ -116,6 +123,7 @@ export function AppShell({
   sidebarStorageKey = DEFAULT_STORAGE_KEY,
   collapseSidebarLabel = 'Collapse sidebar',
   expandSidebarLabel = 'Expand sidebar',
+  headerSpan = 'main',
   UNSAFE_className,
   UNSAFE_style,
 }: AppShellProps) {
@@ -150,9 +158,13 @@ export function AppShell({
         <a className="app-shell__skip" href={`#${mainId}`} onClick={skipToMain}>
           {skipLinkLabel}
         </a>
-        <div className="app-shell__frame" data-sidebar={collapsed ? 'collapsed' : 'expanded'}>
+        <div
+          className="app-shell__frame"
+          data-sidebar={collapsed ? 'collapsed' : 'expanded'}
+          data-header={headerSpan === 'full' ? 'full' : undefined}
+        >
           <div className="app-shell__sidebar" id={sidebarId}>
-            <div className="app-shell__brand">{brand}</div>
+            {headerSpan === 'full' ? null : <div className="app-shell__brand">{brand}</div>}
             <NavDisplayContext value={collapsed ? 'rail' : 'full'}>{nav}</NavDisplayContext>
             <div className="app-shell__collapse">
               <Tooltip content={collapsed ? expandSidebarLabel : collapseSidebarLabel} side="right">
@@ -191,6 +203,7 @@ export function AppShell({
                 </div>
               </Drawer>
             </div>
+            {headerSpan === 'full' ? <div className="app-shell__brand">{brand}</div> : null}
             <div className="app-shell__context">{breadcrumbs}</div>
             {actions || help || userMenu ? (
               <div className="app-shell__actions">

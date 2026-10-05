@@ -188,7 +188,8 @@
       padding-inline: var(--space-inset-xs);
     }
 
-    .app-shell__frame[data-sidebar="collapsed"] .app-shell__brand {
+    /* The sidebar's brand only: a header that spans the frame keeps its own. */
+    .app-shell__frame[data-sidebar="collapsed"] :where(.app-shell__sidebar) > .app-shell__brand {
       position: absolute;
       overflow: hidden;
       clip-path: inset(50%);
@@ -200,6 +201,30 @@
     .app-shell__frame[data-sidebar="collapsed"] .app-shell__collapse {
       justify-content: center;
     }
+  }
+
+  /*
+   * 3b. variant: the header across the whole frame, the sidebar and main below it. Wide only, and
+   * areas only, so the rail's columns (above) and the narrow frame (below) apply unchanged.
+   */
+  @container app-shell (inline-size >= 48rem) {
+    .app-shell__frame[data-header="full"] {
+      grid-template-areas:
+        "header header"
+        "sidebar main";
+    }
+
+    .app-shell__frame[data-header="full"]:has(> .app-shell__assistant) {
+      grid-template-areas:
+        "header header header"
+        "sidebar main assistant";
+    }
+  }
+
+  /* Its brand leads the header row, as FocusedLayout's does. */
+  .app-shell__header > .app-shell__brand {
+    flex: none;
+    padding-inline: 0;
   }
 
   /* The nav inside the narrow-screen Drawer (portalled, so outside the shell's container). */

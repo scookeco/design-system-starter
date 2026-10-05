@@ -1006,7 +1006,7 @@
           "type": "ReactNode",
           "required": true,
           "default": null,
-          "description": "Product name or mark at the top of the sidebar."
+          "description": "Product name or mark: at the top of the sidebar, or at the header's inline start when the header spans the frame."
         },
         {
           "name": "nav",
@@ -1126,6 +1126,17 @@
           "required": false,
           "default": "'Expand sidebar'",
           "description": "Accessible name and tooltip of the rail toggle while the sidebar is collapsed."
+        },
+        {
+          "name": "headerSpan",
+          "type": "'main' | 'full'",
+          "required": false,
+          "default": "'main'",
+          "description": "Where the header sits. `main` (default): beside the sidebar, over main only. `full`: one row across the whole frame, with the brand at its inline start, and the sidebar (nav only) and main side by side below it — the same top bar as FocusedLayout, so the brand, help and account stay put when a task takes over the screen. Narrow, both are the same: a header over main.",
+          "values": [
+            "main",
+            "full"
+          ]
         }
       ],
       "inherits": [],
@@ -1135,7 +1146,12 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {},
+      "variants": {
+        "headerSpan": [
+          "main",
+          "full"
+        ]
+      },
       "states": [
         "defaultNavOpen",
         "sidebarCollapsed",
@@ -1146,6 +1162,7 @@
           "Every signed-in page. Define the composition once for the app (brand, nav, account menu); pages pass where they are and their content.",
           "Fill the slots: `breadcrumbs`, `actions` (global only), `help`, `userMenu`, `children` (the page), `footer` (a long form’s action bar).",
           "Pass `help` (a Help menu: self-help plus a way to reach a person) from the app’s one shell composition, so it sits in the same place on every page.",
+          "`headerSpan=\"full\"` runs the header across the whole frame with the brand first, and puts the sidebar (nav only) and main below it. Choose it when the app also uses `FocusedLayout`: its top bar is the same shape, so the brand, help and account stay put when a task takes over the screen. Set it once, in the shell composition; every page has the same frame.",
           "An assistant beside the page goes in `assistant` (an `AssistantPanel`): a resizable column at main’s inline end, a launcher in the header when narrow.",
           "People can collapse the wide sidebar to an icon rail; the shell remembers it in localStorage under `sidebarStorageKey`. Give every primary nav item an `icon` so the rail reads well."
         ],
@@ -1206,6 +1223,18 @@
           {
             "id": "layouts-appshell--with-assistant",
             "name": "With Assistant"
+          },
+          {
+            "id": "layouts-appshell--full-width-header",
+            "name": "Full Width Header"
+          },
+          {
+            "id": "layouts-appshell--full-width-header-collapsed",
+            "name": "Full Width Header Collapsed"
+          },
+          {
+            "id": "layouts-appshell--full-width-header-narrow",
+            "name": "Full Width Header Narrow"
           },
           {
             "id": "layouts-appshell--user-menu-open",
