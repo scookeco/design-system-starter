@@ -38,7 +38,8 @@ UI rules (design system v0)
 - Every new variant, size or state gets a story. Every new exported component,
   layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
   use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
-  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
+  without one. npm run check, axe and WCAG 2.2 checks must pass;
+  screenshot changes are reviewed after merge.
 - A story that renders an open modal is tagged ['modal-open', '!autodocs'].
 - WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
   focus never hidden behind sticky content (scroll containers use
@@ -6950,8 +6951,8 @@ npm run test:visual:canonical -- --update      # the same stories in the CI imag
 #### The draft workflow
 
 - Open pull requests as drafts while iterating: they run the check job only, which is fast.
-- Mark it ready for review to build the gallery and run the visual, axe and WCAG 2.2 shards. Merge only once that run is green.
-- A new push cancels the run it replaces. The gate job, not the shards, is the required check.
+- Mark it ready for review to build the gallery and run the visual, axe and WCAG 2.2 shards. Only Check is required to merge: fix any axe or WCAG 2.2 failure first, but a screenshot that changed on purpose can merge.
+- After merge, the full run on main regenerates any screenshots that changed and opens one pull request with them to review (the Baselines after merge workflow).
 
 #### WCAG checks and rule tests
 
@@ -7036,7 +7037,8 @@ UI rules (design system v0)
 - Every new variant, size or state gets a story. Every new exported component,
   layout or primitive gets a usage doc in docs/usage/<Name>.usage.tsx (when to
   use, when not to, do/don't, accessibility); tests/unit/docs.test.tsx fails
-  without one. Lint, npm run check and the gallery (visual + axe + WCAG 2.2 checks) must pass.
+  without one. npm run check, axe and WCAG 2.2 checks must pass;
+  screenshot changes are reviewed after merge.
 - A story that renders an open modal is tagged ['modal-open', '!autodocs'].
 - WCAG 2.2 AA is part of the gate: targets ≥ 24px or spaced (size.target-min),
   focus never hidden behind sticky content (scroll containers use

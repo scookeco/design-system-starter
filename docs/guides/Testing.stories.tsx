@@ -118,8 +118,8 @@ npm run test:visual:canonical -- --update      # the same stories in the CI imag
         <Rules
           items={[
             <>Open pull requests as drafts while iterating: they run the check job only, which is fast.</>,
-            <>Mark it ready for review to build the gallery and run the visual, axe and WCAG 2.2 shards. Merge only once that run is green.</>,
-            <>A new push cancels the run it replaces. The gate job, not the shards, is the required check.</>,
+            <>Mark it ready for review to build the gallery and run the visual, axe and WCAG 2.2 shards. Only Check is required to merge: fix any axe or WCAG 2.2 failure first, but a screenshot that changed on purpose can merge.</>,
+            <>After merge, the full run on main regenerates any screenshots that changed and opens one pull request with them to review (the Baselines after merge workflow).</>,
           ]}
         />
       </DocSection>
