@@ -42,7 +42,8 @@ jobs:
 
   update:
     needs: image
-    runs-on: ubuntu-24.04
+    # linux/arm64, like the visual job in ci.yml and npm run test:visual:canonical on Apple silicon.
+    runs-on: ubuntu-24.04-arm
     container:
       image: ${{ needs.image.outputs.image }}
       options: --ipc=host

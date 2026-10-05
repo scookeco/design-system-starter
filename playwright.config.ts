@@ -36,9 +36,11 @@ if (process.env.VISUAL_STEPS === undefined) {
 /**
  * Visual regression and axe over every story of the built Storybook.
  *
- * Baselines are per platform ({platform} in the path). Linux baselines, produced by
- * the "Update visual baselines" workflow, are committed and are the source of truth.
- * Local darwin/win32 baselines are gitignored.
+ * Baselines are per platform ({platform} in the path). Linux baselines are committed and are the
+ * source of truth: made in the Playwright image on linux/arm64, by npm run test:visual:canonical
+ * (native on Apple silicon) or the "Update visual baselines" workflow (GitHub's arm64 runners), and
+ * compared on those runners in CI. macOS and Windows compare with a native reference instead
+ * (scripts/visual-reference.ts); nothing for them is committed.
  */
 export default defineConfig({
   testDir: 'tests/visual',

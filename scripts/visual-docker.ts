@@ -3,15 +3,15 @@
  * machine: the canonical screenshot environment. Optional; everyday local runs are native (test:visual:changed).
  *
  * Linux baselines are made, and checked in CI, inside mcr.microsoft.com/playwright at the version the
- * lockfile pins, on x86 (linux/amd64). Screenshots depend on the fonts the browser renders with, which
- * the image fixes, and on the CPU: arm64 rasterises backdrops and shadows a little differently. So this
- * runs the same x86 image (Docker Desktop runs it through Rosetta on Apple silicon), and its PNGs are
- * CI's byte for byte. That is how a change's Linux baselines are written and committed with the change.
+ * lockfile pins, on arm64 (linux/arm64; CI's visual jobs run on ubuntu-24.04-arm). Screenshots depend on
+ * the fonts the browser renders with, which the image fixes, and on the CPU architecture: x86 rasterises
+ * backdrops and shadows a little differently. So this runs the same arm64 image, natively on Apple
+ * silicon, and its PNGs are CI's byte for byte. That is how a change's Linux baselines are written and committed with the change.
  *
  *   npm run test:visual:canonical                     the stories your changes reach (test:visual:changed)
  *   npm run test:visual:canonical -- --update         and rewrite their baselines where they changed
  *   npm run test:visual:canonical -- --full           regenerate every Linux baseline (deletes the old ones first;
- *                                                  about an hour under Rosetta: the workflow's "full" is quicker)
+ *                                                  about 6 minutes natively on Apple silicon)
  *   npm run test:visual:canonical -- -- <args>        passed on to test:visual:changed (e.g. -- --base <ref>)
  *
  * New stories get their baselines written on any run; a changed screenshot fails unless --update.
@@ -43,8 +43,9 @@ if (!version) {
   process.exit(1);
 }
 const image = `mcr.microsoft.com/playwright:v${version}-noble`;
-const PLATFORM = 'linux/amd64';
-const volume = `ds-node-modules-amd64-${createHash('sha256').update(lockText).digest('hex').slice(0, 12)}`;
+// arm64: CI's visual job runs on arm64 runners, and Apple silicon runs this natively (no emulation).
+const PLATFORM = 'linux/arm64';
+const volume = `ds-node-modules-arm64-${createHash('sha256').update(lockText).digest('hex').slice(0, 12)}`;
 
 if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
   console.error('Docker isn’t running. Start Docker Desktop, then run this again.');
