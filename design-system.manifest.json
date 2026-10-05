@@ -92,7 +92,7 @@
     },
     {
       "command": "npm run check",
-      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size`."
+      "description": "`tokens:check`, `manifest:check`, `typecheck`, `lint:js`, `lint:css`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size` (`scripts/check.ts`). They run concurrently, except `size`, which waits for `build`; each stage's output is printed whole when it ends (a passing one only with `-- --verbose`), then a timing table. About 22s on a 10-core Mac (31s one at a time: `-- --serial`)."
     }
   ],
   "guides": [

@@ -1,11 +1,12 @@
-import { globSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { globSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, sep } from 'node:path';
+import { dirname, join, matchesGlob, sep } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   affectedEntries,
   classify,
   cssScopeProblems,
+  EVERYTHING,
   loadGallery,
   ModuleGraph,
   ROOT,
@@ -249,5 +250,23 @@ describe('CSS scope (what lets barrels be followed by name)', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe('CI runs the visual job for every change that reaches every story', () => {
+  // ci.yml's `changes` job skips the visual job unless a path in its `ui` filter changed. A pattern
+  // here that runs every story but isn't in that filter would skip the visual run outright.
+  const workflow = readFileSync(join(ROOT, '.github/workflows/ci.yml'), 'utf8');
+  const block = /\n\s+ui:\n((?:\s+- '[^']+'\n)+)/.exec(workflow)?.[1] ?? '';
+  const filter = [...block.matchAll(/- '([^']+)'/g)].map((m) => m[1] as string);
+
+  it('finds the ui filter', () => {
+    expect(filter.length).toBeGreaterThan(5);
+  });
+
+  it.each(EVERYTHING.map((rule) => rule.pattern))('%s is in the ui filter', (pattern) => {
+    // A path the pattern matches, to test against the filter's globs.
+    const sample = pattern.replaceAll('**', 'a/b').replaceAll('*', 'a');
+    expect(filter.some((f) => matchesGlob(sample, f)), `${pattern} runs every story but no ui filter pattern matches ${sample}`).toBe(true);
   });
 });

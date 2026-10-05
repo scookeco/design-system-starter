@@ -159,7 +159,7 @@ No provider is chosen here. This is where one plugs in:
 | `npm run regen` | Every generated file: tokens, token usage, the manifest and the llms files. After a merge conflict in any of them, take either side and run this. |
 | `npm run test:wcag22` | Build Storybook, then only the WCAG 2.2 checks (target size, focus not obscured, accessible authentication, consistent help) and their fixtures. |
 | `npm run test:visual:changed` | Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See "Targeted visual runs". |
-| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size`. |
+| `npm run check` | `tokens:check`, `manifest:check`, `typecheck`, `lint:js`, `lint:css`, `dead-modules`, `test`, `test:rules`, `build`, `build:app`, `size` (`scripts/check.ts`). They run concurrently, except `size`, which waits for `build`; each stage's output is printed whole when it ends (a passing one only with `-- --verbose`), then a timing table. About 22s on a 10-core Mac (31s one at a time: `-- --serial`). |
 
 ## Repo map
 
