@@ -8,6 +8,7 @@ export const usage: UsageDoc = {
   whenToUse: [
     'Showing where someone is in a task whose steps must be done in order: setup, a multi-step create. Pair it with `FocusedLayout` and copy the Setup wizard example.',
     'Three to six steps with short, parallel labels. Keep the list the same on every step.',
+    'It spans its container in one row, so put it at the top of the column, full width. It already says how far someone is: no `Progress` bar above it. In under 40rem of container it becomes a vertical track.',
   ],
   whenNotToUse: [
     { situation: 'Sections that can be visited in any order', instead: '`NavTabs` (routes) or `Tabs` (panels)' },

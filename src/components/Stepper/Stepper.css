@@ -1,18 +1,36 @@
 @layer components {
-  /* 1. block: a row of steps that wraps on narrow screens */
+  /* 1. block: the container the steps respond to */
   .stepper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-gap-sm) var(--space-gap-lg);
+    container: stepper / inline-size;
   }
 
-  /* 2. parts */
+  /* 2. parts: a vertical track by default — markers joined by a line down their centre */
+  .stepper__list {
+    display: flex;
+    flex-direction: column;
+  }
+
   .stepper__step {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--space-gap-xs);
     color: var(--color-fg-muted);
     font: var(--text-label);
+  }
+
+  .stepper__step:not(:last-child) {
+    padding-block-end: var(--space-gap-sm);
+  }
+
+  /* the connector to the next step: as thick as NavTabs' indicator, so a filled one reads as filled */
+  .stepper__step:not(:last-child)::after {
+    position: absolute;
+    inset-block: var(--size-target-min) 0;
+    inset-inline-start: calc((var(--size-target-min) - var(--focus-ring-width)) / 2);
+    inline-size: var(--focus-ring-width);
+    background: var(--color-border-strong);
+    content: "";
   }
 
   .stepper__marker {
@@ -22,16 +40,20 @@
     justify-content: center;
     inline-size: var(--size-target-min);
     block-size: var(--size-target-min);
-    border: 1px solid var(--color-border-strong);
+    border: var(--border-width-default) solid var(--color-border-strong);
     border-radius: var(--radius-pill);
     background: var(--color-bg-surface);
     font: var(--text-caption);
     font-variant-numeric: tabular-nums;
   }
 
-  /* 3. states: shape and weight as well as colour */
+  /* 3. states: shape and weight as well as colour; a done step's connector is filled */
   .stepper__step[data-state="completed"] {
     color: var(--color-fg-default);
+  }
+
+  .stepper__step[data-state="completed"]::after {
+    background: var(--color-action-primary);
   }
 
   .stepper__step[data-state="completed"] .stepper__marker {
@@ -49,5 +71,37 @@
     border: var(--focus-ring-width) solid var(--color-action-primary);
     color: var(--color-fg-default);
     font-weight: var(--font-weight-strong);
+  }
+
+  /* 4. wide: one row across the container, the connectors taking up the space between steps */
+  @container stepper (inline-size >= 40rem) {
+    .stepper__list {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-gap-sm);
+    }
+
+    .stepper__step {
+      flex: 1 1 0;
+      gap: var(--space-gap-xs) var(--space-gap-sm);
+      min-inline-size: 0;
+    }
+
+    .stepper__step:not(:last-child) {
+      padding-block-end: 0;
+    }
+
+    .stepper__step:last-child {
+      flex: none;
+    }
+
+    .stepper__step:not(:last-child)::after {
+      position: static;
+      flex: 1 1 var(--space-gap-lg);
+      align-self: center;
+      inline-size: auto;
+      min-inline-size: var(--space-gap-lg);
+      block-size: var(--focus-ring-width);
+    }
   }
 }

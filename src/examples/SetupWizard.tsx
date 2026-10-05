@@ -5,8 +5,8 @@
  * order is a single page (CreateEditFlow). No CSS file, no className, no style.
  *
  * Anatomy:
- *   frame    FocusedLayout: brand · the task · Exit setup | Progress (Step n of 4) | column | Back · Next
- *   column   Stepper (completed · current · upcoming) · PageHeader (the step's h1) · the step's form
+ *   frame    FocusedLayout: brand · the task · Exit setup | column | Back · Next
+ *   column   Stepper across the column (completed · current · upcoming) · PageHeader (the step's h1) · the step's form
  *   steps    Workspace → Invite (optional) → Plan → Review (every answer, each with Edit) → Create
  *
  * Validation is per step: Next checks only this step. On failure, field errors show and focus moves to
@@ -14,7 +14,7 @@
  * step's h1 so screen reader and keyboard users start at the top of the new step.
  */
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Banner, Button, Card, CardBody, CardHeader, CloseIcon, Cluster, FocusedLayout, PageHeader, Progress, RadioGroup, Stack, Stepper, Text, Textarea, TextField } from '../index';
+import { Banner, Button, Card, CardBody, CardHeader, CloseIcon, Cluster, FocusedLayout, PageHeader, RadioGroup, Stack, Stepper, Text, Textarea, TextField } from '../index';
 
 export interface WorkspaceDraft {
   name: string;
@@ -116,7 +116,6 @@ export function SetupWizard({ initialStep = 0, initialDraft, initialAttempted = 
           Exit setup
         </Button>
       }
-      progress={<Progress label="Setup progress" value={step + 1} max={STEPS.length} valueText={`Step ${String(step + 1)} of ${String(STEPS.length)}`} />}
       footer={
         created ? undefined : (
           <Cluster justify="between">

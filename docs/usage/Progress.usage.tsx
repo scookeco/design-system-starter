@@ -4,13 +4,13 @@ import type { UsageDoc } from './types';
 export const usage: UsageDoc = {
   covers: [Progress],
   whenToUse: [
-    'Determinate progress through a task: steps of a wizard, files of an upload, rows of an import.',
-    'Say the value in words with `valueText` (“Step 2 of 4”, “3 of 12 files”); it is shown and read out. Without it, a whole percentage.',
+    'Determinate progress through work someone waits on: files of an upload, rows of an import, the stages of a background job.',
+    'Say the value in words with `valueText` (“3 of 12 files”, “Step 2 of 3: Review”); it is shown and read out. Without it, a whole percentage.',
   ],
   whenNotToUse: [
     { situation: 'Work of unknown length', instead: '`Spinner`' },
     { situation: 'Usage against a limit (seats, storage, API calls)', instead: '`Meter`' },
-    { situation: 'The steps themselves', instead: '`Stepper`, beside it' },
+    { situation: 'Where someone is in a wizard', instead: '`Stepper`, which already says how far: don’t add a bar above it' },
   ],
   do: {
     caption: 'A label and the value in words, over the bar.',

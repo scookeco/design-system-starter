@@ -19743,6 +19743,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Stepper",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.action.primary",
           "readBy": [
             {

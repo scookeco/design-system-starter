@@ -4,7 +4,7 @@
  * No CSS file, no className, no style.
  *
  * Anatomy:
- *   frame    FocusedLayout: brand · the task · Exit import | Progress (Step n of 4) | column | Back · Next
+ *   frame    FocusedLayout: brand · the task · Exit import | column (Stepper first) | Back · Next
  *   steps    Upload → Map columns → Review → Import
  *   upload   FileUpload with its limits up front (CSV, 1 MB, 1,000 rows); the file is read here,
  *            nothing is sent until Import
@@ -200,7 +200,6 @@ export function ImportWizard({ initialStep = 0, initialFile, initialMapping, ini
           {onImport ? 'Close' : 'Exit import'}
         </Button>
       }
-      progress={<Progress label="Import progress" value={step + 1} max={STEPS.length} valueText={`Step ${String(step + 1)} of ${String(STEPS.length)}`} />}
       footer={
         onImport ? (
           <Cluster justify="end">
