@@ -32,7 +32,7 @@ export { EmptyState, type EmptyStateProps, type EmptyStateReason } from './Empty
 export { Banner, type BannerProps, type BannerTone } from './Banner/Banner';
 export { Spinner, type SpinnerProps, type SpinnerSize } from './Spinner/Spinner';
 export { Skeleton, type SkeletonProps, type SkeletonShape } from './Skeleton/Skeleton';
-export { Card, CardHeader, CardBody, CardFooter, type CardProps, type CardHeaderProps, type CardFooterProps } from './Card/Card';
+export { Card, CardHeader, CardBody, CardFooter, CardLink, type CardProps, type CardHeaderProps, type CardFooterProps, type CardLinkProps } from './Card/Card';
 export * from './Icon/icons';
 export { PageHeader, type PageHeaderProps } from './PageHeader/PageHeader';
 export { NavTabs, type NavTabsProps, type NavTab } from './NavTabs/NavTabs';

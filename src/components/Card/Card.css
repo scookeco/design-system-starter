@@ -57,4 +57,65 @@
   .card__footer[data-justify="between"] {
     justify-content: space-between;
   }
+
+  /*
+   * CardLink: the whole card is one link. Its parts stack with the card's own inset; the meta
+   * line sits at the foot, so cards in a row line their meta up.
+   */
+  .card[data-interactive] {
+    gap: var(--space-gap-2xs);
+    padding: var(--space-inset-md);
+    text-decoration: none;
+    transition-property: border-color, background-color;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  .card__title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  .card__description {
+    color: var(--color-fg-muted);
+    font: var(--text-body);
+  }
+
+  .card__meta {
+    margin-block-start: auto;
+    padding-block-start: var(--space-inset-sm);
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  /* Hover and focus: the border and the title, not colour on the surface alone. */
+  :where(a).card[data-interactive]:hover,
+  :where(a).card[data-interactive]:focus-visible {
+    border-color: var(--color-action-primary);
+  }
+
+  :where(a.card[data-interactive]):hover .card__title-row > .heading {
+    color: var(--color-fg-link);
+    text-decoration: underline;
+  }
+
+  /* Pressed: a navigation is under way. */
+  :where(a).card[data-interactive]:active {
+    background: var(--color-bg-selected);
+  }
+
+  /* Unavailable: present so the set is complete, but inert. Dashed and flat, not just faded. */
+  .card[data-state="unavailable"] {
+    border-style: dashed;
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-muted);
+    box-shadow: none;
+  }
+
+  .card[data-state="unavailable"] .heading {
+    color: var(--color-fg-muted);
+  }
 }
+
