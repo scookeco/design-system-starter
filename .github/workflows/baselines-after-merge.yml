@@ -1,0 +1,135 @@
+name: Baselines after merge
+
+# Screenshots are reviewed after merge, not before: when CI's full visual run on main (a push or the
+# nightly run) fails, this regenerates every Linux baseline from that commit and, when any changed,
+# puts them on one rolling branch, visual-baselines/main, as a pull request to review image by image.
+#
+# Only screenshots go in it. An axe or WCAG 2.2 failure changes no PNG, so it leaves nothing to
+# commit here: main stays red until the code is fixed.
+#
+# Pull requests and pushes made with GITHUB_TOKEN start no workflow, and in this repository Actions
+# may not open pull requests. So with a BASELINES_TOKEN secret (a fine-grained token with contents and
+# pull requests: write, on this repository) it pushes and opens the pull request with that, and the
+# pull request's CI starts as for any other. Without one it pushes the branch and links to open the
+# pull request by hand (opening it yourself starts its CI).
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  # By hand on main: regenerate from main's head and open the pull request if anything changed.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: baselines-after-merge
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    name: Did the visual run fail on main?
+    runs-on: ubuntu-24.04
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'failure' &&
+       (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'schedule'))
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+      sha: ${{ steps.decide.outputs.sha }}
+      image: ${{ steps.image.outputs.image }}
+    steps:
+      - id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # A failed check job (types, lint, unit tests) is not a screenshot question.
+          failed=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID/jobs" --paginate \
+            --jq '[.jobs[] | select((.name | startswith("Visual regression and axe (")) and .conclusion == "failure")] | length')
+          echo "Failed visual shards: $failed"
+          echo "run=$([ "$failed" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        if: steps.decide.outputs.run == 'true'
+        with:
+          ref: ${{ steps.decide.outputs.sha }}
+      - id: image
+        if: steps.decide.outputs.run == 'true'
+        run: echo "image=mcr.microsoft.com/playwright:v$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)-noble" >> "$GITHUB_OUTPUT"
+
+  regenerate:
+    name: Regenerate the Linux baselines
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    # linux/arm64, like CI's visual job and npm run test:visual:canonical on Apple silicon.
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ${{ needs.decide.outputs.image }}
+      options: --ipc=host
+    outputs:
+      pushed: ${{ steps.commit.outputs.pushed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.decide.outputs.sha }}
+          # The push below uses this token: a personal one starts CI on the branch, GITHUB_TOKEN doesn't.
+          token: ${{ secrets.BASELINES_TOKEN || github.token }}
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - run: npm ci
+      - name: Regenerate every Linux baseline
+        run: |
+          # Start clean so baselines of deleted stories go too.
+          rm -rf tests/visual/__screenshots__/linux
+          npm run test:visual:update
+      - name: Commit them to visual-baselines/main
+        id: commit
+        env:
+          SHA: ${{ needs.decide.outputs.sha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tests/visual/__screenshots__/linux
+          if git diff --cached --quiet; then
+            echo "::notice title=No screenshot changed::The visual run failed on axe or the WCAG 2.2 checks, not on a screenshot. Fix the code: main stays red until then."
+            exit 0
+          fi
+          git diff --cached --stat | tail -1
+          git checkout -B visual-baselines/main
+          git commit -m "Update Linux visual baselines after ${SHA::7}"
+          # One rolling branch: each failed run on main replaces it with that commit plus its baselines.
+          git push --force origin visual-baselines/main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+  pull-request:
+    name: Open the baselines pull request
+    needs: [decide, regenerate]
+    if: needs.regenerate.outputs.pushed == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.BASELINES_TOKEN }}
+          HAS_TOKEN: ${{ secrets.BASELINES_TOKEN != '' }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ needs.decide.outputs.sha }}
+        run: |
+          if [ "$HAS_TOKEN" != "true" ]; then
+            echo "::notice title=Baselines pushed::visual-baselines/main has the new screenshots. Open the pull request: https://github.com/$REPO/compare/main...visual-baselines/main?expand=1 (opening it yourself starts its CI; a BASELINES_TOKEN secret makes this automatic)."
+            exit 0
+          fi
+          open=$(gh pr list --repo "$REPO" --head visual-baselines/main --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            echo "::notice title=Baselines updated::Pull request #$open now has the screenshots from ${SHA::7}."
+            exit 0
+          fi
+          gh pr create --repo "$REPO" --base main --head visual-baselines/main \
+            --title "Update visual baselines after ${SHA::7}" \
+            --body "The full visual run on main failed at ${SHA}. These are every Linux baseline regenerated from that commit in the canonical image (linux/arm64): review each changed image, and merge if it is the change you meant. An axe or WCAG 2.2 failure is not in here: if main is still red after this merges, fix the code."
