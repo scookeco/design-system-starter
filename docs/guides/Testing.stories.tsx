@@ -39,9 +39,8 @@ function Testing() {
           </TableBody>
         </Table>
         <Code label="Before a pull request">{`
-npm run check                      # tokens, types, lint, unit, rules, build, budgets
-npm run test:visual:docker -- --update             # the stories your changes reach, in the CI image; commit the baselines it writes
-PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, without Docker
+npm run validate                               # check, then the stories your changes reach, natively (no Docker)
+npm run test:visual:canonical -- --update      # the same stories in the CI image (Docker, x86); commit the Linux baselines it writes
 `}</Code>
       </DocSection>
       <DocSection title="Targeted runs">
@@ -50,7 +49,9 @@ PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, w
             <>
               The full visual run is about 1,520 tests: one per story per theme, which loads the story once for its screenshot, axe and (light) the WCAG 2.2 checks. Between steps, run <code>npm run test:visual:changed</code>: screenshots, axe
               and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since <code>origin/main</code> with uncommitted and untracked
-              files included (<code>-- --base HEAD</code> for only what you haven’t committed).
+              files included (<code>-- --base HEAD</code> for only what you haven’t committed). It runs natively: on macOS, where no baselines are committed,
+              screenshots compare with the same stories rendered at the merge base on your machine, cached after the first run. That is feedback; the
+              committed Linux baselines come from <code>npm run test:visual:canonical -- --update</code> or the workflow.
             </>,
             <>
               It prints the plan first: changed files, the story files they reach, the stories and tests that follows, and why.{' '}
@@ -100,7 +101,7 @@ PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, w
               CI compares in, so a local run's screenshots are CI's byte for byte; never edit or delete them by hand.
             </>,
             <>
-              Make them with the change: <code>npm run test:visual:docker -- --update</code> rewrites the baselines of the stories your change reaches,
+              Make them with the change: <code>npm run test:visual:canonical -- --update</code> rewrites the baselines of the stories your change reaches,
               and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them (re-run CI after, unless a BASELINES_TOKEN secret is set).
             </>,
             <>

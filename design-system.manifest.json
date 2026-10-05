@@ -68,15 +68,15 @@
     },
     {
       "command": "npm run test:visual",
-      "description": "Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks."
+      "description": "Build Storybook, then screenshot and axe every story in light and dark, and run the WCAG 2.2 checks: one page load per story per theme. On a platform without committed baselines (macOS) screenshots are skipped; use `test:visual:changed` for native screenshot feedback."
     },
     {
       "command": "npm run test:visual:update",
-      "description": "Rewrite this platform's baselines (local ones are gitignored)."
+      "description": "Rewrite this platform's baselines (only Linux ones are committed: use `test:visual:canonical -- --update`)."
     },
     {
-      "command": "npm run test:visual:docker",
-      "description": "`test:visual:changed` in the CI image, so the Linux baselines it checks and writes are the committed ones. `-- --update` rewrites the ones your change moved; `-- --full` regenerates them all. Needs Docker running x86 images: on a Mac, Docker Desktop, which runs them through Rosetta on Apple silicon (Settings → General → \"Use Rosetta for x86_64/amd64 emulation on Apple Silicon\", on by default). A change's few stories take minutes; `--full` takes about an hour under Rosetta, so for that the workflow's **full** is quicker."
+      "command": "npm run validate",
+      "description": "`check`, then `test:visual:changed`: the fast local gate, native, no Docker."
     },
     {
       "command": "npm run regen",
@@ -88,7 +88,7 @@
     },
     {
       "command": "npm run test:visual:changed",
-      "description": "Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale. See \"Targeted visual runs\"."
+      "description": "Screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach (since `origin/main`, uncommitted included; `-- --base <ref>` for another base), natively. On Linux screenshots compare with the committed baselines; elsewhere with the merge base rendered on the same machine (see \"Native screenshots\"). Prints the plan first; `-- --dry-run` stops there. Builds Storybook when it's stale, and ends with how long each stage took. See \"Targeted visual runs\"."
     },
     {
       "command": "npm run check",

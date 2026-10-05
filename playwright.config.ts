@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 // PLAYWRIGHT_PORT lets parallel checkouts each serve their own storybook-static.
 const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 6007);
+// The native reference run (scripts/visual-reference.ts) points these at the merge base's build and
+// at a cache of its screenshots. Unset: this checkout's storybook-static and committed baselines.
+const STORYBOOK_STATIC = process.env.STORYBOOK_STATIC ?? 'storybook-static';
+const SNAPSHOT_DIR = process.env.VISUAL_SNAPSHOT_DIR;
 const CI = Boolean(process.env.CI);
 
 /**
@@ -38,7 +42,7 @@ if (process.env.VISUAL_STEPS === undefined) {
  */
 export default defineConfig({
   testDir: 'tests/visual',
-  snapshotPathTemplate: 'tests/visual/__screenshots__/{platform}/{arg}{ext}',
+  snapshotPathTemplate: SNAPSHOT_DIR ? `${SNAPSHOT_DIR}/{arg}{ext}` : 'tests/visual/__screenshots__/{platform}/{arg}{ext}',
   fullyParallel: true,
   forbidOnly: CI,
   retries: 0,
@@ -73,7 +77,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npx vite preview --outDir storybook-static --port ${String(PORT)} --strictPort`,
+    command: `npx vite preview --outDir ${JSON.stringify(STORYBOOK_STATIC)} --port ${String(PORT)} --strictPort`,
     url: `http://localhost:${String(PORT)}/index.json`,
     reuseExistingServer: !CI,
   },

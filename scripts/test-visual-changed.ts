@@ -7,16 +7,23 @@
  *   npm run test:visual:changed -- --dry-run             print the plan only (no build, no run)
  *   npm run test:visual:changed -- --list                also print every story and Docs-tab id it runs
  *   npm run test:visual:changed -- --self-check          compare the graph with Storybook's own module graph
+ *   npm run test:visual:changed -- --no-reference        macOS/Windows: skip the merge-base reference (axe and WCAG 2.2 only)
  *   npm run test:visual:changed -- -- <playwright args>  e.g. -- --update-snapshots=changed, or -- --grep @a11y
  *
  * Builds Storybook first (npm run build-storybook) when storybook-static/ is missing or older than
  * anything the gallery reads. Playwright gets the chosen ids in the file named by STORY_IDS_FILE,
  * which tests/visual/storybook.ts reads to filter its stories and Docs tabs.
+ *
+ * Screenshots compare against the committed baselines of this platform when there are any (Linux:
+ * CI, and npm run test:visual:canonical). Anywhere else (macOS, Windows) they compare against the
+ * same stories rendered natively at the merge base (scripts/visual-reference.ts): fast feedback on
+ * what the branch changed, never a baseline to commit. Ends with how long each stage took.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, globSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, matchesGlob, sep } from 'node:path';
+import { ensureReference } from './visual-reference.ts';
 import {
   affectedEntries,
   classify,
@@ -39,7 +46,7 @@ const option = (name: string) => {
   const i = own.indexOf(name);
   return i === -1 ? undefined : own[i + 1];
 };
-const known = new Set(['--base', '--dry-run', '--list', '--self-check', '--verbose']);
+const known = new Set(['--base', '--dry-run', '--list', '--self-check', '--verbose', '--no-reference']);
 for (const [i, arg] of own.entries()) {
   if (arg.startsWith('--') && !known.has(arg)) {
     console.error(`Unknown option ${arg}. Pass Playwright options after a second "--": npm run test:visual:changed -- -- ${arg}`);
@@ -60,6 +67,21 @@ const lines = (s: string) => s.split('\n').filter(Boolean);
 const INDEX = join(ROOT, 'storybook-static/index.json');
 const started = performance.now();
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
+/** Stage timings, printed at the end (and in CI logs). */
+const stages: [string, number][] = [];
+const timed = <T>(name: string, fn: () => T): T => {
+  const t = performance.now();
+  try {
+    return fn();
+  } finally {
+    stages.push([name, performance.now() - t]);
+  }
+};
+const printStages = () => {
+  const width = Math.max(...stages.map(([name]) => name.length));
+  console.log(`\nStages (test:visual:changed, ${seconds(performance.now() - started)} in all)`);
+  for (const [name, ms] of stages) console.log(`  ${name.padEnd(width)}  ${seconds(ms).padStart(7)}`);
+};
 
 const buildStorybook = (extra: string[] = []) => {
   console.log(`\nBuilding Storybook (npm run build-storybook${extra.length ? ` -- ${extra.join(' ')}` : ''})…`);
@@ -115,7 +137,7 @@ const staleReason = () => {
   return missing.length > 0 ? `storybook-static/ lacks ${missing[0] ?? ''}` : undefined;
 };
 const stale = staleReason();
-if (stale && !flag('--dry-run')) buildStorybook();
+if (stale && !flag('--dry-run')) timed('Storybook build', () => buildStorybook());
 if (stale && flag('--dry-run') && !existsSync(INDEX)) {
   console.error(`${stale}: run "npm run build-storybook" once, then --dry-run can map files to stories.`);
   process.exit(1);
@@ -167,17 +189,46 @@ if (tests === 0) {
   process.exit(0);
 }
 
-// 4. Run Playwright on exactly those entries.
+// 4. Where screenshots compare: this platform's committed baselines, or a native reference.
 const env = { ...process.env };
+const args = [...passthrough];
+const committed = git('ls-files', `tests/visual/__screenshots__/${process.platform}`) !== '';
+// The same step choice playwright.config.ts makes: VISUAL_STEPS, or a --grep naming a step's tag.
+const grepAt = passthrough.findIndex((a) => a === '--grep' || a === '-g' || a.startsWith('--grep='));
+const grep = grepAt === -1 ? undefined : (passthrough[grepAt]?.includes('=') ? passthrough[grepAt]?.split('=').slice(1).join('=') : passthrough[grepAt + 1]);
+const screenshots =
+  env.VISUAL_STEPS === undefined ? !grep?.includes('@') || new RegExp(grep).test('@visual') : env.VISUAL_STEPS.split(',').includes('visual');
+if (!committed && screenshots && !flag('--no-reference')) {
+  if (passthrough.some((a) => a.startsWith('--update-snapshots') || a === '-u')) {
+    console.error(
+      `\nThere are no committed ${process.platform} baselines to update: native screenshots are feedback, not baselines.\n` +
+        'Write the Linux ones with npm run test:visual:canonical -- --update (Docker), or the "Update visual baselines" workflow.',
+    );
+    process.exit(2);
+  }
+  const ids = visualStories.filter((e) => !isFixture(e)).map((e) => e.id);
+  const reference = timed('Reference (merge base, native)', () => ensureReference(mergeBase, ids));
+  console.log(
+    `\nScreenshots compare with the merge base rendered on this machine: ${plural(reference.rendered, 'story', 'stories')} rendered, ${String(reference.reused)} cached` +
+      (reference.added.length ? `, ${plural(reference.added.length, 'new story', 'new stories')} with nothing to compare` : ''),
+  );
+  env.VISUAL_SNAPSHOT_DIR = reference.dir;
+  // Compare only: never write into the reference.
+  args.push('--update-snapshots=none');
+} else if (!committed && screenshots) {
+  console.log(`\nNo committed ${process.platform} baselines and no reference: screenshots are skipped; axe and the WCAG 2.2 checks run.`);
+}
+
+// 5. Run Playwright on exactly those entries.
 let dir: string | undefined;
 if (!everything) {
   dir = mkdtempSync(join(tmpdir(), 'visual-changed-'));
   env.STORY_IDS_FILE = join(dir, 'ids.json');
   writeFileSync(env.STORY_IDS_FILE, JSON.stringify(run.map((e) => e.id)));
 }
-console.log(`\nnpx playwright test ${passthrough.join(' ')}${everything ? '' : ` (STORY_IDS_FILE: ${String(run.length)} ids)`}`);
-const playwright = spawnSync('npx', ['playwright', 'test', ...passthrough], { cwd: ROOT, stdio: 'inherit', env });
+console.log(`\nnpx playwright test ${args.join(' ')}${everything ? '' : ` (STORY_IDS_FILE: ${String(run.length)} ids)`}`);
+const playwright = timed('Playwright (screenshots, axe, WCAG 2.2)', () => spawnSync('npx', ['playwright', 'test', ...args], { cwd: ROOT, stdio: 'inherit', env }));
 if (dir) rmSync(dir, { recursive: true, force: true });
-console.log(`\ntest:visual:changed finished in ${seconds(performance.now() - started)}`);
+printStages();
 process.exit(playwright.status ?? 1);
 

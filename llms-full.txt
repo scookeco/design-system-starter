@@ -6919,14 +6919,13 @@ The gallery is the test fixture. Every state gets a story, and every story is sc
 | Budgets | Library JS and CSS size, one component’s cost, and that one import pulls in only what it composes. | `npm run size` (inside `npm run check`) |
 
 ```
-npm run check                      # tokens, types, lint, unit, rules, build, budgets
-npm run test:visual:docker -- --update             # the stories your changes reach, in the CI image; commit the baselines it writes
-PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, without Docker
+npm run validate                               # check, then the stories your changes reach, natively (no Docker)
+npm run test:visual:canonical -- --update      # the same stories in the CI image (Docker, x86); commit the Linux baselines it writes
 ```
 
 #### Targeted runs
 
-- The full visual run is about 1,520 tests: one per story per theme, which loads the story once for its screenshot, axe and (light) the WCAG 2.2 checks. Between steps, run `npm run test:visual:changed`: screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since `origin/main` with uncommitted and untracked files included (`-- --base HEAD` for only what you haven’t committed).
+- The full visual run is about 1,520 tests: one per story per theme, which loads the story once for its screenshot, axe and (light) the WCAG 2.2 checks. Between steps, run `npm run test:visual:changed`: screenshots, axe and the WCAG 2.2 checks for only the stories and Docs tabs your changes can reach, since `origin/main` with uncommitted and untracked files included (`-- --base HEAD` for only what you haven’t committed). It runs natively: on macOS, where no baselines are committed, screenshots compare with the same stories rendered at the merge base on your machine, cached after the first run. That is feedback; the committed Linux baselines come from `npm run test:visual:canonical -- --update` or the workflow.
 - It prints the plan first: changed files, the story files they reach, the stories and tests that follows, and why. `-- --dry-run` stops there. It builds Storybook itself when the build is older than the sources.
 - It follows imports, not guesses: a component change runs its stories, its Docs tab and every story that composes it (the examples included); an app-layer module runs the examples that use it; a guide runs only that guide; a unit test runs nothing.
 - Some changes run everything, and the plan says why: tokens, global styles, Storybook or Playwright config, dependencies, anything every story loads (the preview’s decorators, the mock seed’s clock), and any file it can’t classify.
@@ -6944,7 +6943,7 @@ PLAYWRIGHT_PORT=6107 npm run test:visual:changed   # the same on this machine, w
 #### Baselines
 
 - Linux baselines are committed and are the source of truth. They are made in the Playwright image the lockfile pins, run as x86, the one CI compares in, so a local run's screenshots are CI's byte for byte; never edit or delete them by hand.
-- Make them with the change: `npm run test:visual:docker -- --update` rewrites the baselines of the stories your change reaches, and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them (re-run CI after, unless a BASELINES_TOKEN secret is set).
+- Make them with the change: `npm run test:visual:canonical -- --update` rewrites the baselines of the stories your change reaches, and one push runs CI once. Without Docker, run the Update visual baselines workflow on the branch; it commits them (re-run CI after, unless a BASELINES_TOKEN secret is set).
 - Review every changed image in the pull request, and say in the description which existing stories changed and why. A Playwright upgrade changes every screenshot: regenerate them all (`-- --full`) in the same pull request.
 - Local baselines (darwin, win32) are gitignored. `npm run test:visual:update` rewrites yours, if you want to diff on macOS.
 

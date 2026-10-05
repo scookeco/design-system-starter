@@ -18,8 +18,14 @@ import { runChecks } from './wcag22-run';
  * `--grep @a11y` (or VISUAL_STEPS=a11y) runs that step alone: see STEPS in ./storybook.
  */
 
-/** True when the baseline directory the config resolves to already holds screenshots. */
+/**
+ * True when there is a baseline to compare against. Against committed baselines, the platform's
+ * directory must hold screenshots (none yet: skip, don't write them from whatever is checked out).
+ * Against the native reference (VISUAL_SNAPSHOT_DIR, scripts/visual-reference.ts), this story's own
+ * file must exist: a story new on this branch has nothing at the merge base to compare with.
+ */
 const hasBaselines = (snapshotPath: string) => {
+  if (process.env.VISUAL_SNAPSHOT_DIR) return existsSync(snapshotPath);
   const dir = dirname(snapshotPath);
   return existsSync(dir) && readdirSync(dir).some((f) => f.endsWith('.png'));
 };
@@ -41,7 +47,9 @@ for (const story of stories) {
         if (!updating && !hasBaselines(testInfo.snapshotPath(name))) {
           testInfo.annotations.push({
             type: 'notice',
-            description: `No ${process.platform} baselines yet, so no screenshot. Run the "Update visual baselines" workflow (CI) or "npm run test:visual:update" (local).`,
+            description: process.env.VISUAL_SNAPSHOT_DIR
+              ? `${story.id} [${theme}] is new since the merge base: no reference screenshot to compare with.`
+              : `No ${process.platform} baselines yet, so no screenshot. Run the "Update visual baselines" workflow (CI) or "npm run test:visual:update" (local).`,
           });
         } else {
           // Tall pages (Foundations run to ~5,000px) need longer than the 5s default to produce two
