@@ -55,6 +55,15 @@
     padding-inline: var(--space-inset-lg);
   }
 
+  /* 3. variants: a wider measure for steps laid out across the width; the action bar follows it */
+  .focused-layout[data-width="md"] .focused-layout__column {
+    max-inline-size: var(--size-content-md);
+  }
+
+  .focused-layout[data-width="lg"] .focused-layout__column {
+    max-inline-size: var(--size-content-lg);
+  }
+
   .focused-layout__footer {
     position: sticky;
     inset-block-end: 0;
