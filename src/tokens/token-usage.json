@@ -331,6 +331,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "button.danger.bg",
           "readBy": [
             {
@@ -523,6 +532,10 @@
             {
               "unit": "Button",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -531,10 +544,6 @@
           "readBy": [
             {
               "unit": "AppShell",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -552,6 +561,10 @@
             },
             {
               "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -578,10 +591,6 @@
             },
             {
               "unit": "Drawer",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -634,6 +643,10 @@
             },
             {
               "unit": "Drawer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -764,6 +777,10 @@
           "token": "font.weight.strong",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             }
@@ -829,6 +846,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
@@ -845,10 +866,6 @@
         {
           "token": "radius.indicator",
           "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            },
             {
               "unit": "Link",
               "how": "css"
@@ -964,6 +981,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Spinner",
               "how": "css"
             }
@@ -974,10 +995,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -1133,15 +1150,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.lg",
           "readBy": [
             {
@@ -1212,6 +1220,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
               "how": "css"
             }
@@ -1274,15 +1286,6 @@
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -5725,6 +5728,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.elevated",
           "readBy": [
             {
@@ -5752,7 +5764,7 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
           "readBy": [
             {
               "unit": "Kbd",
@@ -5765,6 +5777,10 @@
           "readBy": [
             {
               "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -5784,10 +5800,6 @@
             {
               "unit": "CommandPalette",
               "how": "css"
-            },
-            {
-              "unit": "Kbd",
-              "how": "css"
             }
           ]
         },
@@ -5796,6 +5808,10 @@
           "readBy": [
             {
               "unit": "CommandPalette",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -5850,6 +5866,10 @@
             {
               "unit": "CommandPalette",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -5886,12 +5906,7 @@
             {
               "unit": "CommandPalette",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
+            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -5960,6 +5975,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Spinner",
               "how": "css"
             }
@@ -5970,10 +5989,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -6037,10 +6052,6 @@
             {
               "unit": "CommandPalette",
               "how": "css"
-            },
-            {
-              "unit": "Kbd",
-              "how": "css"
             }
           ]
         },
@@ -6077,6 +6088,10 @@
             {
               "unit": "CommandPalette",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -6105,15 +6120,6 @@
               "unit": "CommandPalette",
               "how": "css"
             },
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
             {
               "unit": "Kbd",
               "how": "css"
@@ -6154,6 +6160,15 @@
         "Tag"
       ],
       "tokens": [
+        {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
         {
           "token": "button.danger.bg",
           "readBy": [
@@ -6281,6 +6296,10 @@
             {
               "unit": "Composer",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -6289,10 +6308,6 @@
           "readBy": [
             {
               "unit": "Composer",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -6310,6 +6325,10 @@
             },
             {
               "unit": "Composer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -6339,10 +6358,6 @@
               "how": "css"
             },
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Tag",
               "how": "css"
             }
@@ -6362,6 +6377,10 @@
           "readBy": [
             {
               "unit": "Composer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -6414,6 +6433,10 @@
           "token": "font.weight.strong",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Tag",
               "how": "css"
             }
@@ -6456,12 +6479,7 @@
             {
               "unit": "Composer",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
+            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -6529,6 +6547,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Spinner",
               "how": "css"
             }
@@ -6539,10 +6561,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -6600,15 +6618,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.lg",
           "readBy": [
             {
@@ -6644,6 +6653,10 @@
           "readBy": [
             {
               "unit": "Composer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -6684,15 +6697,6 @@
           ]
         },
         {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "text.label",
           "readBy": [
             {
@@ -6723,6 +6727,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.elevated",
           "readBy": [
             {
@@ -6741,7 +6754,7 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
           "readBy": [
             {
               "unit": "Kbd",
@@ -6752,6 +6765,10 @@
         {
           "token": "color.border.default",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -6771,10 +6788,6 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Menu",
               "how": "css"
             }
@@ -6792,6 +6805,10 @@
         {
           "token": "color.fg.muted",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -6826,6 +6843,15 @@
           ]
         },
         {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
@@ -6847,16 +6873,11 @@
           "token": "radius.control",
           "readBy": [
             {
-              "unit": "Menu",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Menu",
               "how": "css"
             }
           ]
@@ -6894,6 +6915,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -6902,10 +6927,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -6960,15 +6981,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.sm",
           "readBy": [
             {
@@ -6980,6 +6992,10 @@
         {
           "token": "space.inset.xs",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -7004,15 +7020,6 @@
             },
             {
               "unit": "Menu",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -11644,7 +11651,25 @@
       "composesAll": [],
       "tokens": [
         {
-          "token": "color.bg.surface",
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
           "readBy": [
             {
               "unit": "Kbd",
@@ -11662,7 +11687,7 @@
           ]
         },
         {
-          "token": "color.fg.default",
+          "token": "color.fg.muted",
           "readBy": [
             {
               "unit": "Kbd",
@@ -11671,7 +11696,7 @@
           ]
         },
         {
-          "token": "radius.indicator",
+          "token": "font.weight.strong",
           "readBy": [
             {
               "unit": "Kbd",
@@ -11680,7 +11705,16 @@
           ]
         },
         {
-          "token": "size.icon.sm",
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
           "readBy": [
             {
               "unit": "Kbd",
@@ -11698,7 +11732,7 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
+          "token": "space.inset.xs",
           "readBy": [
             {
               "unit": "Kbd",
@@ -11708,15 +11742,6 @@
         },
         {
           "token": "text.caption",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
           "readBy": [
             {
               "unit": "Kbd",
@@ -12322,6 +12347,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.elevated",
           "readBy": [
             {
@@ -12340,7 +12374,7 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
           "readBy": [
             {
               "unit": "Kbd",
@@ -12351,6 +12385,10 @@
         {
           "token": "color.border.default",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -12370,10 +12408,6 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Menu",
               "how": "css"
             }
@@ -12391,6 +12425,10 @@
         {
           "token": "color.fg.muted",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -12425,6 +12463,15 @@
           ]
         },
         {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
@@ -12446,16 +12493,11 @@
           "token": "radius.control",
           "readBy": [
             {
-              "unit": "Menu",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Menu",
               "how": "css"
             }
           ]
@@ -12493,6 +12535,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -12501,10 +12547,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -12559,15 +12601,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.sm",
           "readBy": [
             {
@@ -12579,6 +12612,10 @@
         {
           "token": "space.inset.xs",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Menu",
               "how": "css"
@@ -12603,15 +12640,6 @@
             },
             {
               "unit": "Menu",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -13886,6 +13914,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.action.primary",
           "readBy": [
             {
@@ -13922,7 +13959,16 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
           "readBy": [
             {
               "unit": "Kbd",
@@ -13942,10 +13988,6 @@
         {
           "token": "color.fg.default",
           "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            },
             {
               "unit": "Nav",
               "how": "css"
@@ -13973,6 +14015,10 @@
         {
           "token": "color.fg.muted",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Nav",
               "how": "css"
@@ -14014,6 +14060,10 @@
           "token": "font.weight.strong",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             }
@@ -14041,6 +14091,10 @@
           "token": "radius.control",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Nav",
               "how": "css"
             },
@@ -14053,10 +14107,6 @@
         {
           "token": "radius.indicator",
           "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            },
             {
               "unit": "Link",
               "how": "css"
@@ -14087,6 +14137,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -14095,10 +14149,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -14157,15 +14207,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.sm",
           "readBy": [
             {
@@ -14181,6 +14222,10 @@
         {
           "token": "space.inset.xs",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Tooltip",
               "how": "css"
@@ -14200,15 +14245,6 @@
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -17941,6 +17977,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.action.primary",
           "readBy": [
             {
@@ -17980,6 +18025,10 @@
           "token": "color.bg.subtle",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Switch",
               "how": "css"
             }
@@ -17988,10 +18037,6 @@
         {
           "token": "color.bg.surface",
           "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            },
             {
               "unit": "Switch",
               "how": "css"
@@ -18003,6 +18048,10 @@
           "readBy": [
             {
               "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -18036,10 +18085,6 @@
               "how": "css"
             },
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Switch",
               "how": "css"
             }
@@ -18059,6 +18104,10 @@
           "readBy": [
             {
               "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -18090,6 +18139,15 @@
           ]
         },
         {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "icon.stroke",
           "readBy": [
             {
@@ -18113,12 +18171,7 @@
             {
               "unit": "Dialog",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
+            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -18203,6 +18256,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -18211,10 +18268,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -18288,10 +18341,6 @@
           "token": "space.inset.2xs",
           "readBy": [
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Switch",
               "how": "css"
             }
@@ -18318,6 +18367,10 @@
         {
           "token": "space.inset.xs",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Shortcuts",
               "how": "css"
@@ -18354,15 +18407,6 @@
             },
             {
               "unit": "Switch",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -20518,6 +20562,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "button.danger.bg",
           "readBy": [
             {
@@ -20668,6 +20721,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Suggestion",
               "how": "css"
             }
@@ -20678,10 +20735,6 @@
           "readBy": [
             {
               "unit": "Field",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -20699,6 +20752,10 @@
             },
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -20730,10 +20787,6 @@
             {
               "unit": "Field",
               "how": "css"
-            },
-            {
-              "unit": "Kbd",
-              "how": "css"
             }
           ]
         },
@@ -20755,6 +20808,10 @@
           "readBy": [
             {
               "unit": "Field",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -20813,6 +20870,10 @@
             {
               "unit": "AiMarker",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -20855,16 +20916,11 @@
               "how": "css"
             },
             {
-              "unit": "Suggestion",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Suggestion",
               "how": "css"
             }
           ]
@@ -20933,6 +20989,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Spinner",
               "how": "css"
             }
@@ -20943,10 +21003,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             },
             {
@@ -21004,10 +21060,6 @@
             {
               "unit": "AiMarker",
               "how": "css"
-            },
-            {
-              "unit": "Kbd",
-              "how": "css"
             }
           ]
         },
@@ -21062,6 +21114,10 @@
               "how": "css"
             },
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Suggestion",
               "how": "css"
             }
@@ -21110,15 +21166,6 @@
             },
             {
               "unit": "Suggestion",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23426,6 +23473,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.hover",
           "readBy": [
             {
@@ -23453,12 +23509,17 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
           "readBy": [
             {
               "unit": "Kbd",
               "how": "css"
-            },
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
             {
               "unit": "Toolbar",
               "how": "css"
@@ -23468,6 +23529,10 @@
         {
           "token": "color.border.default",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -23486,10 +23551,6 @@
         {
           "token": "color.fg.default",
           "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -23515,6 +23576,15 @@
           ]
         },
         {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.status.danger.fg",
           "readBy": [
             {
@@ -23528,6 +23598,15 @@
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23554,20 +23633,15 @@
           "token": "radius.control",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Toolbar",
               "how": "css"
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23596,6 +23670,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
             }
           ]
         },
@@ -23604,10 +23682,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            },
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23656,10 +23730,6 @@
           "token": "space.inset.2xs",
           "readBy": [
             {
-              "unit": "Kbd",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             }
@@ -23682,6 +23752,10 @@
           "token": "space.inset.xs",
           "readBy": [
             {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
               "how": "css"
             }
@@ -23696,15 +23770,6 @@
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23746,6 +23811,15 @@
       ],
       "tokens": [
         {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.inverse",
           "readBy": [
             {
@@ -23755,7 +23829,16 @@
           ]
         },
         {
-          "token": "color.bg.surface",
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
           "readBy": [
             {
               "unit": "Kbd",
@@ -23773,15 +23856,6 @@
           ]
         },
         {
-          "token": "color.fg.default",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.fg.inverse",
           "readBy": [
             {
@@ -23791,10 +23865,28 @@
           ]
         },
         {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.enter",
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -23812,16 +23904,11 @@
           "token": "radius.control",
           "readBy": [
             {
-              "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
               "how": "css"
             }
           ]
@@ -23836,7 +23923,7 @@
           ]
         },
         {
-          "token": "size.icon.sm",
+          "token": "size.icon.md",
           "readBy": [
             {
               "unit": "Kbd",
@@ -23872,15 +23959,6 @@
           ]
         },
         {
-          "token": "space.inset.2xs",
-          "readBy": [
-            {
-              "unit": "Kbd",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.sm",
           "readBy": [
             {
@@ -23892,6 +23970,10 @@
         {
           "token": "space.inset.xs",
           "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
             {
               "unit": "Tooltip",
               "how": "css"
@@ -23907,15 +23989,6 @@
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.code",
-          "readBy": [
-            {
-              "unit": "Kbd",
               "how": "css"
             }
           ]

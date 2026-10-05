@@ -15,16 +15,23 @@
     gap: var(--space-gap-2xs);
   }
 
+  /* A soft keycap: the UI font, quiet colour, a fixed square-or-wider box and a darker bottom
+     edge, so a hint reads as keys without outweighing the label beside it. */
   .kbd__key {
-    display: inline-block;
-    min-inline-size: var(--size-icon-sm);
-    padding-inline: var(--space-inset-2xs);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-indicator);
-    background: var(--color-bg-surface);
-    color: var(--color-fg-default);
-    font: var(--text-code);
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-block-size: var(--size-icon-md);
+    min-inline-size: var(--size-icon-md);
+    padding-inline: var(--space-inset-xs);
+    border: var(--border-width-default) solid var(--color-border-default);
+    border-block-end-color: var(--color-border-strong);
+    border-radius: var(--radius-control);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+    font-weight: var(--font-weight-strong);
   }
 
   .kbd__then {

@@ -1277,6 +1277,7 @@
           "Tooltip"
         ],
         "tokens": [
+          "border.width.default",
           "button.danger.bg",
           "button.danger.bg-hover",
           "button.danger.fg",
@@ -1343,7 +1344,6 @@
           "space.gap.md",
           "space.gap.sm",
           "space.gap.xs",
-          "space.inset.2xs",
           "space.inset.lg",
           "space.inset.md",
           "space.inset.sm",
@@ -1353,7 +1353,6 @@
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.code",
           "text.heading-3",
           "text.heading-4",
           "text.label",
@@ -4968,10 +4967,11 @@
           "Spinner"
         ],
         "tokens": [
+          "border.width.default",
           "color.bg.elevated",
           "color.bg.scrim",
           "color.bg.selected",
-          "color.bg.surface",
+          "color.bg.subtle",
           "color.border.default",
           "color.border.strong",
           "color.fg.default",
@@ -4985,7 +4985,6 @@
           "motion.slow",
           "motion.spin",
           "radius.control",
-          "radius.indicator",
           "radius.pill",
           "radius.surface",
           "shadow.modal",
@@ -5007,7 +5006,6 @@
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.code",
           "z.modal"
         ]
       }
@@ -5210,6 +5208,7 @@
           "Tag"
         ],
         "tokens": [
+          "border.width.default",
           "button.danger.bg",
           "button.danger.bg-hover",
           "button.danger.fg",
@@ -5239,7 +5238,6 @@
           "motion.fast",
           "motion.spin",
           "radius.control",
-          "radius.indicator",
           "radius.pill",
           "radius.surface",
           "size.control.lg",
@@ -5251,7 +5249,6 @@
           "size.target-min",
           "space.gap.2xs",
           "space.gap.xs",
-          "space.inset.2xs",
           "space.inset.lg",
           "space.inset.md",
           "space.inset.sm",
@@ -5259,7 +5256,6 @@
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.code",
           "text.label"
         ]
       }
@@ -5384,9 +5380,10 @@
           "Menu"
         ],
         "tokens": [
+          "border.width.default",
           "color.bg.elevated",
           "color.bg.hover",
-          "color.bg.surface",
+          "color.bg.subtle",
           "color.border.default",
           "color.border.strong",
           "color.fg.default",
@@ -5395,10 +5392,10 @@
           "color.status.danger.bg",
           "color.status.danger.fg",
           "ease.enter",
+          "font.weight.strong",
           "icon.stroke",
           "motion.base",
           "radius.control",
-          "radius.indicator",
           "radius.surface",
           "shadow.popover",
           "size.control.sm",
@@ -5409,12 +5406,10 @@
           "space.gap.2xs",
           "space.gap.md",
           "space.gap.xs",
-          "space.inset.2xs",
           "space.inset.sm",
           "space.inset.xs",
           "text.body",
           "text.caption",
-          "text.code",
           "z.dropdown"
         ]
       }
@@ -9158,15 +9153,17 @@
         ],
         "composes": [],
         "tokens": [
-          "color.bg.surface",
+          "border.width.default",
+          "color.bg.subtle",
+          "color.border.default",
           "color.border.strong",
-          "color.fg.default",
-          "radius.indicator",
-          "size.icon.sm",
+          "color.fg.muted",
+          "font.weight.strong",
+          "radius.control",
+          "size.icon.md",
           "space.gap.2xs",
-          "space.inset.2xs",
-          "text.caption",
-          "text.code"
+          "space.inset.xs",
+          "text.caption"
         ]
       }
     },
@@ -9633,9 +9630,10 @@
           "Kbd"
         ],
         "tokens": [
+          "border.width.default",
           "color.bg.elevated",
           "color.bg.hover",
-          "color.bg.surface",
+          "color.bg.subtle",
           "color.border.default",
           "color.border.strong",
           "color.fg.default",
@@ -9644,10 +9642,10 @@
           "color.status.danger.bg",
           "color.status.danger.fg",
           "ease.enter",
+          "font.weight.strong",
           "icon.stroke",
           "motion.base",
           "radius.control",
-          "radius.indicator",
           "radius.surface",
           "shadow.popover",
           "size.control.sm",
@@ -9658,12 +9656,10 @@
           "space.gap.2xs",
           "space.gap.md",
           "space.gap.xs",
-          "space.inset.2xs",
           "space.inset.sm",
           "space.inset.xs",
           "text.body",
           "text.caption",
-          "text.code",
           "z.dropdown"
         ]
       }
@@ -10553,11 +10549,13 @@
           "Tooltip"
         ],
         "tokens": [
+          "border.width.default",
           "color.action.primary",
           "color.bg.hover",
           "color.bg.inverse",
           "color.bg.selected",
-          "color.bg.surface",
+          "color.bg.subtle",
+          "color.border.default",
           "color.border.strong",
           "color.fg.default",
           "color.fg.inverse",
@@ -10580,11 +10578,9 @@
           "space.gap.lg",
           "space.gap.sm",
           "space.gap.xs",
-          "space.inset.2xs",
           "space.inset.sm",
           "space.inset.xs",
           "text.caption",
-          "text.code",
           "text.label",
           "z.tooltip"
         ]
@@ -15460,6 +15456,7 @@
           "Spinner"
         ],
         "tokens": [
+          "border.width.default",
           "button.danger.bg",
           "button.danger.bg-hover",
           "button.danger.fg",
@@ -15491,7 +15488,6 @@
           "motion.fast",
           "motion.spin",
           "radius.control",
-          "radius.indicator",
           "radius.pill",
           "size.control.lg",
           "size.control.md",
@@ -15509,7 +15505,6 @@
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.code",
           "text.label"
         ]
       }
@@ -17923,21 +17918,24 @@
           "Tooltip"
         ],
         "tokens": [
+          "border.width.default",
           "color.bg.hover",
           "color.bg.inverse",
           "color.bg.selected",
+          "color.bg.subtle",
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
           "color.fg.default",
           "color.fg.disabled",
           "color.fg.inverse",
+          "color.fg.muted",
           "color.status.danger.fg",
           "ease.enter",
+          "font.weight.strong",
           "icon.stroke",
           "motion.fast",
           "radius.control",
-          "radius.indicator",
           "shadow.popover",
           "size.control.sm",
           "size.icon.md",
@@ -17950,7 +17948,6 @@
           "space.inset.sm",
           "space.inset.xs",
           "text.caption",
-          "text.code",
           "text.label",
           "z.tooltip"
         ]
@@ -18211,25 +18208,25 @@
           "Kbd"
         ],
         "tokens": [
+          "border.width.default",
           "color.bg.inverse",
-          "color.bg.surface",
+          "color.bg.subtle",
+          "color.border.default",
           "color.border.strong",
-          "color.fg.default",
           "color.fg.inverse",
+          "color.fg.muted",
           "ease.enter",
+          "font.weight.strong",
           "motion.fast",
           "radius.control",
-          "radius.indicator",
           "shadow.popover",
-          "size.icon.sm",
+          "size.icon.md",
           "size.overlay-max",
           "space.gap.2xs",
           "space.gap.sm",
-          "space.inset.2xs",
           "space.inset.sm",
           "space.inset.xs",
           "text.caption",
-          "text.code",
           "z.tooltip"
         ]
       }
