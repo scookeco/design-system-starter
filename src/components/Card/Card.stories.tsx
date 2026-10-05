@@ -3,7 +3,9 @@ import { createFormatter } from '../../format/format';
 import { Button } from '../Button/Button';
 import { Text } from '../Text/Text';
 import { TextField } from '../TextField/TextField';
-import { Card, CardBody, CardFooter, CardHeader } from './Card';
+import { Badge } from '../Badge/Badge';
+import { Grid } from '../../primitives/Grid/Grid';
+import { Card, CardBody, CardFooter, CardHeader, CardLink } from './Card';
 import { PlusIcon } from '../Icon/icons';
 
 /** Stories format with the system's formats, like apps do (apps use useFormat()). */
@@ -45,3 +47,26 @@ export const Default: Story = {};
 export const FooterBetween: Story = { args: { footer: 'between' } };
 export const HeaderActions: Story = { args: { actions: true, footer: 'none' } };
 export const BodyOnly: Story = { args: { header: false, footer: 'none' } };
+
+/** A grid of choices, each card one link; one not available yet, shown so the set is complete. */
+export const Links: Story = {
+  render: () => (
+    <Grid as="ul" role="list" min="sm" gap="md">
+      <li>
+        <CardLink href="#healthcare" title="Healthcare" description="Provider agreements with BAAs and payer contracts." meta="8 counterparties · 2 custom fields" />
+      </li>
+      <li>
+        <CardLink href="#retail" title="Retail" description="Supply and marketplace agreements with chargebacks and returns." meta="9 counterparties · 2 custom fields" />
+      </li>
+      <li>
+        <CardLink
+          href="#education"
+          title="Education"
+          description="Enrollment, vendor and research agreements for schools."
+          state="unavailable"
+          badge={<Badge tone="neutral" indicator="none">Coming soon</Badge>}
+        />
+      </li>
+    </Grid>
+  ),
+};

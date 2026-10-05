@@ -3385,20 +3385,41 @@
         "Card",
         "CardBody",
         "CardFooter",
-        "CardHeader"
+        "CardHeader",
+        "CardLink"
       ],
       "stylesheets": [
         "src/components/Card/Card.css"
       ],
       "composes": [
         "Heading",
+        "Link",
         "Text"
       ],
       "composesAll": [
         "Heading",
+        "Link",
         "Text"
       ],
       "tokens": [
+        {
+          "token": "color.action.primary",
+          "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.selected",
+          "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            }
+          ]
+        },
         {
           "token": "color.bg.subtle",
           "readBy": [
@@ -3444,10 +3465,72 @@
           ]
         },
         {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            },
+            {
+              "unit": "Link",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.muted",
           "readBy": [
             {
+              "unit": "Card",
+              "how": "css"
+            },
+            {
               "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.standard",
+          "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Link",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Link",
               "how": "css"
             }
           ]
@@ -3528,6 +3611,10 @@
           "token": "text.body",
           "readBy": [
             {
+              "unit": "Card",
+              "how": "css"
+            },
+            {
               "unit": "Text",
               "how": "css"
             }
@@ -3545,6 +3632,10 @@
         {
           "token": "text.caption",
           "readBy": [
+            {
+              "unit": "Card",
+              "how": "css"
+            },
             {
               "unit": "Text",
               "how": "css"

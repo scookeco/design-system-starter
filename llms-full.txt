@@ -655,15 +655,34 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
+#### CardLink
+
+component, part of Card. A card that is one choice: the whole surface is a single link (an industry, a template, a workspace to open). For a card with its own controls inside, use Card with a link in it; a link can't contain other interactive things.
+
+Props:
+- `href: string`: Where the card goes. Routed through the app's LinkProvider, when there is one.
+- `title: string`: The card's name, and the link's accessible name with the description. Required.
+- `level?: HeadingLevel` = `3`: Outline level of the title. Defaults to 3: these cards come in a grid under a section.
+- `description?: string`: One or two lines on what choosing it does.
+- `meta?: string`: A quiet line at the foot of the card: a count, a size ("8 counterparties · 2 fields").
+- `state?: 'available' | 'unavailable'` = `'available'`: `unavailable` shows a choice that exists but can't be taken yet ("Coming soon"): not a link, dashed and muted, with `badge` saying why. Default `available`.
+- `badge?: ReactNode`: A Badge beside the title, e.g. "Coming soon" on an unavailable card.
+
+Closed styling API: no `className`/`style`.
+
 **When to use**
 
 - One titled block of a page: a record section, a settings category with its own Save.
 - Parts in order: `CardHeader` (title, description, small actions), `CardBody`, `CardFooter`.
+- `CardLink` when the whole card is one choice in a grid of them (an industry, a template): one link, with its title, a line on what it does and a quiet meta line.
+- `CardLink state="unavailable"` with a Badge for a choice that exists but can’t be taken yet, so the set reads as complete.
 
 **When not to use**
 
 - Wrapping a whole page or a table → the page itself; a Table is already a surface
 - Grouping without a title → a `Stack`: a card without a title is just a box
+- A card with its own buttons or links inside → a `Card` with a Link in it: a `CardLink` is one link and can’t contain another
+- Restyling a Card into a clickable tile → `CardLink`
 
 **Do:** A titled section that saves on its own.
 
@@ -698,10 +717,12 @@ Closed styling API: no `className`/`style`.
 
 - `CardHeader` requires a `title`, rendered as a heading at `level` (default 2) so the card is a section in the outline.
 - Keep the card’s actions inside it, next to what they affect.
+- `CardLink`: the title is a heading inside the link, so the grid stays in the outline and the link’s name is its title and description. Hover and focus change the border and the title, not colour alone.
+- An unavailable `CardLink` is not a link at all (nothing to focus), and its Badge says why in words.
 
-Stories: `components-card--default`, `components-card--footer-between`, `components-card--header-actions`, `components-card--body-only`.
-Composes: Heading, Text.
-Tokens read: `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `radius.surface`, `shadow.card`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Stories: `components-card--default`, `components-card--footer-between`, `components-card--header-actions`, `components-card--body-only`, `components-card--links`.
+Composes: Heading, Link, Text.
+Tokens read: `color.action.primary`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `motion.fast`, `radius.indicator`, `radius.surface`, `shadow.card`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### ChatThread
 

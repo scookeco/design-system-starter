@@ -2903,7 +2903,9 @@
       "usage": {
         "whenToUse": [
           "One titled block of a page: a record section, a settings category with its own Save.",
-          "Parts in order: `CardHeader` (title, description, small actions), `CardBody`, `CardFooter`."
+          "Parts in order: `CardHeader` (title, description, small actions), `CardBody`, `CardFooter`.",
+          "`CardLink` when the whole card is one choice in a grid of them (an industry, a template): one link, with its title, a line on what it does and a quiet meta line.",
+          "`CardLink state=\"unavailable\"` with a Badge for a choice that exists but can’t be taken yet, so the set reads as complete."
         ],
         "whenNotToUse": [
           {
@@ -2913,6 +2915,14 @@
           {
             "situation": "Grouping without a title",
             "instead": "a `Stack`: a card without a title is just a box"
+          },
+          {
+            "situation": "A card with its own buttons or links inside",
+            "instead": "a `Card` with a Link in it: a `CardLink` is one link and can’t contain another"
+          },
+          {
+            "situation": "Restyling a Card into a clickable tile",
+            "instead": "`CardLink`"
           }
         ],
         "do": {
@@ -2925,7 +2935,9 @@
         },
         "accessibility": [
           "`CardHeader` requires a `title`, rendered as a heading at `level` (default 2) so the card is a section in the outline.",
-          "Keep the card’s actions inside it, next to what they affect."
+          "Keep the card’s actions inside it, next to what they affect.",
+          "`CardLink`: the title is a heading inside the link, so the grid stays in the outline and the link’s name is its title and description. Hover and focus change the border and the title, not colour alone.",
+          "An unavailable `CardLink` is not a link at all (nothing to focus), and its Badge says why in words."
         ]
       },
       "unit": {
@@ -2946,18 +2958,31 @@
           {
             "id": "components-card--body-only",
             "name": "Body Only"
+          },
+          {
+            "id": "components-card--links",
+            "name": "Links"
           }
         ],
         "composes": [
           "Heading",
+          "Link",
           "Text"
         ],
         "tokens": [
+          "color.action.primary",
+          "color.bg.selected",
           "color.bg.subtle",
           "color.bg.surface",
           "color.border.default",
           "color.fg.default",
+          "color.fg.link",
           "color.fg.muted",
+          "ease.standard",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "motion.fast",
+          "radius.indicator",
           "radius.surface",
           "shadow.card",
           "space.gap.2xs",
@@ -3124,6 +3149,105 @@
       "description": null,
       "partOf": "Card",
       "propsOf": "CardHeader"
+    },
+    {
+      "name": "CardLink",
+      "kind": "component",
+      "source": "src/components/Card/Card.tsx",
+      "status": null,
+      "description": "A card that is one choice: the whole surface is a single link (an industry, a template, a workspace to open). For a card with its own controls inside, use Card with a link in it; a link can't contain other interactive things.",
+      "partOf": "Card",
+      "docs": "docs/usage/Card.usage.tsx",
+      "props": [
+        {
+          "name": "href",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Where the card goes. Routed through the app's LinkProvider, when there is one."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The card's name, and the link's accessible name with the description. Required."
+        },
+        {
+          "name": "level",
+          "type": "HeadingLevel",
+          "required": false,
+          "default": "3",
+          "description": "Outline level of the title. Defaults to 3: these cards come in a grid under a section.",
+          "values": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "One or two lines on what choosing it does."
+        },
+        {
+          "name": "meta",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "A quiet line at the foot of the card: a count, a size (\"8 counterparties · 2 fields\")."
+        },
+        {
+          "name": "state",
+          "type": "'available' | 'unavailable'",
+          "required": false,
+          "default": "'available'",
+          "description": "`unavailable` shows a choice that exists but can't be taken yet (\"Coming soon\"): not a link, dashed and muted, with `badge` saying why. Default `available`.",
+          "values": [
+            "available",
+            "unavailable"
+          ]
+        },
+        {
+          "name": "badge",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A Badge beside the title, e.g. \"Coming soon\" on an unavailable card."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "level": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "state": [
+          "available",
+          "unavailable"
+        ]
+      },
+      "states": []
+    },
+    {
+      "name": "CardLinkProps",
+      "kind": "type-only",
+      "source": "src/components/Card/Card.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Card",
+      "propsOf": "CardLink"
     },
     {
       "name": "CardProps",

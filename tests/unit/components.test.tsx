@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { LinkComponentProps } from '../../src/index';
-import { AppShell, Avatar, FocusedLayout, Badge, Banner, Breadcrumbs, Button, Checkbox, EmptyState, HomeIcon, Link, LinkProvider, Meter, Nav, NavTabs, PageLayout, RadioGroup, SegmentedControl, Select, Skeleton, Spinner, Stack, Stat, Switch, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Textarea, TextField } from '../../src/index';
+import { AppShell, Avatar, FocusedLayout, Badge, Banner, Breadcrumbs, Button, CardLink, Checkbox, EmptyState, HomeIcon, Link, LinkProvider, Meter, Nav, NavTabs, PageLayout, RadioGroup, SegmentedControl, Select, Skeleton, Spinner, Stack, Stat, Switch, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Textarea, TextField } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -274,6 +274,24 @@ describe('AppShell icon rail', () => {
     expect(onChange).toHaveBeenCalledWith(false);
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeTruthy();
     expect(window.localStorage.getItem('app-shell.sidebar-collapsed')).toBeNull();
+  });
+});
+
+describe('CardLink', () => {
+  it('is one link named by its title and description, with the title a heading inside it', () => {
+    render(<CardLink href="/industries/retail" title="Retail" description="Supply and marketplace agreements." meta="9 counterparties" />);
+    const link = screen.getByRole('link', { name: /Retail Supply and marketplace agreements\./ });
+    expect(link.getAttribute('href')).toBe('/industries/retail');
+    expect(link.hasAttribute('data-interactive')).toBe(true);
+    expect(screen.getByRole('heading', { level: 3, name: 'Retail' }).closest('a')).toBe(link);
+  });
+
+  it('is not a link while unavailable, and says why in its badge', () => {
+    render(<CardLink href="/x" title="Education" state="unavailable" badge={<Badge tone="neutral">Coming soon</Badge>} />);
+    expect(screen.queryByRole('link')).toBeNull();
+    const card = screen.getByRole('heading', { name: 'Education' }).closest('.card');
+    expect(card?.getAttribute('data-state')).toBe('unavailable');
+    expect(card?.textContent).toContain('Coming soon');
   });
 });
 
