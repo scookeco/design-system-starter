@@ -107,9 +107,11 @@ jobs:
     name: Visual regression and axe (${{ matrix.shard }}/4)
     needs: [changes, storybook]
     if: needs.storybook.result == 'success'
-    runs-on: ubuntu-24.04
-    # The image the baselines were made in (npm run test:visual:docker locally): same browser, same
-    # fonts, same CPU: a local run's screenshots are these byte for byte. A Playwright bump means new baselines.
+    # arm64: the baselines are linux/arm64, so Apple silicon runs the same image natively
+    # (npm run test:visual:canonical) instead of emulating x86. Free for public repositories.
+    runs-on: ubuntu-24.04-arm
+    # The image the baselines were made in (npm run test:visual:canonical locally): same browser, same
+    # fonts, same CPU architecture. A Playwright bump means new baselines.
     container:
       image: ${{ needs.changes.outputs.image }}
       options: --ipc=host

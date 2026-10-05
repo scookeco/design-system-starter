@@ -16,11 +16,11 @@ npm run validate       # check + test:visual:changed: the fast local gate, no Do
 npm run test:visual    # screenshots + axe for every story, light and dark, plus the WCAG 2.2 checks (mainly for debugging; macOS has no committed baselines, so screenshots skip)
 npm run test:wcag22    # only the WCAG 2.2 story checks: target size, focus not obscured, accessible auth, consistent help
 npm run test:visual:changed   # the same checks for only the stories your changes reach (since origin/main, uncommitted included), natively; on macOS screenshots compare with the merge base rendered on this machine; -- --dry-run for the plan
-npm run test:visual:canonical -- --update   # test:visual:changed in the CI image (Docker, x86): checks and rewrites the committed Linux baselines your change moves
+npm run test:visual:canonical -- --update   # test:visual:changed in the CI image (Docker, linux/arm64: native on Apple silicon): checks and rewrites the committed Linux baselines your change moves
 npm run regen          # tokens + manifest: every generated file (after a merge conflict in one, take either side, then this)
 ```
 
-Verify between steps with `npm run typecheck`, `npm run lint` and `npx vitest run`. Before pushing, run `npm run validate` (no Docker: native screenshots compare with the merge base). When it shows the screenshots you meant to change, make the Linux baselines: `npm run test:visual:canonical -- --update` for a change that reaches a few stories, or the Update visual baselines workflow for a broad one (emulated x86 takes about an hour for a thousand tests), and commit them with the change: then one push runs CI once. Pull requests run only the stories they reach; `main` and the nightly run check everything. Batch related changes into one pull request.
+Verify between steps with `npm run typecheck`, `npm run lint` and `npx vitest run`. Before pushing, run `npm run validate` (no Docker: native screenshots compare with the merge base). When it shows the screenshots you meant to change, make the Linux baselines with `npm run test:visual:canonical -- --update` (or the Update visual baselines workflow without Docker), and commit them with the change: then one push runs CI once. Pull requests run only the stories they reach; `main` and the nightly run check everything. Batch related changes into one pull request.
 
 Work on a branch. Never commit to `main` directly.
 

@@ -40,7 +40,7 @@ function Testing() {
         </Table>
         <Code label="Before a pull request">{`
 npm run validate                               # check, then the stories your changes reach, natively (no Docker)
-npm run test:visual:canonical -- --update      # the same stories in the CI image (Docker, x86); commit the Linux baselines it writes
+npm run test:visual:canonical -- --update      # the same stories in the CI image (Docker, arm64); commit the Linux baselines it writes
 `}</Code>
       </DocSection>
       <DocSection title="Targeted runs">
@@ -97,8 +97,8 @@ npm run test:visual:canonical -- --update      # the same stories in the CI imag
         <Rules
           items={[
             <>
-              Linux baselines are committed and are the source of truth. They are made in the Playwright image the lockfile pins, run as x86, the one
-              CI compares in, so a local run's screenshots are CI's byte for byte; never edit or delete them by hand.
+              Linux baselines are committed and are the source of truth. They are made in the Playwright image the lockfile pins, run as arm64, the one
+              CI compares in (native on Apple silicon), so a local run's screenshots are CI's byte for byte; never edit or delete them by hand.
             </>,
             <>
               Make them with the change: <code>npm run test:visual:canonical -- --update</code> rewrites the baselines of the stories your change reaches,
