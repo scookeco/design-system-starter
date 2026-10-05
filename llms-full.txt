@@ -1254,7 +1254,7 @@ Variants: variant (secondary | ghost); size (sm | md | lg).
 - On success the label reads “Copied” and a polite live region, present from mount, announces it; it reverts after `revertAfter` ms.
 - If the browser blocks the clipboard, it announces `failedMessage`, so keep the value visible and selectable.
 
-Stories: `components-copybutton--secondary`, `components-copybutton--ghost`, `components-copybutton--medium`, `components-copybutton--custom-labels`.
+Stories: `components-copybutton--secondary`, `components-copybutton--ghost`, `components-copybutton--medium`, `components-copybutton--custom-labels`, `components-copybutton--copies-and-reverts`, `components-copybutton--clipboard-refused`.
 Composes: Button, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.label`.
 

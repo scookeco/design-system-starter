@@ -5569,6 +5569,14 @@
           {
             "id": "components-copybutton--custom-labels",
             "name": "Custom Labels"
+          },
+          {
+            "id": "components-copybutton--copies-and-reverts",
+            "name": "Copies And Reverts"
+          },
+          {
+            "id": "components-copybutton--clipboard-refused",
+            "name": "Clipboard Refused"
           }
         ],
         "composes": [
