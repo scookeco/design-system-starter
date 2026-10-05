@@ -2690,14 +2690,14 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 **When to use**
 
-- Determinate progress through a task: steps of a wizard, files of an upload, rows of an import.
-- Say the value in words with `valueText` (“Step 2 of 4”, “3 of 12 files”); it is shown and read out. Without it, a whole percentage.
+- Determinate progress through work someone waits on: files of an upload, rows of an import, the stages of a background job.
+- Say the value in words with `valueText` (“3 of 12 files”, “Step 2 of 3: Review”); it is shown and read out. Without it, a whole percentage.
 
 **When not to use**
 
 - Work of unknown length → `Spinner`
 - Usage against a limit (seats, storage, API calls) → `Meter`
-- The steps themselves → `Stepper`, beside it
+- Where someone is in a wizard → `Stepper`, which already says how far: don’t add a bar above it
 
 **Do:** A label and the value in words, over the bar.
 
@@ -3323,7 +3323,7 @@ Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `co
 
 component · `src/components/Stepper/Stepper.tsx` · usage: `docs/usage/Stepper.usage.tsx`
 
-Where someone is in an ordered task. An ordered list: completed steps show a check and a hidden "Completed" prefix, the current one has aria-current="step" and a heavier mark, upcoming ones their number. State is never carried by colour alone. Not navigation: steps are not links.
+Where someone is in an ordered task. An ordered list: completed steps show a check and a hidden "Completed" prefix, the current one has aria-current="step" and a heavier mark, upcoming ones their number. State is never carried by colour alone. Not navigation: steps are not links. Spans its container in one row, joined by connectors that fill once a step is done; below 40rem of container (the breakpoint-sm token) it becomes a vertical track.
 
 Props:
 - `label: string`: Accessible name of the list ("Setup steps"). Required.
@@ -3337,6 +3337,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 - Showing where someone is in a task whose steps must be done in order: setup, a multi-step create. Pair it with `FocusedLayout` and copy the Setup wizard example.
 - Three to six steps with short, parallel labels. Keep the list the same on every step.
+- It spans its container in one row, so put it at the top of the column, full width. It already says how far someone is: no `Progress` bar above it. In under 40rem of container it becomes a vertical track.
 
 **When not to use**
 
@@ -3368,7 +3369,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 
 Stories: `components-stepper--first-step`, `components-stepper--middle-step`, `components-stepper--last-step`, `components-stepper--all-completed`, `components-stepper--narrow`.
 Composes: Icon.
-Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.fg.on-action`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.pill`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `text.caption`, `text.label`.
+Tokens read: `border.width.default`, `color.action.primary`, `color.bg.surface`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.fg.on-action`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `radius.pill`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.lg`, `space.gap.sm`, `space.gap.xs`, `text.caption`, `text.label`.
 
 ### StreamingText
 
@@ -5249,7 +5250,7 @@ Props:
 - `brand: ReactNode`: Product name or mark at the header's inline start.
 - `task: string`: The task, in the header ("Set up your workspace"). Plain text: the page's h1 is the step's PageHeader.
 - `exit: ReactNode`: The way out, at the header's inline end: a ghost Button or a Link ("Exit setup"). Required: a focused task never traps.
-- `progress?: ReactNode`: A Progress bar under the header, across the column.
+- `progress?: ReactNode`: A Progress bar under the header, across the column. Not for a wizard's steps: the Stepper shows those.
 - `children: ReactNode`: The content column: Stepper, PageHeader, the step's form.
 - `footer?: ReactNode`: Action bar (Back · Next). Sticks to the bottom of main while the step scrolls.
 - `width?: 'sm' | 'md' | 'lg'` = `'sm'`: The column's measure, for every step of the task alike: `sm` (default) for steps that read like a form; `md` or `lg` for steps laid out across the width (a grid of choices, a diagram).

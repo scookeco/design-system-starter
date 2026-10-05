@@ -7770,7 +7770,7 @@
           "type": "ReactNode",
           "required": false,
           "default": null,
-          "description": "A Progress bar under the header, across the column."
+          "description": "A Progress bar under the header, across the column. Not for a wizard's steps: the Stepper shows those."
         },
         {
           "name": "children",
@@ -11721,8 +11721,8 @@
       "states": [],
       "usage": {
         "whenToUse": [
-          "Determinate progress through a task: steps of a wizard, files of an upload, rows of an import.",
-          "Say the value in words with `valueText` (“Step 2 of 4”, “3 of 12 files”); it is shown and read out. Without it, a whole percentage."
+          "Determinate progress through work someone waits on: files of an upload, rows of an import, the stages of a background job.",
+          "Say the value in words with `valueText` (“3 of 12 files”, “Step 2 of 3: Review”); it is shown and read out. Without it, a whole percentage."
         ],
         "whenNotToUse": [
           {
@@ -11734,8 +11734,8 @@
             "instead": "`Meter`"
           },
           {
-            "situation": "The steps themselves",
-            "instead": "`Stepper`, beside it"
+            "situation": "Where someone is in a wizard",
+            "instead": "`Stepper`, which already says how far: don’t add a bar above it"
           }
         ],
         "do": {
@@ -14902,7 +14902,7 @@
       "kind": "component",
       "source": "src/components/Stepper/Stepper.tsx",
       "status": null,
-      "description": "Where someone is in an ordered task. An ordered list: completed steps show a check and a hidden \"Completed\" prefix, the current one has aria-current=\"step\" and a heavier mark, upcoming ones their number. State is never carried by colour alone. Not navigation: steps are not links.",
+      "description": "Where someone is in an ordered task. An ordered list: completed steps show a check and a hidden \"Completed\" prefix, the current one has aria-current=\"step\" and a heavier mark, upcoming ones their number. State is never carried by colour alone. Not navigation: steps are not links. Spans its container in one row, joined by connectors that fill once a step is done; below 40rem of container (the breakpoint-sm token) it becomes a vertical track.",
       "docs": "docs/usage/Stepper.usage.tsx",
       "props": [
         {
@@ -14946,7 +14946,8 @@
       "usage": {
         "whenToUse": [
           "Showing where someone is in a task whose steps must be done in order: setup, a multi-step create. Pair it with `FocusedLayout` and copy the Setup wizard example.",
-          "Three to six steps with short, parallel labels. Keep the list the same on every step."
+          "Three to six steps with short, parallel labels. Keep the list the same on every step.",
+          "It spans its container in one row, so put it at the top of the column, full width. It already says how far someone is: no `Progress` bar above it. In under 40rem of container it becomes a vertical track."
         ],
         "whenNotToUse": [
           {
@@ -15004,6 +15005,7 @@
           "Icon"
         ],
         "tokens": [
+          "border.width.default",
           "color.action.primary",
           "color.bg.surface",
           "color.border.strong",

@@ -9,7 +9,7 @@ export interface FocusedLayoutProps extends EscapeHatch {
   task: string;
   /** The way out, at the header's inline end: a ghost Button or a Link ("Exit setup"). Required: a focused task never traps. */
   exit: ReactNode;
-  /** A Progress bar under the header, across the column. */
+  /** A Progress bar under the header, across the column. Not for a wizard's steps: the Stepper shows those. */
   progress?: ReactNode;
   /** The content column: Stepper, PageHeader, the step's form. */
   children: ReactNode;

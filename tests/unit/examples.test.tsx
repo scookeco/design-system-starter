@@ -172,7 +172,8 @@ describe('Setup wizard example', () => {
     render(<SetupWizard />);
     const current = () => document.querySelector('[aria-current="step"] .stepper__label')?.textContent;
     expect(current()).toBe('Workspace');
-    expect(screen.getByRole('progressbar', { name: 'Setup progress' }).getAttribute('aria-valuetext')).toBe('Step 1 of 4');
+    // The Stepper says how far; a Progress bar above it would say it twice.
+    expect(screen.queryByRole('progressbar')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     const name = screen.getByRole('textbox', { name: 'Workspace name' });
