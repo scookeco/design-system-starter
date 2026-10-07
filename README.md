@@ -275,8 +275,8 @@ Each layer imports only from the layers below it. Every arrow that is not allowe
 
 | Budget | Limit | Measures |
 |---|---|---|
-| Library JS | 34.5 kB | `dist/index.js`, everything exported |
-| Library CSS | 16.2 kB | `dist/styles.css` |
+| Library JS | 38 kB | `dist/index.js`, everything exported |
+| Library CSS | 18.6 kB | `dist/styles.css` |
 | One component | 640 B | `import { Button }` from `dist/index.js`: what a consumer pays for one component |
 
 It then runs `scripts/check-tree-shaking.ts`: for every unit with a public export, it bundles `import { <Export> }` from `dist/index.js` and fails if the output contains any component, primitive or layout other than that unit and the units it composes (`composesAll` in `src/tokens/token-usage.json`). A module-level side effect or a barrel import that drags in unrelated components fails here. Icons are checked the same way, by their path data: an import may carry only the icons its unit and what it composes name in their source, so `import { Button }` carries none (Button draws the icon it's given). A component that looked icons up by name would carry all of them and fail. The CSS is one stylesheet by design, so it has a budget but no tree-shaking.
@@ -297,7 +297,7 @@ Semantic colour tokens hold both values as `light-dark(light, dark)`. `:root` se
 | Actions | `Button`, `Menu`, `ContextMenu`, `Toolbar` (one tab stop, roving focus), `SegmentedControl`, `Toggle`, `CopyButton` |
 | Keyboard | `useShortcut` (one registry: reserved keys refused, conflicts reported, silent in fields and dialogs, single keys can be turned off), `ShortcutHelp` (the ? overlay), `Kbd`, `formatShortcut`, `ariaKeyShortcuts`; `Tooltip` and `MenuItem` take a `shortcut` |
 | Forms | `TextField` (a password gets a show-password toggle), `SearchField`, `Textarea`, `Select`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload` (all share the `Field` anatomy and take an `id` for error-summary links); `Combobox`, `MultiSelect`, `DatePicker`, `DateRangePicker`, `NumberField` (React Aria, locale and time zone from `LocaleProvider`, ISO dates and minor units in and out); `InlineEdit` |
-| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text` |
+| Data display | `Table`, `Badge`, `Tag`, `Avatar`, `Card`, `Stat`, `Meter`, `Timeline`, `CodeBlock`, `Divider`, `Heading`, `Text`, `DocumentViewer` (a document generated from data: one highlight layer at a time, `DataField` values and placeholders, `DocumentField` tags per signer) |
 | Feedback and page states | `Banner`, `Toast`, `EmptyState`, `Spinner`, `Skeleton`, `Progress`, `Tooltip` |
 | AI patterns | `ChatThread`, `Message`, `Composer`, `StreamingText` (safe Markdown, sentence-level announcements), `Citation` and `SourcesList`, `AiMarker`, `Suggestion` (ghost text), `ReviewChanges` (diffs, accept or reject, apply, undo), `Feedback`, `Disclosure`, `Accordion`, `Kbd`; the Guides → AI patterns page says which surface to use and the rules they share |
 | Overlays | `Dialog`, `Drawer`, `Popover`, `Menu`, `Tooltip`, `HoverCard` |

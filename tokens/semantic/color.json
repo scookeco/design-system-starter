@@ -535,6 +535,129 @@
         },
         "$description": "Border of AI-generated content and the AI marker."
       }
+    },
+    "highlight": {
+      "$description": "Highlights in a generated document (DocumentViewer). Three layers; only one shows at a time, so a colour always means one thing. Text on every state is fg.default. Background only: no outline or underline at rest.",
+      "yours": {
+        "$description": "The reader’s own highlights (the annotation convention).",
+        "bg": {
+          "$value": "{color.yellow.100}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.950}"
+            }
+          },
+          "$description": "Resting."
+        },
+        "bg-hover": {
+          "$value": "{color.yellow.200}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.900}"
+            }
+          },
+          "$description": "Under the pointer: a preview, lighter than current."
+        },
+        "bg-current": {
+          "$value": "{color.yellow.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.yellow.800}"
+            }
+          },
+          "$description": "The current target (aria-current)."
+        }
+      },
+      "search": {
+        "$description": "Matches for Find in document.",
+        "bg": {
+          "$value": "{color.blue.100}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.950}"
+            }
+          },
+          "$description": "Resting."
+        },
+        "bg-hover": {
+          "$value": "{color.blue.200}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.900}"
+            }
+          },
+          "$description": "Under the pointer: a preview, lighter than current."
+        },
+        "bg-current": {
+          "$value": "{color.blue.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.blue.800}"
+            }
+          },
+          "$description": "The current target (aria-current)."
+        }
+      },
+      "ai": {
+        "$description": "Passages an AI answer cites or extracted.",
+        "bg": {
+          "$value": "{color.violet.100}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.violet.950}"
+            }
+          },
+          "$description": "Resting."
+        },
+        "bg-hover": {
+          "$value": "{color.violet.200}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.violet.900}"
+            }
+          },
+          "$description": "Under the pointer: a preview, lighter than current."
+        },
+        "bg-current": {
+          "$value": "{color.violet.300}",
+          "$extensions": {
+            "starter.modes": {
+              "dark": "{color.violet.800}"
+            }
+          },
+          "$description": "The current target (aria-current)."
+        }
+      }
+    },
+    "data-field": {
+      "$description": "A value merged into a generated document from data (DataField). Filled values are plain text; these colour a placeholder that fills later and the moment it fills.",
+      "fg": {
+        "$value": "{color.green.800}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.green.300}"
+          }
+        },
+        "$description": "Placeholder text."
+      },
+      "bg": {
+        "$value": "{color.green.100}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.green.950}"
+          }
+        },
+        "$description": "Placeholder background."
+      },
+      "bg-filled": {
+        "$value": "{color.green.200}",
+        "$extensions": {
+          "starter.modes": {
+            "dark": "{color.green.900}"
+          }
+        },
+        "$description": "The brief tint when a placeholder fills in place."
+      }
     }
   }
 }

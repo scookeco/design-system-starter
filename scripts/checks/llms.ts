@@ -13,7 +13,7 @@ import { MANIFEST_FILE, SCHEMA_FILE, type ClosedApi, type ExportEntry, type Expo
 export const LLMS_FILE = 'llms.txt';
 export const LLMS_FULL_FILE = 'llms-full.txt';
 /** llms.txt is read whole at the start of an agent session: keep it small. Raise deliberately, like a bundle budget. */
-export const LLMS_BUDGET_BYTES = 17408;
+export const LLMS_BUDGET_BYTES = 17920;
 
 
 /** First sentence, cut at a word boundary to about `max` characters. */
