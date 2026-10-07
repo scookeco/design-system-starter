@@ -2,25 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { CopyIcon, EditIcon } from '../Icon/icons';
-import { SegmentedControl } from '../SegmentedControl/SegmentedControl';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
 import './DocumentViewer.css';
 
-/** Which highlights show. One layer at a time, so a colour always means one thing. */
-export type HighlightLayer = 'yours' | 'search' | 'ai';
-
-const LAYERS: readonly { value: HighlightLayer; label: string }[] = [
-  { value: 'yours', label: 'Yours' },
-  { value: 'search', label: 'Search' },
-  { value: 'ai', label: 'AI' },
-];
-
 interface ViewerContext {
-  layer: HighlightLayer | undefined;
   announce: (message: string) => void;
 }
 
-const DocumentContext = createContext<ViewerContext>({ layer: undefined, announce: () => undefined });
+const DocumentContext = createContext<ViewerContext>({ announce: () => undefined });
 
 /** The text the reader selected in the document, and the range it covers (to store as a highlight). */
 export interface DocumentSelection {
@@ -33,14 +22,9 @@ export interface DocumentViewerProps extends EscapeHatch {
   label: string;
   /** The generated document: headings and paragraphs, with DataField and Highlight inside. */
   children: ReactNode;
-  /** The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites. */
-  layer?: HighlightLayer;
-  /** The layer shown first when uncontrolled. */
-  defaultLayer?: HighlightLayer;
-  onLayerChange?: (layer: HighlightLayer) => void;
   /**
    * Called with the reader's selection when they choose Highlight (from the menu above a selection,
-   * or the toolbar's Highlight button). Store it and render it as a Highlight with tone="yours".
+   * or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone).
    * Without it, selecting text is plain native selection with no menu.
    */
   onHighlight?: (selection: DocumentSelection) => void;
@@ -53,37 +37,26 @@ interface MenuState extends DocumentSelection {
 }
 
 /**
- * A document the app generates from data, shown as one continuous sheet on a canvas, with a
- * highlight-layer switch and, when `onHighlight` is set, a menu above the reader's selection.
+ * A document the app generates from data, shown as one continuous sheet on a canvas, with, when
+ * `onHighlight` is set, a menu above the reader's selection.
  * Selecting is the browser's own (::selection is not styled); fields and placeholders are not
  * part of a selection. Placeholders that fill in place are announced in a polite live region.
  */
 export function DocumentViewer({
   label,
   children,
-  layer: layerProp,
-  defaultLayer = 'yours',
-  onLayerChange,
   onHighlight,
   toolbar,
   UNSAFE_className,
   UNSAFE_style,
 }: DocumentViewerProps) {
-  const [uncontrolledLayer, setUncontrolledLayer] = useState<HighlightLayer>(defaultLayer);
-  const layer = layerProp ?? uncontrolledLayer;
   const [message, setMessage] = useState('');
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [hasSelection, setHasSelection] = useState(false);
   const paper = useRef<HTMLElement>(null);
 
   const announce = useCallback((text: string) => setMessage(text), []);
-  const context = useMemo(() => ({ layer, announce }), [layer, announce]);
-
-  const changeLayer = (value: string) => {
-    const next = value as HighlightLayer;
-    if (layerProp === undefined) setUncontrolledLayer(next);
-    onLayerChange?.(next);
-  };
+  const context = useMemo(() => ({ announce }), [announce]);
 
   /** The selection, if it is non-empty and inside the paper. */
   const readSelection = useCallback((): DocumentSelection | null => {
@@ -133,7 +106,6 @@ export function DocumentViewer({
     <DocumentContext.Provider value={context}>
       <div className={cx('document-viewer', UNSAFE_className)} style={UNSAFE_style}>
         <div className="document-viewer__toolbar">
-          <SegmentedControl label="Highlights" hideLabel options={LAYERS} value={layer} onValueChange={changeLayer} />
           {onHighlight ? (
             <Toolbar label="Selection">
               <ToolbarButton icon={EditIcon} disabled={!hasSelection} onClick={() => highlight(readSelection())}>
@@ -177,31 +149,6 @@ export function DocumentViewer({
         ) : null}
       </div>
     </DocumentContext.Provider>
-  );
-}
-
-export interface HighlightProps {
-  /** Which layer it belongs to. It shows only while the viewer shows that layer; otherwise it is plain text. */
-  tone: HighlightLayer;
-  /** The current target (from Find's next, a citation, the outline): stronger, and aria-current. */
-  current?: boolean;
-  /** For linking to it (a citation's target, the outline). */
-  id?: string;
-  children: ReactNode;
-}
-
-/**
- * A highlighted passage in a DocumentViewer: a <mark> with a rounded background that reaches just
- * past its text. Background only, no outline or underline, so every highlight should also be
- * listed somewhere the reader can reach without seeing colour (an outline, Find's results).
- */
-export function Highlight({ tone, current = false, id, children }: HighlightProps) {
-  const { layer } = useContext(DocumentContext);
-  if (layer !== undefined && layer !== tone) return <span id={id}>{children}</span>;
-  return (
-    <mark className="document-highlight" data-tone={tone} id={id} aria-current={current ? 'true' : undefined}>
-      {children}
-    </mark>
   );
 }
 

@@ -131,6 +131,7 @@ UI rules (design system v0)
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [Highlight](docs/usage/Highlight.usage.tsx): A highlighted passage
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
@@ -1540,20 +1541,15 @@ Tokens read: `color.border.default`.
 
 component · `src/components/DocumentViewer/DocumentViewer.tsx` · usage: `docs/usage/DocumentViewer.usage.tsx`
 
-A document the app generates from data, shown as one continuous sheet on a canvas, with a highlight-layer switch and, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
+A document the app generates from data, shown as one continuous sheet on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
 
 Props:
 - `label: string`: The document's name: labels the document region ("Master services agreement"). Required.
 - `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
-- `layer?: HighlightLayer`: The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites.
-- `defaultLayer?: HighlightLayer` = `'yours'`: The layer shown first when uncontrolled.
-- `onLayerChange?: (layer: HighlightLayer) => void`
-- `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight with tone="yours". Without it, selecting text is plain native selection with no menu.
+- `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
 - `toolbar?: ReactNode`: More controls at the end of the viewer's toolbar: Find in document, Download.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
-
-Variants: layer (yours | search | ai); defaultLayer (yours | search | ai).
 
 #### DataField
 
@@ -1566,22 +1562,10 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
-#### Highlight
-
-component, part of DocumentViewer. A highlighted passage in a DocumentViewer: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be listed somewhere the reader can reach without seeing colour (an outline, Find's results).
-
-Props:
-- `tone: HighlightLayer`: Which layer it belongs to. It shows only while the viewer shows that layer; otherwise it is plain text.
-- `current?: boolean` = `false`: The current target (from Find's next, a citation, the outline): stronger, and aria-current.
-- `id?: string`: For linking to it (a citation's target, the outline).
-- `children: ReactNode`
-
-Closed styling API: no `className`/`style`.
-
 **When to use**
 
 - A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.
-- Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight.
+- Highlights (`Highlight`) can show together in their own colours: the reader’s own (yellow), Find’s matches (blue), what an AI answer cites (purple). Pass `onHighlight` to let readers keep a selection as a highlight.
 
 **When not to use**
 
@@ -1599,12 +1583,12 @@ Closed styling API: no `className`/`style`.
 </DocumentViewer>
 ```
 
-**Don't:** Flagging an empty value inside the document, or showing two highlight colours at once: fix data in the form that collected it, and keep one layer.
+**Don't:** Flagging an empty value inside the document: fix the data in the form that collected it.
 
 ```tsx
 <DocumentViewer label="Order form">
   <Text size="body-lg">
-    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with <Highlight tone="yours">sixty days’ notice</Highlight>.
+    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.
   </Text>
 </DocumentViewer>
 ```
@@ -1612,12 +1596,11 @@ Closed styling API: no `className`/`style`.
 **Accessibility**
 
 - The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.
-- A highlight is a `<mark>`; the current one carries `aria-current`. Its background is its only mark, so list highlights somewhere reachable without colour (an outline, Find’s results).
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
-Stories: `components-documentviewer--default`, `components-documentviewer--search-layer`, `components-documentviewer--ai-layer`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Icon, Kbd, SegmentedControl, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.highlight.ai.bg`, `color.highlight.ai.bg-current`, `color.highlight.search.bg`, `color.highlight.search.bg-current`, `color.highlight.yours.bg`, `color.highlight.yours.bg-current`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.surface`, `shadow.card`, `shadow.popover`, `size.control.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`, `z.tooltip`.
+Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
+Composes: Icon, Kbd, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.surface`, `shadow.card`, `shadow.popover`, `size.control.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`, `z.tooltip`.
 
 ### Drawer
 
@@ -1917,6 +1900,58 @@ Variants: level (1 | 2 | 3 | 4); size (1 | 2 | 3 | 4).
 
 Stories: `components-heading--level-1`, `components-heading--level-2`, `components-heading--level-3`, `components-heading--level-4`, `components-heading--level-2-at-size-4`.
 Tokens read: `color.fg.default`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### Highlight
+
+component · `src/components/Highlight/Highlight.tsx` · usage: `docs/usage/Highlight.usage.tsx`
+
+A highlighted passage: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be reachable without seeing colour (Find's results, the citation that points to it).
+
+Props:
+- `tone?: HighlightTone` = `'highlight'`: highlight = the reader's own (yellow, the default), search = Find's matches (blue), ai = what an AI answer cites (purple).
+- `id?: string`: For linking to it (a citation's target, a search result).
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+Variants: tone (highlight | search | ai).
+
+**When to use**
+
+- Marking a passage in running text: the reader’s own highlights (the default tone), Find’s matches (`tone="search"`), or what an AI answer cites (`tone="ai"`).
+- Tones can show together; each colour keeps one meaning wherever it appears, in a DocumentViewer, search results or a chat answer’s source.
+- Give a highlight an `id` when something links to it (a citation, a search result), so the link can scroll to it.
+
+**When not to use**
+
+- A status or a category → `Badge` or `Tag`
+- Emphasis the author wrote → the text’s own `<strong>` or `<em>`
+- An AI suggestion not yet accepted → `AiMarker`
+
+**Do:** One meaning per colour: the reader’s highlight in yellow, the passage an answer cites in purple.
+
+```tsx
+<Text size="body-lg">
+  The agreement <Highlight tone="ai">automatically renews</Highlight> unless either party gives <Highlight>sixty days’ notice</Highlight>.
+</Text>
+```
+
+**Don't:** Highlighting a whole paragraph: nothing stands out, and the colour stops meaning anything.
+
+```tsx
+<Text size="body-lg">
+  <Highlight>The agreement automatically renews for successive 12-month terms unless either party gives sixty days’ notice before the renewal date.</Highlight>
+</Text>
+```
+
+**Accessibility**
+
+- A highlight is a `<mark>`, which screen readers can announce as highlighted text.
+- Its background is its only visual mark, so every highlight must also be reachable without colour: Find’s results, or the citation that points to it by `id`.
+- Text keeps its own colour on every tone, and every tone passes contrast in light and dark (contrast test).
+
+Stories: `components-highlight--default`, `components-highlight--tones`, `components-highlight--wrapped`.
+Tokens read: `color.highlight.ai.bg`, `color.highlight.bg`, `color.highlight.search.bg`, `radius.control`, `space.mark.overhang`.
 
 ### HoverCard
 
@@ -5644,7 +5679,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `GapToken` (`src/tokens/tokens.ts`): `type GapToken = keyof typeof vars.space.gap`
 - `GridItemToken` (`src/tokens/tokens.ts`): `type GridItemToken = keyof typeof vars.size['grid-item']`
 - `HeadingLevel` (`src/components/Heading/Heading.tsx`): `type HeadingLevel = 1 | 2 | 3 | 4`
-- `HighlightLayer` (`src/components/DocumentViewer/DocumentViewer.tsx`): `type HighlightLayer = 'yours' | 'search' | 'ai'` Which highlights show. One layer at a time, so a colour always means one thing.
+- `HighlightTone` (`src/components/Highlight/Highlight.tsx`): `type HighlightTone = 'highlight' | 'search' | 'ai'` What a highlight means. Tones can show together; each colour keeps one meaning.
 - `IconDefinition` (`src/components/Icon/icons.ts`): `interface IconDefinition { readonly name: string; readonly path: string; }` An icon from the system set: pass it to a component's `icon` prop.
 - `InsetToken` (`src/tokens/tokens.ts`): `type InsetToken = keyof typeof vars.space.inset`
 - `IsoDate` (`src/components/DatePicker/DatePicker.tsx`): `type IsoDate = string` A calendar date as the system passes it: ISO "2026-09-25", no time, no zone.
@@ -6779,7 +6814,7 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 | `text-wrap: pretty` | Body copy: p, li, dd, blockquote, figcaption (reset layer) | A single word left alone on a paragraph’s or a list item’s last line. | Limited: Chrome, Edge and Safari; not Firefox | Ignored: text wraps normally. |
 | `scrollbar-gutter: stable` | AppShell’s main, SplitView’s panes, CommandPalette’s results, ChatThread | Content shifting sideways when a classic (non-overlay) scrollbar appears: a list loading, results filtering, an answer streaming in. | Newly available (2024-12-11) | Ignored: the shift comes back on platforms with classic scrollbars. Overlay scrollbars (macOS, phones, headless test browsers) never had it. |
 | `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
-| `box-decoration-break: clone` | DocumentViewer: a highlight or a data-field placeholder that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
+| `box-decoration-break: clone` | Highlight, and a DataField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
 | `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
 | Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
 
@@ -7315,15 +7350,9 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `color.fg.on-action` `var(--color-fg-on-action)`: `#ffffff` (dark `#020617`). Text on action.primary.
 - `color.fg.on-danger` `var(--color-fg-on-danger)`: `#ffffff` (dark `#020617`). Text on action.danger.
 - `color.focus` `var(--color-focus)`: `#4f46e5` (dark `#a5b4fc`). Focus ring. Must meet 3:1 against every surface.
-- `color.highlight.ai.bg` `var(--color-highlight-ai-bg)`: `#ede9fe` (dark `#2e1065`). Resting.
-- `color.highlight.ai.bg-current` `var(--color-highlight-ai-bg-current)`: `#c4b5fd` (dark `#5b21b6`). The current target (aria-current).
-- `color.highlight.ai.bg-hover` `var(--color-highlight-ai-bg-hover)`: `#ddd6fe` (dark `#4c1d95`). Under the pointer: a preview, lighter than current.
-- `color.highlight.search.bg` `var(--color-highlight-search-bg)`: `#dbeafe` (dark `#172554`). Resting.
-- `color.highlight.search.bg-current` `var(--color-highlight-search-bg-current)`: `#93c5fd` (dark `#1e40af`). The current target (aria-current).
-- `color.highlight.search.bg-hover` `var(--color-highlight-search-bg-hover)`: `#bfdbfe` (dark `#1e3a8a`). Under the pointer: a preview, lighter than current.
-- `color.highlight.yours.bg` `var(--color-highlight-yours-bg)`: `#fef9c3` (dark `#422006`). Resting.
-- `color.highlight.yours.bg-current` `var(--color-highlight-yours-bg-current)`: `#fde047` (dark `#854d0e`). The current target (aria-current).
-- `color.highlight.yours.bg-hover` `var(--color-highlight-yours-bg-hover)`: `#fef08a` (dark `#713f12`). Under the pointer: a preview, lighter than current.
+- `color.highlight.ai.bg` `var(--color-highlight-ai-bg)`: `#c4b5fd` (dark `#5b21b6`). A passage an AI answer cites.
+- `color.highlight.bg` `var(--color-highlight-bg)`: `#fde047` (dark `#854d0e`). The default tone: the reader’s own highlights (the annotation convention).
+- `color.highlight.search.bg` `var(--color-highlight-search-bg)`: `#93c5fd` (dark `#1e40af`). A Find match.
 - `color.status.danger.bg` `var(--color-status-danger-bg)`: `#fef2f2` (dark `#450a0a`). Status tones. fg and bg are a contrast-checked pair; border is decorative.
 - `color.status.danger.border` `var(--color-status-danger-border)`: `#fca5a5` (dark `#991b1b`). Status tones. fg and bg are a contrast-checked pair; border is decorative.
 - `color.status.danger.fg` `var(--color-status-danger-fg)`: `#b91c1c` (dark `#fca5a5`). Status tones. fg and bg are a contrast-checked pair; border is decorative.

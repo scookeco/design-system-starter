@@ -319,15 +319,9 @@
     --color-ai-fg: light-dark(var(--color-violet-700), var(--color-violet-300));
     --color-ai-bg: light-dark(var(--color-violet-50), var(--color-violet-950));
     --color-ai-border: light-dark(var(--color-violet-300), var(--color-violet-800));
-    --color-highlight-yours-bg: light-dark(var(--color-yellow-100), var(--color-yellow-950));
-    --color-highlight-yours-bg-hover: light-dark(var(--color-yellow-200), var(--color-yellow-900));
-    --color-highlight-yours-bg-current: light-dark(var(--color-yellow-300), var(--color-yellow-800));
-    --color-highlight-search-bg: light-dark(var(--color-blue-100), var(--color-blue-950));
-    --color-highlight-search-bg-hover: light-dark(var(--color-blue-200), var(--color-blue-900));
-    --color-highlight-search-bg-current: light-dark(var(--color-blue-300), var(--color-blue-800));
-    --color-highlight-ai-bg: light-dark(var(--color-violet-100), var(--color-violet-950));
-    --color-highlight-ai-bg-hover: light-dark(var(--color-violet-200), var(--color-violet-900));
-    --color-highlight-ai-bg-current: light-dark(var(--color-violet-300), var(--color-violet-800));
+    --color-highlight-bg: light-dark(var(--color-yellow-300), var(--color-yellow-800));
+    --color-highlight-search-bg: light-dark(var(--color-blue-300), var(--color-blue-800));
+    --color-highlight-ai-bg: light-dark(var(--color-violet-300), var(--color-violet-800));
     --color-data-field-fg: light-dark(var(--color-green-800), var(--color-green-300));
     --color-data-field-bg: light-dark(var(--color-green-100), var(--color-green-950));
     --color-data-field-bg-filled: light-dark(var(--color-green-200), var(--color-green-900));

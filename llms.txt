@@ -131,6 +131,7 @@ UI rules (design system v0)
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [Highlight](docs/usage/Highlight.usage.tsx): A highlighted passage
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps

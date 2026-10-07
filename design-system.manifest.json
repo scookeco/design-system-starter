@@ -6871,7 +6871,7 @@
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "A document the app generates from data, shown as one continuous sheet on a canvas, with a highlight-layer switch and, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
+      "description": "A document the app generates from data, shown as one continuous sheet on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
       "docs": "docs/usage/DocumentViewer.usage.tsx",
       "props": [
         {
@@ -6889,42 +6889,11 @@
           "description": "The generated document: headings and paragraphs, with DataField and Highlight inside."
         },
         {
-          "name": "layer",
-          "type": "HighlightLayer",
-          "required": false,
-          "default": null,
-          "description": "The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites.",
-          "values": [
-            "yours",
-            "search",
-            "ai"
-          ]
-        },
-        {
-          "name": "defaultLayer",
-          "type": "HighlightLayer",
-          "required": false,
-          "default": "'yours'",
-          "description": "The layer shown first when uncontrolled.",
-          "values": [
-            "yours",
-            "search",
-            "ai"
-          ]
-        },
-        {
-          "name": "onLayerChange",
-          "type": "(layer: HighlightLayer) => void",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
           "name": "onHighlight",
           "type": "(selection: DocumentSelection) => void",
           "required": false,
           "default": null,
-          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight with tone=\"yours\". Without it, selecting text is plain native selection with no menu."
+          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu."
         },
         {
           "name": "toolbar",
@@ -6941,23 +6910,12 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {
-        "layer": [
-          "yours",
-          "search",
-          "ai"
-        ],
-        "defaultLayer": [
-          "yours",
-          "search",
-          "ai"
-        ]
-      },
+      "variants": {},
       "states": [],
       "usage": {
         "whenToUse": [
           "A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.",
-          "Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight."
+          "Highlights (`Highlight`) can show together in their own colours: the reader’s own (yellow), Find’s matches (blue), what an AI answer cites (purple). Pass `onHighlight` to let readers keep a selection as a highlight."
         ],
         "whenNotToUse": [
           {
@@ -6978,12 +6936,11 @@
           "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n  </Text>\n</DocumentViewer>"
         },
         "dont": {
-          "caption": "Flagging an empty value inside the document, or showing two highlight colours at once: fix data in the form that collected it, and keep one layer.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with <Highlight tone=\"yours\">sixty days’ notice</Highlight>.\n  </Text>\n</DocumentViewer>"
+          "caption": "Flagging an empty value inside the document: fix the data in the form that collected it.",
+          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.\n  </Text>\n</DocumentViewer>"
         },
         "accessibility": [
           "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.",
-          "A highlight is a `<mark>`; the current one carries `aria-current`. Its background is its only mark, so list highlights somewhere reachable without colour (an outline, Find’s results).",
           "A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test)."
         ]
       },
@@ -6993,14 +6950,6 @@
           {
             "id": "components-documentviewer--default",
             "name": "Default"
-          },
-          {
-            "id": "components-documentviewer--search-layer",
-            "name": "Search Layer"
-          },
-          {
-            "id": "components-documentviewer--ai-layer",
-            "name": "Ai Layer"
           },
           {
             "id": "components-documentviewer--placeholders",
@@ -7018,7 +6967,6 @@
         "composes": [
           "Icon",
           "Kbd",
-          "SegmentedControl",
           "Toolbar",
           "Tooltip"
         ],
@@ -7039,12 +6987,6 @@
           "color.fg.disabled",
           "color.fg.inverse",
           "color.fg.muted",
-          "color.highlight.ai.bg",
-          "color.highlight.ai.bg-current",
-          "color.highlight.search.bg",
-          "color.highlight.search.bg-current",
-          "color.highlight.yours.bg",
-          "color.highlight.yours.bg-current",
           "color.status.danger.fg",
           "ease.enter",
           "ease.exit",
@@ -8674,37 +8616,29 @@
     {
       "name": "Highlight",
       "kind": "component",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
+      "source": "src/components/Highlight/Highlight.tsx",
       "status": null,
-      "description": "A highlighted passage in a DocumentViewer: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be listed somewhere the reader can reach without seeing colour (an outline, Find's results).",
-      "partOf": "DocumentViewer",
-      "docs": "docs/usage/DocumentViewer.usage.tsx",
+      "description": "A highlighted passage: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be reachable without seeing colour (Find's results, the citation that points to it).",
+      "docs": "docs/usage/Highlight.usage.tsx",
       "props": [
         {
           "name": "tone",
-          "type": "HighlightLayer",
-          "required": true,
-          "default": null,
-          "description": "Which layer it belongs to. It shows only while the viewer shows that layer; otherwise it is plain text.",
+          "type": "HighlightTone",
+          "required": false,
+          "default": "'highlight'",
+          "description": "highlight = the reader's own (yellow, the default), search = Find's matches (blue), ai = what an AI answer cites (purple).",
           "values": [
-            "yours",
+            "highlight",
             "search",
             "ai"
           ]
-        },
-        {
-          "name": "current",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": "The current target (from Find's next, a citation, the outline): stronger, and aria-current."
         },
         {
           "name": "id",
           "type": "string",
           "required": false,
           "default": null,
-          "description": "For linking to it (a citation's target, the outline)."
+          "description": "For linking to it (a citation's target, a search result)."
         },
         {
           "name": "children",
@@ -8723,37 +8657,94 @@
       },
       "variants": {
         "tone": [
-          "yours",
+          "highlight",
           "search",
           "ai"
         ]
       },
-      "states": [
-        "current"
-      ]
-    },
-    {
-      "name": "HighlightLayer",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "Which highlights show. One layer at a time, so a colour always means one thing.",
-      "partOf": "DocumentViewer",
-      "definition": "type HighlightLayer = 'yours' | 'search' | 'ai'",
-      "values": [
-        "yours",
-        "search",
-        "ai"
-      ]
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Marking a passage in running text: the reader’s own highlights (the default tone), Find’s matches (`tone=\"search\"`), or what an AI answer cites (`tone=\"ai\"`).",
+          "Tones can show together; each colour keeps one meaning wherever it appears, in a DocumentViewer, search results or a chat answer’s source.",
+          "Give a highlight an `id` when something links to it (a citation, a search result), so the link can scroll to it."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A status or a category",
+            "instead": "`Badge` or `Tag`"
+          },
+          {
+            "situation": "Emphasis the author wrote",
+            "instead": "the text’s own `<strong>` or `<em>`"
+          },
+          {
+            "situation": "An AI suggestion not yet accepted",
+            "instead": "`AiMarker`"
+          }
+        ],
+        "do": {
+          "caption": "One meaning per colour: the reader’s highlight in yellow, the passage an answer cites in purple.",
+          "code": "<Text size=\"body-lg\">\n  The agreement <Highlight tone=\"ai\">automatically renews</Highlight> unless either party gives <Highlight>sixty days’ notice</Highlight>.\n</Text>"
+        },
+        "dont": {
+          "caption": "Highlighting a whole paragraph: nothing stands out, and the colour stops meaning anything.",
+          "code": "<Text size=\"body-lg\">\n  <Highlight>The agreement automatically renews for successive 12-month terms unless either party gives sixty days’ notice before the renewal date.</Highlight>\n</Text>"
+        },
+        "accessibility": [
+          "A highlight is a `<mark>`, which screen readers can announce as highlighted text.",
+          "Its background is its only visual mark, so every highlight must also be reachable without colour: Find’s results, or the citation that points to it by `id`.",
+          "Text keeps its own colour on every tone, and every tone passes contrast in light and dark (contrast test)."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Highlight",
+        "stories": [
+          {
+            "id": "components-highlight--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-highlight--tones",
+            "name": "Tones"
+          },
+          {
+            "id": "components-highlight--wrapped",
+            "name": "Wrapped"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.highlight.ai.bg",
+          "color.highlight.bg",
+          "color.highlight.search.bg",
+          "radius.control",
+          "space.mark.overhang"
+        ]
+      }
     },
     {
       "name": "HighlightProps",
       "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
+      "source": "src/components/Highlight/Highlight.tsx",
       "status": null,
       "description": null,
-      "partOf": "DocumentViewer",
+      "partOf": "Highlight",
       "propsOf": "Highlight"
+    },
+    {
+      "name": "HighlightTone",
+      "kind": "type-only",
+      "source": "src/components/Highlight/Highlight.tsx",
+      "status": null,
+      "description": "What a highlight means. Tones can show together; each colour keeps one meaning.",
+      "partOf": "Highlight",
+      "definition": "type HighlightTone = 'highlight' | 'search' | 'ai'",
+      "values": [
+        "highlight",
+        "search",
+        "ai"
+      ]
     },
     {
       "name": "HomeIcon",
@@ -19976,126 +19967,42 @@
       "cssVar": "--color-highlight-ai-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#ede9fe",
-      "chain": [
-        "color.highlight.ai.bg",
-        "color.violet.100"
-      ],
-      "modes": {
-        "dark": "#2e1065"
-      }
-    },
-    "color.highlight.ai.bg-current": {
-      "cssVar": "--color-highlight-ai-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A passage an AI answer cites.",
       "value": "#c4b5fd",
       "chain": [
-        "color.highlight.ai.bg-current",
+        "color.highlight.ai.bg",
         "color.violet.300"
       ],
       "modes": {
         "dark": "#5b21b6"
       }
     },
-    "color.highlight.ai.bg-hover": {
-      "cssVar": "--color-highlight-ai-bg-hover",
+    "color.highlight.bg": {
+      "cssVar": "--color-highlight-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#ddd6fe",
-      "chain": [
-        "color.highlight.ai.bg-hover",
-        "color.violet.200"
-      ],
-      "modes": {
-        "dark": "#4c1d95"
-      }
-    },
-    "color.highlight.search.bg": {
-      "cssVar": "--color-highlight-search-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#dbeafe",
-      "chain": [
-        "color.highlight.search.bg",
-        "color.blue.100"
-      ],
-      "modes": {
-        "dark": "#172554"
-      }
-    },
-    "color.highlight.search.bg-current": {
-      "cssVar": "--color-highlight-search-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
-      "value": "#93c5fd",
-      "chain": [
-        "color.highlight.search.bg-current",
-        "color.blue.300"
-      ],
-      "modes": {
-        "dark": "#1e40af"
-      }
-    },
-    "color.highlight.search.bg-hover": {
-      "cssVar": "--color-highlight-search-bg-hover",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#bfdbfe",
-      "chain": [
-        "color.highlight.search.bg-hover",
-        "color.blue.200"
-      ],
-      "modes": {
-        "dark": "#1e3a8a"
-      }
-    },
-    "color.highlight.yours.bg": {
-      "cssVar": "--color-highlight-yours-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#fef9c3",
-      "chain": [
-        "color.highlight.yours.bg",
-        "color.yellow.100"
-      ],
-      "modes": {
-        "dark": "#422006"
-      }
-    },
-    "color.highlight.yours.bg-current": {
-      "cssVar": "--color-highlight-yours-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "The default tone: the reader’s own highlights (the annotation convention).",
       "value": "#fde047",
       "chain": [
-        "color.highlight.yours.bg-current",
+        "color.highlight.bg",
         "color.yellow.300"
       ],
       "modes": {
         "dark": "#854d0e"
       }
     },
-    "color.highlight.yours.bg-hover": {
-      "cssVar": "--color-highlight-yours-bg-hover",
+    "color.highlight.search.bg": {
+      "cssVar": "--color-highlight-search-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#fef08a",
+      "description": "A Find match.",
+      "value": "#93c5fd",
       "chain": [
-        "color.highlight.yours.bg-hover",
-        "color.yellow.200"
+        "color.highlight.search.bg",
+        "color.blue.300"
       ],
       "modes": {
-        "dark": "#713f12"
+        "dark": "#1e40af"
       }
     },
     "color.status.danger.bg": {
