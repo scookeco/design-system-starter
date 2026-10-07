@@ -8443,11 +8443,15 @@
       ],
       "composes": [
         "Icon",
+        "Shortcuts",
         "Toolbar"
       ],
       "composesAll": [
+        "Dialog",
         "Icon",
         "Kbd",
+        "Shortcuts",
+        "Switch",
         "Toolbar",
         "Tooltip"
       ],
@@ -8462,8 +8466,21 @@
           ]
         },
         {
+          "token": "color.action.primary",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.elevated",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "DocumentViewer",
               "how": "css"
@@ -8473,6 +8490,10 @@
         {
           "token": "color.bg.hover",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8484,6 +8505,15 @@
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.scrim",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8507,6 +8537,10 @@
             {
               "unit": "Kbd",
               "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
             }
           ]
         },
@@ -8515,6 +8549,10 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8527,11 +8565,23 @@
           "token": "color.border.default",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             },
             {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8545,6 +8595,10 @@
           "readBy": [
             {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8580,7 +8634,15 @@
           "token": "color.fg.default",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8592,6 +8654,10 @@
         {
           "token": "color.fg.disabled",
           "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8611,7 +8677,28 @@
           "token": "color.fg.muted",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.on-action",
+          "readBy": [
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8628,6 +8715,10 @@
         {
           "token": "ease.enter",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "Tooltip",
               "how": "css"
@@ -8674,6 +8765,10 @@
           "token": "motion.slow",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             }
@@ -8682,6 +8777,10 @@
         {
           "token": "radius.control",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "DocumentViewer",
               "how": "css"
@@ -8701,7 +8800,29 @@
           ]
         },
         {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "radius.surface",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
           "readBy": [
             {
               "unit": "DocumentViewer",
@@ -8714,6 +8835,15 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.modal",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8732,10 +8862,50 @@
           ]
         },
         {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.control.sm",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.sm",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8768,6 +8938,10 @@
             {
               "unit": "Icon",
               "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
             }
           ]
         },
@@ -8781,10 +8955,23 @@
           ]
         },
         {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.gap.2xs",
           "readBy": [
             {
               "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8797,7 +8984,19 @@
           "token": "space.gap.md",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8806,7 +9005,7 @@
           "token": "space.gap.sm",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Dialog",
               "how": "css"
             },
             {
@@ -8818,6 +9017,14 @@
         {
           "token": "space.gap.xs",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8832,7 +9039,29 @@
               "how": "css"
             },
             {
+              "unit": "Switch",
+              "how": "css"
+            },
+            {
               "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8867,6 +9096,10 @@
               "how": "css"
             },
             {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
               "how": "css"
             }
@@ -8877,6 +9110,23 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8898,7 +9148,24 @@
               "how": "css"
             },
             {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -8906,6 +9173,10 @@
         {
           "token": "text.label",
           "readBy": [
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8917,6 +9188,15 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.modal",
+          "readBy": [
+            {
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -11161,6 +11441,15 @@
               "unit": "Frame",
               "how": "css"
             },
+            {
+              "unit": "Frame",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
             {
               "unit": "Frame",
               "how": "prop"
@@ -26340,6 +26629,18 @@
       "chain": [
         "ratio.landscape",
         "aspect.4-3"
+      ],
+      "modes": {}
+    },
+    "ratio.page": {
+      "cssVar": "--ratio-page",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.",
+      "value": "0.7727",
+      "chain": [
+        "ratio.page",
+        "aspect.letter"
       ],
       "modes": {}
     },

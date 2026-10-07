@@ -33,7 +33,7 @@ export const usage: UsageDoc = {
     ),
   },
   accessibility: [
-    'The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.',
+    'The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.',
     'A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).',
   ],
 };

@@ -63,7 +63,7 @@ function Interactive() {
   );
 }
 
-/** The reader's highlights, a Find match and an AI citation together. Select text to get the Highlight menu; the toolbar's Highlight does the same from the keyboard. */
+/** The reader's highlights, a Find match and an AI citation together. Select text to get the Highlight menu; H does the same from the keyboard. The paper is at least a page tall. */
 export const Default: Story = { render: () => <Interactive /> };
 
 /** Placeholders for values that fill later: the effective date, the second signer's name and title. */
