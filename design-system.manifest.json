@@ -6871,7 +6871,7 @@
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "A document the app generates from data, shown as one continuous sheet on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
+      "description": "A document the app generates from data, shown as one continuous sheet (at least a page tall) on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the document area only: the page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
       "docs": "docs/usage/DocumentViewer.usage.tsx",
       "props": [
         {
@@ -6893,14 +6893,7 @@
           "type": "(selection: DocumentSelection) => void",
           "required": false,
           "default": null,
-          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu."
-        },
-        {
-          "name": "toolbar",
-          "type": "ReactNode",
-          "required": false,
-          "default": null,
-          "description": "More controls at the end of the viewer's toolbar: Find in document, Download."
+          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu."
         }
       ],
       "inherits": [],
@@ -6940,7 +6933,7 @@
           "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.\n  </Text>\n</DocumentViewer>"
         },
         "accessibility": [
-          "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.",
+          "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.",
           "A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test)."
         ]
       },
@@ -6965,16 +6958,21 @@
           }
         ],
         "composes": [
+          "Dialog",
           "Icon",
           "Kbd",
+          "Shortcuts",
+          "Switch",
           "Toolbar",
           "Tooltip"
         ],
         "tokens": [
           "border.width.default",
+          "color.action.primary",
           "color.bg.elevated",
           "color.bg.hover",
           "color.bg.inverse",
+          "color.bg.scrim",
           "color.bg.selected",
           "color.bg.subtle",
           "color.bg.surface",
@@ -6987,6 +6985,7 @@
           "color.fg.disabled",
           "color.fg.inverse",
           "color.fg.muted",
+          "color.fg.on-action",
           "color.status.danger.fg",
           "ease.enter",
           "ease.exit",
@@ -6995,27 +6994,40 @@
           "motion.fast",
           "motion.slow",
           "radius.control",
+          "radius.pill",
           "radius.surface",
+          "ratio.page",
           "shadow.card",
+          "shadow.modal",
           "shadow.popover",
+          "size.control.md",
           "size.control.sm",
+          "size.dialog.lg",
+          "size.dialog.md",
+          "size.dialog.sm",
           "size.document.measure",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
+          "size.target-min",
           "space.gap.2xs",
           "space.gap.md",
           "space.gap.sm",
           "space.gap.xs",
           "space.inset.2xs",
+          "space.inset.lg",
+          "space.inset.md",
           "space.inset.sm",
           "space.inset.xl",
           "space.inset.xs",
           "space.mark.overhang",
+          "text.body",
           "text.body-lg",
           "text.caption",
+          "text.heading-3",
           "text.label",
           "z.dropdown",
+          "z.modal",
           "z.tooltip"
         ]
       }
@@ -8178,7 +8190,8 @@
           "values": [
             "square",
             "landscape",
-            "wide"
+            "wide",
+            "page"
           ]
         }
       ],
@@ -8197,7 +8210,8 @@
         "ratio": [
           "square",
           "landscape",
-          "wide"
+          "wide",
+          "page"
         ]
       },
       "states": [],
@@ -8251,6 +8265,7 @@
         "composes": [],
         "tokens": [
           "ratio.landscape",
+          "ratio.page",
           "ratio.square",
           "ratio.wide"
         ]
@@ -12391,7 +12406,8 @@
       "values": [
         "square",
         "landscape",
-        "wide"
+        "wide",
+        "page"
       ]
     },
     {
@@ -20486,6 +20502,18 @@
       "chain": [
         "ratio.landscape",
         "aspect.4-3"
+      ],
+      "modes": {}
+    },
+    "ratio.page": {
+      "cssVar": "--ratio-page",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.",
+      "value": "0.7727",
+      "chain": [
+        "ratio.page",
+        "aspect.letter"
       ],
       "modes": {}
     },

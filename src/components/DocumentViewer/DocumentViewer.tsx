@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
 import { CopyIcon, EditIcon } from '../Icon/icons';
+import { useShortcut } from '../Shortcuts/Shortcuts';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
 import './DocumentViewer.css';
 
@@ -24,12 +25,19 @@ export interface DocumentViewerProps extends EscapeHatch {
   children: ReactNode;
   /**
    * Called with the reader's selection when they choose Highlight (from the menu above a selection,
-   * or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone).
-   * Without it, selecting text is plain native selection with no menu.
+   * or with H while text in the document is selected). Store it and render it as a Highlight (the
+   * default tone). Without it, selecting text is plain native selection with no menu.
    */
   onHighlight?: (selection: DocumentSelection) => void;
-  /** More controls at the end of the viewer's toolbar: Find in document, Download. */
-  toolbar?: ReactNode;
+}
+
+/** The keys that highlight the selection: shown in the menu, registered only while there is one. */
+const HIGHLIGHT_KEYS = 'h';
+
+/** Registers H while the reader has text selected in this viewer, so only one viewer holds it. */
+function HighlightShortcut({ onPress }: { onPress: () => void }) {
+  useShortcut({ id: 'document.highlight', keys: HIGHLIGHT_KEYS, description: 'Highlight the selection', scope: 'Document', handler: onPress });
+  return null;
 }
 
 interface MenuState extends DocumentSelection {
@@ -37,8 +45,9 @@ interface MenuState extends DocumentSelection {
 }
 
 /**
- * A document the app generates from data, shown as one continuous sheet on a canvas, with, when
- * `onHighlight` is set, a menu above the reader's selection.
+ * A document the app generates from data, shown as one continuous sheet (at least a page tall) on a
+ * canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the
+ * document area only: the page around it holds any toolbar (Find, Download).
  * Selecting is the browser's own (::selection is not styled); fields and placeholders are not
  * part of a selection. Placeholders that fill in place are announced in a polite live region.
  */
@@ -46,7 +55,6 @@ export function DocumentViewer({
   label,
   children,
   onHighlight,
-  toolbar,
   UNSAFE_className,
   UNSAFE_style,
 }: DocumentViewerProps) {
@@ -105,16 +113,7 @@ export function DocumentViewer({
   return (
     <DocumentContext.Provider value={context}>
       <div className={cx('document-viewer', UNSAFE_className)} style={UNSAFE_style}>
-        <div className="document-viewer__toolbar">
-          {onHighlight ? (
-            <Toolbar label="Selection">
-              <ToolbarButton icon={EditIcon} disabled={!hasSelection} onClick={() => highlight(readSelection())}>
-                Highlight
-              </ToolbarButton>
-            </Toolbar>
-          ) : null}
-          {toolbar ? <div className="document-viewer__extra">{toolbar}</div> : null}
-        </div>
+        {onHighlight && hasSelection ? <HighlightShortcut onPress={() => highlight(readSelection())} /> : null}
         <div className="document-viewer__canvas">
           <article ref={paper} className="document-viewer__paper" aria-label={label} onMouseUp={selectionEnded} onKeyUp={(event) => event.shiftKey && selectionEnded()}>
             {children}
@@ -136,7 +135,7 @@ export function DocumentViewer({
                 onCloseAutoFocus={(event) => event.preventDefault()}
               >
                 <Toolbar label="Selection actions">
-                  <ToolbarButton icon={EditIcon} onClick={() => highlight(menu)}>
+                  <ToolbarButton icon={EditIcon} shortcut={HIGHLIGHT_KEYS} onClick={() => highlight(menu)}>
                     Highlight
                   </ToolbarButton>
                   <ToolbarButton icon={CopyIcon} onClick={() => copy(menu)}>

@@ -319,7 +319,8 @@ export const vars = {
   "ratio": {
     "square": "var(--ratio-square)",
     "landscape": "var(--ratio-landscape)",
-    "wide": "var(--ratio-wide)"
+    "wide": "var(--ratio-wide)",
+    "page": "var(--ratio-page)"
   },
   "text": {
     "body": "var(--text-body)",

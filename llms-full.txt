@@ -1541,13 +1541,12 @@ Tokens read: `color.border.default`.
 
 component · `src/components/DocumentViewer/DocumentViewer.tsx` · usage: `docs/usage/DocumentViewer.usage.tsx`
 
-A document the app generates from data, shown as one continuous sheet on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
+A document the app generates from data, shown as one continuous sheet (at least a page tall) on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the document area only: the page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
 
 Props:
 - `label: string`: The document's name: labels the document region ("Master services agreement"). Required.
 - `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
-- `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
-- `toolbar?: ReactNode`: More controls at the end of the viewer's toolbar: Find in document, Download.
+- `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
@@ -1595,12 +1594,12 @@ Closed styling API: no `className`/`style`.
 
 **Accessibility**
 
-- The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.
+- The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Icon, Kbd, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.surface`, `shadow.card`, `shadow.popover`, `size.control.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`, `z.tooltip`.
+Composes: Dialog, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
 
@@ -4690,7 +4689,7 @@ Props:
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
-Variants: ratio (square | landscape | wide).
+Variants: ratio (square | landscape | wide | page).
 
 **When to use**
 
@@ -4731,7 +4730,7 @@ Variants: ratio (square | landscape | wide).
 - Layout only. The media keeps its own alternative: `alt=""` when a visible name sits beside it, a real description when it carries information.
 
 Stories: `primitives-frame--landscape`, `primitives-frame--square`, `primitives-frame--wide`, `primitives-frame--centred-content`.
-Tokens read: `ratio.landscape`, `ratio.square`, `ratio.wide`.
+Tokens read: `ratio.landscape`, `ratio.page`, `ratio.square`, `ratio.wide`.
 
 ### Grid
 
@@ -7390,6 +7389,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `radius.pill` `var(--radius-pill)`: `9999px`. Badges and pills.
 - `radius.surface` `var(--radius-surface)`: `8px`. Cards, tables, dialogs, popovers.
 - `ratio.landscape` `var(--ratio-landscape)`: `1.3333`. File and document previews.
+- `ratio.page` `var(--ratio-page)`: `0.7727`. A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.
 - `ratio.square` `var(--ratio-square)`: `1`. Avatars, logos, square thumbnails.
 - `ratio.wide` `var(--ratio-wide)`: `1.7778`. Video, cover images, banners.
 - `shadow.card` `var(--shadow-card)`: `0 1px 2px 0 #0206171a`. Resting surfaces on the canvas: cards, tables.

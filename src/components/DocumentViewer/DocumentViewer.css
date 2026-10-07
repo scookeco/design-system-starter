@@ -5,21 +5,6 @@
     gap: var(--space-gap-md);
   }
 
-  .document-viewer__toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-gap-sm);
-  }
-
-  .document-viewer__extra {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-gap-sm);
-    margin-inline-start: auto;
-  }
-
   /* The canvas the paper sits on; the paper is one continuous sheet, centred, never paginated. */
   .document-viewer__canvas {
     padding: var(--space-inset-xl);
@@ -32,6 +17,7 @@
     flex-direction: column;
     gap: var(--space-gap-md);
     max-inline-size: var(--size-document-measure);
+    aspect-ratio: var(--ratio-page); /* at least a page tall; a longer document grows past it */
     margin-inline: auto;
     padding: var(--space-inset-xl);
     border: 1px solid var(--color-border-default);

@@ -27,15 +27,14 @@ describe('DocumentViewer highlights', () => {
     expect(mark?.className).toBe('highlight-mark');
   });
 
-  it('keeps a selection inside the document as a highlight, from the toolbar button', () => {
+  it('keeps a selection inside the document as a highlight, with H', () => {
     const onHighlight = vi.fn();
     render(
       <DocumentViewer label="Agreement" onHighlight={onHighlight}>
         <Text>The agreement automatically renews every year.</Text>
       </DocumentViewer>,
     );
-    const button = screen.getByRole('button', { name: 'Highlight' });
-    expect((button as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByRole('button', { name: 'Highlight' })).toBeNull();
     const text = screen.getByText('The agreement automatically renews every year.').firstChild as Node;
     const range = document.createRange();
     range.setStart(text, 14);
@@ -45,7 +44,7 @@ describe('DocumentViewer highlights', () => {
     act(() => {
       document.dispatchEvent(new Event('selectionchange'));
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Highlight' }));
+    fireEvent.keyDown(document.body, { key: 'h' });
     expect(onHighlight).toHaveBeenCalledWith(expect.objectContaining({ text: 'automatically renews' }));
   });
 
@@ -66,7 +65,8 @@ describe('DocumentViewer highlights', () => {
     act(() => {
       document.dispatchEvent(new Event('selectionchange'));
     });
-    expect((screen.getByRole('button', { name: 'Highlight' }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.keyDown(document.body, { key: 'h' });
+    expect(onHighlight).not.toHaveBeenCalled();
   });
 });
 
