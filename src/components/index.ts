@@ -84,6 +84,7 @@ export {
   type DocumentSigner,
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
+export { SignatureBlock, type SignatureBlockProps, type SignatureRecipient } from './SignatureBlock/SignatureBlock';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
 export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';

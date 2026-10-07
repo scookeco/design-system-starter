@@ -9,6 +9,10 @@
       "code": {
         "$value": "{font.family.mono}",
         "$description": "Code, IDs and other machine-readable values."
+      },
+      "signature": {
+        "$value": "{font.family.script}",
+        "$description": "An adopted signature drawn on a signature line (SignatureBlock). A system script face: no font is downloaded."
       }
     },
     "weight": {
@@ -106,6 +110,15 @@
         "lineHeight": "{font.line-height.snug}"
       },
       "$description": "Small groups, card headers."
+    },
+    "signature": {
+      "$value": {
+        "fontFamily": "{font.family.script}",
+        "fontSize": "{font.size.700}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{font.line-height.tight}"
+      },
+      "$description": "A signature drawn on its line (SignatureBlock, signed)."
     }
   }
 }

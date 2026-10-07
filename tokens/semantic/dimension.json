@@ -234,6 +234,21 @@
         "$value": "{container.2xl}",
         "$description": "Max inline size of the paper: one continuous surface, centred, no page breaks."
       }
+    },
+    "signature": {
+      "$description": "A SignatureBlock’s signature slot: the same space before and after signing.",
+      "slot-inline": {
+        "$value": "{container.3xs}",
+        "$description": "Inline size of the space a signature takes."
+      },
+      "slot-block": {
+        "$value": "{size.16}",
+        "$description": "Block size of the space a signature takes."
+      },
+      "tag-inline": {
+        "$value": "{size.24}",
+        "$description": "Inline size of the Sign tag inside the slot: half of it."
+      }
     }
   },
   "radius": {
@@ -261,6 +276,10 @@
       "default": {
         "$value": "{border-width.1}",
         "$description": "Hairline borders on controls and surfaces."
+      },
+      "field": {
+        "$value": "{border-width.2}",
+        "$description": "Field tags placed on a document for a signer to complete (SignatureBlock)."
       }
     }
   },

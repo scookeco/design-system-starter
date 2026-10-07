@@ -21,6 +21,14 @@
           "Consolas",
           "monospace"
         ]
+      },
+      "script": {
+        "$value": [
+          "Snell Roundhand",
+          "Segoe Script",
+          "Brush Script MT",
+          "cursive"
+        ]
       }
     },
     "size": {
