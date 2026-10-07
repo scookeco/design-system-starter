@@ -6858,178 +6858,6 @@
       "propsOf": "Divider"
     },
     {
-      "name": "DocumentField",
-      "kind": "component",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "A field in a document's text flow: a tag in the signer's colour, inline so it moves with the text. An outline means it is yours to complete. Activating it opens the system's own control (`editor`, in a popover) or the app's flow (`onActivate`). Not part of a text selection.",
-      "partOf": "DocumentViewer",
-      "docs": "docs/usage/DocumentViewer.usage.tsx",
-      "props": [
-        {
-          "name": "kind",
-          "type": "DocumentFieldKind",
-          "required": true,
-          "default": null,
-          "description": null,
-          "values": [
-            "signature",
-            "initials",
-            "date-signed",
-            "stamp",
-            "text",
-            "textarea",
-            "number",
-            "date",
-            "select",
-            "combobox",
-            "multi-select",
-            "attachment",
-            "checkbox",
-            "radio",
-            "switch",
-            "slider"
-          ]
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "required": true,
-          "default": null,
-          "description": "What the field asks for: \"Sign\", \"Invoice frequency\". The tag's text, and its accessible name."
-        },
-        {
-          "name": "signer",
-          "type": "DocumentSigner",
-          "required": true,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "yours",
-          "type": "boolean",
-          "required": false,
-          "default": "true",
-          "description": "Whether the person reading can act on it. Someone else's field is flat (no outline) and not actionable."
-        },
-        {
-          "name": "required",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": null
-        },
-        {
-          "name": "invalid",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": null
-        },
-        {
-          "name": "value",
-          "type": "string | undefined",
-          "required": false,
-          "default": null,
-          "description": "The filled value, shown in place of the label (\"Maya Okafor\", \"Quarterly\")."
-        },
-        {
-          "name": "checked",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": "For checkbox, radio and switch: filled when true."
-        },
-        {
-          "name": "editor",
-          "type": "ReactNode",
-          "required": false,
-          "default": null,
-          "description": "The system control that edits it (TextField, Select, DatePicker…), opened in a popover anchored to the tag."
-        },
-        {
-          "name": "open",
-          "type": "boolean",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "defaultOpen",
-          "type": "boolean",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "onOpenChange",
-          "type": "(open: boolean) => void",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "onActivate",
-          "type": "() => void",
-          "required": false,
-          "default": null,
-          "description": "For fields completed elsewhere (signature, initials, attachment): the app opens its own flow."
-        }
-      ],
-      "inherits": [],
-      "closedApi": {
-        "className": false,
-        "style": false,
-        "UNSAFE_className": false,
-        "UNSAFE_style": false
-      },
-      "variants": {},
-      "states": [
-        "yours",
-        "required",
-        "invalid",
-        "checked",
-        "open",
-        "defaultOpen"
-      ]
-    },
-    {
-      "name": "DocumentFieldKind",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": null,
-      "partOf": "DocumentViewer",
-      "definition": "type DocumentFieldKind = 'signature' | 'initials' | 'date-signed' | 'stamp' | 'text' | 'textarea' | 'number' | 'date' | 'select' | 'combobox' | 'multi-select' | 'attachment' | 'checkbox' | 'radio' | 'switch' | 'slider'",
-      "values": [
-        "signature",
-        "initials",
-        "date-signed",
-        "stamp",
-        "text",
-        "textarea",
-        "number",
-        "date",
-        "select",
-        "combobox",
-        "multi-select",
-        "attachment",
-        "checkbox",
-        "radio",
-        "switch",
-        "slider"
-      ]
-    },
-    {
-      "name": "DocumentFieldProps",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": null,
-      "partOf": "DocumentViewer",
-      "propsOf": "DocumentField"
-    },
-    {
       "name": "DocumentSelection",
       "kind": "type-only",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
@@ -7037,15 +6865,6 @@
       "description": "The text the reader selected in the document, and the range it covers (to store as a highlight).",
       "partOf": "DocumentViewer",
       "definition": "interface DocumentSelection { text: string; range: Range; }"
-    },
-    {
-      "name": "DocumentSigner",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "Who a field belongs to. `category` (1–6, color.category.*) is that signer's colour, the same everywhere in the document.",
-      "partOf": "DocumentViewer",
-      "definition": "interface DocumentSigner { name: string; category: 1 | 2 | 3 | 4 | 5 | 6; }"
     },
     {
       "name": "DocumentViewer",
@@ -7067,7 +6886,7 @@
           "type": "ReactNode",
           "required": true,
           "default": null,
-          "description": "The generated document: headings and paragraphs, with DataField, Highlight and DocumentField inside."
+          "description": "The generated document: headings and paragraphs, with DataField and Highlight inside."
         },
         {
           "name": "layer",
@@ -7137,9 +6956,8 @@
       "states": [],
       "usage": {
         "whenToUse": [
-          "A document the app generates from data (an agreement, an order form, a policy) for people to read, highlight and complete fields in. The document is the app’s own HTML: headings and `Text`, with `DataField`, `Highlight` and `DocumentField` inline.",
-          "Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight.",
-          "Signing and approval flows: each `DocumentField` belongs to a signer, in that signer’s category colour. An outline means it is yours to complete; another signer’s is flat (`yours={false}`). A field opens as the system’s own control (`editor`) or the app’s flow (`onActivate`)."
+          "A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.",
+          "Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight."
         ],
         "whenNotToUse": [
           {
@@ -7156,8 +6974,8 @@
           }
         ],
         "do": {
-          "caption": "Merged values read as plain text; a value that fills later is a placeholder; a field sits in the sentence it belongs to.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by{' '}\n    <DocumentField kind=\"signature\" label=\"Sign\" signer={maya} required />\n  </Text>\n</DocumentViewer>"
+          "caption": "Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.",
+          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n  </Text>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "Flagging an empty value inside the document, or showing two highlight colours at once: fix data in the form that collected it, and keep one layer.",
@@ -7166,7 +6984,6 @@
         "accessibility": [
           "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.",
           "A highlight is a `<mark>`; the current one carries `aria-current`. Its background is its only mark, so list highlights somewhere reachable without colour (an outline, Find’s results).",
-          "A `DocumentField` is a button named “Sign, required, Maya Okafor” (or its value once filled); another signer’s is announced as “Sign, Jon Park’s field” and is not focusable. Fields and placeholders are not part of a text selection.",
           "A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test)."
         ]
       },
@@ -7196,20 +7013,11 @@
           {
             "id": "components-documentviewer--with-selection",
             "name": "With Selection"
-          },
-          {
-            "id": "components-documentviewer--field-kinds",
-            "name": "Field Kinds"
-          },
-          {
-            "id": "components-documentviewer--field-editor-open",
-            "name": "Field Editor Open"
           }
         ],
         "composes": [
           "Icon",
           "Kbd",
-          "Popover",
           "SegmentedControl",
           "Toolbar",
           "Tooltip"
@@ -7224,24 +7032,6 @@
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
-          "color.category.1.bg",
-          "color.category.1.border",
-          "color.category.1.fg",
-          "color.category.2.bg",
-          "color.category.2.border",
-          "color.category.2.fg",
-          "color.category.3.bg",
-          "color.category.3.border",
-          "color.category.3.fg",
-          "color.category.4.bg",
-          "color.category.4.border",
-          "color.category.4.fg",
-          "color.category.5.bg",
-          "color.category.5.border",
-          "color.category.5.fg",
-          "color.category.6.bg",
-          "color.category.6.border",
-          "color.category.6.fg",
           "color.data-field.bg",
           "color.data-field.bg-filled",
           "color.data-field.fg",
@@ -7249,50 +7039,39 @@
           "color.fg.disabled",
           "color.fg.inverse",
           "color.fg.muted",
-          "color.focus",
           "color.highlight.ai.bg",
           "color.highlight.ai.bg-current",
           "color.highlight.search.bg",
           "color.highlight.search.bg-current",
           "color.highlight.yours.bg",
           "color.highlight.yours.bg-current",
-          "color.status.danger.bg",
           "color.status.danger.fg",
           "ease.enter",
           "ease.exit",
-          "focus.ring.offset",
-          "focus.ring.width",
           "font.weight.strong",
           "icon.stroke",
-          "motion.base",
           "motion.fast",
           "motion.slow",
           "radius.control",
-          "radius.pill",
           "radius.surface",
           "shadow.card",
           "shadow.popover",
-          "size.control.md",
           "size.control.sm",
           "size.document.measure",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
-          "size.sidebar.sm",
-          "size.target-min",
           "space.gap.2xs",
           "space.gap.md",
           "space.gap.sm",
           "space.gap.xs",
           "space.inset.2xs",
-          "space.inset.md",
           "space.inset.sm",
           "space.inset.xl",
           "space.inset.xs",
           "space.mark.overhang",
           "text.body-lg",
           "text.caption",
-          "text.heading-4",
           "text.label",
           "z.dropdown",
           "z.tooltip"

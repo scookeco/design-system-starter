@@ -2,12 +2,9 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DataField, DocumentField, DocumentViewer, Highlight, Text } from '../../src/index';
+import { DataField, DocumentViewer, Highlight, Text } from '../../src/index';
 
 afterEach(cleanup);
-
-const maya = { name: 'Maya Okafor', category: 1 } as const;
-const jon = { name: 'Jon Park', category: 3 } as const;
 
 describe('DocumentViewer highlights', () => {
   it('shows only the current layer as marks; the others read as plain text', () => {
@@ -111,42 +108,5 @@ describe('DataField', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sign' }));
     expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('Effective date filled: 14 October 2026');
     expect(container.querySelector('[data-state="filled-now"]')?.textContent).toBe('14 October 2026');
-  });
-});
-
-describe('DocumentField', () => {
-  it('names a field by what it asks, whether it is required, and whose it is', () => {
-    render(<DocumentField kind="signature" label="Sign" signer={maya} required />);
-    expect(screen.getByRole('button', { name: 'Sign, required, Maya Okafor' })).toBeTruthy();
-  });
-
-  it('shows the value once filled, and says so', () => {
-    render(<DocumentField kind="select" label="Invoice frequency" signer={maya} value="Quarterly" />);
-    expect(screen.getByRole('button', { name: 'Invoice frequency, Quarterly, Maya Okafor' }).textContent).toBe('Quarterly');
-  });
-
-  it('another signer’s field is not focusable and says whose it is', () => {
-    const { container } = render(<DocumentField kind="signature" label="Sign" signer={jon} yours={false} />);
-    expect(screen.queryByRole('button')).toBeNull();
-    expect(container.querySelector('[data-signer="other"]')?.getAttribute('aria-label')).toBe('Sign, Jon Park’s field');
-  });
-
-  it('opens its editor in a popover and runs onActivate when it has none', () => {
-    const onActivate = vi.fn();
-    render(
-      <>
-        <DocumentField kind="text" label="Site contact" signer={maya} editor={<input aria-label="Site contact value" />} />
-        <DocumentField kind="signature" label="Sign" signer={maya} onActivate={onActivate} />
-      </>,
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Site contact, empty, Maya Okafor' }));
-    expect(screen.getByRole('textbox', { name: 'Site contact value' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Sign, empty, Maya Okafor' }));
-    expect(onActivate).toHaveBeenCalledOnce();
-  });
-
-  it('marks an invalid field for assistive technology', () => {
-    render(<DocumentField kind="number" label="Seats" signer={maya} required invalid />);
-    expect(screen.getByRole('button', { name: 'Seats, required, Maya Okafor' }).getAttribute('aria-invalid')).toBe('true');
   });
 });

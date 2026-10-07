@@ -1,21 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { Icon } from '../Icon/Icon';
-import {
-  AttachIcon,
-  BuildingIcon,
-  CalendarIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  CopyIcon,
-  EditIcon,
-  FileIcon,
-  SearchIcon,
-  UsersIcon,
-  type IconDefinition,
-} from '../Icon/icons';
-import { Popover } from '../Popover/Popover';
+import { CopyIcon, EditIcon } from '../Icon/icons';
 import { SegmentedControl } from '../SegmentedControl/SegmentedControl';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
 import './DocumentViewer.css';
@@ -45,7 +31,7 @@ export interface DocumentSelection {
 export interface DocumentViewerProps extends EscapeHatch {
   /** The document's name: labels the document region ("Master services agreement"). Required. */
   label: string;
-  /** The generated document: headings and paragraphs, with DataField, Highlight and DocumentField inside. */
+  /** The generated document: headings and paragraphs, with DataField and Highlight inside. */
   children: ReactNode;
   /** The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites. */
   layer?: HighlightLayer;
@@ -261,132 +247,4 @@ export function DataField({ value, placeholder, announceAs }: DataFieldProps) {
     );
   }
   return null;
-}
-
-export type DocumentFieldKind =
-  | 'signature'
-  | 'initials'
-  | 'date-signed'
-  | 'stamp'
-  | 'text'
-  | 'textarea'
-  | 'number'
-  | 'date'
-  | 'select'
-  | 'combobox'
-  | 'multi-select'
-  | 'attachment'
-  | 'checkbox'
-  | 'radio'
-  | 'switch'
-  | 'slider';
-
-/** Who a field belongs to. `category` (1–6, color.category.*) is that signer's colour, the same everywhere in the document. */
-export interface DocumentSigner {
-  name: string;
-  category: 1 | 2 | 3 | 4 | 5 | 6;
-}
-
-export interface DocumentFieldProps {
-  kind: DocumentFieldKind;
-  /** What the field asks for: "Sign", "Invoice frequency". The tag's text, and its accessible name. */
-  label: string;
-  signer: DocumentSigner;
-  /** Whether the person reading can act on it. Someone else's field is flat (no outline) and not actionable. */
-  yours?: boolean;
-  required?: boolean;
-  invalid?: boolean;
-  /** The filled value, shown in place of the label ("Maya Okafor", "Quarterly"). */
-  value?: string | undefined;
-  /** For checkbox, radio and switch: filled when true. */
-  checked?: boolean;
-  /** The system control that edits it (TextField, Select, DatePicker…), opened in a popover anchored to the tag. */
-  editor?: ReactNode;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  /** For fields completed elsewhere (signature, initials, attachment): the app opens its own flow. */
-  onActivate?: () => void;
-}
-
-const KIND_ICON: Partial<Record<DocumentFieldKind, IconDefinition>> = {
-  signature: EditIcon,
-  initials: EditIcon,
-  'date-signed': CalendarIcon,
-  stamp: BuildingIcon,
-  text: EditIcon,
-  textarea: FileIcon,
-  number: EditIcon,
-  date: CalendarIcon,
-  combobox: SearchIcon,
-  attachment: AttachIcon,
-};
-
-const BOXED: readonly DocumentFieldKind[] = ['checkbox', 'radio', 'switch'];
-
-/**
- * A field in a document's text flow: a tag in the signer's colour, inline so it moves with the
- * text. An outline means it is yours to complete. Activating it opens the system's own control
- * (`editor`, in a popover) or the app's flow (`onActivate`). Not part of a text selection.
- */
-export function DocumentField({
-  kind,
-  label,
-  signer,
-  yours = true,
-  required = false,
-  invalid = false,
-  value,
-  checked = false,
-  editor,
-  open,
-  defaultOpen,
-  onOpenChange,
-  onActivate,
-}: DocumentFieldProps) {
-  const boxed = BOXED.includes(kind);
-  const filled = boxed ? checked : Boolean(value);
-  const status = filled ? (value ?? 'checked') : required ? 'required' : 'empty';
-  const name = yours ? `${label}, ${status}, ${signer.name}` : `${label}, ${signer.name}’s field`;
-  const icon = boxed ? (filled ? (kind === 'checkbox' ? CheckIcon : undefined) : yours ? undefined : UsersIcon) : filled ? undefined : KIND_ICON[kind];
-  const trailing = (kind === 'select' || kind === 'multi-select') && !boxed;
-  const shown = boxed ? null : (value ?? label);
-
-  const content = (
-    <>
-      {icon ? <Icon icon={icon} /> : null}
-      {kind === 'radio' && filled ? <span className="document-field__dot" /> : null}
-      {kind === 'switch' ? <span className="document-field__thumb" /> : null}
-      {shown ? <span className="document-field__text">{shown}</span> : null}
-      {trailing ? <Icon icon={ChevronDownIcon} /> : null}
-    </>
-  );
-
-  const attributes = {
-    className: 'document-field',
-    'data-kind': kind,
-    'data-category': String(signer.category),
-    'data-filled': filled ? 'true' : undefined,
-    'aria-invalid': invalid ? true : undefined,
-  } as const;
-
-  if (!yours) {
-    return (
-      <span {...attributes} data-signer="other" role="img" aria-label={name}>
-        {content}
-      </span>
-    );
-  }
-
-  const button = (
-    <button type="button" {...attributes} aria-label={name} onClick={editor ? undefined : onActivate}>
-      {content}
-    </button>
-  );
-  if (!editor) return button;
-  return (
-    <Popover label={label} trigger={button} {...(open === undefined ? {} : { open })} {...(defaultOpen === undefined ? {} : { defaultOpen })} {...(onOpenChange ? { onOpenChange } : {})}>
-      {editor}
-    </Popover>
-  );
 }
