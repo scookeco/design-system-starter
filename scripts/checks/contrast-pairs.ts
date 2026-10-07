@@ -57,6 +57,8 @@ export const pairs: ContrastPair[] = [
   ...SURFACES.map((bg) => ({ fg: 'color.ai.fg', bg, min: TEXT })),
   // Highlight: text on every tone; DataField: a placeholder and the tint it fills with.
   ...HIGHLIGHTS.map((bg) => ({ fg: 'color.fg.default', bg, min: TEXT })),
+  // Redline: a move is green on the paper, as Word marks it (author colours are the category pairs above).
+  ...SURFACES.map((bg) => ({ fg: 'color.status.success.fg', bg, min: TEXT })),
   { fg: 'color.data-field.fg', bg: 'color.data-field.bg', min: TEXT },
   { fg: 'color.fg.default', bg: 'color.data-field.bg-filled', min: TEXT },
   { fg: 'button.primary.fg', bg: 'button.primary.bg', min: TEXT },

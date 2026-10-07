@@ -3799,6 +3799,110 @@
         }
       ]
     },
+    "Change": {
+      "kind": "component",
+      "dir": "src/components/Change",
+      "exports": [
+        "Change"
+      ],
+      "stylesheets": [
+        "src/components/Change/Change.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "ChatThread": {
       "kind": "component",
       "dir": "src/components/ChatThread",
@@ -4792,15 +4896,116 @@
         "src/components/Clause/Clause.css"
       ],
       "composes": [
+        "Change",
         "Heading"
       ],
       "composesAll": [
+        "Change",
         "Heading"
       ],
       "tokens": [
         {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.default",
           "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Heading",
               "how": "css"
@@ -4828,6 +5033,19 @@
         {
           "token": "color.status.danger.fg",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
             {
               "unit": "Clause",
               "how": "css"
@@ -4880,7 +5098,47 @@
           ]
         },
         {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
           "readBy": [
             {
               "unit": "Clause",
@@ -4938,6 +5196,146 @@
           "readBy": [
             {
               "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "ClauseNote": {
+      "kind": "component",
+      "dir": "src/components/ClauseNote",
+      "exports": [
+        "ClauseNote"
+      ],
+      "stylesheets": [
+        "src/components/ClauseNote/ClauseNote.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
               "how": "css"
             }
           ]
@@ -8595,6 +8993,384 @@
         }
       ]
     },
+    "DocumentTitle": {
+      "kind": "component",
+      "dir": "src/components/DocumentTitle",
+      "exports": [
+        "DocumentTitle",
+        "Recital",
+        "Recitals"
+      ],
+      "stylesheets": [
+        "src/components/DocumentTitle/DocumentTitle.css"
+      ],
+      "composes": [
+        "Clause",
+        "Heading",
+        "Text"
+      ],
+      "composesAll": [
+        "Change",
+        "Clause",
+        "Heading",
+        "Text"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            },
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "DocumentViewer": {
       "kind": "component",
       "dir": "src/components/DocumentViewer",
@@ -8612,6 +9388,7 @@
         "Toolbar"
       ],
       "composesAll": [
+        "Change",
         "Clause",
         "Dialog",
         "Heading",
@@ -8623,6 +9400,19 @@
         "Tooltip"
       ],
       "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
         {
           "token": "border.width.default",
           "readBy": [
@@ -8771,6 +9561,84 @@
           ]
         },
         {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.data-field.bg",
           "readBy": [
             {
@@ -8800,6 +9668,14 @@
         {
           "token": "color.fg.default",
           "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Dialog",
               "how": "css"
@@ -8901,6 +9777,19 @@
             },
             {
               "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9153,6 +10042,15 @@
           ]
         },
         {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.icon.md",
           "readBy": [
             {
@@ -9216,6 +10114,10 @@
         {
           "token": "space.gap.md",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Dialog",
               "how": "css"
@@ -9298,7 +10200,19 @@
           "token": "space.inset.md",
           "readBy": [
             {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
               "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -9319,6 +10233,10 @@
         {
           "token": "space.inset.xl",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "DocumentViewer",
               "how": "css"
@@ -9988,6 +10906,369 @@
         {
           "token": "text.heading-4",
           "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "Exhibit": {
+      "kind": "component",
+      "dir": "src/components/Exhibit",
+      "exports": [
+        "Exhibit"
+      ],
+      "stylesheets": [
+        "src/components/Exhibit/Exhibit.css"
+      ],
+      "composes": [
+        "Clause",
+        "Heading"
+      ],
+      "composesAll": [
+        "Change",
+        "Clause",
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            },
             {
               "unit": "Heading",
               "how": "css"
@@ -19687,6 +20968,470 @@
         }
       ]
     },
+    "SignatureBlock": {
+      "kind": "component",
+      "dir": "src/components/SignatureBlock",
+      "exports": [
+        "SignatureBlock"
+      ],
+      "stylesheets": [
+        "src/components/SignatureBlock/SignatureBlock.css"
+      ],
+      "composes": [
+        "Icon"
+      ],
+      "composesAll": [
+        "Icon"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.field",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-block",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-inline",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.tag-inline",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.signature",
+          "readBy": [
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "SignaturePage": {
+      "kind": "component",
+      "dir": "src/components/SignaturePage",
+      "exports": [
+        "SignaturePage",
+        "SignatureParty"
+      ],
+      "stylesheets": [
+        "src/components/SignaturePage/SignaturePage.css"
+      ],
+      "composes": [
+        "Text"
+      ],
+      "composesAll": [
+        "Text"
+      ],
+      "tokens": [
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            },
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.grid-item.md",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Skeleton": {
       "kind": "component",
       "dir": "src/components/Skeleton",
@@ -25154,6 +26899,18 @@
     }
   },
   "tokens": {
+    "border.width.change-bar": {
+      "cssVar": "--border-width-change-bar",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The bar in the left margin beside a changed line in a redline (Change), as Word draws it.",
+      "value": "2px",
+      "chain": [
+        "border.width.change-bar",
+        "border-width.2"
+      ],
+      "modes": {}
+    },
     "border.width.default": {
       "cssVar": "--border-width-default",
       "tier": "semantic",
@@ -25163,6 +26920,18 @@
       "chain": [
         "border.width.default",
         "border-width.1"
+      ],
+      "modes": {}
+    },
+    "border.width.field": {
+      "cssVar": "--border-width-field",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Field tags placed on a document for a signer to complete (SignatureBlock).",
+      "value": "2px",
+      "chain": [
+        "border.width.field",
+        "border-width.2"
       ],
       "modes": {}
     },
@@ -27215,6 +28984,18 @@
       ],
       "modes": {}
     },
+    "size.document.note": {
+      "cssVar": "--size-document-note",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of a clause note in the margin beside the paper (ClauseNote).",
+      "value": "12rem",
+      "chain": [
+        "size.document.note",
+        "container.3xs"
+      ],
+      "modes": {}
+    },
     "size.drawer.md": {
       "cssVar": "--size-drawer-md",
       "tier": "semantic",
@@ -27392,6 +29173,42 @@
       "chain": [
         "size.sidebar.sm",
         "container.3xs"
+      ],
+      "modes": {}
+    },
+    "size.signature.slot-block": {
+      "cssVar": "--size-signature-slot-block",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Block size of the space a signature takes.",
+      "value": "64px",
+      "chain": [
+        "size.signature.slot-block",
+        "size.16"
+      ],
+      "modes": {}
+    },
+    "size.signature.slot-inline": {
+      "cssVar": "--size-signature-slot-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the space a signature takes.",
+      "value": "12rem",
+      "chain": [
+        "size.signature.slot-inline",
+        "container.3xs"
+      ],
+      "modes": {}
+    },
+    "size.signature.tag-inline": {
+      "cssVar": "--size-signature-tag-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the Sign tag inside the slot: half of it.",
+      "value": "96px",
+      "chain": [
+        "size.signature.tag-inline",
+        "size.24"
       ],
       "modes": {}
     },
@@ -27731,6 +29548,17 @@
       "value": "500 0.875rem/1.25 system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
       "chain": [
         "text.label"
+      ],
+      "modes": {}
+    },
+    "text.signature": {
+      "cssVar": "--text-signature",
+      "tier": "semantic",
+      "type": "typography",
+      "description": "A signature drawn on its line (SignatureBlock, signed).",
+      "value": "400 1.875rem/1.25 \"Snell Roundhand\", \"Segoe Script\", \"Brush Script MT\", cursive",
+      "chain": [
+        "text.signature"
       ],
       "modes": {}
     },

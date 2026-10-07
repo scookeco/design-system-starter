@@ -7,12 +7,16 @@
 
   /* The canvas the paper sits on; the paper is one continuous sheet, centred, never paginated. */
   .document-viewer__canvas {
+    container: document-canvas / inline-size;
     padding: var(--space-inset-xl);
     border-radius: var(--radius-surface);
     background: var(--color-bg-subtle);
   }
 
   .document-viewer__paper {
+    /* Where a redline's changed-line bar sits: in the paper's margin (Change, Clause). */
+    --change-reach: var(--space-inset-md);
+
     display: flex;
     flex-direction: column;
     gap: var(--space-gap-md);

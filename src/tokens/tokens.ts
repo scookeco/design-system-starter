@@ -244,7 +244,8 @@ export const vars = {
     },
     "breakpoint": {
       "sm": "var(--size-breakpoint-sm)",
-      "md": "var(--size-breakpoint-md)"
+      "md": "var(--size-breakpoint-md)",
+      "lg": "var(--size-breakpoint-lg)"
     },
     "avatar": {
       "sm": "var(--size-avatar-sm)",
@@ -256,7 +257,13 @@ export const vars = {
     },
     "document": {
       "measure": "var(--size-document-measure)",
-      "clause-indent": "var(--size-document-clause-indent)"
+      "clause-indent": "var(--size-document-clause-indent)",
+      "note": "var(--size-document-note)"
+    },
+    "signature": {
+      "slot-inline": "var(--size-signature-slot-inline)",
+      "slot-block": "var(--size-signature-slot-block)",
+      "tag-inline": "var(--size-signature-tag-inline)"
     }
   },
   "radius": {
@@ -268,7 +275,8 @@ export const vars = {
   "font": {
     "family": {
       "body": "var(--font-family-body)",
-      "code": "var(--font-family-code)"
+      "code": "var(--font-family-code)",
+      "signature": "var(--font-family-signature)"
     },
     "weight": {
       "body": "var(--font-weight-body)",
@@ -277,7 +285,9 @@ export const vars = {
   },
   "border": {
     "width": {
-      "default": "var(--border-width-default)"
+      "default": "var(--border-width-default)",
+      "field": "var(--border-width-field)",
+      "change-bar": "var(--border-width-change-bar)"
     }
   },
   "focus": {
@@ -332,7 +342,8 @@ export const vars = {
     "heading-1": "var(--text-heading-1)",
     "heading-2": "var(--text-heading-2)",
     "heading-3": "var(--text-heading-3)",
-    "heading-4": "var(--text-heading-4)"
+    "heading-4": "var(--text-heading-4)",
+    "signature": "var(--text-signature)"
   }
 } as const;
 

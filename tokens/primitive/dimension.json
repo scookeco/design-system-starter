@@ -130,6 +130,18 @@
         "unit": "px"
       }
     },
+    "16": {
+      "$value": {
+        "value": 64,
+        "unit": "px"
+      }
+    },
+    "24": {
+      "$value": {
+        "value": 96,
+        "unit": "px"
+      }
+    },
     "$type": "dimension",
     "$description": "Fixed sizes on the same 4px grid, for controls, icons and targets."
   },

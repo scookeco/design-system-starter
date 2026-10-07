@@ -3445,6 +3445,153 @@
       "propsOf": "Center"
     },
     {
+      "name": "Change",
+      "kind": "component",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "A tracked change in a document compare view (a redline), marked as Microsoft Word marks it: insertions underlined and deletions struck through in the author's colour, moves in green with double lines, and a bar in the left margin beside every paragraph that holds a change. Renders <ins> or <del>; what the change is and who made it is announced from CSS, so it never ends up in copied text.",
+      "docs": "docs/usage/Change.usage.tsx",
+      "props": [
+        {
+          "name": "kind",
+          "type": "ChangeKind",
+          "required": true,
+          "default": null,
+          "description": "Inserted (underlined), deleted (struck through), or moved (green, double struck / double underlined). Required.",
+          "values": [
+            "insert",
+            "delete",
+            "move-from",
+            "move-to"
+          ]
+        },
+        {
+          "name": "author",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Who made the change (\"Maya Okafor\"): announced with it (\"Deleted by Maya Okafor\")."
+        },
+        {
+          "name": "color",
+          "type": "ChangeColor",
+          "required": false,
+          "default": "1",
+          "description": "The author's colour. Use one per reviewer, and the same one as their signature block. Moves are always green. Default 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The changed text. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "kind": [
+          "insert",
+          "delete",
+          "move-from",
+          "move-to"
+        ],
+        "color": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A redline: an agreement compared with an amendment or another version, marked as Microsoft Word marks tracked changes. Insertions underlined and deletions struck through in the author’s `color` (one per reviewer, the same as their signature block), moves green with double lines (`move-from`, `move-to`).",
+          "A bar in the left margin marks every paragraph that holds a change. A whole clause inserted, deleted or moved takes a `change` on its `Clause`, and keeps its number."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Changes an AI proposes before anyone accepts them",
+            "instead": "`ReviewChanges`"
+          },
+          {
+            "situation": "Marking a passage for attention",
+            "instead": "`Highlight`"
+          }
+        ],
+        "do": {
+          "caption": "Each change with its author, in that author’s colour.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Text>\n    Liability will not exceed{' '}\n    <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n      two times (2×)\n    </Change>{' '}\n    the fees of the prior twelve (12) months.\n  </Text>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>\n      <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.\n      </Change>\n    </Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A change is an `<ins>` or `<del>`; what it is and who made it (“Deleted by Jon Park”) is announced from CSS, so it never ends up in copied text.",
+          "Never colour alone: the underline, the strike, the double lines and the margin bar carry each change; the colour only says whose it is. Each author colour passes contrast on the paper in light and dark."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Change",
+        "stories": [
+          {
+            "id": "components-change--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-change--compared",
+            "name": "Compared"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.status.success.fg",
+          "space.inset.md"
+        ]
+      }
+    },
+    {
+      "name": "ChangeColor",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "A reviewer's colour (color.category.*), the same for every change they make (Word's “By author”).",
+      "partOf": "Change",
+      "definition": "type ChangeColor = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
       "name": "ChangeDecision",
       "kind": "type-only",
       "source": "src/components/ReviewChanges/ReviewChanges.tsx",
@@ -3458,6 +3605,21 @@
       ]
     },
     {
+      "name": "ChangeKind",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "What a tracked change did: Word's insertion, deletion and the two ends of a move.",
+      "partOf": "Change",
+      "definition": "type ChangeKind = 'insert' | 'delete' | 'move-from' | 'move-to'",
+      "values": [
+        "insert",
+        "delete",
+        "move-from",
+        "move-to"
+      ]
+    },
+    {
       "name": "ChangeOutcome",
       "kind": "type-only",
       "source": "src/components/ReviewChanges/ReviewChanges.tsx",
@@ -3465,6 +3627,15 @@
       "description": "How each change went once applied: done, or why it failed.",
       "partOf": "ReviewChanges",
       "definition": "type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }"
+    },
+    {
+      "name": "ChangeProps",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Change",
+      "propsOf": "Change"
     },
     {
       "name": "ChatThread",
@@ -4140,6 +4311,27 @@
           "required": true,
           "default": null,
           "description": "The clause text: paragraphs, and nested Clauses for its sub-clauses."
+        },
+        {
+          "name": "note",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not."
+        },
+        {
+          "name": "conspicuous",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out."
+        },
+        {
+          "name": "change",
+          "type": "{ kind: ChangeKind; author?: string; color?: ChangeColor }",
+          "required": false,
+          "default": null,
+          "description": "In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number."
         }
       ],
       "inherits": [],
@@ -4150,7 +4342,9 @@
         "UNSAFE_style": false
       },
       "variants": {},
-      "states": [],
+      "states": [
+        "conspicuous"
+      ],
       "usage": {
         "whenToUse": [
           "The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.",
@@ -4203,19 +4397,32 @@
           }
         ],
         "composes": [
+          "Change",
           "Heading"
         ],
         "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
           "color.fg.default",
           "color.fg.link",
           "color.focus",
           "color.status.danger.fg",
+          "color.status.success.fg",
           "focus.ring.offset",
           "focus.ring.width",
           "font.weight.strong",
           "radius.indicator",
           "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
           "space.gap.sm",
+          "space.inset.md",
+          "space.inset.xl",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
           "text.heading-1",
@@ -4224,6 +4431,147 @@
           "text.heading-4"
         ]
       }
+    },
+    {
+      "name": "ClauseNote",
+      "kind": "component",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "A note about a clause for whoever drafts or reviews the agreement, never part of the signed text: its negotiation position (Balanced, Seller-favored, Buyer-favored) or the contract type it comes from in the clause library. Pass it to a Clause's `note`: it sits in the margin beside the paper when the viewer is wide enough, and under the clause heading when it is not. The words carry the meaning; a source's bar is in its contract type's colour.",
+      "docs": "docs/usage/ClauseNote.usage.tsx",
+      "props": [
+        {
+          "name": "position",
+          "type": "NegotiationPosition",
+          "required": false,
+          "default": null,
+          "description": "The clause's negotiation position. Set this or `source`.",
+          "values": [
+            "balanced",
+            "seller-favored",
+            "buyer-favored"
+          ]
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The contract type the clause comes from in the clause library (\"DPA\"). Set this or `position`."
+        },
+        {
+          "name": "color",
+          "type": "ClauseSourceColor",
+          "required": false,
+          "default": "1",
+          "description": "The source's colour: one per contract type. Default 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "One line of detail: what makes it that position, or the library reference."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "position": [
+          "balanced",
+          "seller-favored",
+          "buyer-favored"
+        ],
+        "color": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A note on a clause for whoever drafts or reviews the agreement: its negotiation position (`balanced`, `seller-favored`, `buyer-favored`) with one line of why, or the contract type it comes from in the clause library (`source`, in that type’s `color`).",
+          "Pass it to a `Clause`’s `note`: it sits in the margin beside the paper when the viewer is at least size.breakpoint.lg wide, and under the clause heading when it is narrower. It is never printed."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A comment someone left on the text",
+            "instead": "the app’s comment thread (`ChatThread`, `Message`)"
+          },
+          {
+            "situation": "Text the parties sign",
+            "instead": "the clause itself"
+          }
+        ],
+        "do": {
+          "caption": "A position named in words, with the reason in one line.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\" note={<ClauseNote position=\"balanced\">Cap at the fees of the prior 12 months</ClauseNote>}>\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A drafting remark typed into the clause: it would be signed with the agreement.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A note has role=\"note\" and reads as “Position Balanced …” right after the clause heading, wherever it is drawn.",
+          "Colour is never the only cue: the words name the position and the source; a source’s bar repeats its contract type’s colour."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ClauseNote",
+        "stories": [
+          {
+            "id": "components-clausenote--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-clausenote--on-clauses",
+            "name": "On Clauses"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "border.width.change-bar",
+          "color.border.default",
+          "color.category.1.border",
+          "color.category.2.border",
+          "color.category.3.border",
+          "color.category.4.border",
+          "color.category.5.border",
+          "color.category.6.border",
+          "color.fg.default",
+          "color.fg.muted",
+          "space.gap.2xs",
+          "space.inset.sm",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "ClauseNoteProps",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ClauseNote",
+      "propsOf": "ClauseNote"
     },
     {
       "name": "ClauseProps",
@@ -4239,7 +4587,7 @@
       "kind": "component",
       "source": "src/components/Clause/Clause.tsx",
       "status": null,
-      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
+      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), or to an Exhibit (\"Exhibit A\"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
       "partOf": "Clause",
       "docs": "docs/usage/Clause.usage.tsx",
       "props": [
@@ -4276,6 +4624,23 @@
       "description": null,
       "partOf": "Clause",
       "propsOf": "ClauseRef"
+    },
+    {
+      "name": "ClauseSourceColor",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "A contract type's colour (color.category.*), the same wherever that type's clauses appear.",
+      "partOf": "ClauseNote",
+      "definition": "type ClauseSourceColor = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     {
       "name": "CloseIcon",
@@ -7032,6 +7397,137 @@
       "definition": "interface DocumentSelection { text: string; range: Range; }"
     },
     {
+      "name": "DocumentTitle",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The agreement's title (\"Master Services Agreement\"). Required."
+        },
+        {
+          "name": "number",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Its number line, under the title (\"Order Form No. OF-2026-0311 under Agreement No. MSA-2026-0142\")."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "The preamble: who the parties are, and the defined terms for the document and each party (Term define)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The top of a generated agreement: `DocumentTitle` for its title and number (centred) and the preamble that names the parties, with each defined term in a `Term define`.",
+          "`Recitals` for the background before the operative clauses: each `Recital` is written without its “WHEREAS,” (it is added), and `closing` follows “NOW, THEREFORE,”."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The page’s own title in an app (the record, the list)",
+            "instead": "`PageHeader`"
+          },
+          {
+            "situation": "A heading inside the agreement",
+            "instead": "`Clause` with a `title`"
+          }
+        ],
+        "do": {
+          "caption": "Title, number and preamble, then the recitals: the same structure for every agreement the app generates.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n  </DocumentTitle>\n  <Recitals>\n    <Recital>Provider operates a facilities management platform;</Recital>\n  </Recitals>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>MASTER SERVICES AGREEMENT</Text>\n  <Text>Whereas Provider operates a platform…</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.",
+          "The title block is a `header`; recitals are plain paragraphs in reading order."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentTitle",
+        "stories": [
+          {
+            "id": "components-documenttitle--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documenttitle--amendment",
+            "name": "Amendment"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Clause",
+          "Heading",
+          "Text"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.indicator",
+          "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "DocumentTitleProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentTitle",
+      "propsOf": "DocumentTitle"
+    },
+    {
       "name": "DocumentViewer",
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
@@ -7071,6 +7567,13 @@
             3,
             4
           ]
+        },
+        {
+          "name": "documentName",
+          "type": "string",
+          "required": false,
+          "default": "'the Agreement'",
+          "description": "How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default \"the Agreement\"."
         }
       ],
       "inherits": [],
@@ -7141,6 +7644,7 @@
           }
         ],
         "composes": [
+          "Change",
           "Clause",
           "Dialog",
           "Heading",
@@ -7152,6 +7656,7 @@
           "Tooltip"
         ],
         "tokens": [
+          "border.width.change-bar",
           "border.width.default",
           "color.action.primary",
           "color.bg.elevated",
@@ -7163,6 +7668,12 @@
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
           "color.data-field.bg",
           "color.data-field.bg-filled",
           "color.data-field.fg",
@@ -7174,6 +7685,7 @@
           "color.fg.on-action",
           "color.focus",
           "color.status.danger.fg",
+          "color.status.success.fg",
           "ease.enter",
           "ease.exit",
           "focus.ring.offset",
@@ -7197,6 +7709,7 @@
           "size.dialog.sm",
           "size.document.clause-indent",
           "size.document.measure",
+          "size.document.note",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
@@ -7661,6 +8174,129 @@
       "status": null,
       "description": "The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.",
       "definition": "interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }"
+    },
+    {
+      "name": "Exhibit",
+      "kind": "component",
+      "source": "src/components/Exhibit/Exhibit.tsx",
+      "status": null,
+      "description": "An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
+      "docs": "docs/usage/Exhibit.usage.tsx",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Stable id that references use (`<ClauseRef to=\"dpa\" />` → “Exhibit A”). Unique among clauses and exhibits. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The exhibit's name (\"Data Processing Agreement\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The exhibit's clauses: their numbering starts again at 1."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.",
+          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A separate agreement that refers to this one (an Order Form, an Amendment)",
+            "instead": "its own DocumentViewer, naming this agreement in plain text"
+          },
+          {
+            "situation": "A section of the agreement itself",
+            "instead": "`Clause`"
+          }
+        ],
+        "do": {
+          "caption": "An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"privacy\" title=\"Data Privacy\">\n    <Text>\n      Personal data is processed under <ClauseRef to=\"dpa\" />.\n    </Text>\n  </Clause>\n  <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n    <Clause id=\"roles\" title=\"Roles\">\n      <Text>Customer is the controller and Provider the processor.</Text>\n    </Clause>\n  </Exhibit>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>EXHIBIT A — Data Processing Agreement</Text>\n  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.",
+          "A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Exhibit",
+        "stories": [
+          {
+            "id": "components-exhibit--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Clause",
+          "Heading"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.border.default",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.link",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.indicator",
+          "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "ExhibitProps",
+      "kind": "type-only",
+      "source": "src/components/Exhibit/Exhibit.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Exhibit",
+      "propsOf": "Exhibit"
     },
     {
       "name": "EyeIcon",
@@ -11318,6 +11954,20 @@
       "propsOf": "NavTabs"
     },
     {
+      "name": "NegotiationPosition",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "Where a clause sits in negotiation, as each clause in a clause library records it.",
+      "partOf": "ClauseNote",
+      "definition": "type NegotiationPosition = 'balanced' | 'seller-favored' | 'buyer-favored'",
+      "values": [
+        "balanced",
+        "seller-favored",
+        "buyer-favored"
+      ]
+    },
+    {
       "name": "NumberField",
       "kind": "component",
       "source": "src/components/NumberField/NumberField.tsx",
@@ -12605,6 +13255,76 @@
         "wide",
         "page"
       ]
+    },
+    {
+      "name": "Recital",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.",
+      "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "Recitals",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.",
+      "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One Recital per piece of background. Required."
+        },
+        {
+          "name": "closing",
+          "type": "string",
+          "required": false,
+          "default": "'in consideration of the mutual covenants set out below, the Parties agree as follows:'",
+          "description": "What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows:"
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "RecitalsProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentTitle",
+      "propsOf": "Recitals"
     },
     {
       "name": "Reel",
@@ -14274,6 +14994,352 @@
         "sm",
         "md",
         "lg"
+      ]
+    },
+    {
+      "name": "SignatureBlock",
+      "kind": "component",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": "The signature block at the end of a generated document, one per signer, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each label followed by a field tag in the recipient's colour. Signed, the signature is drawn on its line and the values read as plain text. Every value keeps the space of the tag it replaces, so nothing moves when the document is signed.",
+      "docs": "docs/usage/SignatureBlock.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The signer's name, shown once signed (\"Maya Okafor\"). Also names the Sign button. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The signer's title, shown once signed (\"Legal counsel\")."
+        },
+        {
+          "name": "signature",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The adopted signature, drawn on the line. Setting it makes the block signed."
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The date signed, formatted for the reader (useFormat). Shown once signed."
+        },
+        {
+          "name": "recipient",
+          "type": "SignatureRecipient",
+          "required": false,
+          "default": "1",
+          "description": "The recipient's colour for the field tags. Defaults to 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "onSign",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Makes the Sign tag a button that starts signing (the app's adopt-signature flow)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "recipient": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The end of a generated agreement (a DocumentViewer), one block per signer: Signature, Name, Title and Date Signed.",
+          "Before signing, each value is a field tag in the recipient’s colour (`recipient`, color.category.*); pass `onSign` to make the Sign tag start the app’s signing flow.",
+          "Once signed (`signature` set), the signature is drawn on its line and the values read as plain text, each in the space its tag held, so the document does not shift."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Collecting a signer’s details in a form",
+            "instead": "the form components (`TextField`, `DatePicker`) on a page"
+          },
+          {
+            "situation": "Showing who signed in a list or a record",
+            "instead": "`Timeline` or a `Table` row"
+          }
+        ],
+        "do": {
+          "caption": "One block per signer, side by side, each in its recipient’s colour.",
+          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" title=\"Legal counsel\" recipient={3} />\n  <SignatureBlock name=\"Jon Park\" title=\"Operations director\" recipient={1} />\n</Cluster>"
+        },
+        "dont": {
+          "caption": "Two signers in one colour: the reader can’t tell whose fields are whose.",
+          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</Cluster>"
+        },
+        "accessibility": [
+          "The block is a description list: each label is a `<dt>` and its value a `<dd>`, so screen readers announce them as pairs.",
+          "With `onSign`, the Sign tag is a button named “Sign as <name>”, at least the minimum target size, with a visible focus ring.",
+          "A recipient’s colour is never the only cue: each block names its signer once signed, and the document says whose block it is."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/SignatureBlock",
+        "stories": [
+          {
+            "id": "components-signatureblock--unsigned",
+            "name": "Unsigned"
+          },
+          {
+            "id": "components-signatureblock--with-sign-action",
+            "name": "With Sign Action"
+          },
+          {
+            "id": "components-signatureblock--signed",
+            "name": "Signed"
+          },
+          {
+            "id": "components-signatureblock--before-and-after",
+            "name": "Before And After"
+          },
+          {
+            "id": "components-signatureblock--recipients",
+            "name": "Recipients"
+          }
+        ],
+        "composes": [
+          "Icon"
+        ],
+        "tokens": [
+          "border.width.field",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.indicator",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.signature.slot-block",
+          "size.signature.slot-inline",
+          "size.signature.tag-inline",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.xs",
+          "text.body-lg",
+          "text.label",
+          "text.signature"
+        ]
+      }
+    },
+    {
+      "name": "SignatureBlockProps",
+      "kind": "type-only",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignatureBlock",
+      "propsOf": "SignatureBlock"
+    },
+    {
+      "name": "SignaturePage",
+      "kind": "component",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": "The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
+      "props": [
+        {
+          "name": "witness",
+          "type": "string",
+          "required": false,
+          "default": "'IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.'",
+          "description": "The execution line. Default: IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One SignatureParty per party: 1, 2 or 3 (an escrow agreement's three). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.",
+          "One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One signer’s fields in the middle of a document (initials, a date)",
+            "instead": "a `SignatureBlock` on its own"
+          },
+          {
+            "situation": "A list of who has signed so far",
+            "instead": "`Timeline`"
+          }
+        ],
+        "do": {
+          "caption": "One party per SignatureParty, each signer in their own recipient colour.",
+          "code": "<SignaturePage>\n  <SignatureParty name=\"Acme Corp\">\n    <SignatureBlock name=\"Maya Okafor\" recipient={3} />\n  </SignatureParty>\n  <SignatureParty name=\"Globex Inc.\">\n    <SignatureBlock name=\"Jon Park\" recipient={1} />\n  </SignatureParty>\n</SignaturePage>"
+        },
+        "dont": {
+          "caption": "Signers stacked under one typed heading: who signs for which party is lost.",
+          "code": "<>\n  <Text>Signatures:</Text>\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</>"
+        },
+        "accessibility": [
+          "The page is a `section` named “Signatures”; each party’s name comes before its block in reading order.",
+          "The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/SignaturePage",
+        "stories": [
+          {
+            "id": "components-signaturepage--two-parties",
+            "name": "Two Parties"
+          },
+          {
+            "id": "components-signaturepage--one-party",
+            "name": "One Party"
+          },
+          {
+            "id": "components-signaturepage--three-parties",
+            "name": "Three Parties"
+          }
+        ],
+        "composes": [
+          "Text"
+        ],
+        "tokens": [
+          "color.fg.default",
+          "color.fg.muted",
+          "size.grid-item.md",
+          "space.gap.lg",
+          "space.gap.sm",
+          "space.gap.xl",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "SignaturePageProps",
+      "kind": "type-only",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignaturePage",
+      "propsOf": "SignaturePage"
+    },
+    {
+      "name": "SignatureParty",
+      "kind": "component",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": "One party on a SignaturePage: its name over its SignatureBlock.",
+      "partOf": "SignaturePage",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party, as the agreement names it (\"Acme Corp\"): shown in capitals. Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The party's SignatureBlock, in its recipient's colour. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "SignaturePartyProps",
+      "kind": "type-only",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignaturePage",
+      "propsOf": "SignatureParty"
+    },
+    {
+      "name": "SignatureRecipient",
+      "kind": "type-only",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": "A recipient's colour (color.category.*): the same for every field that recipient completes.",
+      "partOf": "SignatureBlock",
+      "definition": "type SignatureRecipient = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
       ]
     },
     {
@@ -19125,6 +20191,18 @@
     }
   ],
   "tokens": {
+    "border.width.change-bar": {
+      "cssVar": "--border-width-change-bar",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The bar in the left margin beside a changed line in a redline (Change), as Word draws it.",
+      "value": "2px",
+      "chain": [
+        "border.width.change-bar",
+        "border-width.2"
+      ],
+      "modes": {}
+    },
     "border.width.default": {
       "cssVar": "--border-width-default",
       "tier": "semantic",
@@ -19134,6 +20212,18 @@
       "chain": [
         "border.width.default",
         "border-width.1"
+      ],
+      "modes": {}
+    },
+    "border.width.field": {
+      "cssVar": "--border-width-field",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Field tags placed on a document for a signer to complete (SignatureBlock).",
+      "value": "2px",
+      "chain": [
+        "border.width.field",
+        "border-width.2"
       ],
       "modes": {}
     },
@@ -20575,6 +21665,18 @@
       ],
       "modes": {}
     },
+    "font.family.signature": {
+      "cssVar": "--font-family-signature",
+      "tier": "semantic",
+      "type": "fontFamily",
+      "description": "An adopted signature drawn on a signature line (SignatureBlock). A system script face: no font is downloaded.",
+      "value": "\"Snell Roundhand\", \"Segoe Script\", \"Brush Script MT\", cursive",
+      "chain": [
+        "font.family.signature",
+        "font.family.script"
+      ],
+      "modes": {}
+    },
     "font.weight.body": {
       "cssVar": "--font-weight-body",
       "tier": "semantic",
@@ -20906,6 +22008,18 @@
       ],
       "modes": {}
     },
+    "size.breakpoint.lg": {
+      "cssVar": "--size-breakpoint-lg",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "At and above this a DocumentViewer's canvas has room beside the paper: clause notes move into the margin (below it they sit under the clause heading).",
+      "value": "75rem",
+      "chain": [
+        "size.breakpoint.lg",
+        "container.4xl"
+      ],
+      "modes": {}
+    },
     "size.breakpoint.md": {
       "cssVar": "--size-breakpoint-md",
       "tier": "semantic",
@@ -21071,6 +22185,18 @@
       "chain": [
         "size.document.measure",
         "container.2xl"
+      ],
+      "modes": {}
+    },
+    "size.document.note": {
+      "cssVar": "--size-document-note",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of a clause note in the margin beside the paper (ClauseNote).",
+      "value": "12rem",
+      "chain": [
+        "size.document.note",
+        "container.3xs"
       ],
       "modes": {}
     },
@@ -21251,6 +22377,42 @@
       "chain": [
         "size.sidebar.sm",
         "container.3xs"
+      ],
+      "modes": {}
+    },
+    "size.signature.slot-block": {
+      "cssVar": "--size-signature-slot-block",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Block size of the space a signature takes.",
+      "value": "64px",
+      "chain": [
+        "size.signature.slot-block",
+        "size.16"
+      ],
+      "modes": {}
+    },
+    "size.signature.slot-inline": {
+      "cssVar": "--size-signature-slot-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the space a signature takes.",
+      "value": "12rem",
+      "chain": [
+        "size.signature.slot-inline",
+        "container.3xs"
+      ],
+      "modes": {}
+    },
+    "size.signature.tag-inline": {
+      "cssVar": "--size-signature-tag-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the Sign tag inside the slot: half of it.",
+      "value": "96px",
+      "chain": [
+        "size.signature.tag-inline",
+        "size.24"
       ],
       "modes": {}
     },
@@ -21590,6 +22752,17 @@
       "value": "500 0.875rem/1.25 system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
       "chain": [
         "text.label"
+      ],
+      "modes": {}
+    },
+    "text.signature": {
+      "cssVar": "--text-signature",
+      "tier": "semantic",
+      "type": "typography",
+      "description": "A signature drawn on its line (SignatureBlock, signed).",
+      "value": "400 1.875rem/1.25 \"Snell Roundhand\", \"Segoe Script\", \"Brush Script MT\", cursive",
+      "chain": [
+        "text.signature"
       ],
       "modes": {}
     },

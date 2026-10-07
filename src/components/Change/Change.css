@@ -1,0 +1,75 @@
+@layer components {
+  /* The author's colour (color.category.*); a move is always green, as in Word. */
+  .change {
+    --change-color: var(--color-category-1-fg);
+
+    color: var(--change-color);
+    text-decoration-color: var(--change-color);
+  }
+
+  .change[data-color="2"] {
+    --change-color: var(--color-category-2-fg);
+  }
+
+  .change[data-color="3"] {
+    --change-color: var(--color-category-3-fg);
+  }
+
+  .change[data-color="4"] {
+    --change-color: var(--color-category-4-fg);
+  }
+
+  .change[data-color="5"] {
+    --change-color: var(--color-category-5-fg);
+  }
+
+  .change[data-color="6"] {
+    --change-color: var(--color-category-6-fg);
+  }
+
+  .change[data-kind^="move"] {
+    --change-color: var(--color-status-success-fg);
+  }
+
+  .change[data-kind="insert"] {
+    text-decoration-line: underline;
+  }
+
+  .change[data-kind="delete"] {
+    text-decoration-line: line-through;
+  }
+
+  .change[data-kind="move-to"] {
+    text-decoration-line: underline;
+    text-decoration-style: double;
+  }
+
+  .change[data-kind="move-from"] {
+    text-decoration-line: line-through;
+    text-decoration-style: double;
+  }
+
+  /* What changed and who changed it, for assistive technology only: never copied with the text. */
+  .change::before {
+    position: absolute;
+    overflow: hidden;
+    inline-size: 1px;
+    block-size: 1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    content: attr(data-label) ": ";
+  }
+
+  /*
+   * The changed-line bar sits in the paper's margin (DocumentViewer sets the reach, Clause adds
+   * its gutters), so every paragraph holding a change reaches back to the same line.
+   */
+  :is(p, h1, h2, h3, h4):has(.change) {
+    --change-pull: calc(var(--change-reach, var(--space-inset-md)) * -1);
+    --change-inset: calc(var(--change-reach, var(--space-inset-md)) - var(--border-width-change-bar));
+
+    margin-inline-start: var(--change-pull);
+    padding-inline-start: var(--change-inset);
+    border-inline-start: var(--border-width-change-bar) solid var(--color-fg-default);
+  }
+}
