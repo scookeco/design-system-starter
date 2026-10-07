@@ -4780,6 +4780,170 @@
         }
       ]
     },
+    "Clause": {
+      "kind": "component",
+      "dir": "src/components/Clause",
+      "exports": [
+        "Clause",
+        "ClauseRef",
+        "Term"
+      ],
+      "stylesheets": [
+        "src/components/Clause/Clause.css"
+      ],
+      "composes": [
+        "Heading"
+      ],
+      "composesAll": [
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Cluster": {
       "kind": "primitive",
       "dir": "src/primitives/Cluster",
@@ -8442,12 +8606,15 @@
         "src/components/DocumentViewer/DocumentViewer.css"
       ],
       "composes": [
+        "Clause",
         "Icon",
         "Shortcuts",
         "Toolbar"
       ],
       "composesAll": [
+        "Clause",
         "Dialog",
+        "Heading",
         "Icon",
         "Kbd",
         "Shortcuts",
@@ -8642,6 +8809,10 @@
               "how": "css"
             },
             {
+              "unit": "Heading",
+              "how": "css"
+            },
+            {
               "unit": "Switch",
               "how": "css"
             },
@@ -8669,6 +8840,15 @@
           "readBy": [
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8704,8 +8884,21 @@
           ]
         },
         {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.status.danger.fg",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8735,8 +8928,30 @@
           ]
         },
         {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "font.weight.strong",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -8795,6 +9010,15 @@
             },
             {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8911,6 +9135,15 @@
           ]
         },
         {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.document.measure",
           "readBy": [
             {
@@ -9004,6 +9237,10 @@
         {
           "token": "space.gap.sm",
           "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
             {
               "unit": "Dialog",
               "how": "css"
@@ -9115,6 +9352,24 @@
           ]
         },
         {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.body",
           "readBy": [
             {
@@ -9162,10 +9417,41 @@
           ]
         },
         {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.heading-3",
           "readBy": [
             {
               "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
               "how": "css"
             }
           ]
@@ -26902,6 +27188,18 @@
       "chain": [
         "size.dialog.sm",
         "container.md"
+      ],
+      "modes": {}
+    },
+    "size.document.clause-indent": {
+      "cssVar": "--size-document-clause-indent",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The gutter a clause number hangs in (Clause); each nested clause indents one more.",
+      "value": "48px",
+      "chain": [
+        "size.document.clause-indent",
+        "size.12"
       ],
       "modes": {}
     },

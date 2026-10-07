@@ -115,6 +115,7 @@ UI rules (design system v0)
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
+- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
@@ -911,6 +912,89 @@ Stories: `components-citation--in-answer`, `components-citation--active-source`,
 Composes: Link.
 Tokens read: `color.bg.selected`, `color.bg.surface`, `color.border.default`, `color.fg.link`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.control`, `radius.indicator`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.sm`, `text.body`, `text.caption`, `text.label`.
 
+### Clause
+
+component · `src/components/Clause/Clause.tsx` · usage: `docs/usage/Clause.usage.tsx`
+
+A numbered clause in a DocumentViewer. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.
+
+Props:
+- `id: string`: Stable id that references use (`<ClauseRef to="liability" />`). Unique in the document. Required.
+- `title?: string`: The clause's heading ("Limitation of liability"). Sub-items such as (a) usually have none.
+- `children: ReactNode`: The clause text: paragraphs, and nested Clauses for its sub-clauses.
+
+Closed styling API: no `className`/`style`.
+
+#### ClauseRef
+
+component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
+
+Props:
+- `to: string`: The id of the Clause it points to. Required.
+- `prefix?: string` = `'Section'`: The word before the number. Default "Section".
+
+Closed styling API: no `className`/`style`.
+
+#### Term
+
+component, part of Clause. A defined term: defined once (`define`) and used by name everywhere else, so a term used but never defined, or defined twice, is marked in the document and reported in the console.
+
+Props:
+- `children: string`: The term as written here ("Confidential Information"). Required.
+- `define?: boolean` = `false`: This is where the term is defined: shown in quotes, in bold. Define each term once.
+- `name?: string`: The term this refers to, when the text differs (a plural or possessive: "Customer’s" → "Customer").
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.
+- `ClauseRef` wherever the text points at another clause (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.
+- `Term define` once where a defined term is defined, `Term` wherever it is used; `name` for a plural or possessive. Undefined or twice-defined terms are marked.
+
+**When not to use**
+
+- A reference to another document (“MSA §6” from a DPA) → plain text naming that document: references resolve within one DocumentViewer only
+- Headings in an app page or a long help article → `Heading` (and a table of contents built from it)
+- A list of options or steps → a list in `Text`, or `Steps`
+
+**Do:** Clauses by id, references by id: remove or move a clause and every number follows.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Clause id="fees" title="Fees">
+    <Text>
+      The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
+    </Text>
+  </Clause>
+  <Clause id="disputes" title="Disputed amounts">
+    <Text>
+      <Term>Fees</Term> disputed in good faith may be withheld.
+    </Text>
+  </Clause>
+</DocumentViewer>
+```
+
+**Don't:** Numbers typed into headings and text: the first clause added or removed leaves them wrong.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>
+  <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the viewer’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.
+- A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).
+- Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.
+- A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
+
+Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`.
+Composes: Heading.
+Tokens read: `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `space.gap.sm`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
 ### CodeBlock
 
 component · `src/components/CodeBlock/CodeBlock.tsx` · usage: `docs/usage/CodeBlock.usage.tsx`
@@ -1547,8 +1631,11 @@ Props:
 - `label: string`: The document's name: labels the document region ("Master services agreement"). Required.
 - `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
 - `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
+- `headingLevel?: Exclude<HeadingLevel, 1>` = `2`: The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: headingLevel (2 | 3 | 4).
 
 #### DataField
 
@@ -1598,8 +1685,8 @@ Closed styling API: no `className`/`style`.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Dialog, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
+Composes: Clause, Dialog, Heading, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.clause-indent`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
 
@@ -7414,6 +7501,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.dialog.lg` `var(--size-dialog-lg)`: `48rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.md` `var(--size-dialog-md)`: `36rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.sm` `var(--size-dialog-sm)`: `28rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
+- `size.document.clause-indent` `var(--size-document-clause-indent)`: `48px`. The gutter a clause number hangs in (Clause); each nested clause indents one more.
 - `size.document.measure` `var(--size-document-measure)`: `48rem`. Max inline size of the paper: one continuous surface, centred, no page breaks.
 - `size.drawer.md` `var(--size-drawer-md)`: `28rem`. Drawer widths: sm for navigation, md for details and filters.
 - `size.drawer.sm` `var(--size-drawer-sm)`: `16rem`. Drawer widths: sm for navigation, md for details and filters.

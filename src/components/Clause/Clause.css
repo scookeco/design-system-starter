@@ -1,0 +1,48 @@
+@layer components {
+  /* A clause: its number hangs in the gutter; nested clauses indent one gutter more. */
+  .clause {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    padding-inline-start: var(--size-document-clause-indent);
+    scroll-margin-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .clause:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .clause__number {
+    position: absolute;
+    inset-inline-start: 0;
+  }
+
+  .clause-ref {
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    text-decoration-line: underline;
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
+  .clause-ref:hover {
+    text-decoration-thickness: var(--focus-ring-width);
+  }
+
+  dfn.term {
+    font-style: normal;
+    font-weight: var(--font-weight-strong);
+  }
+
+  /* Something the document can't resolve: a missing clause, an undefined term, a duplicate. */
+  .clause-ref[data-unresolved],
+  .term[data-unresolved],
+  .term[data-duplicate],
+  .clause[data-duplicate] > .clause__number {
+    color: var(--color-status-danger-fg);
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--color-status-danger-fg);
+  }
+}

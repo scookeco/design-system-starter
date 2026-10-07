@@ -255,7 +255,8 @@ export const vars = {
       "block": "var(--size-skeleton-block)"
     },
     "document": {
-      "measure": "var(--size-document-measure)"
+      "measure": "var(--size-document-measure)",
+      "clause-indent": "var(--size-document-clause-indent)"
     }
   },
   "radius": {

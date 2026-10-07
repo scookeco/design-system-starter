@@ -381,6 +381,7 @@
     --size-avatar-lg: var(--size-10);
     --size-skeleton-block: var(--container-3xs);
     --size-document-measure: var(--container-2xl);
+    --size-document-clause-indent: var(--size-12);
     --radius-indicator: var(--radius-xs);
     --radius-control: var(--radius-md);
     --radius-surface: var(--radius-lg);

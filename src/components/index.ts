@@ -78,6 +78,7 @@ export {
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
 export { Highlight, type HighlightProps, type HighlightTone } from './Highlight/Highlight';
+export { Clause, ClauseRef, Term, type ClauseProps, type ClauseRefProps, type TermProps } from './Clause/Clause';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
 export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';

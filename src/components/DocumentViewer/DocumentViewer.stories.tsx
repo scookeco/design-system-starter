@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
 import { Stack } from '../../primitives/Stack/Stack';
+import { Clause } from '../Clause/Clause';
 import { Heading } from '../Heading/Heading';
 import { Highlight } from '../Highlight/Highlight';
 import { Text } from '../Text/Text';
@@ -26,18 +27,17 @@ function Agreement({ effective, signerName, title }: { effective?: string; signe
         Washington corporation, effective{' '}
         <DataField value={effective} placeholder="the date the last party signs" announceAs="Effective date" />.
       </Text>
-      <Heading level={2} size={3}>
-        2. Term and renewal
-      </Heading>
-      <Text size="body-lg">
-        The initial term is <DataField value="24 months" /> from the Effective date. The agreement then{' '}
-        <Highlight tone="ai">automatically renews</Highlight> for successive 12-month terms unless either party gives{' '}
-        <Highlight>sixty days’ notice</Highlight>{' '}
-        before the renewal date. Either party may end it for material breach that is{' '}
-        <Highlight>not cured within 30 days</Highlight> of written{' '}
-        <Highlight tone="search">notice</Highlight>
-        .
-      </Text>
+      <Clause id="term" title="Term and renewal">
+        <Text size="body-lg">
+          The initial term is <DataField value="24 months" /> from the Effective date. The agreement then{' '}
+          <Highlight tone="ai">automatically renews</Highlight> for successive 12-month terms unless either party gives{' '}
+          <Highlight>sixty days’ notice</Highlight>{' '}
+          before the renewal date. Either party may end it for material breach that is{' '}
+          <Highlight>not cured within 30 days</Highlight> of written{' '}
+          <Highlight tone="search">notice</Highlight>
+          .
+        </Text>
+      </Clause>
       <Heading level={2} size={3}>
         Signatures
       </Heading>
