@@ -8436,21 +8436,18 @@
       "dir": "src/components/DocumentViewer",
       "exports": [
         "DataField",
-        "DocumentViewer",
-        "Highlight"
+        "DocumentViewer"
       ],
       "stylesheets": [
         "src/components/DocumentViewer/DocumentViewer.css"
       ],
       "composes": [
         "Icon",
-        "SegmentedControl",
         "Toolbar"
       ],
       "composesAll": [
         "Icon",
         "Kbd",
-        "SegmentedControl",
         "Toolbar",
         "Tooltip"
       ],
@@ -8510,10 +8507,6 @@
             {
               "unit": "Kbd",
               "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
             }
           ]
         },
@@ -8522,10 +8515,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
               "how": "css"
             },
             {
@@ -8556,10 +8545,6 @@
           "readBy": [
             {
               "unit": "Kbd",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
               "how": "css"
             }
           ]
@@ -8599,10 +8584,6 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             }
@@ -8611,10 +8592,6 @@
         {
           "token": "color.fg.disabled",
           "readBy": [
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8635,64 +8612,6 @@
           "readBy": [
             {
               "unit": "Kbd",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.ai.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.ai.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.search.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.search.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.yours.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.yours.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -8729,10 +8648,6 @@
           "readBy": [
             {
               "unit": "Kbd",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
               "how": "css"
             }
           ]
@@ -8776,10 +8691,6 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             },
@@ -8804,10 +8715,6 @@
             {
               "unit": "DocumentViewer",
               "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
             }
           ]
         },
@@ -8827,10 +8734,6 @@
         {
           "token": "size.control.sm",
           "readBy": [
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8885,10 +8788,6 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             }
@@ -8933,10 +8832,6 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             }
@@ -8945,10 +8840,6 @@
         {
           "token": "space.inset.sm",
           "readBy": [
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -9015,10 +8906,6 @@
         {
           "token": "text.label",
           "readBy": [
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -11465,6 +11352,65 @@
           "readBy": [
             {
               "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "Highlight": {
+      "kind": "component",
+      "dir": "src/components/Highlight",
+      "exports": [
+        "Highlight"
+      ],
+      "stylesheets": [
+        "src/components/Highlight/Highlight.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "color.highlight.ai.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.search.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.mark.overhang",
+          "readBy": [
+            {
+              "unit": "Highlight",
               "how": "css"
             }
           ]
@@ -25793,38 +25739,38 @@
       "cssVar": "--color-highlight-ai-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#ede9fe",
-      "chain": [
-        "color.highlight.ai.bg",
-        "color.violet.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#2e1065",
-          "chain": [
-            "color.highlight.ai.bg",
-            "color.violet.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.ai.bg-current": {
-      "cssVar": "--color-highlight-ai-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A passage an AI answer cites.",
       "value": "#c4b5fd",
       "chain": [
-        "color.highlight.ai.bg-current",
+        "color.highlight.ai.bg",
         "color.violet.300"
       ],
       "modes": {
         "dark": {
           "value": "#5b21b6",
           "chain": [
-            "color.highlight.ai.bg-current",
+            "color.highlight.ai.bg",
             "color.violet.800"
+          ]
+        }
+      }
+    },
+    "color.highlight.bg": {
+      "cssVar": "--color-highlight-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The default tone: the reader’s own highlights (the annotation convention).",
+      "value": "#fde047",
+      "chain": [
+        "color.highlight.bg",
+        "color.yellow.300"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#854d0e",
+          "chain": [
+            "color.highlight.bg",
+            "color.yellow.800"
           ]
         }
       }
@@ -25833,78 +25779,18 @@
       "cssVar": "--color-highlight-search-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#dbeafe",
-      "chain": [
-        "color.highlight.search.bg",
-        "color.blue.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#172554",
-          "chain": [
-            "color.highlight.search.bg",
-            "color.blue.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.search.bg-current": {
-      "cssVar": "--color-highlight-search-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A Find match.",
       "value": "#93c5fd",
       "chain": [
-        "color.highlight.search.bg-current",
+        "color.highlight.search.bg",
         "color.blue.300"
       ],
       "modes": {
         "dark": {
           "value": "#1e40af",
           "chain": [
-            "color.highlight.search.bg-current",
+            "color.highlight.search.bg",
             "color.blue.800"
-          ]
-        }
-      }
-    },
-    "color.highlight.yours.bg": {
-      "cssVar": "--color-highlight-yours-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#fef9c3",
-      "chain": [
-        "color.highlight.yours.bg",
-        "color.yellow.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#422006",
-          "chain": [
-            "color.highlight.yours.bg",
-            "color.yellow.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.yours.bg-current": {
-      "cssVar": "--color-highlight-yours-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
-      "value": "#fde047",
-      "chain": [
-        "color.highlight.yours.bg-current",
-        "color.yellow.300"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#854d0e",
-          "chain": [
-            "color.highlight.yours.bg-current",
-            "color.yellow.800"
           ]
         }
       }

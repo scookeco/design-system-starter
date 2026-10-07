@@ -149,20 +149,12 @@ export const vars = {
       "border": "var(--color-ai-border)"
     },
     "highlight": {
-      "yours": {
-        "bg": "var(--color-highlight-yours-bg)",
-        "bg-hover": "var(--color-highlight-yours-bg-hover)",
-        "bg-current": "var(--color-highlight-yours-bg-current)"
-      },
+      "bg": "var(--color-highlight-bg)",
       "search": {
-        "bg": "var(--color-highlight-search-bg)",
-        "bg-hover": "var(--color-highlight-search-bg-hover)",
-        "bg-current": "var(--color-highlight-search-bg-current)"
+        "bg": "var(--color-highlight-search-bg)"
       },
       "ai": {
-        "bg": "var(--color-highlight-ai-bg)",
-        "bg-hover": "var(--color-highlight-ai-bg-hover)",
-        "bg-current": "var(--color-highlight-ai-bg-current)"
+        "bg": "var(--color-highlight-ai-bg)"
       }
     },
     "data-field": {

@@ -7,32 +7,24 @@ import { DataField, DocumentViewer, Highlight, Text } from '../../src/index';
 afterEach(cleanup);
 
 describe('DocumentViewer highlights', () => {
-  it('shows only the current layer as marks; the others read as plain text', () => {
-    const { container } = render(
-      <DocumentViewer label="Agreement" defaultLayer="search">
-        <Text>
-          <Highlight tone="yours">mine</Highlight> <Highlight tone="search" current>found</Highlight> <Highlight tone="ai">cited</Highlight>
-        </Text>
-      </DocumentViewer>,
-    );
-    const marks = container.querySelectorAll('mark');
-    expect(marks).toHaveLength(1);
-    expect(marks[0]?.textContent).toBe('found');
-    expect(marks[0]?.getAttribute('aria-current')).toBe('true');
-    expect(container.textContent).toContain('mine');
-  });
-
-  it('switching the layer changes which highlights show', () => {
+  it('shows every tone together, each as a mark with its tone', () => {
     const { container } = render(
       <DocumentViewer label="Agreement">
         <Text>
-          <Highlight tone="yours">mine</Highlight> <Highlight tone="ai">cited</Highlight>
+          <Highlight>mine</Highlight> <Highlight tone="search">found</Highlight> <Highlight tone="ai">cited</Highlight>
         </Text>
       </DocumentViewer>,
     );
-    expect(container.querySelector('mark')?.textContent).toBe('mine');
-    fireEvent.click(screen.getByRole('radio', { name: 'AI' }));
-    expect(container.querySelector('mark')?.textContent).toBe('cited');
+    const marks = [...container.querySelectorAll('mark')];
+    expect(marks.map((m) => m.textContent)).toEqual(['mine', 'found', 'cited']);
+    expect(marks.map((m) => m.getAttribute('data-tone'))).toEqual([null, 'search', 'ai']);
+  });
+
+  it('a highlight works outside a viewer too', () => {
+    const { container } = render(<Highlight id="cite-1" tone="ai">cited</Highlight>);
+    const mark = container.querySelector('mark');
+    expect(mark?.id).toBe('cite-1');
+    expect(mark?.className).toBe('highlight-mark');
   });
 
   it('keeps a selection inside the document as a highlight, from the toolbar button', () => {

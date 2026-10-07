@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
 import { Stack } from '../../primitives/Stack/Stack';
 import { Heading } from '../Heading/Heading';
+import { Highlight } from '../Highlight/Highlight';
 import { Text } from '../Text/Text';
-import { DataField, DocumentViewer, Highlight, type HighlightLayer } from './DocumentViewer';
+import { DataField, DocumentViewer } from './DocumentViewer';
 
 const meta = {
   title: 'Components/DocumentViewer',
@@ -31,14 +32,10 @@ function Agreement({ effective, signerName, title }: { effective?: string; signe
       <Text size="body-lg">
         The initial term is <DataField value="24 months" /> from the Effective date. The agreement then{' '}
         <Highlight tone="ai">automatically renews</Highlight> for successive 12-month terms unless either party gives{' '}
-        <Highlight tone="yours" current>
-          sixty days’ notice
-        </Highlight>{' '}
+        <Highlight>sixty days’ notice</Highlight>{' '}
         before the renewal date. Either party may end it for material breach that is{' '}
-        <Highlight tone="yours">not cured within 30 days</Highlight> of written{' '}
-        <Highlight tone="search" current>
-          notice
-        </Highlight>
+        <Highlight>not cured within 30 days</Highlight> of written{' '}
+        <Highlight tone="search">notice</Highlight>
         .
       </Text>
       <Heading level={2} size={3}>
@@ -54,12 +51,11 @@ function Agreement({ effective, signerName, title }: { effective?: string; signe
   );
 }
 
-function Interactive({ initialLayer = 'yours' }: { initialLayer?: HighlightLayer }) {
-  const [layer, setLayer] = useState<HighlightLayer>(initialLayer);
+function Interactive() {
   const [saved, setSaved] = useState<string[]>([]);
   return (
     <Stack gap="md">
-      <DocumentViewer label="Master services agreement" layer={layer} onLayerChange={setLayer} onHighlight={({ text }) => setSaved((list) => [...list, text])}>
+      <DocumentViewer label="Master services agreement" onHighlight={({ text }) => setSaved((list) => [...list, text])}>
         <Agreement />
       </DocumentViewer>
       {saved.length ? <Text tone="muted">Highlighted: {saved.join(' · ')}</Text> : null}
@@ -67,12 +63,8 @@ function Interactive({ initialLayer = 'yours' }: { initialLayer?: HighlightLayer
   );
 }
 
-/** Your highlights showing. Select text to get the Highlight menu; the toolbar's Highlight does the same from the keyboard. */
+/** The reader's highlights, a Find match and an AI citation together. Select text to get the Highlight menu; the toolbar's Highlight does the same from the keyboard. */
 export const Default: Story = { render: () => <Interactive /> };
-/** The search layer: Find's matches, the current one stronger. Your highlights read as plain text meanwhile. */
-export const SearchLayer: Story = { render: () => <Interactive initialLayer="search" /> };
-/** The AI layer: the passage an answer cites. */
-export const AiLayer: Story = { render: () => <Interactive initialLayer="ai" /> };
 
 /** Placeholders for values that fill later: the effective date, the second signer's name and title. */
 export const Placeholders: Story = {

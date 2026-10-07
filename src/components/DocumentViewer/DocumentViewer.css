@@ -51,38 +51,6 @@
     box-shadow: var(--shadow-popover);
   }
 
-  /*
-   * Highlight: a rounded background that reaches past the text without moving it (the padding is
-   * cancelled by an equal negative margin). Each wrapped line gets its own rounded ends where
-   * box-decoration-break is supported (Guides/Browser support); elsewhere the inner ends are square.
-   */
-  .document-highlight {
-    --highlight-bg: var(--color-highlight-yours-bg);
-    --highlight-bg-current: var(--color-highlight-yours-bg-current);
-    --mark-pull: calc(var(--space-mark-overhang) * -1);
-
-    margin-inline: var(--mark-pull);
-    padding-inline: var(--space-mark-overhang);
-    border-radius: var(--radius-control);
-    background: var(--highlight-bg);
-    color: inherit;
-    box-decoration-break: clone;
-  }
-
-  .document-highlight[data-tone="search"] {
-    --highlight-bg: var(--color-highlight-search-bg);
-    --highlight-bg-current: var(--color-highlight-search-bg-current);
-  }
-
-  .document-highlight[data-tone="ai"] {
-    --highlight-bg: var(--color-highlight-ai-bg);
-    --highlight-bg-current: var(--color-highlight-ai-bg-current);
-  }
-
-  .document-highlight[aria-current="true"] {
-    background: var(--highlight-bg-current);
-  }
-
   /* DataField: plain text when filled; a placeholder and the moment it fills look like a highlight. */
   .document-data[data-state] {
     --mark-pull: calc(var(--space-mark-overhang) * -1);

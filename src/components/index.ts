@@ -72,14 +72,12 @@ export { Composer, type ComposerProps, type ComposerAttachment } from './Compose
 export { Citation, SourcesList, type CitationProps, type SourcesListProps, type Source } from './Citation/Citation';
 export {
   DocumentViewer,
-  Highlight,
   DataField,
   type DocumentViewerProps,
-  type HighlightProps,
-  type HighlightLayer,
   type DataFieldProps,
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
+export { Highlight, type HighlightProps, type HighlightTone } from './Highlight/Highlight';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
 export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';
