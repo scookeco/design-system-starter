@@ -74,14 +74,10 @@ export {
   DocumentViewer,
   Highlight,
   DataField,
-  DocumentField,
   type DocumentViewerProps,
   type HighlightProps,
   type HighlightLayer,
   type DataFieldProps,
-  type DocumentFieldProps,
-  type DocumentFieldKind,
-  type DocumentSigner,
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';

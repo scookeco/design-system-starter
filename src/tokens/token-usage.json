@@ -8436,7 +8436,6 @@
       "dir": "src/components/DocumentViewer",
       "exports": [
         "DataField",
-        "DocumentField",
         "DocumentViewer",
         "Highlight"
       ],
@@ -8445,14 +8444,12 @@
       ],
       "composes": [
         "Icon",
-        "Popover",
         "SegmentedControl",
         "Toolbar"
       ],
       "composesAll": [
         "Icon",
         "Kbd",
-        "Popover",
         "SegmentedControl",
         "Toolbar",
         "Tooltip"
@@ -8472,10 +8469,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]
@@ -8501,10 +8494,6 @@
         {
           "token": "color.bg.selected",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8557,10 +8546,6 @@
               "how": "css"
             },
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
               "how": "css"
             }
@@ -8570,177 +8555,11 @@
           "token": "color.border.strong",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
               "unit": "Kbd",
               "how": "css"
             },
             {
               "unit": "SegmentedControl",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.fg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -8777,10 +8596,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Popover",
               "how": "css"
             },
             {
@@ -8824,15 +8639,6 @@
             },
             {
               "unit": "SegmentedControl",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.focus",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -8892,21 +8698,8 @@
           ]
         },
         {
-          "token": "color.status.danger.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.status.danger.fg",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8917,10 +8710,6 @@
           "token": "ease.enter",
           "readBy": [
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Tooltip",
               "how": "css"
             }
@@ -8928,24 +8717,6 @@
         },
         {
           "token": "ease.exit",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "focus.ring.offset",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "focus.ring.width",
           "readBy": [
             {
               "unit": "DocumentViewer",
@@ -8971,15 +8742,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "motion.base",
-          "readBy": [
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]
@@ -9028,23 +8790,10 @@
           ]
         },
         {
-          "token": "radius.pill",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "radius.surface",
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]
@@ -9070,20 +8819,7 @@
               "how": "css"
             },
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "size.control.md",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -9091,10 +8827,6 @@
         {
           "token": "size.control.sm",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "SegmentedControl",
               "how": "css"
@@ -9131,10 +8863,6 @@
           "token": "size.icon.sm",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
               "unit": "Icon",
               "how": "css"
             }
@@ -9144,29 +8872,7 @@
           "token": "size.overlay-max",
           "readBy": [
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "size.sidebar.sm",
-          "readBy": [
-            {
-              "unit": "Popover",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "size.target-min",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -9174,10 +8880,6 @@
         {
           "token": "space.gap.2xs",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -9206,10 +8908,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Popover",
               "how": "css"
             },
             {
@@ -9245,21 +8943,8 @@
           ]
         },
         {
-          "token": "space.inset.md",
-          "readBy": [
-            {
-              "unit": "Popover",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.sm",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "SegmentedControl",
               "how": "css"
@@ -9286,10 +8971,6 @@
         {
           "token": "space.inset.xs",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -9332,21 +9013,8 @@
           ]
         },
         {
-          "token": "text.heading-4",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "text.label",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
             {
               "unit": "SegmentedControl",
               "how": "css"
@@ -9362,10 +9030,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]

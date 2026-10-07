@@ -1544,7 +1544,7 @@ A document the app generates from data, shown as one continuous sheet on a canva
 
 Props:
 - `label: string`: The document's name: labels the document region ("Master services agreement"). Required.
-- `children: ReactNode`: The generated document: headings and paragraphs, with DataField, Highlight and DocumentField inside.
+- `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
 - `layer?: HighlightLayer`: The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites.
 - `defaultLayer?: HighlightLayer` = `'yours'`: The layer shown first when uncontrolled.
 - `onLayerChange?: (layer: HighlightLayer) => void`
@@ -1566,27 +1566,6 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
-#### DocumentField
-
-component, part of DocumentViewer. A field in a document's text flow: a tag in the signer's colour, inline so it moves with the text. An outline means it is yours to complete. Activating it opens the system's own control (`editor`, in a popover) or the app's flow (`onActivate`). Not part of a text selection.
-
-Props:
-- `kind: DocumentFieldKind`
-- `label: string`: What the field asks for: "Sign", "Invoice frequency". The tag's text, and its accessible name.
-- `signer: DocumentSigner`
-- `yours?: boolean` = `true`: Whether the person reading can act on it. Someone else's field is flat (no outline) and not actionable.
-- `required?: boolean` = `false`
-- `invalid?: boolean` = `false`
-- `value?: string | undefined`: The filled value, shown in place of the label ("Maya Okafor", "Quarterly").
-- `checked?: boolean` = `false`: For checkbox, radio and switch: filled when true.
-- `editor?: ReactNode`: The system control that edits it (TextField, Select, DatePicker…), opened in a popover anchored to the tag.
-- `open?: boolean`
-- `defaultOpen?: boolean`
-- `onOpenChange?: (open: boolean) => void`
-- `onActivate?: () => void`: For fields completed elsewhere (signature, initials, attachment): the app opens its own flow.
-
-Closed styling API: no `className`/`style`.
-
 #### Highlight
 
 component, part of DocumentViewer. A highlighted passage in a DocumentViewer: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be listed somewhere the reader can reach without seeing colour (an outline, Find's results).
@@ -1601,9 +1580,8 @@ Closed styling API: no `className`/`style`.
 
 **When to use**
 
-- A document the app generates from data (an agreement, an order form, a policy) for people to read, highlight and complete fields in. The document is the app’s own HTML: headings and `Text`, with `DataField`, `Highlight` and `DocumentField` inline.
+- A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.
 - Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight.
-- Signing and approval flows: each `DocumentField` belongs to a signer, in that signer’s category colour. An outline means it is yours to complete; another signer’s is flat (`yours={false}`). A field opens as the system’s own control (`editor`) or the app’s flow (`onActivate`).
 
 **When not to use**
 
@@ -1611,13 +1589,12 @@ Closed styling API: no `className`/`style`.
 - A PDF or a scanned file → a preview in `Frame` that opens the file
 - A short note or an AI answer → `Text` or `StreamingText`
 
-**Do:** Merged values read as plain text; a value that fills later is a placeholder; a field sits in the sentence it belongs to.
+**Do:** Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.
 
 ```tsx
 <DocumentViewer label="Order form">
   <Text size="body-lg">
-    Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by{' '}
-    <DocumentField kind="signature" label="Sign" signer={maya} required />
+    Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by Maya Okafor.
   </Text>
 </DocumentViewer>
 ```
@@ -1636,12 +1613,11 @@ Closed styling API: no `className`/`style`.
 
 - The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.
 - A highlight is a `<mark>`; the current one carries `aria-current`. Its background is its only mark, so list highlights somewhere reachable without colour (an outline, Find’s results).
-- A `DocumentField` is a button named “Sign, required, Maya Okafor” (or its value once filled); another signer’s is announced as “Sign, Jon Park’s field” and is not focusable. Fields and placeholders are not part of a text selection.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
-Stories: `components-documentviewer--default`, `components-documentviewer--search-layer`, `components-documentviewer--ai-layer`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`, `components-documentviewer--field-kinds`, `components-documentviewer--field-editor-open`.
-Composes: Icon, Kbd, Popover, SegmentedControl, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.focus`, `color.highlight.ai.bg`, `color.highlight.ai.bg-current`, `color.highlight.search.bg`, `color.highlight.search.bg-current`, `color.highlight.yours.bg`, `color.highlight.yours.bg-current`, `color.status.danger.bg`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.base`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.card`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.sidebar.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body-lg`, `text.caption`, `text.heading-4`, `text.label`, `z.dropdown`, `z.tooltip`.
+Stories: `components-documentviewer--default`, `components-documentviewer--search-layer`, `components-documentviewer--ai-layer`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
+Composes: Icon, Kbd, SegmentedControl, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.highlight.ai.bg`, `color.highlight.ai.bg-current`, `color.highlight.search.bg`, `color.highlight.search.bg-current`, `color.highlight.yours.bg`, `color.highlight.yours.bg-current`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.surface`, `shadow.card`, `shadow.popover`, `size.control.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`, `z.tooltip`.
 
 ### Drawer
 
@@ -5657,9 +5633,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
 - `DateRange` (`src/components/DatePicker/DatePicker.tsx`): `interface DateRange { start: IsoDate; end: IsoDate; }`
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long' | 'month'` short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period).
-- `DocumentFieldKind` (`src/components/DocumentViewer/DocumentViewer.tsx`): `type DocumentFieldKind = 'signature' | 'initials' | 'date-signed' | 'stamp' | 'text' | 'textarea' | 'number' | 'date' | 'select' | 'combobox' | 'multi-select' | 'attachment' | 'checkbox' | 'radio' | 'switch' | 'slider'`
 - `DocumentSelection` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSelection { text: string; range: Range; }` The text the reader selected in the document, and the range it covers (to store as a highlight).
-- `DocumentSigner` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSigner { name: string; category: 1 | 2 | 3 | 4 | 5 | 6; }` Who a field belongs to. `category` (1–6, color.category.*) is that signer's colour, the same everywhere in the document.
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
 - `FeedbackRating` (`src/components/Feedback/Feedback.tsx`): `type FeedbackRating = 'up' | 'down'`
