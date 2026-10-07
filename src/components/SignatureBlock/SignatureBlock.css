@@ -1,0 +1,110 @@
+@layer components {
+  .signature-block {
+    --signature-fg: var(--color-category-1-fg);
+    --signature-bg: var(--color-category-1-bg);
+    --signature-border: var(--color-category-1-border);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    color: var(--color-fg-default);
+    font: var(--text-body-lg);
+  }
+
+  .signature-block[data-recipient="2"] {
+    --signature-fg: var(--color-category-2-fg);
+    --signature-bg: var(--color-category-2-bg);
+    --signature-border: var(--color-category-2-border);
+  }
+
+  .signature-block[data-recipient="3"] {
+    --signature-fg: var(--color-category-3-fg);
+    --signature-bg: var(--color-category-3-bg);
+    --signature-border: var(--color-category-3-border);
+  }
+
+  .signature-block[data-recipient="4"] {
+    --signature-fg: var(--color-category-4-fg);
+    --signature-bg: var(--color-category-4-bg);
+    --signature-border: var(--color-category-4-border);
+  }
+
+  .signature-block[data-recipient="5"] {
+    --signature-fg: var(--color-category-5-fg);
+    --signature-bg: var(--color-category-5-bg);
+    --signature-border: var(--color-category-5-border);
+  }
+
+  .signature-block[data-recipient="6"] {
+    --signature-fg: var(--color-category-6-fg);
+    --signature-bg: var(--color-category-6-bg);
+    --signature-border: var(--color-category-6-border);
+  }
+
+  .signature-block__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-gap-xs);
+  }
+
+  .signature-block__row[data-signature="true"] {
+    align-items: flex-end;
+  }
+
+  .signature-block__label,
+  .signature-block__value {
+    margin: 0;
+  }
+
+  /* The space a signature takes: the same before and after signing, so nothing moves. */
+  .signature-block__slot {
+    display: flex;
+    align-items: flex-end;
+    inline-size: var(--size-signature-slot-inline);
+    block-size: var(--size-signature-slot-block);
+  }
+
+  /*
+   * A field tag, and the plain value that replaces it once signed: the same padding and a border of
+   * the same width (transparent once signed), so the value starts where the tag did.
+   */
+  .signature-block__tag,
+  .signature-block__text {
+    display: inline-flex;
+    align-items: center;
+    padding-block: var(--space-inset-2xs);
+    padding-inline: var(--space-inset-xs);
+    border: var(--border-width-field) solid transparent;
+    border-radius: var(--radius-indicator);
+  }
+
+  .signature-block__tag {
+    border-color: var(--signature-border);
+    background: var(--signature-bg);
+    color: var(--color-fg-default);
+  }
+
+  .signature-block__sign {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-gap-2xs);
+    inline-size: var(--size-signature-tag-inline);
+    block-size: 100%;
+    font: var(--text-label);
+  }
+
+  button.signature-block__sign {
+    cursor: pointer;
+  }
+
+  button.signature-block__sign:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .signature-block__signature {
+    padding-inline: var(--space-inset-xs);
+    font: var(--text-signature);
+  }
+}

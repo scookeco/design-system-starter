@@ -154,6 +154,7 @@ UI rules (design system v0)
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
+- [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
@@ -3315,6 +3316,63 @@ Stories: `components-select--placeholder`, `components-select--with-value`, `com
 Composes: Field, Icon.
 Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.base`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
+### SignatureBlock
+
+component · `src/components/SignatureBlock/SignatureBlock.tsx` · usage: `docs/usage/SignatureBlock.usage.tsx`
+
+The signature block at the end of a generated document, one per signer, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each label followed by a field tag in the recipient's colour. Signed, the signature is drawn on its line and the values read as plain text. Every value keeps the space of the tag it replaces, so nothing moves when the document is signed.
+
+Props:
+- `name: string`: The signer's name, shown once signed ("Maya Okafor"). Also names the Sign button. Required.
+- `title?: string`: The signer's title, shown once signed ("Legal counsel").
+- `signature?: string`: The adopted signature, drawn on the line. Setting it makes the block signed.
+- `date?: string`: The date signed, formatted for the reader (useFormat). Shown once signed.
+- `recipient?: SignatureRecipient` = `1`: The recipient's colour for the field tags. Defaults to 1.
+- `onSign?: () => void`: Makes the Sign tag a button that starts signing (the app's adopt-signature flow).
+
+Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
+
+Variants: recipient (1 | 2 | 3 | 4 | 5 | 6).
+
+**When to use**
+
+- The end of a generated agreement (a DocumentViewer), one block per signer: Signature, Name, Title and Date Signed.
+- Before signing, each value is a field tag in the recipient’s colour (`recipient`, color.category.*); pass `onSign` to make the Sign tag start the app’s signing flow.
+- Once signed (`signature` set), the signature is drawn on its line and the values read as plain text, each in the space its tag held, so the document does not shift.
+
+**When not to use**
+
+- Collecting a signer’s details in a form → the form components (`TextField`, `DatePicker`) on a page
+- Showing who signed in a list or a record → `Timeline` or a `Table` row
+
+**Do:** One block per signer, side by side, each in its recipient’s colour.
+
+```tsx
+<Cluster gap="xl">
+  <SignatureBlock name="Maya Okafor" title="Legal counsel" recipient={3} />
+  <SignatureBlock name="Jon Park" title="Operations director" recipient={1} />
+</Cluster>
+```
+
+**Don't:** Two signers in one colour: the reader can’t tell whose fields are whose.
+
+```tsx
+<Cluster gap="xl">
+  <SignatureBlock name="Maya Okafor" recipient={1} />
+  <SignatureBlock name="Jon Park" recipient={1} />
+</Cluster>
+```
+
+**Accessibility**
+
+- The block is a description list: each label is a `<dt>` and its value a `<dd>`, so screen readers announce them as pairs.
+- With `onSign`, the Sign tag is a button named “Sign as <name>”, at least the minimum target size, with a visible focus ring.
+- A recipient’s colour is never the only cue: each block names its signer once signed, and the document says whose block it is.
+
+Stories: `components-signatureblock--unsigned`, `components-signatureblock--with-sign-action`, `components-signatureblock--signed`, `components-signatureblock--before-and-after`, `components-signatureblock--recipients`.
+Composes: Icon.
+Tokens read: `border.width.field`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `text.body-lg`, `text.label`, `text.signature`.
+
 ### Skeleton
 
 component · `src/components/Skeleton/Skeleton.tsx` · usage: `docs/usage/Skeleton.usage.tsx`
@@ -5791,6 +5849,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ShortcutConflict` (`src/components/Shortcuts/registry.ts`): `interface ShortcutConflict { keys: string; kept: string; refused: string; }`
 - `ShortcutDefinition` (`src/components/Shortcuts/registry.ts`): `interface ShortcutDefinition { id: string; keys: string; description: string; scope?: string; handler: (event: KeyboardEvent) => void; allowInInputs?: boolean; allowInDialogs?: boolean; enabled?: boolean; }`
 - `SidebarWidthToken` (`src/tokens/tokens.ts`): `type SidebarWidthToken = keyof typeof vars.size.sidebar`
+- `SignatureRecipient` (`src/components/SignatureBlock/SignatureBlock.tsx`): `type SignatureRecipient = 1 | 2 | 3 | 4 | 5 | 6` A recipient's colour (color.category.*): the same for every field that recipient completes.
 - `SkeletonShape` (`src/components/Skeleton/Skeleton.tsx`): `type SkeletonShape = 'text' | 'block' | 'table-row'`
 - `SortDirection` (`src/components/Table/Table.tsx`): `type SortDirection = 'ascending' | 'descending'`
 - `Source` (`src/components/Citation/Citation.tsx`): `interface Source { title: string; origin: string; excerpt?: string; href?: string; hrefLabel?: string; }`
@@ -7371,6 +7430,7 @@ A persistent, quiet disclaimer sits under every composer: “AI can make mistake
 Path, CSS custom property, value (and dark value), what it is for. Look up component-tier tokens and alias chains in the manifest.
 
 - `border.width.default` `var(--border-width-default)`: `1px`. Hairline borders on controls and surfaces.
+- `border.width.field` `var(--border-width-field)`: `2px`. Field tags placed on a document for a signer to complete (SignatureBlock).
 - `color.action.danger` `var(--color-action-danger)`: `#dc2626` (dark `#f87171`). Destructive action fill.
 - `color.action.danger-hover` `var(--color-action-danger-hover)`: `#b91c1c` (dark `#fca5a5`)
 - `color.action.primary` `var(--color-action-primary)`: `#4f46e5` (dark `#818cf8`). Primary action fill.
@@ -7462,6 +7522,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `focus.ring.width` `var(--focus-ring-width)`: `2px`. Thickness of the focus outline.
 - `font.family.body` `var(--font-family-body)`: `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. All interface text.
 - `font.family.code` `var(--font-family-code)`: `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`. Code, IDs and other machine-readable values.
+- `font.family.signature` `var(--font-family-signature)`: `"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive`. An adopted signature drawn on a signature line (SignatureBlock). A system script face: no font is downloaded.
 - `font.weight.body` `var(--font-weight-body)`: `400`. Running text.
 - `font.weight.strong` `var(--font-weight-strong)`: `600`. Emphasis inside running text.
 - `icon.stroke` `var(--icon-stroke)`: `1.75`. Stroke width for the system icon set.
@@ -7518,6 +7579,9 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.sidebar.lg` `var(--size-sidebar-lg)`: `20rem`. Sidebar widths.
 - `size.sidebar.md` `var(--size-sidebar-md)`: `16rem`. Sidebar widths.
 - `size.sidebar.sm` `var(--size-sidebar-sm)`: `12rem`. Sidebar widths.
+- `size.signature.slot-block` `var(--size-signature-slot-block)`: `64px`. Block size of the space a signature takes.
+- `size.signature.slot-inline` `var(--size-signature-slot-inline)`: `12rem`. Inline size of the space a signature takes.
+- `size.signature.tag-inline` `var(--size-signature-tag-inline)`: `96px`. Inline size of the Sign tag inside the slot: half of it.
 - `size.skeleton.block` `var(--size-skeleton-block)`: `12rem`. Default height of a block skeleton (card, chart, image).
 - `size.target-min` `var(--size-target-min)`: `24px`. WCAG 2.2 minimum target size (24px).
 - `size.viewport.block` `var(--size-viewport-block)`: `100dvh`. Full viewport height: the app shell's block size.
@@ -7547,6 +7611,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `text.heading-3` `var(--text-heading-3)`: `600 1.25rem/1.375 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Subsections.
 - `text.heading-4` `var(--text-heading-4)`: `600 1.125rem/1.375 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Small groups, card headers.
 - `text.label` `var(--text-label)`: `500 0.875rem/1.25 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Form labels, buttons, tabs and navigation.
+- `text.signature` `var(--text-signature)`: `400 1.875rem/1.25 "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive`. A signature drawn on its line (SignatureBlock, signed).
 - `z.base` `var(--z-base)`: `0`. Content in normal flow.
 - `z.dropdown` `var(--z-dropdown)`: `200`. Panels anchored to a trigger that close on their own: menus, selects, popovers, hover cards.
 - `z.modal` `var(--z-modal)`: `400`. Modal dialogs and drawers with their scrim. Everything below is inert while one is open.

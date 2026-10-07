@@ -182,6 +182,8 @@
     --size-10: 40px;
     --size-11: 44px;
     --size-12: 48px;
+    --size-16: 64px;
+    --size-24: 96px;
     --container-3xs: 12rem;
     --container-2xs: 16rem;
     --container-xs: 20rem;
@@ -228,6 +230,7 @@
     --stroke-bold: 2.25;
     --font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-family-script: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
     --font-size-100: 0.75rem;
     --font-size-200: 0.875rem;
     --font-size-300: 1rem;
@@ -382,15 +385,20 @@
     --size-skeleton-block: var(--container-3xs);
     --size-document-measure: var(--container-2xl);
     --size-document-clause-indent: var(--size-12);
+    --size-signature-slot-inline: var(--container-3xs);
+    --size-signature-slot-block: var(--size-16);
+    --size-signature-tag-inline: var(--size-24);
     --radius-indicator: var(--radius-xs);
     --radius-control: var(--radius-md);
     --radius-surface: var(--radius-lg);
     --radius-pill: var(--radius-full);
     --font-family-body: var(--font-family-sans);
     --font-family-code: var(--font-family-mono);
+    --font-family-signature: var(--font-family-script);
     --font-weight-body: var(--font-weight-regular);
     --font-weight-strong: var(--font-weight-semibold);
     --border-width-default: var(--border-width-1);
+    --border-width-field: var(--border-width-2);
     --focus-ring-width: var(--border-width-2);
     --focus-ring-offset: var(--space-half);
     --shadow-card: 0 1px 2px 0 var(--color-black-alpha-10);
@@ -427,6 +435,7 @@
     --text-heading-2: var(--font-weight-semibold) var(--font-size-600)/var(--font-line-height-tight) var(--font-family-sans);
     --text-heading-3: var(--font-weight-semibold) var(--font-size-500)/var(--font-line-height-snug) var(--font-family-sans);
     --text-heading-4: var(--font-weight-semibold) var(--font-size-400)/var(--font-line-height-snug) var(--font-family-sans);
+    --text-signature: var(--font-weight-regular) var(--font-size-700)/var(--font-line-height-tight) var(--font-family-script);
     /* component */
     --button-primary-bg: var(--color-action-primary);
     --button-primary-bg-hover: var(--color-action-primary-hover);

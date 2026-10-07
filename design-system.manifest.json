@@ -14277,6 +14277,207 @@
       ]
     },
     {
+      "name": "SignatureBlock",
+      "kind": "component",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": "The signature block at the end of a generated document, one per signer, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each label followed by a field tag in the recipient's colour. Signed, the signature is drawn on its line and the values read as plain text. Every value keeps the space of the tag it replaces, so nothing moves when the document is signed.",
+      "docs": "docs/usage/SignatureBlock.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The signer's name, shown once signed (\"Maya Okafor\"). Also names the Sign button. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The signer's title, shown once signed (\"Legal counsel\")."
+        },
+        {
+          "name": "signature",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The adopted signature, drawn on the line. Setting it makes the block signed."
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The date signed, formatted for the reader (useFormat). Shown once signed."
+        },
+        {
+          "name": "recipient",
+          "type": "SignatureRecipient",
+          "required": false,
+          "default": "1",
+          "description": "The recipient's colour for the field tags. Defaults to 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "onSign",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Makes the Sign tag a button that starts signing (the app's adopt-signature flow)."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": true,
+        "UNSAFE_style": true
+      },
+      "variants": {
+        "recipient": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The end of a generated agreement (a DocumentViewer), one block per signer: Signature, Name, Title and Date Signed.",
+          "Before signing, each value is a field tag in the recipient’s colour (`recipient`, color.category.*); pass `onSign` to make the Sign tag start the app’s signing flow.",
+          "Once signed (`signature` set), the signature is drawn on its line and the values read as plain text, each in the space its tag held, so the document does not shift."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Collecting a signer’s details in a form",
+            "instead": "the form components (`TextField`, `DatePicker`) on a page"
+          },
+          {
+            "situation": "Showing who signed in a list or a record",
+            "instead": "`Timeline` or a `Table` row"
+          }
+        ],
+        "do": {
+          "caption": "One block per signer, side by side, each in its recipient’s colour.",
+          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" title=\"Legal counsel\" recipient={3} />\n  <SignatureBlock name=\"Jon Park\" title=\"Operations director\" recipient={1} />\n</Cluster>"
+        },
+        "dont": {
+          "caption": "Two signers in one colour: the reader can’t tell whose fields are whose.",
+          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</Cluster>"
+        },
+        "accessibility": [
+          "The block is a description list: each label is a `<dt>` and its value a `<dd>`, so screen readers announce them as pairs.",
+          "With `onSign`, the Sign tag is a button named “Sign as <name>”, at least the minimum target size, with a visible focus ring.",
+          "A recipient’s colour is never the only cue: each block names its signer once signed, and the document says whose block it is."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/SignatureBlock",
+        "stories": [
+          {
+            "id": "components-signatureblock--unsigned",
+            "name": "Unsigned"
+          },
+          {
+            "id": "components-signatureblock--with-sign-action",
+            "name": "With Sign Action"
+          },
+          {
+            "id": "components-signatureblock--signed",
+            "name": "Signed"
+          },
+          {
+            "id": "components-signatureblock--before-and-after",
+            "name": "Before And After"
+          },
+          {
+            "id": "components-signatureblock--recipients",
+            "name": "Recipients"
+          }
+        ],
+        "composes": [
+          "Icon"
+        ],
+        "tokens": [
+          "border.width.field",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.indicator",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.signature.slot-block",
+          "size.signature.slot-inline",
+          "size.signature.tag-inline",
+          "space.gap.2xs",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.xs",
+          "text.body-lg",
+          "text.label",
+          "text.signature"
+        ]
+      }
+    },
+    {
+      "name": "SignatureBlockProps",
+      "kind": "type-only",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignatureBlock",
+      "propsOf": "SignatureBlock"
+    },
+    {
+      "name": "SignatureRecipient",
+      "kind": "type-only",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": "A recipient's colour (color.category.*): the same for every field that recipient completes.",
+      "partOf": "SignatureBlock",
+      "definition": "type SignatureRecipient = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
       "name": "Skeleton",
       "kind": "component",
       "source": "src/components/Skeleton/Skeleton.tsx",
@@ -19137,6 +19338,18 @@
       ],
       "modes": {}
     },
+    "border.width.field": {
+      "cssVar": "--border-width-field",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Field tags placed on a document for a signer to complete (SignatureBlock).",
+      "value": "2px",
+      "chain": [
+        "border.width.field",
+        "border-width.2"
+      ],
+      "modes": {}
+    },
     "button.danger.bg": {
       "cssVar": "--button-danger-bg",
       "tier": "component",
@@ -20575,6 +20788,18 @@
       ],
       "modes": {}
     },
+    "font.family.signature": {
+      "cssVar": "--font-family-signature",
+      "tier": "semantic",
+      "type": "fontFamily",
+      "description": "An adopted signature drawn on a signature line (SignatureBlock). A system script face: no font is downloaded.",
+      "value": "\"Snell Roundhand\", \"Segoe Script\", \"Brush Script MT\", cursive",
+      "chain": [
+        "font.family.signature",
+        "font.family.script"
+      ],
+      "modes": {}
+    },
     "font.weight.body": {
       "cssVar": "--font-weight-body",
       "tier": "semantic",
@@ -21254,6 +21479,42 @@
       ],
       "modes": {}
     },
+    "size.signature.slot-block": {
+      "cssVar": "--size-signature-slot-block",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Block size of the space a signature takes.",
+      "value": "64px",
+      "chain": [
+        "size.signature.slot-block",
+        "size.16"
+      ],
+      "modes": {}
+    },
+    "size.signature.slot-inline": {
+      "cssVar": "--size-signature-slot-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the space a signature takes.",
+      "value": "12rem",
+      "chain": [
+        "size.signature.slot-inline",
+        "container.3xs"
+      ],
+      "modes": {}
+    },
+    "size.signature.tag-inline": {
+      "cssVar": "--size-signature-tag-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of the Sign tag inside the slot: half of it.",
+      "value": "96px",
+      "chain": [
+        "size.signature.tag-inline",
+        "size.24"
+      ],
+      "modes": {}
+    },
     "size.skeleton.block": {
       "cssVar": "--size-skeleton-block",
       "tier": "semantic",
@@ -21590,6 +21851,17 @@
       "value": "500 0.875rem/1.25 system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
       "chain": [
         "text.label"
+      ],
+      "modes": {}
+    },
+    "text.signature": {
+      "cssVar": "--text-signature",
+      "tier": "semantic",
+      "type": "typography",
+      "description": "A signature drawn on its line (SignatureBlock, signed).",
+      "value": "400 1.875rem/1.25 \"Snell Roundhand\", \"Segoe Script\", \"Brush Script MT\", cursive",
+      "chain": [
+        "text.signature"
       ],
       "modes": {}
     },
