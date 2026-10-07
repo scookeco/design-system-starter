@@ -4239,7 +4239,7 @@
       "kind": "component",
       "source": "src/components/Clause/Clause.tsx",
       "status": null,
-      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), resolved from where that clause is now, so it never goes stale. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
+      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
       "partOf": "Clause",
       "docs": "docs/usage/Clause.usage.tsx",
       "props": [

@@ -927,7 +927,7 @@ Closed styling API: no `className`/`style`.
 
 #### ClauseRef
 
-component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that clause is now, so it never goes stale. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
+component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
 
 Props:
 - `to: string`: The id of the Clause it points to. Required.

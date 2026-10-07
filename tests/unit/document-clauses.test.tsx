@@ -56,10 +56,10 @@ describe('Clause', () => {
 
   it('renumbers the document and its references when a clause is removed', async () => {
     const { container, rerender } = render(<Msa />);
-    expect(screen.getByRole('link', { name: 'Section 3.2(a)' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Section\u00a03.2(a)' })).toBeTruthy();
     rerender(<Msa withFees={false} />);
     await waitFor(() => expect(numbers(container)).toEqual(['1.', '2.', '2.1', '2.2', '(a)', '(b)']));
-    expect(screen.getByRole('link', { name: 'Section 2.2(a)' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Section\u00a02.2(a)' })).toBeTruthy();
   });
 
   it('scopes ids to the document, so two documents on a page never share one', () => {
@@ -93,7 +93,7 @@ describe('Clause', () => {
 describe('ClauseRef', () => {
   it('links to the clause and moves focus there', () => {
     render(<Msa />);
-    const link = screen.getByRole('link', { name: 'Section 3.2(a)' });
+    const link = screen.getByRole('link', { name: 'Section\u00a03.2(a)' });
     fireEvent.click(link);
     expect(document.activeElement?.getAttribute('data-clause')).toBe('breach');
     expect(link.getAttribute('href')).toBe(`#${document.activeElement?.id}`);
@@ -109,7 +109,7 @@ describe('ClauseRef', () => {
     );
     const ref = container.querySelector('.clause-ref');
     expect(ref?.getAttribute('data-unresolved')).toBe('true');
-    expect(ref?.textContent).toBe('Section [warranty?]');
+    expect(ref?.textContent).toBe('Section\u00a0[warranty?]');
     expect(screen.queryByRole('link')).toBeNull();
     expect(errors).toHaveBeenCalledWith(expect.stringContaining('no clause "warranty"'));
   });
@@ -127,7 +127,7 @@ describe('ClauseRef', () => {
         </Clause>
       </DocumentViewer>,
     );
-    expect(screen.getByRole('link', { name: 'clause 1' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'clause\u00a01' })).toBeTruthy();
   });
 });
 

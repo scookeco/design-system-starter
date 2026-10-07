@@ -63,7 +63,8 @@ export interface ClauseRefProps {
 
 /**
  * A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that
- * clause is now, so it never goes stale. It links to the clause and moves focus there. A missing
+ * clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line.
+ * It links to the clause and moves focus there. A missing
  * target is marked in the document and reported in the console.
  */
 export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
@@ -78,7 +79,8 @@ export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
   if (!doc || !at) {
     return (
       <span className="clause-ref" data-unresolved={missing ? 'true' : undefined}>
-        {prefix} {missing ? `[${to}?]` : ''}
+        {prefix}
+        {missing ? `\u00a0[${to}?]` : ''}
       </span>
     );
   }
@@ -92,7 +94,9 @@ export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
   };
   return (
     <a className="clause-ref" href={`#${target}`} onClick={jump}>
-      {prefix} {at.ref}
+      {prefix}
+      {'\u00a0'}
+      {at.ref}
     </a>
   );
 }
