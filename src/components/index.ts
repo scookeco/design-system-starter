@@ -70,6 +70,20 @@ export { Message, type MessageProps, type MessageRole } from './Message/Message'
 export { ChatThread, type ChatThreadProps } from './ChatThread/ChatThread';
 export { Composer, type ComposerProps, type ComposerAttachment } from './Composer/Composer';
 export { Citation, SourcesList, type CitationProps, type SourcesListProps, type Source } from './Citation/Citation';
+export {
+  DocumentViewer,
+  Highlight,
+  DataField,
+  DocumentField,
+  type DocumentViewerProps,
+  type HighlightProps,
+  type HighlightLayer,
+  type DataFieldProps,
+  type DocumentFieldProps,
+  type DocumentFieldKind,
+  type DocumentSigner,
+  type DocumentSelection,
+} from './DocumentViewer/DocumentViewer';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
 export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';

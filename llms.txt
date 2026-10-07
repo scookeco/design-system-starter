@@ -125,6 +125,7 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
+- [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result

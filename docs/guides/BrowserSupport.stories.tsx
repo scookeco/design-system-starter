@@ -58,6 +58,13 @@ const ADOPTED = [
     without: 'Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off).',
   },
   {
+    feature: '`box-decoration-break: clone`',
+    where: 'DocumentViewer: a highlight or a data-field placeholder that wraps onto a second line',
+    replaces: 'Nothing: the background would break square at the line end.',
+    baseline: 'Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break',
+    without: 'Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves.',
+  },
+  {
     feature: '`light-dark()`',
     where: 'Every semantic colour in the token output',
     replaces: 'A second block of colour variables per scheme.',

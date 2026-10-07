@@ -60,6 +60,13 @@
         "$value": "{space.32}",
         "$description": "Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action."
       }
+    },
+    "mark": {
+      "$description": "Inline marks inside running text.",
+      "overhang": {
+        "$value": "{space.half}",
+        "$description": "How far a highlight’s or a data field’s background reaches past its text on each side, without moving the text."
+      }
     }
   },
   "size": {
@@ -219,6 +226,13 @@
       "block": {
         "$value": "{container.3xs}",
         "$description": "Default height of a block skeleton (card, chart, image)."
+      }
+    },
+    "document": {
+      "$description": "A generated document’s paper (DocumentViewer).",
+      "measure": {
+        "$value": "{container.2xl}",
+        "$description": "Max inline size of the paper: one continuous surface, centred, no page breaks."
       }
     }
   },

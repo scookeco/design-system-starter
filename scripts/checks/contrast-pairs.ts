@@ -11,6 +11,8 @@ export const UI = 3;
 const SURFACES = ['color.bg.canvas', 'color.bg.surface', 'color.bg.subtle', 'color.bg.elevated'];
 const STATUSES = ['success', 'warning', 'danger', 'info', 'neutral'];
 const CATEGORIES = ['1', '2', '3', '4', '5', '6'];
+const HIGHLIGHTS = ['yours', 'search', 'ai'];
+const HIGHLIGHT_STATES = ['bg', 'bg-hover', 'bg-current'];
 
 export interface ContrastPair {
   fg: string;
@@ -54,6 +56,10 @@ export const pairs: ContrastPair[] = [
   { fg: 'color.ai.fg', bg: 'color.ai.bg', min: TEXT },
   { fg: 'color.fg.default', bg: 'color.ai.bg', min: TEXT },
   ...SURFACES.map((bg) => ({ fg: 'color.ai.fg', bg, min: TEXT })),
+  // DocumentViewer: document text on every highlight state; a data field's placeholder and the tint it fills with.
+  ...HIGHLIGHTS.flatMap((h) => HIGHLIGHT_STATES.map((s) => ({ fg: 'color.fg.default', bg: `color.highlight.${h}.${s}`, min: TEXT }))),
+  { fg: 'color.data-field.fg', bg: 'color.data-field.bg', min: TEXT },
+  { fg: 'color.fg.default', bg: 'color.data-field.bg-filled', min: TEXT },
   { fg: 'button.primary.fg', bg: 'button.primary.bg', min: TEXT },
   { fg: 'button.primary.fg', bg: 'button.primary.bg-hover', min: TEXT },
   { fg: 'button.secondary.fg', bg: 'button.secondary.bg', min: TEXT },

@@ -8431,6 +8431,956 @@
         }
       ]
     },
+    "DocumentViewer": {
+      "kind": "component",
+      "dir": "src/components/DocumentViewer",
+      "exports": [
+        "DataField",
+        "DocumentField",
+        "DocumentViewer",
+        "Highlight"
+      ],
+      "stylesheets": [
+        "src/components/DocumentViewer/DocumentViewer.css"
+      ],
+      "composes": [
+        "Icon",
+        "Popover",
+        "SegmentedControl",
+        "Toolbar"
+      ],
+      "composesAll": [
+        "Icon",
+        "Kbd",
+        "Popover",
+        "SegmentedControl",
+        "Toolbar",
+        "Tooltip"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.default",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.elevated",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.hover",
+          "readBy": [
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.inverse",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.selected",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.subtle",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.strong",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.data-field.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.data-field.bg-filled",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.data-field.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.disabled",
+          "readBy": [
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.inverse",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.ai.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.ai.bg-current",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.search.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.search.bg-current",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.yours.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.yours.bg-current",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.bg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.enter",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ease.exit",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.base",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.fast",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "motion.slow",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.pill",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.surface",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.popover",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.md",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.control.sm",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.measure",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.overlay-max",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.sidebar.sm",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.target-min",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.mark.overhang",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Kbd",
+              "how": "css"
+            },
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "SegmentedControl",
+              "how": "css"
+            },
+            {
+              "unit": "Toolbar",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.dropdown",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Popover",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "z.tooltip",
+          "readBy": [
+            {
+              "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Drawer": {
       "kind": "component",
       "dir": "src/components/Drawer",
@@ -24975,6 +25925,66 @@
         }
       }
     },
+    "color.data-field.bg": {
+      "cssVar": "--color-data-field-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Placeholder background.",
+      "value": "#dcfce7",
+      "chain": [
+        "color.data-field.bg",
+        "color.green.100"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#052e16",
+          "chain": [
+            "color.data-field.bg",
+            "color.green.950"
+          ]
+        }
+      }
+    },
+    "color.data-field.bg-filled": {
+      "cssVar": "--color-data-field-bg-filled",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The brief tint when a placeholder fills in place.",
+      "value": "#bbf7d0",
+      "chain": [
+        "color.data-field.bg-filled",
+        "color.green.200"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#14532d",
+          "chain": [
+            "color.data-field.bg-filled",
+            "color.green.900"
+          ]
+        }
+      }
+    },
+    "color.data-field.fg": {
+      "cssVar": "--color-data-field-fg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Placeholder text.",
+      "value": "#166534",
+      "chain": [
+        "color.data-field.fg",
+        "color.green.800"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#86efac",
+          "chain": [
+            "color.data-field.fg",
+            "color.green.300"
+          ]
+        }
+      }
+    },
     "color.fg.default": {
       "cssVar": "--color-fg-default",
       "tier": "semantic",
@@ -25111,6 +26121,126 @@
           "chain": [
             "color.focus",
             "color.indigo.300"
+          ]
+        }
+      }
+    },
+    "color.highlight.ai.bg": {
+      "cssVar": "--color-highlight-ai-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Resting.",
+      "value": "#ede9fe",
+      "chain": [
+        "color.highlight.ai.bg",
+        "color.violet.100"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#2e1065",
+          "chain": [
+            "color.highlight.ai.bg",
+            "color.violet.950"
+          ]
+        }
+      }
+    },
+    "color.highlight.ai.bg-current": {
+      "cssVar": "--color-highlight-ai-bg-current",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The current target (aria-current).",
+      "value": "#c4b5fd",
+      "chain": [
+        "color.highlight.ai.bg-current",
+        "color.violet.300"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#5b21b6",
+          "chain": [
+            "color.highlight.ai.bg-current",
+            "color.violet.800"
+          ]
+        }
+      }
+    },
+    "color.highlight.search.bg": {
+      "cssVar": "--color-highlight-search-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Resting.",
+      "value": "#dbeafe",
+      "chain": [
+        "color.highlight.search.bg",
+        "color.blue.100"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#172554",
+          "chain": [
+            "color.highlight.search.bg",
+            "color.blue.950"
+          ]
+        }
+      }
+    },
+    "color.highlight.search.bg-current": {
+      "cssVar": "--color-highlight-search-bg-current",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The current target (aria-current).",
+      "value": "#93c5fd",
+      "chain": [
+        "color.highlight.search.bg-current",
+        "color.blue.300"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#1e40af",
+          "chain": [
+            "color.highlight.search.bg-current",
+            "color.blue.800"
+          ]
+        }
+      }
+    },
+    "color.highlight.yours.bg": {
+      "cssVar": "--color-highlight-yours-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "Resting.",
+      "value": "#fef9c3",
+      "chain": [
+        "color.highlight.yours.bg",
+        "color.yellow.100"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#422006",
+          "chain": [
+            "color.highlight.yours.bg",
+            "color.yellow.950"
+          ]
+        }
+      }
+    },
+    "color.highlight.yours.bg-current": {
+      "cssVar": "--color-highlight-yours-bg-current",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The current target (aria-current).",
+      "value": "#fde047",
+      "chain": [
+        "color.highlight.yours.bg-current",
+        "color.yellow.300"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#854d0e",
+          "chain": [
+            "color.highlight.yours.bg-current",
+            "color.yellow.800"
           ]
         }
       }
@@ -25424,6 +26554,18 @@
       "chain": [
         "ease.enter",
         "easing.decelerate"
+      ],
+      "modes": {}
+    },
+    "ease.exit": {
+      "cssVar": "--ease-exit",
+      "tier": "semantic",
+      "type": "cubicBezier",
+      "description": "Things leaving: accelerates away.",
+      "value": "cubic-bezier(0.3, 0, 1, 1)",
+      "chain": [
+        "ease.exit",
+        "easing.accelerate"
       ],
       "modes": {}
     },
@@ -25912,6 +27054,18 @@
       ],
       "modes": {}
     },
+    "size.document.measure": {
+      "cssVar": "--size-document-measure",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Max inline size of the paper: one continuous surface, centred, no page breaks.",
+      "value": "48rem",
+      "chain": [
+        "size.document.measure",
+        "container.2xl"
+      ],
+      "modes": {}
+    },
     "size.drawer.md": {
       "cssVar": "--size-drawer-md",
       "tier": "semantic",
@@ -26281,6 +27435,18 @@
       "chain": [
         "space.inset.xs",
         "space.1"
+      ],
+      "modes": {}
+    },
+    "space.mark.overhang": {
+      "cssVar": "--space-mark-overhang",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "How far a highlight’s or a data field’s background reaches past its text on each side, without moving the text.",
+      "value": "2px",
+      "chain": [
+        "space.mark.overhang",
+        "space.half"
       ],
       "modes": {}
     },

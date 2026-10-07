@@ -147,6 +147,28 @@ export const vars = {
       "fg": "var(--color-ai-fg)",
       "bg": "var(--color-ai-bg)",
       "border": "var(--color-ai-border)"
+    },
+    "highlight": {
+      "yours": {
+        "bg": "var(--color-highlight-yours-bg)",
+        "bg-hover": "var(--color-highlight-yours-bg-hover)",
+        "bg-current": "var(--color-highlight-yours-bg-current)"
+      },
+      "search": {
+        "bg": "var(--color-highlight-search-bg)",
+        "bg-hover": "var(--color-highlight-search-bg-hover)",
+        "bg-current": "var(--color-highlight-search-bg-current)"
+      },
+      "ai": {
+        "bg": "var(--color-highlight-ai-bg)",
+        "bg-hover": "var(--color-highlight-ai-bg-hover)",
+        "bg-current": "var(--color-highlight-ai-bg-current)"
+      }
+    },
+    "data-field": {
+      "fg": "var(--color-data-field-fg)",
+      "bg": "var(--color-data-field-bg)",
+      "bg-filled": "var(--color-data-field-bg-filled)"
     }
   },
   "space": {
@@ -171,6 +193,9 @@ export const vars = {
       "start": "var(--space-scroll-padding-start)",
       "end": "var(--space-scroll-padding-end)",
       "toast": "var(--space-scroll-padding-toast)"
+    },
+    "mark": {
+      "overhang": "var(--space-mark-overhang)"
     }
   },
   "size": {
@@ -236,6 +261,9 @@ export const vars = {
     },
     "skeleton": {
       "block": "var(--size-skeleton-block)"
+    },
+    "document": {
+      "measure": "var(--size-document-measure)"
     }
   },
   "radius": {
