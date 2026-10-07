@@ -33,6 +33,8 @@ export interface DocumentViewerProps extends EscapeHatch {
   onHighlight?: (selection: DocumentSelection) => void;
   /** The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1). */
   headingLevel?: Exclude<HeadingLevel, 1>;
+  /** How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement". */
+  documentName?: string;
 }
 
 /** The keys that highlight the selection: shown in the menu, registered only while there is one. */
@@ -60,6 +62,7 @@ export function DocumentViewer({
   children,
   onHighlight,
   headingLevel = 2,
+  documentName = 'the Agreement',
   UNSAFE_className,
   UNSAFE_style,
 }: DocumentViewerProps) {
@@ -69,7 +72,7 @@ export function DocumentViewer({
   const paper = useRef<HTMLElement>(null);
   const scope = useId();
   const index = useDocumentIndex(paper);
-  const documentScope = useMemo(() => ({ scope, headingLevel, index }), [scope, headingLevel, index]);
+  const documentScope = useMemo(() => ({ scope, headingLevel, documentName, index }), [scope, headingLevel, documentName, index]);
 
   const announce = useCallback((text: string) => setMessage(text), []);
   const context = useMemo(() => ({ announce }), [announce]);

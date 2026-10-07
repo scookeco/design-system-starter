@@ -19,6 +19,21 @@
     inset-inline-start: 0;
   }
 
+  /* Capitals, as contracts set a liability cap or a damages waiver so it stands out. */
+  .clause[data-conspicuous] > p {
+    text-transform: uppercase;
+  }
+
+  /* A ClauseNote: under the heading by default; in the margin beside the paper when there is room. */
+  @container document-canvas (inline-size >= 75rem) {
+    .clause__note {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
+      inline-size: var(--size-document-note);
+    }
+  }
+
   .clause-ref {
     border-radius: var(--radius-indicator);
     color: var(--color-fg-link);

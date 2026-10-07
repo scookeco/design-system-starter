@@ -379,12 +379,14 @@
     --size-viewport-block: var(--viewport-block);
     --size-breakpoint-sm: var(--container-xl);
     --size-breakpoint-md: var(--container-2xl);
+    --size-breakpoint-lg: var(--container-4xl);
     --size-avatar-sm: var(--size-6);
     --size-avatar-md: var(--size-8);
     --size-avatar-lg: var(--size-10);
     --size-skeleton-block: var(--container-3xs);
     --size-document-measure: var(--container-2xl);
     --size-document-clause-indent: var(--size-12);
+    --size-document-note: var(--container-3xs);
     --size-signature-slot-inline: var(--container-3xs);
     --size-signature-slot-block: var(--size-16);
     --size-signature-tag-inline: var(--size-24);
@@ -399,6 +401,7 @@
     --font-weight-strong: var(--font-weight-semibold);
     --border-width-default: var(--border-width-1);
     --border-width-field: var(--border-width-2);
+    --border-width-change-bar: var(--border-width-2);
     --focus-ring-width: var(--border-width-2);
     --focus-ring-offset: var(--space-half);
     --shadow-card: 0 1px 2px 0 var(--color-black-alpha-10);

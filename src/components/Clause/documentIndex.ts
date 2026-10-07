@@ -5,7 +5,15 @@ import type { HeadingLevel } from '../Heading/Heading';
 export interface ClausePosition {
   number: string;
   ref: string;
-  /** Another clause in the same document has this id. */
+  /** Another clause or exhibit in the same document has this id. */
+  duplicate: boolean;
+  /** The id of the Exhibit the clause is in, or null in the body of the document. */
+  exhibit: string | null;
+}
+
+/** An exhibit attached to the document: lettered A, B, C… in the order attached. */
+export interface ExhibitPosition {
+  letter: string;
   duplicate: boolean;
 }
 
@@ -14,6 +22,7 @@ export interface DocumentIndex {
   /** False until the paper has been read once: nothing is flagged as missing before then. */
   ready: boolean;
   clauses: Readonly<Record<string, ClausePosition>>;
+  exhibits: Readonly<Record<string, ExhibitPosition>>;
   /** How many times each defined term is defined (normalised name → count). */
   terms: Readonly<Record<string, number>>;
 }
@@ -22,6 +31,8 @@ export interface DocumentIndex {
 export interface DocumentScope {
   scope: string;
   headingLevel: HeadingLevel;
+  /** How a reference from an exhibit names the body of the document ("the Agreement"). */
+  documentName: string;
   index: DocumentIndex;
 }
 
@@ -30,7 +41,10 @@ export const DocumentScopeContext = createContext<DocumentScope | null>(null);
 /** How deep the enclosing clause is (0 outside any clause). */
 export const ClauseDepthContext = createContext(0);
 
-const EMPTY: DocumentIndex = { ready: false, clauses: {}, terms: {} };
+/** The id of the Exhibit a clause or reference is inside (null in the body of the document). */
+export const ExhibitContext = createContext<string | null>(null);
+
+const EMPTY: DocumentIndex = { ready: false, clauses: {}, terms: {}, exhibits: {} };
 
 /** A term's identity: case and spacing don't matter ("Confidential  information" = "confidential information"). */
 export const termKey = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -76,23 +90,34 @@ function position(counters: readonly number[]): { number: string; ref: string } 
 }
 
 function read(root: HTMLElement): DocumentIndex {
+  const exhibits: Record<string, ExhibitPosition> = {};
+  [...root.querySelectorAll<HTMLElement>('[data-exhibit]')].forEach((el, i) => {
+    const id = el.dataset.exhibit ?? '';
+    const existing = exhibits[id];
+    if (existing) existing.duplicate = true;
+    else exhibits[id] = { letter: letter(i + 1).toUpperCase(), duplicate: false };
+  });
   const clauses: Record<string, ClausePosition> = {};
-  const counters: number[] = [];
+  // Numbering restarts in each exhibit: one set of counters per scope (the body is '').
+  const counters = new Map<string, number[]>();
   for (const el of root.querySelectorAll<HTMLElement>('[data-clause]')) {
     const depth = Number(el.dataset.depth);
     const id = el.dataset.clause ?? '';
-    counters.length = depth;
-    counters[depth - 1] = (counters[depth - 1] ?? 0) + 1;
+    const exhibit = el.closest<HTMLElement>('[data-exhibit]')?.dataset.exhibit ?? null;
+    const scoped = counters.get(exhibit ?? '') ?? [];
+    counters.set(exhibit ?? '', scoped);
+    scoped.length = depth;
+    scoped[depth - 1] = (scoped[depth - 1] ?? 0) + 1;
     const existing = clauses[id];
     if (existing) existing.duplicate = true;
-    else clauses[id] = { ...position(counters), duplicate: false };
+    else clauses[id] = { ...position(scoped), duplicate: id in exhibits, exhibit };
   }
   const terms: Record<string, number> = {};
   for (const el of root.querySelectorAll<HTMLElement>('dfn[data-term]')) {
     const key = el.dataset.term ?? '';
     terms[key] = (terms[key] ?? 0) + 1;
   }
-  return { ready: true, clauses, terms };
+  return { ready: true, clauses, terms, exhibits };
 }
 
 /**

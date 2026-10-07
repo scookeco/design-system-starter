@@ -244,7 +244,8 @@ export const vars = {
     },
     "breakpoint": {
       "sm": "var(--size-breakpoint-sm)",
-      "md": "var(--size-breakpoint-md)"
+      "md": "var(--size-breakpoint-md)",
+      "lg": "var(--size-breakpoint-lg)"
     },
     "avatar": {
       "sm": "var(--size-avatar-sm)",
@@ -256,7 +257,8 @@ export const vars = {
     },
     "document": {
       "measure": "var(--size-document-measure)",
-      "clause-indent": "var(--size-document-clause-indent)"
+      "clause-indent": "var(--size-document-clause-indent)",
+      "note": "var(--size-document-note)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",
@@ -284,7 +286,8 @@ export const vars = {
   "border": {
     "width": {
       "default": "var(--border-width-default)",
-      "field": "var(--border-width-field)"
+      "field": "var(--border-width-field)",
+      "change-bar": "var(--border-width-change-bar)"
     }
   },
   "focus": {

@@ -7,6 +7,7 @@
 
   /* The canvas the paper sits on; the paper is one continuous sheet, centred, never paginated. */
   .document-viewer__canvas {
+    container: document-canvas / inline-size;
     padding: var(--space-inset-xl);
     border-radius: var(--radius-surface);
     background: var(--color-bg-subtle);

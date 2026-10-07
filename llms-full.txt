@@ -112,10 +112,12 @@ UI rules (design system v0)
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [Change](src/components/Change/Change.tsx): A tracked change in a document compare view
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
+- [ClauseNote](src/components/ClauseNote/ClauseNote.tsx): A note about a clause for whoever drafts or reviews the…
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
@@ -126,9 +128,11 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
+- [DocumentTitle](src/components/DocumentTitle/DocumentTitle.tsx): The top of an agreement in a DocumentViewer
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Exhibit](src/components/Exhibit/Exhibit.tsx): An exhibit attached to an agreement in the same…
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
@@ -155,6 +159,7 @@ UI rules (design system v0)
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
 - [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
+- [SignaturePage](src/components/SignaturePage/SignaturePage.tsx): The execution page that ends an agreement
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
@@ -729,6 +734,25 @@ Stories: `components-card--default`, `components-card--footer-between`, `compone
 Composes: Heading, Link, Text.
 Tokens read: `color.action.primary`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `ease.standard`, `focus.ring.offset`, `focus.ring.width`, `motion.fast`, `radius.indicator`, `radius.surface`, `shadow.card`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
+### Change
+
+component · `src/components/Change/Change.tsx`
+
+A tracked change in a document compare view (a redline), marked as Microsoft Word marks it: insertions underlined and deletions struck through in the author's colour, moves in green with double lines, and a bar in the left margin beside every paragraph that holds a change. Renders <ins> or <del>; what the change is and who made it is announced from CSS, so it never ends up in copied text.
+
+Props:
+- `kind: ChangeKind`: Inserted (underlined), deleted (struck through), or moved (green, double struck / double underlined). Required.
+- `author?: string`: Who made the change ("Maya Okafor"): announced with it ("Deleted by Maya Okafor").
+- `color?: ChangeColor` = `1`: The author's colour. Use one per reviewer, and the same one as their signature block. Moves are always green. Default 1.
+- `children: ReactNode`: The changed text. Required.
+
+Closed styling API: no `className`/`style`.
+
+Variants: kind (insert | delete | move-from | move-to); color (1 | 2 | 3 | 4 | 5 | 6).
+
+Stories: none.
+Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.status.success.fg`, `size.document.clause-indent`, `space.inset.md`.
+
 ### ChatThread
 
 component · `src/components/ChatThread/ChatThread.tsx` · usage: `docs/usage/ChatThread.usage.tsx`
@@ -923,12 +947,16 @@ Props:
 - `id: string`: Stable id that references use (`<ClauseRef to="liability" />`). Unique in the document. Required.
 - `title?: string`: The clause's heading ("Limitation of liability"). Sub-items such as (a) usually have none.
 - `children: ReactNode`: The clause text: paragraphs, and nested Clauses for its sub-clauses.
+- `note?: ReactNode`: A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not.
+- `conspicuous?: boolean` = `false`: Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out.
+- `change?: { kind: ChangeKind; author?: string; color?: ChangeColor }`: In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number.
 
 Closed styling API: no `className`/`style`.
+States: conspicuous.
 
 #### ClauseRef
 
-component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
+component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), or to an Exhibit ("Exhibit A"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
 
 Props:
 - `to: string`: The id of the Clause it points to. Required.
@@ -993,8 +1021,27 @@ Closed styling API: no `className`/`style`.
 - A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
 
 Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`.
-Composes: Heading.
-Tokens read: `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `space.gap.sm`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Change, Heading.
+Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### ClauseNote
+
+component · `src/components/ClauseNote/ClauseNote.tsx`
+
+A note about a clause for whoever drafts or reviews the agreement, never part of the signed text: its negotiation position (Balanced, Seller-favored, Buyer-favored) or the contract type it comes from in the clause library. Pass it to a Clause's `note`: it sits in the margin beside the paper when the viewer is wide enough, and under the clause heading when it is not. The words carry the meaning; a source's bar is in its contract type's colour.
+
+Props:
+- `position?: NegotiationPosition`: The clause's negotiation position. Set this or `source`.
+- `source?: string`: The contract type the clause comes from in the clause library ("DPA"). Set this or `position`.
+- `color?: ClauseSourceColor` = `1`: The source's colour: one per contract type. Default 1.
+- `children?: ReactNode`: One line of detail: what makes it that position, or the library reference.
+
+Closed styling API: no `className`/`style`.
+
+Variants: position (balanced | seller-favored | buyer-favored); color (1 | 2 | 3 | 4 | 5 | 6).
+
+Stories: none.
+Tokens read: `border.width.change-bar`, `color.border.default`, `color.category.1.border`, `color.category.2.border`, `color.category.3.border`, `color.category.4.border`, `color.category.5.border`, `color.category.6.border`, `color.fg.default`, `color.fg.muted`, `space.gap.2xs`, `space.inset.sm`, `text.caption`, `text.label`.
 
 ### CodeBlock
 
@@ -1622,6 +1669,42 @@ States: decorative.
 Stories: `components-divider--horizontal`, `components-divider--vertical`, `components-divider--semantic`.
 Tokens read: `color.border.default`.
 
+### DocumentTitle
+
+component · `src/components/DocumentTitle/DocumentTitle.tsx`
+
+The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.
+
+Props:
+- `title: string`: The agreement's title ("Master Services Agreement"). Required.
+- `number?: string`: Its number line, under the title ("Order Form No. OF-2026-0311 under Agreement No. MSA-2026-0142").
+- `children?: ReactNode`: The preamble: who the parties are, and the defined terms for the document and each party (Term define).
+
+Closed styling API: no `className`/`style`.
+
+#### Recital
+
+component, part of DocumentTitle. One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.
+
+Props:
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+#### Recitals
+
+component, part of DocumentTitle. The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.
+
+Props:
+- `children: ReactNode`: One Recital per piece of background. Required.
+- `closing?: string` = `'in consideration of the mutual covenants set out below, the Parties agree as follows:'`: What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows:
+
+Closed styling API: no `className`/`style`.
+
+Stories: none.
+Composes: Change, Clause, Heading, Text.
+Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
 ### DocumentViewer
 
 component · `src/components/DocumentViewer/DocumentViewer.tsx` · usage: `docs/usage/DocumentViewer.usage.tsx`
@@ -1633,6 +1716,7 @@ Props:
 - `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
 - `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
 - `headingLevel?: Exclude<HeadingLevel, 1>` = `2`: The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).
+- `documentName?: string` = `'the Agreement'`: How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement".
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
@@ -1686,8 +1770,8 @@ Closed styling API: no `className`/`style`.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Clause, Dialog, Heading, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.clause-indent`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
+Composes: Change, Clause, Dialog, Heading, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Tokens read: `border.width.change-bar`, `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `ease.enter`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.clause-indent`, `size.document.measure`, `size.document.note`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
 
@@ -1811,6 +1895,23 @@ Variants: reason (first-use | no-results | error); headingLevel (1 | 2 | 3 | 4).
 Stories: `components-emptystate--first-use`, `components-emptystate--no-results`, `components-emptystate--load-error`, `components-emptystate--without-action`.
 Composes: Heading, Icon, Text.
 Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.fg`, `icon.stroke`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `space.gap.2xs`, `space.gap.md`, `space.inset.lg`, `space.inset.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### Exhibit
+
+component · `src/components/Exhibit/Exhibit.tsx`
+
+An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
+
+Props:
+- `id: string`: Stable id that references use (`<ClauseRef to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required.
+- `title: string`: The exhibit's name ("Data Processing Agreement"). Required.
+- `children: ReactNode`: The exhibit's clauses: their numbering starts again at 1.
+
+Closed styling API: no `className`/`style`.
+
+Stories: none.
+Composes: Change, Clause, Heading.
+Tokens read: `border.width.change-bar`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.inset.lg`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Feedback
 
@@ -3372,6 +3473,32 @@ Variants: recipient (1 | 2 | 3 | 4 | 5 | 6).
 Stories: `components-signatureblock--unsigned`, `components-signatureblock--with-sign-action`, `components-signatureblock--signed`, `components-signatureblock--before-and-after`, `components-signatureblock--recipients`.
 Composes: Icon.
 Tokens read: `border.width.field`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `text.body-lg`, `text.label`, `text.signature`.
+
+### SignaturePage
+
+component · `src/components/SignaturePage/SignaturePage.tsx`
+
+The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.
+
+Props:
+- `witness?: string` = `'IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.'`: The execution line. Default: IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.
+- `children: ReactNode`: One SignatureParty per party: 1, 2 or 3 (an escrow agreement's three). Required.
+
+Closed styling API: no `className`/`style`.
+
+#### SignatureParty
+
+component, part of SignaturePage. One party on a SignaturePage: its name over its SignatureBlock.
+
+Props:
+- `name: string`: The party, as the agreement names it ("Acme Corp"): shown in capitals. Required.
+- `children: ReactNode`: The party's SignatureBlock, in its recipient's colour. Required.
+
+Closed styling API: no `className`/`style`.
+
+Stories: none.
+Composes: Text.
+Tokens read: `color.fg.default`, `color.fg.muted`, `size.grid-item.md`, `space.gap.lg`, `space.gap.sm`, `space.gap.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
 ### Skeleton
 
@@ -5801,9 +5928,12 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `BreadcrumbLink` (`src/components/Breadcrumbs/Breadcrumbs.tsx`): `interface BreadcrumbLink { label: string; href: string; }`
 - `ButtonSize` (`src/components/Button/Button.tsx`): `type ButtonSize = 'sm' | 'md' | 'lg'`
 - `ButtonVariant` (`src/components/Button/Button.tsx`): `type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'`
+- `ChangeColor` (`src/components/Change/Change.tsx`): `type ChangeColor = 1 | 2 | 3 | 4 | 5 | 6` A reviewer's colour (color.category.*), the same for every change they make (Word's “By author”).
 - `ChangeDecision` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeDecision = 'accepted' | 'rejected'`
+- `ChangeKind` (`src/components/Change/Change.tsx`): `type ChangeKind = 'insert' | 'delete' | 'move-from' | 'move-to'` What a tracked change did: Word's insertion, deletion and the two ends of a move.
 - `ChangeOutcome` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }` How each change went once applied: done, or why it failed.
 - `CheckedState` (`src/components/Checkbox/Checkbox.tsx`): `type CheckedState = boolean | 'indeterminate'`
+- `ClauseSourceColor` (`src/components/ClauseNote/ClauseNote.tsx`): `type ClauseSourceColor = 1 | 2 | 3 | 4 | 5 | 6` A contract type's colour (color.category.*), the same wherever that type's clauses appear.
 - `ComboboxOption` (`src/components/Combobox/Combobox.tsx`): `interface ComboboxOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `CommandGroup` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandGroup { id: string; label: string; items: readonly CommandItem[]; filter?: 'local' | 'none'; }`
 - `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconDefinition; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
@@ -5840,6 +5970,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `NavItem` (`src/components/Nav/Nav.tsx`): `interface NavItem { label: string; href: string; icon?: IconDefinition; }`
 - `NavSection` (`src/components/Nav/Nav.tsx`): `interface NavSection { label?: string; items: readonly NavItem[]; }`
 - `NavTab` (`src/components/NavTabs/NavTabs.tsx`): `interface NavTab { label: string; href: string; }`
+- `NegotiationPosition` (`src/components/ClauseNote/ClauseNote.tsx`): `type NegotiationPosition = 'balanced' | 'seller-favored' | 'buyer-favored'` Where a clause sits in negotiation, as each clause in a clause library records it.
 - `ProposedChange` (`src/components/ReviewChanges/ReviewChanges.tsx`): `interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }` One proposed change: a field's old and new value, or a text rewrite shown word by word.
 - `RadioOption` (`src/components/RadioGroup/RadioGroup.tsx`): `interface RadioOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `RatioToken` (`src/tokens/tokens.ts`): `type RatioToken = keyof typeof vars.ratio`
@@ -7429,6 +7560,7 @@ A persistent, quiet disclaimer sits under every composer: “AI can make mistake
 
 Path, CSS custom property, value (and dark value), what it is for. Look up component-tier tokens and alias chains in the manifest.
 
+- `border.width.change-bar` `var(--border-width-change-bar)`: `2px`. The bar in the left margin beside a changed line in a redline (Change), as Word draws it.
 - `border.width.default` `var(--border-width-default)`: `1px`. Hairline borders on controls and surfaces.
 - `border.width.field` `var(--border-width-field)`: `2px`. Field tags placed on a document for a signer to complete (SignatureBlock).
 - `color.action.danger` `var(--color-action-danger)`: `#dc2626` (dark `#f87171`). Destructive action fill.
@@ -7550,6 +7682,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.avatar.md` `var(--size-avatar-md)`: `32px`. Avatar diameters.
 - `size.avatar.sm` `var(--size-avatar-sm)`: `24px`. Avatar diameters.
 - `size.bar` `var(--size-bar)`: `8px`. Thickness of Progress and Meter bars.
+- `size.breakpoint.lg` `var(--size-breakpoint-lg)`: `75rem`. At and above this a DocumentViewer's canvas has room beside the paper: clause notes move into the margin (below it they sit under the clause heading).
 - `size.breakpoint.md` `var(--size-breakpoint-md)`: `48rem`. Below this the app shell's sidebar collapses to a drawer.
 - `size.breakpoint.sm` `var(--size-breakpoint-sm)`: `40rem`. Below this PageLayout stacks its nav, main and aside regions.
 - `size.content.lg` `var(--size-content-lg)`: `75rem`. Max measure for Center.
@@ -7564,6 +7697,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.dialog.sm` `var(--size-dialog-sm)`: `28rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.document.clause-indent` `var(--size-document-clause-indent)`: `48px`. The gutter a clause number hangs in (Clause); each nested clause indents one more.
 - `size.document.measure` `var(--size-document-measure)`: `48rem`. Max inline size of the paper: one continuous surface, centred, no page breaks.
+- `size.document.note` `var(--size-document-note)`: `12rem`. Inline size of a clause note in the margin beside the paper (ClauseNote).
 - `size.drawer.md` `var(--size-drawer-md)`: `28rem`. Drawer widths: sm for navigation, md for details and filters.
 - `size.drawer.sm` `var(--size-drawer-sm)`: `16rem`. Drawer widths: sm for navigation, md for details and filters.
 - `size.grid-item.lg` `var(--size-grid-item-lg)`: `20rem`. Minimum item width for auto-fit Grid.

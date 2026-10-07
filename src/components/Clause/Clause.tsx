@@ -1,6 +1,7 @@
 import { useContext, useEffect, useId, type MouseEvent, type ReactNode } from 'react';
+import { changeLabel, type ChangeColor, type ChangeKind } from '../Change/Change';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
-import { ClauseDepthContext, DocumentScopeContext, scopedId, termKey } from './documentIndex';
+import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, scopedId, termKey } from './documentIndex';
 import './Clause.css';
 
 export interface ClauseProps {
@@ -10,6 +11,12 @@ export interface ClauseProps {
   title?: string;
   /** The clause text: paragraphs, and nested Clauses for its sub-clauses. */
   children: ReactNode;
+  /** A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not. */
+  note?: ReactNode;
+  /** Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out. */
+  conspicuous?: boolean;
+  /** In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number. */
+  change?: { kind: ChangeKind; author?: string; color?: ChangeColor };
 }
 
 /**
@@ -17,13 +24,15 @@ export interface ClauseProps {
  * never typed, so adding, removing or reordering clauses renumbers the document and every
  * ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.
  */
-export function Clause({ id, title, children }: ClauseProps) {
+export function Clause({ id, title, children, note, conspicuous = false, change }: ClauseProps) {
   const doc = useContext(DocumentScopeContext);
   const depth = useContext(ClauseDepthContext) + 1;
+  const inExhibit = useContext(ExhibitContext) !== null;
   const headingId = useId();
   const at = doc?.index.clauses[id];
   const number = at ? <span className="clause__number">{at.number}</span> : null;
-  const level = Math.min(4, (doc?.headingLevel ?? 2) + depth - 1) as HeadingLevel;
+  // An exhibit's heading takes the document's top level, so its clauses start one below it.
+  const level = Math.min(4, (doc?.headingLevel ?? 2) + depth - 1 + (inExhibit ? 1 : 0)) as HeadingLevel;
   const Element = title ? 'section' : 'div';
 
   useEffect(() => {
@@ -38,6 +47,10 @@ export function Clause({ id, title, children }: ClauseProps) {
         data-clause={id}
         data-depth={depth}
         data-duplicate={at?.duplicate ? 'true' : undefined}
+        data-conspicuous={conspicuous ? 'true' : undefined}
+        data-change={change?.kind}
+        data-change-color={change ? String(change.color ?? 1) : undefined}
+        data-change-label={change ? changeLabel(change.kind, change.author) : undefined}
         aria-labelledby={title ? headingId : undefined}
       >
         {title ? (
@@ -48,6 +61,7 @@ export function Clause({ id, title, children }: ClauseProps) {
         ) : (
           number
         )}
+        {note ? <div className="clause__note">{note}</div> : null}
         {children}
       </Element>
     </ClauseDepthContext>
@@ -62,21 +76,24 @@ export interface ClauseRefProps {
 }
 
 /**
- * A reference to another clause in the same document ("Section 3.1(a)"), resolved from where that
+ * A reference to another clause in the same document ("Section 3.1(a)"), or to an Exhibit
+ * ("Exhibit A"), resolved from where that
  * clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line.
  * It links to the clause and moves focus there. A missing
  * target is marked in the document and reported in the console.
  */
 export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
   const doc = useContext(DocumentScopeContext);
+  const own = useContext(ExhibitContext);
   const at = doc?.index.clauses[to];
-  const missing = Boolean(doc?.index.ready) && !at;
+  const exhibit = doc?.index.exhibits[to];
+  const missing = Boolean(doc?.index.ready) && !at && !exhibit;
 
   useEffect(() => {
     if (missing) console.error(`ClauseRef: no clause "${to}" in this document.`);
   }, [missing, to]);
 
-  if (!doc || !at) {
+  if (!doc || (!at && !exhibit)) {
     return (
       <span className="clause-ref" data-unresolved={missing ? 'true' : undefined}>
         {prefix}
@@ -92,11 +109,12 @@ export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
     clause.tabIndex = -1;
     clause.focus();
   };
+  // A reference across scopes says where: into an exhibit, or from one back to the document's body.
+  const letterOf = (id: string) => doc.index.exhibits[id]?.letter ?? '?';
+  const where = at && at.exhibit !== own ? (at.exhibit ? ` of Exhibit\u00a0${letterOf(at.exhibit)}` : ` of ${doc.documentName}`) : '';
   return (
     <a className="clause-ref" href={`#${target}`} onClick={jump}>
-      {prefix}
-      {'\u00a0'}
-      {at.ref}
+      {at ? `${prefix}\u00a0${at.ref}${where}` : `Exhibit\u00a0${exhibit?.letter ?? ''}`}
     </a>
   );
 }

@@ -208,6 +208,10 @@
       "md": {
         "$value": "{container.2xl}",
         "$description": "Below this the app shell's sidebar collapses to a drawer."
+      },
+      "lg": {
+        "$value": "{container.4xl}",
+        "$description": "At and above this a DocumentViewer's canvas has room beside the paper: clause notes move into the margin (below it they sit under the clause heading)."
       }
     },
     "avatar": {
@@ -237,6 +241,10 @@
       "clause-indent": {
         "$value": "{size.12}",
         "$description": "The gutter a clause number hangs in (Clause); each nested clause indents one more."
+      },
+      "note": {
+        "$value": "{container.3xs}",
+        "$description": "Inline size of a clause note in the margin beside the paper (ClauseNote)."
       }
     },
     "signature": {
@@ -284,6 +292,10 @@
       "field": {
         "$value": "{border-width.2}",
         "$description": "Field tags placed on a document for a signer to complete (SignatureBlock)."
+      },
+      "change-bar": {
+        "$value": "{border-width.2}",
+        "$description": "The bar in the left margin beside a changed line in a redline (Change), as Word draws it."
       }
     }
   },

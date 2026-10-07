@@ -1,0 +1,28 @@
+@layer components {
+  .signature-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-lg);
+  }
+
+  /* The Grid primitive's columns, filled (not fitted): one party keeps a column's width. */
+  .signature-page__parties {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--size-grid-item-md), 100%), 1fr));
+    gap: var(--space-gap-xl);
+  }
+
+  .signature-party {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    min-inline-size: 0;
+  }
+
+  .signature-party__name {
+    margin: 0;
+    color: var(--color-fg-default);
+    font: var(--text-label);
+    text-transform: uppercase;
+  }
+}
