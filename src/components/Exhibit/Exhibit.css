@@ -1,0 +1,26 @@
+@layer components {
+  /* An exhibit: a rule, its letter and name centred, then its clauses. */
+  .exhibit {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+    padding-block-start: var(--space-inset-lg);
+    border-block-start: 1px solid var(--color-border-default);
+    scroll-margin-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .exhibit:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .exhibit__letter,
+  .exhibit__title {
+    display: block;
+    text-align: center;
+  }
+
+  .exhibit__title {
+    font: var(--text-heading-4);
+  }
+}

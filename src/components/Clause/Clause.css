@@ -1,0 +1,159 @@
+@layer components {
+  /* A clause: its number hangs in the gutter; nested clauses indent one gutter more. */
+  .clause {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    padding-inline-start: var(--size-document-clause-indent);
+    scroll-margin-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .clause:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .clause__number {
+    position: absolute;
+    inset-inline-start: 0;
+  }
+
+  /* How far a paragraph at this depth reaches back to the paper's margin, for a redline's bar (Change). */
+  .clause[data-depth="1"] {
+    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent));
+  }
+
+  .clause[data-depth="2"] {
+    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
+  }
+
+  .clause[data-depth="3"] {
+    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
+  }
+
+  .clause[data-depth="4"] {
+    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
+  }
+
+  /* A whole clause inserted, deleted or moved in a redline: marked as Change marks text, with the bar. */
+  .clause[data-change] {
+    --clause-change-color: var(--color-category-1-fg);
+
+    color: var(--clause-change-color);
+    text-decoration-color: var(--clause-change-color);
+  }
+
+  .clause[data-change][data-change-color="2"] {
+    --clause-change-color: var(--color-category-2-fg);
+  }
+
+  .clause[data-change][data-change-color="3"] {
+    --clause-change-color: var(--color-category-3-fg);
+  }
+
+  .clause[data-change][data-change-color="4"] {
+    --clause-change-color: var(--color-category-4-fg);
+  }
+
+  .clause[data-change][data-change-color="5"] {
+    --clause-change-color: var(--color-category-5-fg);
+  }
+
+  .clause[data-change][data-change-color="6"] {
+    --clause-change-color: var(--color-category-6-fg);
+  }
+
+  .clause[data-change^="move"] {
+    --clause-change-color: var(--color-status-success-fg);
+  }
+
+  /* Headings and paragraphs set their own colour, so the author's colour is applied to them too. */
+  .clause[data-change] .clause__number,
+  .clause[data-change] :is(p, h2, h3, h4) {
+    color: var(--clause-change-color);
+  }
+
+  .clause[data-change="insert"],
+  .clause[data-change="insert"] .clause__number {
+    text-decoration-line: underline;
+  }
+
+  .clause[data-change="delete"],
+  .clause[data-change="delete"] .clause__number {
+    text-decoration-line: line-through;
+  }
+
+  .clause[data-change="move-to"],
+  .clause[data-change="move-to"] .clause__number {
+    text-decoration-line: underline;
+    text-decoration-style: double;
+  }
+
+  .clause[data-change="move-from"],
+  .clause[data-change="move-from"] .clause__number {
+    text-decoration-line: line-through;
+    text-decoration-style: double;
+  }
+
+  .clause[data-change]::before {
+    position: absolute;
+    overflow: hidden;
+    inline-size: 1px;
+    block-size: 1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    content: attr(data-change-label) ": ";
+  }
+
+  .clause[data-change] > :is(p, h2, h3, h4) {
+    --change-pull: calc(var(--change-reach) * -1);
+    --change-inset: calc(var(--change-reach) - var(--border-width-change-bar));
+
+    margin-inline-start: var(--change-pull);
+    padding-inline-start: var(--change-inset);
+    border-inline-start: var(--border-width-change-bar) solid var(--color-fg-default);
+  }
+
+  /* Capitals, as contracts set a liability cap or a damages waiver so it stands out. */
+  .clause[data-conspicuous] > p {
+    text-transform: uppercase;
+  }
+
+  /* A ClauseNote: under the heading by default; in the margin beside the paper when there is room. */
+  @container document-canvas (inline-size >= 75rem) {
+    .clause__note {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
+      inline-size: var(--size-document-note);
+    }
+  }
+
+  .clause-ref {
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    text-decoration-line: underline;
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
+  .clause-ref:hover {
+    text-decoration-thickness: var(--focus-ring-width);
+  }
+
+  dfn.term {
+    font-style: normal;
+    font-weight: var(--font-weight-strong);
+  }
+
+  /* Something the document can't resolve: a missing clause, an undefined term, a duplicate. */
+  .clause-ref[data-unresolved],
+  .term[data-unresolved],
+  .term[data-duplicate],
+  .clause[data-duplicate] > .clause__number {
+    color: var(--color-status-danger-fg);
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--color-status-danger-fg);
+  }
+}

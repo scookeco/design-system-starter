@@ -112,9 +112,12 @@ UI rules (design system v0)
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
+- [Change](docs/usage/Change.usage.tsx): A tracked change in a document compare view
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
+- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
+- [ClauseNote](docs/usage/ClauseNote.usage.tsx): A note about a clause for whoever drafts or reviews the…
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
@@ -125,12 +128,15 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
+- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a DocumentViewer
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
+- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same…
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
+- [Highlight](docs/usage/Highlight.usage.tsx): A highlighted passage
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
@@ -153,6 +159,7 @@ UI rules (design system v0)
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
 - [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
+- [SignaturePage](docs/usage/SignaturePage.usage.tsx): The execution page that ends an agreement
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits

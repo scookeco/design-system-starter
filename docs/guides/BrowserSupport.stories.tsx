@@ -59,7 +59,7 @@ const ADOPTED = [
   },
   {
     feature: '`box-decoration-break: clone`',
-    where: 'DocumentViewer: a highlight or a data-field placeholder that wraps onto a second line',
+    where: 'Highlight, and a DataField placeholder, that wraps onto a second line',
     replaces: 'Nothing: the background would break square at the line end.',
     baseline: 'Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break',
     without: 'Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves.',

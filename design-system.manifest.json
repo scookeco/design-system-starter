@@ -3445,6 +3445,153 @@
       "propsOf": "Center"
     },
     {
+      "name": "Change",
+      "kind": "component",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "A tracked change in a document compare view (a redline), marked as Microsoft Word marks it: insertions underlined and deletions struck through in the author's colour, moves in green with double lines, and a bar in the left margin beside every paragraph that holds a change. Renders <ins> or <del>; what the change is and who made it is announced from CSS, so it never ends up in copied text.",
+      "docs": "docs/usage/Change.usage.tsx",
+      "props": [
+        {
+          "name": "kind",
+          "type": "ChangeKind",
+          "required": true,
+          "default": null,
+          "description": "Inserted (underlined), deleted (struck through), or moved (green, double struck / double underlined). Required.",
+          "values": [
+            "insert",
+            "delete",
+            "move-from",
+            "move-to"
+          ]
+        },
+        {
+          "name": "author",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Who made the change (\"Maya Okafor\"): announced with it (\"Deleted by Maya Okafor\")."
+        },
+        {
+          "name": "color",
+          "type": "ChangeColor",
+          "required": false,
+          "default": "1",
+          "description": "The author's colour. Use one per reviewer, and the same one as their signature block. Moves are always green. Default 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The changed text. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "kind": [
+          "insert",
+          "delete",
+          "move-from",
+          "move-to"
+        ],
+        "color": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A redline: an agreement compared with an amendment or another version, marked as Microsoft Word marks tracked changes. Insertions underlined and deletions struck through in the author’s `color` (one per reviewer, the same as their signature block), moves green with double lines (`move-from`, `move-to`).",
+          "A bar in the left margin marks every paragraph that holds a change. A whole clause inserted, deleted or moved takes a `change` on its `Clause`, and keeps its number."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Changes an AI proposes before anyone accepts them",
+            "instead": "`ReviewChanges`"
+          },
+          {
+            "situation": "Marking a passage for attention",
+            "instead": "`Highlight`"
+          }
+        ],
+        "do": {
+          "caption": "Each change with its author, in that author’s colour.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Text>\n    Liability will not exceed{' '}\n    <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n      two times (2×)\n    </Change>{' '}\n    the fees of the prior twelve (12) months.\n  </Text>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>\n      <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.\n      </Change>\n    </Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A change is an `<ins>` or `<del>`; what it is and who made it (“Deleted by Jon Park”) is announced from CSS, so it never ends up in copied text.",
+          "Never colour alone: the underline, the strike, the double lines and the margin bar carry each change; the colour only says whose it is. Each author colour passes contrast on the paper in light and dark."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Change",
+        "stories": [
+          {
+            "id": "components-change--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-change--compared",
+            "name": "Compared"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.status.success.fg",
+          "space.inset.md"
+        ]
+      }
+    },
+    {
+      "name": "ChangeColor",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "A reviewer's colour (color.category.*), the same for every change they make (Word's “By author”).",
+      "partOf": "Change",
+      "definition": "type ChangeColor = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
       "name": "ChangeDecision",
       "kind": "type-only",
       "source": "src/components/ReviewChanges/ReviewChanges.tsx",
@@ -3458,6 +3605,21 @@
       ]
     },
     {
+      "name": "ChangeKind",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": "What a tracked change did: Word's insertion, deletion and the two ends of a move.",
+      "partOf": "Change",
+      "definition": "type ChangeKind = 'insert' | 'delete' | 'move-from' | 'move-to'",
+      "values": [
+        "insert",
+        "delete",
+        "move-from",
+        "move-to"
+      ]
+    },
+    {
       "name": "ChangeOutcome",
       "kind": "type-only",
       "source": "src/components/ReviewChanges/ReviewChanges.tsx",
@@ -3465,6 +3627,15 @@
       "description": "How each change went once applied: done, or why it failed.",
       "partOf": "ReviewChanges",
       "definition": "type ChangeOutcome = { ok: true; } | { ok: false; reason: string; }"
+    },
+    {
+      "name": "ChangeProps",
+      "kind": "type-only",
+      "source": "src/components/Change/Change.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Change",
+      "propsOf": "Change"
     },
     {
       "name": "ChatThread",
@@ -4111,6 +4282,365 @@
       "description": null,
       "partOf": "Citation",
       "propsOf": "Citation"
+    },
+    {
+      "name": "Clause",
+      "kind": "component",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": "A numbered clause in a DocumentViewer. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.",
+      "docs": "docs/usage/Clause.usage.tsx",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Stable id that references use (`<ClauseRef to=\"liability\" />`). Unique in the document. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The clause's heading (\"Limitation of liability\"). Sub-items such as (a) usually have none."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The clause text: paragraphs, and nested Clauses for its sub-clauses."
+        },
+        {
+          "name": "note",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not."
+        },
+        {
+          "name": "conspicuous",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out."
+        },
+        {
+          "name": "change",
+          "type": "{ kind: ChangeKind; author?: string; color?: ChangeColor }",
+          "required": false,
+          "default": null,
+          "description": "In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "conspicuous"
+      ],
+      "usage": {
+        "whenToUse": [
+          "The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.",
+          "`ClauseRef` wherever the text points at another clause (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.",
+          "`Term define` once where a defined term is defined, `Term` wherever it is used; `name` for a plural or possessive. Undefined or twice-defined terms are marked."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A reference to another document (“MSA §6” from a DPA)",
+            "instead": "plain text naming that document: references resolve within one DocumentViewer only"
+          },
+          {
+            "situation": "Headings in an app page or a long help article",
+            "instead": "`Heading` (and a table of contents built from it)"
+          },
+          {
+            "situation": "A list of options or steps",
+            "instead": "a list in `Text`, or `Steps`"
+          }
+        ],
+        "do": {
+          "caption": "Clauses by id, references by id: remove or move a clause and every number follows.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"fees\" title=\"Fees\">\n    <Text>\n      The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to=\"disputes\" />.\n    </Text>\n  </Clause>\n  <Clause id=\"disputes\" title=\"Disputed amounts\">\n    <Text>\n      <Term>Fees</Term> disputed in good faith may be withheld.\n    </Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Numbers typed into headings and text: the first clause added or removed leaves them wrong.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>\n  <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the viewer’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.",
+          "A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).",
+          "Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.",
+          "A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Clause",
+        "stories": [
+          {
+            "id": "components-clause--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-clause--renumbered",
+            "name": "Renumbered"
+          },
+          {
+            "id": "components-clause--unresolved",
+            "name": "Unresolved"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Heading"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.link",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.indicator",
+          "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "ClauseNote",
+      "kind": "component",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "A note about a clause for whoever drafts or reviews the agreement, never part of the signed text: its negotiation position (Balanced, Seller-favored, Buyer-favored) or the contract type it comes from in the clause library. Pass it to a Clause's `note`: it sits in the margin beside the paper when the viewer is wide enough, and under the clause heading when it is not. The words carry the meaning; a source's bar is in its contract type's colour.",
+      "docs": "docs/usage/ClauseNote.usage.tsx",
+      "props": [
+        {
+          "name": "position",
+          "type": "NegotiationPosition",
+          "required": false,
+          "default": null,
+          "description": "The clause's negotiation position. Set this or `source`.",
+          "values": [
+            "balanced",
+            "seller-favored",
+            "buyer-favored"
+          ]
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The contract type the clause comes from in the clause library (\"DPA\"). Set this or `position`."
+        },
+        {
+          "name": "color",
+          "type": "ClauseSourceColor",
+          "required": false,
+          "default": "1",
+          "description": "The source's colour: one per contract type. Default 1.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "One line of detail: what makes it that position, or the library reference."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "position": [
+          "balanced",
+          "seller-favored",
+          "buyer-favored"
+        ],
+        "color": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A note on a clause for whoever drafts or reviews the agreement: its negotiation position (`balanced`, `seller-favored`, `buyer-favored`) with one line of why, or the contract type it comes from in the clause library (`source`, in that type’s `color`).",
+          "Pass it to a `Clause`’s `note`: it sits in the margin beside the paper when the viewer is at least size.breakpoint.lg wide, and under the clause heading when it is narrower. It is never printed."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A comment someone left on the text",
+            "instead": "the app’s comment thread (`ChatThread`, `Message`)"
+          },
+          {
+            "situation": "Text the parties sign",
+            "instead": "the clause itself"
+          }
+        ],
+        "do": {
+          "caption": "A position named in words, with the reason in one line.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\" note={<ClauseNote position=\"balanced\">Cap at the fees of the prior 12 months</ClauseNote>}>\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A drafting remark typed into the clause: it would be signed with the agreement.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A note has role=\"note\" and reads as “Position Balanced …” right after the clause heading, wherever it is drawn.",
+          "Colour is never the only cue: the words name the position and the source; a source’s bar repeats its contract type’s colour."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/ClauseNote",
+        "stories": [
+          {
+            "id": "components-clausenote--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-clausenote--on-clauses",
+            "name": "On Clauses"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "border.width.change-bar",
+          "color.border.default",
+          "color.category.1.border",
+          "color.category.2.border",
+          "color.category.3.border",
+          "color.category.4.border",
+          "color.category.5.border",
+          "color.category.6.border",
+          "color.fg.default",
+          "color.fg.muted",
+          "space.gap.2xs",
+          "space.inset.sm",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "ClauseNoteProps",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "ClauseNote",
+      "propsOf": "ClauseNote"
+    },
+    {
+      "name": "ClauseProps",
+      "kind": "type-only",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Clause",
+      "propsOf": "Clause"
+    },
+    {
+      "name": "ClauseRef",
+      "kind": "component",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), or to an Exhibit (\"Exhibit A\"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
+      "partOf": "Clause",
+      "docs": "docs/usage/Clause.usage.tsx",
+      "props": [
+        {
+          "name": "to",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The id of the Clause it points to. Required."
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "required": false,
+          "default": "'Section'",
+          "description": "The word before the number. Default \"Section\"."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "ClauseRefProps",
+      "kind": "type-only",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Clause",
+      "propsOf": "ClauseRef"
+    },
+    {
+      "name": "ClauseSourceColor",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "A contract type's colour (color.category.*), the same wherever that type's clauses appear.",
+      "partOf": "ClauseNote",
+      "definition": "type ClauseSourceColor = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     {
       "name": "CloseIcon",
@@ -6858,122 +7388,42 @@
       "propsOf": "Divider"
     },
     {
-      "name": "DocumentField",
-      "kind": "component",
+      "name": "DocumentSelection",
+      "kind": "type-only",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "A field in a document's text flow: a tag in the signer's colour, inline so it moves with the text. An outline means it is yours to complete. Activating it opens the system's own control (`editor`, in a popover) or the app's flow (`onActivate`). Not part of a text selection.",
+      "description": "The text the reader selected in the document, and the range it covers (to store as a highlight).",
       "partOf": "DocumentViewer",
-      "docs": "docs/usage/DocumentViewer.usage.tsx",
+      "definition": "interface DocumentSelection { text: string; range: Range; }"
+    },
+    {
+      "name": "DocumentTitle",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
         {
-          "name": "kind",
-          "type": "DocumentFieldKind",
-          "required": true,
-          "default": null,
-          "description": null,
-          "values": [
-            "signature",
-            "initials",
-            "date-signed",
-            "stamp",
-            "text",
-            "textarea",
-            "number",
-            "date",
-            "select",
-            "combobox",
-            "multi-select",
-            "attachment",
-            "checkbox",
-            "radio",
-            "switch",
-            "slider"
-          ]
-        },
-        {
-          "name": "label",
+          "name": "title",
           "type": "string",
           "required": true,
           "default": null,
-          "description": "What the field asks for: \"Sign\", \"Invoice frequency\". The tag's text, and its accessible name."
+          "description": "The agreement's title (\"Master Services Agreement\"). Required."
         },
         {
-          "name": "signer",
-          "type": "DocumentSigner",
-          "required": true,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "yours",
-          "type": "boolean",
-          "required": false,
-          "default": "true",
-          "description": "Whether the person reading can act on it. Someone else's field is flat (no outline) and not actionable."
-        },
-        {
-          "name": "required",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": null
-        },
-        {
-          "name": "invalid",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": null
-        },
-        {
-          "name": "value",
-          "type": "string | undefined",
+          "name": "number",
+          "type": "string",
           "required": false,
           "default": null,
-          "description": "The filled value, shown in place of the label (\"Maya Okafor\", \"Quarterly\")."
+          "description": "Its number line, under the title (\"Order Form No. OF-2026-0311 under Agreement No. MSA-2026-0142\")."
         },
         {
-          "name": "checked",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": "For checkbox, radio and switch: filled when true."
-        },
-        {
-          "name": "editor",
+          "name": "children",
           "type": "ReactNode",
           "required": false,
           "default": null,
-          "description": "The system control that edits it (TextField, Select, DatePicker…), opened in a popover anchored to the tag."
-        },
-        {
-          "name": "open",
-          "type": "boolean",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "defaultOpen",
-          "type": "boolean",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "onOpenChange",
-          "type": "(open: boolean) => void",
-          "required": false,
-          "default": null,
-          "description": null
-        },
-        {
-          "name": "onActivate",
-          "type": "() => void",
-          "required": false,
-          "default": null,
-          "description": "For fields completed elsewhere (signature, initials, attachment): the app opens its own flow."
+          "description": "The preamble: who the parties are, and the defined terms for the document and each party (Term define)."
         }
       ],
       "inherits": [],
@@ -6984,75 +7434,105 @@
         "UNSAFE_style": false
       },
       "variants": {},
-      "states": [
-        "yours",
-        "required",
-        "invalid",
-        "checked",
-        "open",
-        "defaultOpen"
-      ]
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The top of a generated agreement: `DocumentTitle` for its title and number (centred) and the preamble that names the parties, with each defined term in a `Term define`.",
+          "`Recitals` for the background before the operative clauses: each `Recital` is written without its “WHEREAS,” (it is added), and `closing` follows “NOW, THEREFORE,”."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The page’s own title in an app (the record, the list)",
+            "instead": "`PageHeader`"
+          },
+          {
+            "situation": "A heading inside the agreement",
+            "instead": "`Clause` with a `title`"
+          }
+        ],
+        "do": {
+          "caption": "Title, number and preamble, then the recitals: the same structure for every agreement the app generates.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n  </DocumentTitle>\n  <Recitals>\n    <Recital>Provider operates a facilities management platform;</Recital>\n  </Recitals>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>MASTER SERVICES AGREEMENT</Text>\n  <Text>Whereas Provider operates a platform…</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.",
+          "The title block is a `header`; recitals are plain paragraphs in reading order."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentTitle",
+        "stories": [
+          {
+            "id": "components-documenttitle--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documenttitle--amendment",
+            "name": "Amendment"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Clause",
+          "Heading",
+          "Text"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.link",
+          "color.fg.muted",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.indicator",
+          "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xs",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
     },
     {
-      "name": "DocumentFieldKind",
+      "name": "DocumentTitleProps",
       "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
       "status": null,
       "description": null,
-      "partOf": "DocumentViewer",
-      "definition": "type DocumentFieldKind = 'signature' | 'initials' | 'date-signed' | 'stamp' | 'text' | 'textarea' | 'number' | 'date' | 'select' | 'combobox' | 'multi-select' | 'attachment' | 'checkbox' | 'radio' | 'switch' | 'slider'",
-      "values": [
-        "signature",
-        "initials",
-        "date-signed",
-        "stamp",
-        "text",
-        "textarea",
-        "number",
-        "date",
-        "select",
-        "combobox",
-        "multi-select",
-        "attachment",
-        "checkbox",
-        "radio",
-        "switch",
-        "slider"
-      ]
-    },
-    {
-      "name": "DocumentFieldProps",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": null,
-      "partOf": "DocumentViewer",
-      "propsOf": "DocumentField"
-    },
-    {
-      "name": "DocumentSelection",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "The text the reader selected in the document, and the range it covers (to store as a highlight).",
-      "partOf": "DocumentViewer",
-      "definition": "interface DocumentSelection { text: string; range: Range; }"
-    },
-    {
-      "name": "DocumentSigner",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "Who a field belongs to. `category` (1–6, color.category.*) is that signer's colour, the same everywhere in the document.",
-      "partOf": "DocumentViewer",
-      "definition": "interface DocumentSigner { name: string; category: 1 | 2 | 3 | 4 | 5 | 6; }"
+      "partOf": "DocumentTitle",
+      "propsOf": "DocumentTitle"
     },
     {
       "name": "DocumentViewer",
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "A document the app generates from data, shown as one continuous sheet on a canvas, with a highlight-layer switch and, when `onHighlight` is set, a menu above the reader's selection. Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
+      "description": "A document the app generates from data, shown as one continuous sheet (at least a page tall) on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the document area only: the page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
       "docs": "docs/usage/DocumentViewer.usage.tsx",
       "props": [
         {
@@ -7067,52 +7547,33 @@
           "type": "ReactNode",
           "required": true,
           "default": null,
-          "description": "The generated document: headings and paragraphs, with DataField, Highlight and DocumentField inside."
-        },
-        {
-          "name": "layer",
-          "type": "HighlightLayer",
-          "required": false,
-          "default": null,
-          "description": "The highlight layer shown (controlled). Yours = the reader's highlights, Search = Find matches, AI = what an answer cites.",
-          "values": [
-            "yours",
-            "search",
-            "ai"
-          ]
-        },
-        {
-          "name": "defaultLayer",
-          "type": "HighlightLayer",
-          "required": false,
-          "default": "'yours'",
-          "description": "The layer shown first when uncontrolled.",
-          "values": [
-            "yours",
-            "search",
-            "ai"
-          ]
-        },
-        {
-          "name": "onLayerChange",
-          "type": "(layer: HighlightLayer) => void",
-          "required": false,
-          "default": null,
-          "description": null
+          "description": "The generated document: headings and paragraphs, with DataField and Highlight inside."
         },
         {
           "name": "onHighlight",
           "type": "(selection: DocumentSelection) => void",
           "required": false,
           "default": null,
-          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or the toolbar's Highlight button). Store it and render it as a Highlight with tone=\"yours\". Without it, selecting text is plain native selection with no menu."
+          "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu."
         },
         {
-          "name": "toolbar",
-          "type": "ReactNode",
+          "name": "headingLevel",
+          "type": "Exclude<HeadingLevel, 1>",
           "required": false,
-          "default": null,
-          "description": "More controls at the end of the viewer's toolbar: Find in document, Download."
+          "default": "2",
+          "description": "The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).",
+          "values": [
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "documentName",
+          "type": "string",
+          "required": false,
+          "default": "'the Agreement'",
+          "description": "How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default \"the Agreement\"."
         }
       ],
       "inherits": [],
@@ -7123,23 +7584,17 @@
         "UNSAFE_style": true
       },
       "variants": {
-        "layer": [
-          "yours",
-          "search",
-          "ai"
-        ],
-        "defaultLayer": [
-          "yours",
-          "search",
-          "ai"
+        "headingLevel": [
+          2,
+          3,
+          4
         ]
       },
       "states": [],
       "usage": {
         "whenToUse": [
-          "A document the app generates from data (an agreement, an order form, a policy) for people to read, highlight and complete fields in. The document is the app’s own HTML: headings and `Text`, with `DataField`, `Highlight` and `DocumentField` inline.",
-          "Highlights come in three layers and only one shows at a time: `yours` (the reader’s own, yellow), `search` (Find’s matches, blue) and `ai` (what an answer cites, purple). Pass `onHighlight` to let readers keep a selection as a highlight.",
-          "Signing and approval flows: each `DocumentField` belongs to a signer, in that signer’s category colour. An outline means it is yours to complete; another signer’s is flat (`yours={false}`). A field opens as the system’s own control (`editor`) or the app’s flow (`onActivate`)."
+          "A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.",
+          "Highlights (`Highlight`) can show together in their own colours: the reader’s own (yellow), Find’s matches (blue), what an AI answer cites (purple). Pass `onHighlight` to let readers keep a selection as a highlight."
         ],
         "whenNotToUse": [
           {
@@ -7156,17 +7611,15 @@
           }
         ],
         "do": {
-          "caption": "Merged values read as plain text; a value that fills later is a placeholder; a field sits in the sentence it belongs to.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by{' '}\n    <DocumentField kind=\"signature\" label=\"Sign\" signer={maya} required />\n  </Text>\n</DocumentViewer>"
+          "caption": "Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.",
+          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n  </Text>\n</DocumentViewer>"
         },
         "dont": {
-          "caption": "Flagging an empty value inside the document, or showing two highlight colours at once: fix data in the form that collected it, and keep one layer.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with <Highlight tone=\"yours\">sixty days’ notice</Highlight>.\n  </Text>\n</DocumentViewer>"
+          "caption": "Flagging an empty value inside the document: fix the data in the form that collected it.",
+          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.\n  </Text>\n</DocumentViewer>"
         },
         "accessibility": [
-          "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu above a selection is mirrored by the toolbar’s Highlight button for keyboard users.",
-          "A highlight is a `<mark>`; the current one carries `aria-current`. Its background is its only mark, so list highlights somewhere reachable without colour (an outline, Find’s results).",
-          "A `DocumentField` is a button named “Sign, required, Maya Okafor” (or its value once filled); another signer’s is announced as “Sign, Jon Park’s field” and is not focusable. Fields and placeholders are not part of a text selection.",
+          "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.",
           "A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test)."
         ]
       },
@@ -7176,14 +7629,6 @@
           {
             "id": "components-documentviewer--default",
             "name": "Default"
-          },
-          {
-            "id": "components-documentviewer--search-layer",
-            "name": "Search Layer"
-          },
-          {
-            "id": "components-documentviewer--ai-layer",
-            "name": "Ai Layer"
           },
           {
             "id": "components-documentviewer--placeholders",
@@ -7196,51 +7641,38 @@
           {
             "id": "components-documentviewer--with-selection",
             "name": "With Selection"
-          },
-          {
-            "id": "components-documentviewer--field-kinds",
-            "name": "Field Kinds"
-          },
-          {
-            "id": "components-documentviewer--field-editor-open",
-            "name": "Field Editor Open"
           }
         ],
         "composes": [
+          "Change",
+          "Clause",
+          "Dialog",
+          "Heading",
           "Icon",
           "Kbd",
-          "Popover",
-          "SegmentedControl",
+          "Shortcuts",
+          "Switch",
           "Toolbar",
           "Tooltip"
         ],
         "tokens": [
+          "border.width.change-bar",
           "border.width.default",
+          "color.action.primary",
           "color.bg.elevated",
           "color.bg.hover",
           "color.bg.inverse",
+          "color.bg.scrim",
           "color.bg.selected",
           "color.bg.subtle",
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
-          "color.category.1.bg",
-          "color.category.1.border",
           "color.category.1.fg",
-          "color.category.2.bg",
-          "color.category.2.border",
           "color.category.2.fg",
-          "color.category.3.bg",
-          "color.category.3.border",
           "color.category.3.fg",
-          "color.category.4.bg",
-          "color.category.4.border",
           "color.category.4.fg",
-          "color.category.5.bg",
-          "color.category.5.border",
           "color.category.5.fg",
-          "color.category.6.bg",
-          "color.category.6.border",
           "color.category.6.fg",
           "color.data-field.bg",
           "color.data-field.bg-filled",
@@ -7248,53 +7680,63 @@
           "color.fg.default",
           "color.fg.disabled",
           "color.fg.inverse",
+          "color.fg.link",
           "color.fg.muted",
+          "color.fg.on-action",
           "color.focus",
-          "color.highlight.ai.bg",
-          "color.highlight.ai.bg-current",
-          "color.highlight.search.bg",
-          "color.highlight.search.bg-current",
-          "color.highlight.yours.bg",
-          "color.highlight.yours.bg-current",
-          "color.status.danger.bg",
           "color.status.danger.fg",
+          "color.status.success.fg",
           "ease.enter",
           "ease.exit",
           "focus.ring.offset",
           "focus.ring.width",
           "font.weight.strong",
           "icon.stroke",
-          "motion.base",
           "motion.fast",
           "motion.slow",
           "radius.control",
+          "radius.indicator",
           "radius.pill",
           "radius.surface",
+          "ratio.page",
           "shadow.card",
+          "shadow.modal",
           "shadow.popover",
           "size.control.md",
           "size.control.sm",
+          "size.dialog.lg",
+          "size.dialog.md",
+          "size.dialog.sm",
+          "size.document.clause-indent",
           "size.document.measure",
+          "size.document.note",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
-          "size.sidebar.sm",
           "size.target-min",
           "space.gap.2xs",
           "space.gap.md",
           "space.gap.sm",
           "space.gap.xs",
           "space.inset.2xs",
+          "space.inset.lg",
           "space.inset.md",
           "space.inset.sm",
           "space.inset.xl",
           "space.inset.xs",
           "space.mark.overhang",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.body",
           "text.body-lg",
           "text.caption",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
           "text.heading-4",
           "text.label",
           "z.dropdown",
+          "z.modal",
           "z.tooltip"
         ]
       }
@@ -7732,6 +8174,129 @@
       "status": null,
       "description": "The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.",
       "definition": "interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }"
+    },
+    {
+      "name": "Exhibit",
+      "kind": "component",
+      "source": "src/components/Exhibit/Exhibit.tsx",
+      "status": null,
+      "description": "An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
+      "docs": "docs/usage/Exhibit.usage.tsx",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Stable id that references use (`<ClauseRef to=\"dpa\" />` → “Exhibit A”). Unique among clauses and exhibits. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The exhibit's name (\"Data Processing Agreement\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The exhibit's clauses: their numbering starts again at 1."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.",
+          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A separate agreement that refers to this one (an Order Form, an Amendment)",
+            "instead": "its own DocumentViewer, naming this agreement in plain text"
+          },
+          {
+            "situation": "A section of the agreement itself",
+            "instead": "`Clause`"
+          }
+        ],
+        "do": {
+          "caption": "An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"privacy\" title=\"Data Privacy\">\n    <Text>\n      Personal data is processed under <ClauseRef to=\"dpa\" />.\n    </Text>\n  </Clause>\n  <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n    <Clause id=\"roles\" title=\"Roles\">\n      <Text>Customer is the controller and Provider the processor.</Text>\n    </Clause>\n  </Exhibit>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>EXHIBIT A — Data Processing Agreement</Text>\n  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.",
+          "A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Exhibit",
+        "stories": [
+          {
+            "id": "components-exhibit--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Clause",
+          "Heading"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.border.default",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.link",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "radius.indicator",
+          "size.document.clause-indent",
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "ExhibitProps",
+      "kind": "type-only",
+      "source": "src/components/Exhibit/Exhibit.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Exhibit",
+      "propsOf": "Exhibit"
     },
     {
       "name": "EyeIcon",
@@ -8457,7 +9022,8 @@
           "values": [
             "square",
             "landscape",
-            "wide"
+            "wide",
+            "page"
           ]
         }
       ],
@@ -8476,7 +9042,8 @@
         "ratio": [
           "square",
           "landscape",
-          "wide"
+          "wide",
+          "page"
         ]
       },
       "states": [],
@@ -8530,6 +9097,7 @@
         "composes": [],
         "tokens": [
           "ratio.landscape",
+          "ratio.page",
           "ratio.square",
           "ratio.wide"
         ]
@@ -8895,37 +9463,29 @@
     {
       "name": "Highlight",
       "kind": "component",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
+      "source": "src/components/Highlight/Highlight.tsx",
       "status": null,
-      "description": "A highlighted passage in a DocumentViewer: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be listed somewhere the reader can reach without seeing colour (an outline, Find's results).",
-      "partOf": "DocumentViewer",
-      "docs": "docs/usage/DocumentViewer.usage.tsx",
+      "description": "A highlighted passage: a <mark> with a rounded background that reaches just past its text. Background only, no outline or underline, so every highlight should also be reachable without seeing colour (Find's results, the citation that points to it).",
+      "docs": "docs/usage/Highlight.usage.tsx",
       "props": [
         {
           "name": "tone",
-          "type": "HighlightLayer",
-          "required": true,
-          "default": null,
-          "description": "Which layer it belongs to. It shows only while the viewer shows that layer; otherwise it is plain text.",
+          "type": "HighlightTone",
+          "required": false,
+          "default": "'highlight'",
+          "description": "highlight = the reader's own (yellow, the default), search = Find's matches (blue), ai = what an AI answer cites (purple).",
           "values": [
-            "yours",
+            "highlight",
             "search",
             "ai"
           ]
-        },
-        {
-          "name": "current",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": "The current target (from Find's next, a citation, the outline): stronger, and aria-current."
         },
         {
           "name": "id",
           "type": "string",
           "required": false,
           "default": null,
-          "description": "For linking to it (a citation's target, the outline)."
+          "description": "For linking to it (a citation's target, a search result)."
         },
         {
           "name": "children",
@@ -8944,37 +9504,94 @@
       },
       "variants": {
         "tone": [
-          "yours",
+          "highlight",
           "search",
           "ai"
         ]
       },
-      "states": [
-        "current"
-      ]
-    },
-    {
-      "name": "HighlightLayer",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "Which highlights show. One layer at a time, so a colour always means one thing.",
-      "partOf": "DocumentViewer",
-      "definition": "type HighlightLayer = 'yours' | 'search' | 'ai'",
-      "values": [
-        "yours",
-        "search",
-        "ai"
-      ]
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Marking a passage in running text: the reader’s own highlights (the default tone), Find’s matches (`tone=\"search\"`), or what an AI answer cites (`tone=\"ai\"`).",
+          "Tones can show together; each colour keeps one meaning wherever it appears, in a DocumentViewer, search results or a chat answer’s source.",
+          "Give a highlight an `id` when something links to it (a citation, a search result), so the link can scroll to it."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A status or a category",
+            "instead": "`Badge` or `Tag`"
+          },
+          {
+            "situation": "Emphasis the author wrote",
+            "instead": "the text’s own `<strong>` or `<em>`"
+          },
+          {
+            "situation": "An AI suggestion not yet accepted",
+            "instead": "`AiMarker`"
+          }
+        ],
+        "do": {
+          "caption": "One meaning per colour: the reader’s highlight in yellow, the passage an answer cites in purple.",
+          "code": "<Text size=\"body-lg\">\n  The agreement <Highlight tone=\"ai\">automatically renews</Highlight> unless either party gives <Highlight>sixty days’ notice</Highlight>.\n</Text>"
+        },
+        "dont": {
+          "caption": "Highlighting a whole paragraph: nothing stands out, and the colour stops meaning anything.",
+          "code": "<Text size=\"body-lg\">\n  <Highlight>The agreement automatically renews for successive 12-month terms unless either party gives sixty days’ notice before the renewal date.</Highlight>\n</Text>"
+        },
+        "accessibility": [
+          "A highlight is a `<mark>`, which screen readers can announce as highlighted text.",
+          "Its background is its only visual mark, so every highlight must also be reachable without colour: Find’s results, or the citation that points to it by `id`.",
+          "Text keeps its own colour on every tone, and every tone passes contrast in light and dark (contrast test)."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Highlight",
+        "stories": [
+          {
+            "id": "components-highlight--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-highlight--tones",
+            "name": "Tones"
+          },
+          {
+            "id": "components-highlight--wrapped",
+            "name": "Wrapped"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.highlight.ai.bg",
+          "color.highlight.bg",
+          "color.highlight.search.bg",
+          "radius.control",
+          "space.mark.overhang"
+        ]
+      }
     },
     {
       "name": "HighlightProps",
       "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
+      "source": "src/components/Highlight/Highlight.tsx",
       "status": null,
       "description": null,
-      "partOf": "DocumentViewer",
+      "partOf": "Highlight",
       "propsOf": "Highlight"
+    },
+    {
+      "name": "HighlightTone",
+      "kind": "type-only",
+      "source": "src/components/Highlight/Highlight.tsx",
+      "status": null,
+      "description": "What a highlight means. Tones can show together; each colour keeps one meaning.",
+      "partOf": "Highlight",
+      "definition": "type HighlightTone = 'highlight' | 'search' | 'ai'",
+      "values": [
+        "highlight",
+        "search",
+        "ai"
+      ]
     },
     {
       "name": "HomeIcon",
@@ -11337,6 +11954,20 @@
       "propsOf": "NavTabs"
     },
     {
+      "name": "NegotiationPosition",
+      "kind": "type-only",
+      "source": "src/components/ClauseNote/ClauseNote.tsx",
+      "status": null,
+      "description": "Where a clause sits in negotiation, as each clause in a clause library records it.",
+      "partOf": "ClauseNote",
+      "definition": "type NegotiationPosition = 'balanced' | 'seller-favored' | 'buyer-favored'",
+      "values": [
+        "balanced",
+        "seller-favored",
+        "buyer-favored"
+      ]
+    },
+    {
       "name": "NumberField",
       "kind": "component",
       "source": "src/components/NumberField/NumberField.tsx",
@@ -12621,8 +13252,79 @@
       "values": [
         "square",
         "landscape",
-        "wide"
+        "wide",
+        "page"
       ]
+    },
+    {
+      "name": "Recital",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.",
+      "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "Recitals",
+      "kind": "component",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": "The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.",
+      "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One Recital per piece of background. Required."
+        },
+        {
+          "name": "closing",
+          "type": "string",
+          "required": false,
+          "default": "'in consideration of the mutual covenants set out below, the Parties agree as follows:'",
+          "description": "What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows:"
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "RecitalsProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentTitle/DocumentTitle.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentTitle",
+      "propsOf": "Recitals"
     },
     {
       "name": "Reel",
@@ -14477,6 +15179,151 @@
       "description": null,
       "partOf": "SignatureBlock",
       "propsOf": "SignatureBlock"
+    },
+    {
+      "name": "SignaturePage",
+      "kind": "component",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": "The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
+      "props": [
+        {
+          "name": "witness",
+          "type": "string",
+          "required": false,
+          "default": "'IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.'",
+          "description": "The execution line. Default: IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One SignatureParty per party: 1, 2 or 3 (an escrow agreement's three). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.",
+          "One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One signer’s fields in the middle of a document (initials, a date)",
+            "instead": "a `SignatureBlock` on its own"
+          },
+          {
+            "situation": "A list of who has signed so far",
+            "instead": "`Timeline`"
+          }
+        ],
+        "do": {
+          "caption": "One party per SignatureParty, each signer in their own recipient colour.",
+          "code": "<SignaturePage>\n  <SignatureParty name=\"Acme Corp\">\n    <SignatureBlock name=\"Maya Okafor\" recipient={3} />\n  </SignatureParty>\n  <SignatureParty name=\"Globex Inc.\">\n    <SignatureBlock name=\"Jon Park\" recipient={1} />\n  </SignatureParty>\n</SignaturePage>"
+        },
+        "dont": {
+          "caption": "Signers stacked under one typed heading: who signs for which party is lost.",
+          "code": "<>\n  <Text>Signatures:</Text>\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</>"
+        },
+        "accessibility": [
+          "The page is a `section` named “Signatures”; each party’s name comes before its block in reading order.",
+          "The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/SignaturePage",
+        "stories": [
+          {
+            "id": "components-signaturepage--two-parties",
+            "name": "Two Parties"
+          },
+          {
+            "id": "components-signaturepage--one-party",
+            "name": "One Party"
+          },
+          {
+            "id": "components-signaturepage--three-parties",
+            "name": "Three Parties"
+          }
+        ],
+        "composes": [
+          "Text"
+        ],
+        "tokens": [
+          "color.fg.default",
+          "color.fg.muted",
+          "size.grid-item.md",
+          "space.gap.lg",
+          "space.gap.sm",
+          "space.gap.xl",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "SignaturePageProps",
+      "kind": "type-only",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignaturePage",
+      "propsOf": "SignaturePage"
+    },
+    {
+      "name": "SignatureParty",
+      "kind": "component",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": "One party on a SignaturePage: its name over its SignatureBlock.",
+      "partOf": "SignaturePage",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party, as the agreement names it (\"Acme Corp\"): shown in capitals. Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The party's SignatureBlock, in its recipient's colour. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "SignaturePartyProps",
+      "kind": "type-only",
+      "source": "src/components/SignaturePage/SignaturePage.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "SignaturePage",
+      "propsOf": "SignatureParty"
     },
     {
       "name": "SignatureRecipient",
@@ -17403,6 +18250,58 @@
       "propsOf": "Tag"
     },
     {
+      "name": "Term",
+      "kind": "component",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": "A defined term: defined once (`define`) and used by name everywhere else, so a term used but never defined, or defined twice, is marked in the document and reported in the console.",
+      "partOf": "Clause",
+      "docs": "docs/usage/Clause.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The term as written here (\"Confidential Information\"). Required."
+        },
+        {
+          "name": "define",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "This is where the term is defined: shown in quotes, in bold. Define each term once."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The term this refers to, when the text differs (a plural or possessive: \"Customer’s\" → \"Customer\")."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "define"
+      ]
+    },
+    {
+      "name": "TermProps",
+      "kind": "type-only",
+      "source": "src/components/Clause/Clause.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Clause",
+      "propsOf": "Term"
+    },
+    {
       "name": "Text",
       "kind": "component",
       "source": "src/components/Text/Text.tsx",
@@ -19292,6 +20191,18 @@
     }
   ],
   "tokens": {
+    "border.width.change-bar": {
+      "cssVar": "--border-width-change-bar",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The bar in the left margin beside a changed line in a redline (Change), as Word draws it.",
+      "value": "2px",
+      "chain": [
+        "border.width.change-bar",
+        "border-width.2"
+      ],
+      "modes": {}
+    },
     "border.width.default": {
       "cssVar": "--border-width-default",
       "tier": "semantic",
@@ -20410,126 +21321,42 @@
       "cssVar": "--color-highlight-ai-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#ede9fe",
-      "chain": [
-        "color.highlight.ai.bg",
-        "color.violet.100"
-      ],
-      "modes": {
-        "dark": "#2e1065"
-      }
-    },
-    "color.highlight.ai.bg-current": {
-      "cssVar": "--color-highlight-ai-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A passage an AI answer cites.",
       "value": "#c4b5fd",
       "chain": [
-        "color.highlight.ai.bg-current",
+        "color.highlight.ai.bg",
         "color.violet.300"
       ],
       "modes": {
         "dark": "#5b21b6"
       }
     },
-    "color.highlight.ai.bg-hover": {
-      "cssVar": "--color-highlight-ai-bg-hover",
+    "color.highlight.bg": {
+      "cssVar": "--color-highlight-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#ddd6fe",
-      "chain": [
-        "color.highlight.ai.bg-hover",
-        "color.violet.200"
-      ],
-      "modes": {
-        "dark": "#4c1d95"
-      }
-    },
-    "color.highlight.search.bg": {
-      "cssVar": "--color-highlight-search-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#dbeafe",
-      "chain": [
-        "color.highlight.search.bg",
-        "color.blue.100"
-      ],
-      "modes": {
-        "dark": "#172554"
-      }
-    },
-    "color.highlight.search.bg-current": {
-      "cssVar": "--color-highlight-search-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
-      "value": "#93c5fd",
-      "chain": [
-        "color.highlight.search.bg-current",
-        "color.blue.300"
-      ],
-      "modes": {
-        "dark": "#1e40af"
-      }
-    },
-    "color.highlight.search.bg-hover": {
-      "cssVar": "--color-highlight-search-bg-hover",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#bfdbfe",
-      "chain": [
-        "color.highlight.search.bg-hover",
-        "color.blue.200"
-      ],
-      "modes": {
-        "dark": "#1e3a8a"
-      }
-    },
-    "color.highlight.yours.bg": {
-      "cssVar": "--color-highlight-yours-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#fef9c3",
-      "chain": [
-        "color.highlight.yours.bg",
-        "color.yellow.100"
-      ],
-      "modes": {
-        "dark": "#422006"
-      }
-    },
-    "color.highlight.yours.bg-current": {
-      "cssVar": "--color-highlight-yours-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "The default tone: the reader’s own highlights (the annotation convention).",
       "value": "#fde047",
       "chain": [
-        "color.highlight.yours.bg-current",
+        "color.highlight.bg",
         "color.yellow.300"
       ],
       "modes": {
         "dark": "#854d0e"
       }
     },
-    "color.highlight.yours.bg-hover": {
-      "cssVar": "--color-highlight-yours-bg-hover",
+    "color.highlight.search.bg": {
+      "cssVar": "--color-highlight-search-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Under the pointer: a preview, lighter than current.",
-      "value": "#fef08a",
+      "description": "A Find match.",
+      "value": "#93c5fd",
       "chain": [
-        "color.highlight.yours.bg-hover",
-        "color.yellow.200"
+        "color.highlight.search.bg",
+        "color.blue.300"
       ],
       "modes": {
-        "dark": "#713f12"
+        "dark": "#1e40af"
       }
     },
     "color.status.danger.bg": {
@@ -21028,6 +21855,18 @@
       ],
       "modes": {}
     },
+    "ratio.page": {
+      "cssVar": "--ratio-page",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.",
+      "value": "0.7727",
+      "chain": [
+        "ratio.page",
+        "aspect.letter"
+      ],
+      "modes": {}
+    },
     "ratio.square": {
       "cssVar": "--ratio-square",
       "tier": "semantic",
@@ -21166,6 +22005,18 @@
       "chain": [
         "size.bar",
         "space.2"
+      ],
+      "modes": {}
+    },
+    "size.breakpoint.lg": {
+      "cssVar": "--size-breakpoint-lg",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "At and above this a DocumentViewer's canvas has room beside the paper: clause notes move into the margin (below it they sit under the clause heading).",
+      "value": "75rem",
+      "chain": [
+        "size.breakpoint.lg",
+        "container.4xl"
       ],
       "modes": {}
     },
@@ -21313,6 +22164,18 @@
       ],
       "modes": {}
     },
+    "size.document.clause-indent": {
+      "cssVar": "--size-document-clause-indent",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The gutter a clause number hangs in (Clause); each nested clause indents one more.",
+      "value": "48px",
+      "chain": [
+        "size.document.clause-indent",
+        "size.12"
+      ],
+      "modes": {}
+    },
     "size.document.measure": {
       "cssVar": "--size-document-measure",
       "tier": "semantic",
@@ -21322,6 +22185,18 @@
       "chain": [
         "size.document.measure",
         "container.2xl"
+      ],
+      "modes": {}
+    },
+    "size.document.note": {
+      "cssVar": "--size-document-note",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of a clause note in the margin beside the paper (ClauseNote).",
+      "value": "12rem",
+      "chain": [
+        "size.document.note",
+        "container.3xs"
       ],
       "modes": {}
     },

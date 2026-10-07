@@ -13,6 +13,10 @@
     "wide": {
       "$value": "{aspect.16-9}",
       "$description": "Video, cover images, banners."
+    },
+    "page": {
+      "$value": "{aspect.letter}",
+      "$description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows."
     }
   }
 }

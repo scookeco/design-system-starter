@@ -149,20 +149,12 @@ export const vars = {
       "border": "var(--color-ai-border)"
     },
     "highlight": {
-      "yours": {
-        "bg": "var(--color-highlight-yours-bg)",
-        "bg-hover": "var(--color-highlight-yours-bg-hover)",
-        "bg-current": "var(--color-highlight-yours-bg-current)"
-      },
+      "bg": "var(--color-highlight-bg)",
       "search": {
-        "bg": "var(--color-highlight-search-bg)",
-        "bg-hover": "var(--color-highlight-search-bg-hover)",
-        "bg-current": "var(--color-highlight-search-bg-current)"
+        "bg": "var(--color-highlight-search-bg)"
       },
       "ai": {
-        "bg": "var(--color-highlight-ai-bg)",
-        "bg-hover": "var(--color-highlight-ai-bg-hover)",
-        "bg-current": "var(--color-highlight-ai-bg-current)"
+        "bg": "var(--color-highlight-ai-bg)"
       }
     },
     "data-field": {
@@ -252,7 +244,8 @@ export const vars = {
     },
     "breakpoint": {
       "sm": "var(--size-breakpoint-sm)",
-      "md": "var(--size-breakpoint-md)"
+      "md": "var(--size-breakpoint-md)",
+      "lg": "var(--size-breakpoint-lg)"
     },
     "avatar": {
       "sm": "var(--size-avatar-sm)",
@@ -263,7 +256,9 @@ export const vars = {
       "block": "var(--size-skeleton-block)"
     },
     "document": {
-      "measure": "var(--size-document-measure)"
+      "measure": "var(--size-document-measure)",
+      "clause-indent": "var(--size-document-clause-indent)",
+      "note": "var(--size-document-note)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",
@@ -291,7 +286,8 @@ export const vars = {
   "border": {
     "width": {
       "default": "var(--border-width-default)",
-      "field": "var(--border-width-field)"
+      "field": "var(--border-width-field)",
+      "change-bar": "var(--border-width-change-bar)"
     }
   },
   "focus": {
@@ -334,7 +330,8 @@ export const vars = {
   "ratio": {
     "square": "var(--ratio-square)",
     "landscape": "var(--ratio-landscape)",
-    "wide": "var(--ratio-wide)"
+    "wide": "var(--ratio-wide)",
+    "page": "var(--ratio-page)"
   },
   "text": {
     "body": "var(--text-body)",

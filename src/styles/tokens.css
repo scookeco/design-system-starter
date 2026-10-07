@@ -225,6 +225,7 @@
     --aspect-1-1: 1;
     --aspect-4-3: 1.3333;
     --aspect-16-9: 1.7778;
+    --aspect-letter: 0.7727;
     --stroke-regular: 1.75;
     --stroke-bold: 2.25;
     --font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -322,15 +323,9 @@
     --color-ai-fg: light-dark(var(--color-violet-700), var(--color-violet-300));
     --color-ai-bg: light-dark(var(--color-violet-50), var(--color-violet-950));
     --color-ai-border: light-dark(var(--color-violet-300), var(--color-violet-800));
-    --color-highlight-yours-bg: light-dark(var(--color-yellow-100), var(--color-yellow-950));
-    --color-highlight-yours-bg-hover: light-dark(var(--color-yellow-200), var(--color-yellow-900));
-    --color-highlight-yours-bg-current: light-dark(var(--color-yellow-300), var(--color-yellow-800));
-    --color-highlight-search-bg: light-dark(var(--color-blue-100), var(--color-blue-950));
-    --color-highlight-search-bg-hover: light-dark(var(--color-blue-200), var(--color-blue-900));
-    --color-highlight-search-bg-current: light-dark(var(--color-blue-300), var(--color-blue-800));
-    --color-highlight-ai-bg: light-dark(var(--color-violet-100), var(--color-violet-950));
-    --color-highlight-ai-bg-hover: light-dark(var(--color-violet-200), var(--color-violet-900));
-    --color-highlight-ai-bg-current: light-dark(var(--color-violet-300), var(--color-violet-800));
+    --color-highlight-bg: light-dark(var(--color-yellow-300), var(--color-yellow-800));
+    --color-highlight-search-bg: light-dark(var(--color-blue-300), var(--color-blue-800));
+    --color-highlight-ai-bg: light-dark(var(--color-violet-300), var(--color-violet-800));
     --color-data-field-fg: light-dark(var(--color-green-800), var(--color-green-300));
     --color-data-field-bg: light-dark(var(--color-green-100), var(--color-green-950));
     --color-data-field-bg-filled: light-dark(var(--color-green-200), var(--color-green-900));
@@ -384,11 +379,14 @@
     --size-viewport-block: var(--viewport-block);
     --size-breakpoint-sm: var(--container-xl);
     --size-breakpoint-md: var(--container-2xl);
+    --size-breakpoint-lg: var(--container-4xl);
     --size-avatar-sm: var(--size-6);
     --size-avatar-md: var(--size-8);
     --size-avatar-lg: var(--size-10);
     --size-skeleton-block: var(--container-3xs);
     --size-document-measure: var(--container-2xl);
+    --size-document-clause-indent: var(--size-12);
+    --size-document-note: var(--container-3xs);
     --size-signature-slot-inline: var(--container-3xs);
     --size-signature-slot-block: var(--size-16);
     --size-signature-tag-inline: var(--size-24);
@@ -403,6 +401,7 @@
     --font-weight-strong: var(--font-weight-semibold);
     --border-width-default: var(--border-width-1);
     --border-width-field: var(--border-width-2);
+    --border-width-change-bar: var(--border-width-2);
     --focus-ring-width: var(--border-width-2);
     --focus-ring-offset: var(--space-half);
     --shadow-card: 0 1px 2px 0 var(--color-black-alpha-10);
@@ -429,6 +428,7 @@
     --ratio-square: var(--aspect-1-1);
     --ratio-landscape: var(--aspect-4-3);
     --ratio-wide: var(--aspect-16-9);
+    --ratio-page: var(--aspect-letter);
     --text-body: var(--font-weight-regular) var(--font-size-200)/var(--font-line-height-normal) var(--font-family-sans);
     --text-body-lg: var(--font-weight-regular) var(--font-size-300)/var(--font-line-height-normal) var(--font-family-sans);
     --text-label: var(--font-weight-medium) var(--font-size-200)/var(--font-line-height-tight) var(--font-family-sans);

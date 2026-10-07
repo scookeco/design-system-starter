@@ -72,19 +72,19 @@ export { Composer, type ComposerProps, type ComposerAttachment } from './Compose
 export { Citation, SourcesList, type CitationProps, type SourcesListProps, type Source } from './Citation/Citation';
 export {
   DocumentViewer,
-  Highlight,
   DataField,
-  DocumentField,
   type DocumentViewerProps,
-  type HighlightProps,
-  type HighlightLayer,
   type DataFieldProps,
-  type DocumentFieldProps,
-  type DocumentFieldKind,
-  type DocumentSigner,
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
+export { Highlight, type HighlightProps, type HighlightTone } from './Highlight/Highlight';
+export { Clause, ClauseRef, Term, type ClauseProps, type ClauseRefProps, type TermProps } from './Clause/Clause';
 export { SignatureBlock, type SignatureBlockProps, type SignatureRecipient } from './SignatureBlock/SignatureBlock';
+export { SignaturePage, SignatureParty, type SignaturePageProps, type SignaturePartyProps } from './SignaturePage/SignaturePage';
+export { Exhibit, type ExhibitProps } from './Exhibit/Exhibit';
+export { DocumentTitle, Recitals, Recital, type DocumentTitleProps, type RecitalsProps } from './DocumentTitle/DocumentTitle';
+export { ClauseNote, type ClauseNoteProps, type NegotiationPosition, type ClauseSourceColor } from './ClauseNote/ClauseNote';
+export { Change, type ChangeProps, type ChangeKind, type ChangeColor } from './Change/Change';
 export { Suggestion, type SuggestionProps } from './Suggestion/Suggestion';
 export { ReviewChanges, type ReviewChangesProps, type ProposedChange, type ChangeDecision, type ChangeOutcome } from './ReviewChanges/ReviewChanges';
 export { Feedback, type FeedbackProps, type FeedbackValue, type FeedbackRating } from './Feedback/Feedback';

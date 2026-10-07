@@ -1,0 +1,27 @@
+@layer components {
+  /*
+   * Highlight: a rounded background that reaches past the text without moving it (the padding is
+   * cancelled by an equal negative margin). An inline background paints the font's content area,
+   * not the whole line, so highlights on consecutive lines keep a gap of paper between them. Each
+   * wrapped line gets its own rounded ends where box-decoration-break is supported (Guides/Browser
+   * support); elsewhere the inner ends are square.
+   */
+  .highlight-mark {
+    --mark-pull: calc(var(--space-mark-overhang) * -1);
+
+    margin-inline: var(--mark-pull);
+    padding-inline: var(--space-mark-overhang);
+    border-radius: var(--radius-control);
+    background: var(--color-highlight-bg);
+    color: inherit;
+    box-decoration-break: clone;
+  }
+
+  .highlight-mark[data-tone="search"] {
+    background: var(--color-highlight-search-bg);
+  }
+
+  .highlight-mark[data-tone="ai"] {
+    background: var(--color-highlight-ai-bg);
+  }
+}

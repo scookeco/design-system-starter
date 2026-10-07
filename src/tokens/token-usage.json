@@ -3799,6 +3799,110 @@
         }
       ]
     },
+    "Change": {
+      "kind": "component",
+      "dir": "src/components/Change",
+      "exports": [
+        "Change"
+      ],
+      "stylesheets": [
+        "src/components/Change/Change.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "ChatThread": {
       "kind": "component",
       "dir": "src/components/ChatThread",
@@ -4774,6 +4878,464 @@
           "readBy": [
             {
               "unit": "Citation",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "Clause": {
+      "kind": "component",
+      "dir": "src/components/Clause",
+      "exports": [
+        "Clause",
+        "ClauseRef",
+        "Term"
+      ],
+      "stylesheets": [
+        "src/components/Clause/Clause.css"
+      ],
+      "composes": [
+        "Change",
+        "Heading"
+      ],
+      "composesAll": [
+        "Change",
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "ClauseNote": {
+      "kind": "component",
+      "dir": "src/components/ClauseNote",
+      "exports": [
+        "ClauseNote"
+      ],
+      "stylesheets": [
+        "src/components/ClauseNote/ClauseNote.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.sm",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "ClauseNote",
               "how": "css"
             }
           ]
@@ -8431,33 +8993,426 @@
         }
       ]
     },
+    "DocumentTitle": {
+      "kind": "component",
+      "dir": "src/components/DocumentTitle",
+      "exports": [
+        "DocumentTitle",
+        "Recital",
+        "Recitals"
+      ],
+      "stylesheets": [
+        "src/components/DocumentTitle/DocumentTitle.css"
+      ],
+      "composes": [
+        "Clause",
+        "Heading",
+        "Text"
+      ],
+      "composesAll": [
+        "Change",
+        "Clause",
+        "Heading",
+        "Text"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            },
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "DocumentViewer": {
       "kind": "component",
       "dir": "src/components/DocumentViewer",
       "exports": [
         "DataField",
-        "DocumentField",
-        "DocumentViewer",
-        "Highlight"
+        "DocumentViewer"
       ],
       "stylesheets": [
         "src/components/DocumentViewer/DocumentViewer.css"
       ],
       "composes": [
+        "Clause",
         "Icon",
-        "Popover",
-        "SegmentedControl",
+        "Shortcuts",
         "Toolbar"
       ],
       "composesAll": [
+        "Change",
+        "Clause",
+        "Dialog",
+        "Heading",
         "Icon",
         "Kbd",
-        "Popover",
-        "SegmentedControl",
+        "Shortcuts",
+        "Switch",
         "Toolbar",
         "Tooltip"
       ],
       "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
         {
           "token": "border.width.default",
           "readBy": [
@@ -8468,14 +9423,23 @@
           ]
         },
         {
+          "token": "color.action.primary",
+          "readBy": [
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.bg.elevated",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Dialog",
               "how": "css"
             },
             {
-              "unit": "Popover",
+              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -8483,6 +9447,10 @@
         {
           "token": "color.bg.hover",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8499,12 +9467,17 @@
           ]
         },
         {
-          "token": "color.bg.selected",
+          "token": "color.bg.scrim",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Dialog",
               "how": "css"
-            },
+            }
+          ]
+        },
+        {
+          "token": "color.bg.selected",
+          "readBy": [
             {
               "unit": "Toolbar",
               "how": "css"
@@ -8523,7 +9496,7 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8536,7 +9509,7 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8549,6 +9522,10 @@
           "token": "color.border.default",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             },
@@ -8557,7 +9534,11 @@
               "how": "css"
             },
             {
-              "unit": "Popover",
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8570,33 +9551,11 @@
           "token": "color.border.strong",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
               "unit": "Kbd",
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8605,25 +9564,11 @@
           "token": "color.category.1.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.bg",
-          "readBy": [
+            },
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8632,25 +9577,11 @@
           "token": "color.category.2.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.bg",
-          "readBy": [
+            },
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8659,25 +9590,11 @@
           "token": "color.category.3.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.bg",
-          "readBy": [
+            },
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8686,25 +9603,11 @@
           "token": "color.category.4.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.bg",
-          "readBy": [
+            },
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8713,25 +9616,11 @@
           "token": "color.category.5.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
               "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.bg",
-          "readBy": [
+            },
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.border",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8740,7 +9629,11 @@
           "token": "color.category.6.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8776,15 +9669,27 @@
           "token": "color.fg.default",
           "readBy": [
             {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             },
             {
-              "unit": "Popover",
+              "unit": "Heading",
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8797,7 +9702,7 @@
           "token": "color.fg.disabled",
           "readBy": [
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -8816,14 +9721,40 @@
           ]
         },
         {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.muted",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
             {
               "unit": "Kbd",
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.on-action",
+          "readBy": [
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -8832,70 +9763,7 @@
           "token": "color.focus",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.ai.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.ai.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.search.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.search.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.yours.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.highlight.yours.bg-current",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.status.danger.bg",
-          "readBy": [
-            {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8904,7 +9772,7 @@
           "token": "color.status.danger.fg",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             },
             {
@@ -8914,10 +9782,23 @@
           ]
         },
         {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "ease.enter",
           "readBy": [
             {
-              "unit": "Popover",
+              "unit": "Dialog",
               "how": "css"
             },
             {
@@ -8939,7 +9820,7 @@
           "token": "focus.ring.offset",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8948,7 +9829,7 @@
           "token": "focus.ring.width",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8957,11 +9838,11 @@
           "token": "font.weight.strong",
           "readBy": [
             {
-              "unit": "Kbd",
+              "unit": "Clause",
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Kbd",
               "how": "css"
             }
           ]
@@ -8971,15 +9852,6 @@
           "readBy": [
             {
               "unit": "Icon",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "motion.base",
-          "readBy": [
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]
@@ -8997,6 +9869,10 @@
           "token": "motion.slow",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             }
@@ -9006,15 +9882,15 @@
           "token": "radius.control",
           "readBy": [
             {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             },
             {
               "unit": "Kbd",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
               "how": "css"
             },
             {
@@ -9028,10 +9904,19 @@
           ]
         },
         {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "radius.pill",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9040,11 +9925,20 @@
           "token": "radius.surface",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Dialog",
               "how": "css"
             },
             {
-              "unit": "Popover",
+              "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -9055,9 +9949,14 @@
             {
               "unit": "DocumentViewer",
               "how": "css"
-            },
+            }
+          ]
+        },
+        {
+          "token": "shadow.modal",
+          "readBy": [
             {
-              "unit": "SegmentedControl",
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -9070,10 +9969,6 @@
               "how": "css"
             },
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Tooltip",
               "how": "css"
             }
@@ -9083,7 +9978,7 @@
           "token": "size.control.md",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9092,11 +9987,7 @@
           "token": "size.control.sm",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
+              "unit": "Dialog",
               "how": "css"
             },
             {
@@ -9106,10 +9997,55 @@
           ]
         },
         {
+          "token": "size.dialog.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.md",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.dialog.sm",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.document.measure",
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9131,11 +10067,11 @@
           "token": "size.icon.sm",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Icon",
               "how": "css"
             },
             {
-              "unit": "Icon",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9144,20 +10080,7 @@
           "token": "size.overlay-max",
           "readBy": [
             {
-              "unit": "Popover",
-              "how": "css"
-            },
-            {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "size.sidebar.sm",
-          "readBy": [
-            {
-              "unit": "Popover",
               "how": "css"
             }
           ]
@@ -9166,7 +10089,7 @@
           "token": "size.target-min",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9175,15 +10098,11 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
               "unit": "Kbd",
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -9196,7 +10115,23 @@
           "token": "space.gap.md",
           "readBy": [
             {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9205,11 +10140,11 @@
           "token": "space.gap.sm",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Clause",
               "how": "css"
             },
             {
-              "unit": "Popover",
+              "unit": "Dialog",
               "how": "css"
             },
             {
@@ -9221,6 +10156,14 @@
         {
           "token": "space.gap.xs",
           "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -9235,7 +10178,7 @@
               "how": "css"
             },
             {
-              "unit": "SegmentedControl",
+              "unit": "Switch",
               "how": "css"
             },
             {
@@ -9245,10 +10188,31 @@
           ]
         },
         {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.inset.md",
           "readBy": [
             {
-              "unit": "Popover",
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -9256,14 +10220,6 @@
         {
           "token": "space.inset.sm",
           "readBy": [
-            {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
-              "how": "css"
-            },
             {
               "unit": "Toolbar",
               "how": "css"
@@ -9278,6 +10234,10 @@
           "token": "space.inset.xl",
           "readBy": [
             {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
               "unit": "DocumentViewer",
               "how": "css"
             }
@@ -9287,11 +10247,11 @@
           "token": "space.inset.xs",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Kbd",
               "how": "css"
             },
             {
-              "unit": "Kbd",
+              "unit": "Shortcuts",
               "how": "css"
             },
             {
@@ -9305,6 +10265,41 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
               "how": "css"
             }
           ]
@@ -9326,7 +10321,46 @@
               "how": "css"
             },
             {
+              "unit": "Shortcuts",
+              "how": "css"
+            },
+            {
+              "unit": "Switch",
+              "how": "css"
+            },
+            {
               "unit": "Tooltip",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
               "how": "css"
             }
           ]
@@ -9335,7 +10369,7 @@
           "token": "text.heading-4",
           "readBy": [
             {
-              "unit": "DocumentViewer",
+              "unit": "Heading",
               "how": "css"
             }
           ]
@@ -9344,11 +10378,7 @@
           "token": "text.label",
           "readBy": [
             {
-              "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "SegmentedControl",
+              "unit": "Shortcuts",
               "how": "css"
             },
             {
@@ -9363,9 +10393,14 @@
             {
               "unit": "DocumentViewer",
               "how": "css"
-            },
+            }
+          ]
+        },
+        {
+          "token": "z.modal",
+          "readBy": [
             {
-              "unit": "Popover",
+              "unit": "Dialog",
               "how": "css"
             }
           ]
@@ -9871,6 +10906,369 @@
         {
           "token": "text.heading-4",
           "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "Exhibit": {
+      "kind": "component",
+      "dir": "src/components/Exhibit",
+      "exports": [
+        "Exhibit"
+      ],
+      "stylesheets": [
+        "src/components/Exhibit/Exhibit.css"
+      ],
+      "composes": [
+        "Clause",
+        "Heading"
+      ],
+      "composesAll": [
+        "Change",
+        "Clause",
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.lg",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Exhibit",
+              "how": "css"
+            },
             {
               "unit": "Heading",
               "how": "css"
@@ -11617,6 +13015,15 @@
           ]
         },
         {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Frame",
+              "how": "prop"
+            }
+          ]
+        },
+        {
           "token": "ratio.square",
           "readBy": [
             {
@@ -11801,6 +13208,65 @@
           "readBy": [
             {
               "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "Highlight": {
+      "kind": "component",
+      "dir": "src/components/Highlight",
+      "exports": [
+        "Highlight"
+      ],
+      "stylesheets": [
+        "src/components/Highlight/Highlight.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "color.highlight.ai.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.highlight.search.bg",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Highlight",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.mark.overhang",
+          "readBy": [
+            {
+              "unit": "Highlight",
               "how": "css"
             }
           ]
@@ -19853,6 +21319,119 @@
         }
       ]
     },
+    "SignaturePage": {
+      "kind": "component",
+      "dir": "src/components/SignaturePage",
+      "exports": [
+        "SignaturePage",
+        "SignatureParty"
+      ],
+      "stylesheets": [
+        "src/components/SignaturePage/SignaturePage.css"
+      ],
+      "composes": [
+        "Text"
+      ],
+      "composesAll": [
+        "Text"
+      ],
+      "tokens": [
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            },
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.grid-item.md",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Skeleton": {
       "kind": "component",
       "dir": "src/components/Skeleton",
@@ -25320,6 +26899,18 @@
     }
   },
   "tokens": {
+    "border.width.change-bar": {
+      "cssVar": "--border-width-change-bar",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The bar in the left margin beside a changed line in a redline (Change), as Word draws it.",
+      "value": "2px",
+      "chain": [
+        "border.width.change-bar",
+        "border-width.2"
+      ],
+      "modes": {}
+    },
     "border.width.default": {
       "cssVar": "--border-width-default",
       "tier": "semantic",
@@ -26492,38 +28083,38 @@
       "cssVar": "--color-highlight-ai-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#ede9fe",
-      "chain": [
-        "color.highlight.ai.bg",
-        "color.violet.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#2e1065",
-          "chain": [
-            "color.highlight.ai.bg",
-            "color.violet.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.ai.bg-current": {
-      "cssVar": "--color-highlight-ai-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A passage an AI answer cites.",
       "value": "#c4b5fd",
       "chain": [
-        "color.highlight.ai.bg-current",
+        "color.highlight.ai.bg",
         "color.violet.300"
       ],
       "modes": {
         "dark": {
           "value": "#5b21b6",
           "chain": [
-            "color.highlight.ai.bg-current",
+            "color.highlight.ai.bg",
             "color.violet.800"
+          ]
+        }
+      }
+    },
+    "color.highlight.bg": {
+      "cssVar": "--color-highlight-bg",
+      "tier": "semantic",
+      "type": "color",
+      "description": "The default tone: the reader’s own highlights (the annotation convention).",
+      "value": "#fde047",
+      "chain": [
+        "color.highlight.bg",
+        "color.yellow.300"
+      ],
+      "modes": {
+        "dark": {
+          "value": "#854d0e",
+          "chain": [
+            "color.highlight.bg",
+            "color.yellow.800"
           ]
         }
       }
@@ -26532,78 +28123,18 @@
       "cssVar": "--color-highlight-search-bg",
       "tier": "semantic",
       "type": "color",
-      "description": "Resting.",
-      "value": "#dbeafe",
-      "chain": [
-        "color.highlight.search.bg",
-        "color.blue.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#172554",
-          "chain": [
-            "color.highlight.search.bg",
-            "color.blue.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.search.bg-current": {
-      "cssVar": "--color-highlight-search-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
+      "description": "A Find match.",
       "value": "#93c5fd",
       "chain": [
-        "color.highlight.search.bg-current",
+        "color.highlight.search.bg",
         "color.blue.300"
       ],
       "modes": {
         "dark": {
           "value": "#1e40af",
           "chain": [
-            "color.highlight.search.bg-current",
+            "color.highlight.search.bg",
             "color.blue.800"
-          ]
-        }
-      }
-    },
-    "color.highlight.yours.bg": {
-      "cssVar": "--color-highlight-yours-bg",
-      "tier": "semantic",
-      "type": "color",
-      "description": "Resting.",
-      "value": "#fef9c3",
-      "chain": [
-        "color.highlight.yours.bg",
-        "color.yellow.100"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#422006",
-          "chain": [
-            "color.highlight.yours.bg",
-            "color.yellow.950"
-          ]
-        }
-      }
-    },
-    "color.highlight.yours.bg-current": {
-      "cssVar": "--color-highlight-yours-bg-current",
-      "tier": "semantic",
-      "type": "color",
-      "description": "The current target (aria-current).",
-      "value": "#fde047",
-      "chain": [
-        "color.highlight.yours.bg-current",
-        "color.yellow.300"
-      ],
-      "modes": {
-        "dark": {
-          "value": "#854d0e",
-          "chain": [
-            "color.highlight.yours.bg-current",
-            "color.yellow.800"
           ]
         }
       }
@@ -27156,6 +28687,18 @@
       ],
       "modes": {}
     },
+    "ratio.page": {
+      "cssVar": "--ratio-page",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.",
+      "value": "0.7727",
+      "chain": [
+        "ratio.page",
+        "aspect.letter"
+      ],
+      "modes": {}
+    },
     "ratio.square": {
       "cssVar": "--ratio-square",
       "tier": "semantic",
@@ -27417,6 +28960,18 @@
       ],
       "modes": {}
     },
+    "size.document.clause-indent": {
+      "cssVar": "--size-document-clause-indent",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "The gutter a clause number hangs in (Clause); each nested clause indents one more.",
+      "value": "48px",
+      "chain": [
+        "size.document.clause-indent",
+        "size.12"
+      ],
+      "modes": {}
+    },
     "size.document.measure": {
       "cssVar": "--size-document-measure",
       "tier": "semantic",
@@ -27426,6 +28981,18 @@
       "chain": [
         "size.document.measure",
         "container.2xl"
+      ],
+      "modes": {}
+    },
+    "size.document.note": {
+      "cssVar": "--size-document-note",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Inline size of a clause note in the margin beside the paper (ClauseNote).",
+      "value": "12rem",
+      "chain": [
+        "size.document.note",
+        "container.3xs"
       ],
       "modes": {}
     },
