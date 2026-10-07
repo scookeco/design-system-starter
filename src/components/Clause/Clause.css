@@ -68,7 +68,9 @@
     --clause-change-color: var(--color-status-success-fg);
   }
 
-  .clause[data-change] .clause__number {
+  /* Headings and paragraphs set their own colour, so the author's colour is applied to them too. */
+  .clause[data-change] .clause__number,
+  .clause[data-change] :is(p, h2, h3, h4) {
     color: var(--clause-change-color);
   }
 
