@@ -1,6 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
+import { DocumentScopeContext, useDocumentIndex } from '../Clause/documentIndex';
+import type { HeadingLevel } from '../Heading/Heading';
 import { CopyIcon, EditIcon } from '../Icon/icons';
 import { useShortcut } from '../Shortcuts/Shortcuts';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
@@ -29,6 +31,8 @@ export interface DocumentViewerProps extends EscapeHatch {
    * default tone). Without it, selecting text is plain native selection with no menu.
    */
   onHighlight?: (selection: DocumentSelection) => void;
+  /** The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1). */
+  headingLevel?: Exclude<HeadingLevel, 1>;
 }
 
 /** The keys that highlight the selection: shown in the menu, registered only while there is one. */
@@ -55,6 +59,7 @@ export function DocumentViewer({
   label,
   children,
   onHighlight,
+  headingLevel = 2,
   UNSAFE_className,
   UNSAFE_style,
 }: DocumentViewerProps) {
@@ -62,6 +67,9 @@ export function DocumentViewer({
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [hasSelection, setHasSelection] = useState(false);
   const paper = useRef<HTMLElement>(null);
+  const scope = useId();
+  const index = useDocumentIndex(paper);
+  const documentScope = useMemo(() => ({ scope, headingLevel, index }), [scope, headingLevel, index]);
 
   const announce = useCallback((text: string) => setMessage(text), []);
   const context = useMemo(() => ({ announce }), [announce]);
@@ -116,7 +124,7 @@ export function DocumentViewer({
         {onHighlight && hasSelection ? <HighlightShortcut onPress={() => highlight(readSelection())} /> : null}
         <div className="document-viewer__canvas">
           <article ref={paper} className="document-viewer__paper" aria-label={label} onMouseUp={selectionEnded} onKeyUp={(event) => event.shiftKey && selectionEnded()}>
-            {children}
+            <DocumentScopeContext value={documentScope}>{children}</DocumentScopeContext>
           </article>
         </div>
         <span className="visually-hidden" aria-live="polite">

@@ -233,6 +233,10 @@
       "measure": {
         "$value": "{container.2xl}",
         "$description": "Max inline size of the paper: one continuous surface, centred, no page breaks."
+      },
+      "clause-indent": {
+        "$value": "{size.12}",
+        "$description": "The gutter a clause number hangs in (Clause); each nested clause indents one more."
       }
     }
   },
