@@ -3893,15 +3893,6 @@
           ]
         },
         {
-          "token": "size.document.clause-indent",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "space.inset.md",
           "readBy": [
             {
@@ -4919,6 +4910,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -4927,6 +4922,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -4937,6 +4936,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -4945,6 +4948,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -4955,6 +4962,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -4963,6 +4974,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -4973,6 +4988,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -4981,6 +5000,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             },
             {
@@ -5021,6 +5044,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -5065,10 +5092,6 @@
           "token": "size.document.clause-indent",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
               "unit": "Clause",
               "how": "css"
             }
@@ -5106,6 +5129,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -8995,6 +9022,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9003,6 +9034,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9013,6 +9048,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9021,6 +9060,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9031,6 +9074,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9039,6 +9086,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9049,6 +9100,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9057,6 +9112,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             },
             {
@@ -9111,6 +9170,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9153,10 +9216,6 @@
         {
           "token": "size.document.clause-indent",
           "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
             {
               "unit": "Clause",
               "how": "css"
@@ -9212,6 +9271,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9342,6 +9405,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9499,6 +9566,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9507,6 +9578,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9517,6 +9592,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9525,6 +9604,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9535,6 +9618,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -9543,6 +9630,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9579,6 +9670,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             },
             {
@@ -9691,6 +9786,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9928,10 +10027,6 @@
           "token": "size.document.clause-indent",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
               "unit": "Clause",
               "how": "css"
             }
@@ -10109,7 +10204,15 @@
               "how": "css"
             },
             {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
               "unit": "Dialog",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentViewer",
               "how": "css"
             }
           ]
@@ -10836,6 +10939,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -10854,6 +10961,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -10862,6 +10973,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -10872,6 +10987,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -10880,6 +10999,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -10890,6 +11013,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -10899,6 +11026,10 @@
             {
               "unit": "Change",
               "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
             }
           ]
         },
@@ -10907,6 +11038,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             },
             {
@@ -10951,6 +11086,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -11003,10 +11142,6 @@
           "token": "size.document.clause-indent",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
               "unit": "Clause",
               "how": "css"
             }
@@ -11057,6 +11192,10 @@
           "readBy": [
             {
               "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
               "how": "css"
             }
           ]

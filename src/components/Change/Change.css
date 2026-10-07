@@ -1,76 +1,56 @@
 @layer components {
   /* The author's colour (color.category.*); a move is always green, as in Word. */
-  .change,
-  .clause[data-change] {
+  .change {
     --change-color: var(--color-category-1-fg);
-  }
 
-  .change[data-color="2"],
-  .clause[data-change][data-change-color="2"] {
-    --change-color: var(--color-category-2-fg);
-  }
-
-  .change[data-color="3"],
-  .clause[data-change][data-change-color="3"] {
-    --change-color: var(--color-category-3-fg);
-  }
-
-  .change[data-color="4"],
-  .clause[data-change][data-change-color="4"] {
-    --change-color: var(--color-category-4-fg);
-  }
-
-  .change[data-color="5"],
-  .clause[data-change][data-change-color="5"] {
-    --change-color: var(--color-category-5-fg);
-  }
-
-  .change[data-color="6"],
-  .clause[data-change][data-change-color="6"] {
-    --change-color: var(--color-category-6-fg);
-  }
-
-  .change[data-kind^="move"],
-  .clause[data-change^="move"] {
-    --change-color: var(--color-status-success-fg);
-  }
-
-  .change,
-  .clause[data-change],
-  .clause[data-change] .clause__number {
     color: var(--change-color);
     text-decoration-color: var(--change-color);
   }
 
-  .change[data-kind="insert"],
-  .clause[data-change="insert"],
-  .clause[data-change="insert"] .clause__number {
+  .change[data-color="2"] {
+    --change-color: var(--color-category-2-fg);
+  }
+
+  .change[data-color="3"] {
+    --change-color: var(--color-category-3-fg);
+  }
+
+  .change[data-color="4"] {
+    --change-color: var(--color-category-4-fg);
+  }
+
+  .change[data-color="5"] {
+    --change-color: var(--color-category-5-fg);
+  }
+
+  .change[data-color="6"] {
+    --change-color: var(--color-category-6-fg);
+  }
+
+  .change[data-kind^="move"] {
+    --change-color: var(--color-status-success-fg);
+  }
+
+  .change[data-kind="insert"] {
     text-decoration-line: underline;
   }
 
-  .change[data-kind="delete"],
-  .clause[data-change="delete"],
-  .clause[data-change="delete"] .clause__number {
+  .change[data-kind="delete"] {
     text-decoration-line: line-through;
   }
 
-  .change[data-kind="move-to"],
-  .clause[data-change="move-to"],
-  .clause[data-change="move-to"] .clause__number {
+  .change[data-kind="move-to"] {
     text-decoration-line: underline;
     text-decoration-style: double;
   }
 
-  .change[data-kind="move-from"],
-  .clause[data-change="move-from"],
-  .clause[data-change="move-from"] .clause__number {
+  .change[data-kind="move-from"] {
     text-decoration-line: line-through;
     text-decoration-style: double;
   }
 
   /* What changed and who changed it, for assistive technology only: never copied with the text. */
-  .change::before,
-  .clause[data-change]::before {
+  .change::before {
     position: absolute;
     overflow: hidden;
     inline-size: 1px;
@@ -80,38 +60,13 @@
     content: attr(data-label) ": ";
   }
 
-  .clause[data-change]::before {
-    content: attr(data-change-label) ": ";
-  }
-
   /*
-   * The changed-line bar sits in the paper's margin, the same distance from the paper's edge at
-   * every depth: each paragraph reaches back past the clause gutters it is indented by.
+   * The changed-line bar sits in the paper's margin (DocumentViewer sets the reach, Clause adds
+   * its gutters), so every paragraph holding a change reaches back to the same line.
    */
-  .document-viewer__paper {
-    --change-reach: var(--space-inset-md);
-  }
-
-  .clause[data-depth="1"] {
-    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent));
-  }
-
-  .clause[data-depth="2"] {
-    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
-  }
-
-  .clause[data-depth="3"] {
-    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
-  }
-
-  .clause[data-depth="4"] {
-    --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
-  }
-
-  .document-viewer__paper :is(p, h1, h2, h3, h4):has(.change),
-  .clause[data-change] > :is(p, h2, h3, h4) {
-    --change-pull: calc(var(--change-reach) * -1);
-    --change-inset: calc(var(--change-reach) - var(--border-width-change-bar));
+  :is(p, h1, h2, h3, h4):has(.change) {
+    --change-pull: calc(var(--change-reach, var(--space-inset-md)) * -1);
+    --change-inset: calc(var(--change-reach, var(--space-inset-md)) - var(--border-width-change-bar));
 
     margin-inline-start: var(--change-pull);
     padding-inline-start: var(--change-inset);

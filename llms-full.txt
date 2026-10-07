@@ -112,12 +112,12 @@ UI rules (design system v0)
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
-- [Change](src/components/Change/Change.tsx): A tracked change in a document compare view
+- [Change](docs/usage/Change.usage.tsx): A tracked change in a document compare view
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
 - [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
-- [ClauseNote](src/components/ClauseNote/ClauseNote.tsx): A note about a clause for whoever drafts or reviews the…
+- [ClauseNote](docs/usage/ClauseNote.usage.tsx): A note about a clause for whoever drafts or reviews the…
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
@@ -128,11 +128,11 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
-- [DocumentTitle](src/components/DocumentTitle/DocumentTitle.tsx): The top of an agreement in a DocumentViewer
+- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a DocumentViewer
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
-- [Exhibit](src/components/Exhibit/Exhibit.tsx): An exhibit attached to an agreement in the same…
+- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same…
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
@@ -159,7 +159,7 @@ UI rules (design system v0)
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
 - [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
-- [SignaturePage](src/components/SignaturePage/SignaturePage.tsx): The execution page that ends an agreement
+- [SignaturePage](docs/usage/SignaturePage.usage.tsx): The execution page that ends an agreement
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
@@ -736,7 +736,7 @@ Tokens read: `color.action.primary`, `color.bg.selected`, `color.bg.subtle`, `co
 
 ### Change
 
-component · `src/components/Change/Change.tsx`
+component · `src/components/Change/Change.tsx` · usage: `docs/usage/Change.usage.tsx`
 
 A tracked change in a document compare view (a redline), marked as Microsoft Word marks it: insertions underlined and deletions struck through in the author's colour, moves in green with double lines, and a bar in the left margin beside every paragraph that holds a change. Renders <ins> or <del>; what the change is and who made it is announced from CSS, so it never ends up in copied text.
 
@@ -750,8 +750,51 @@ Closed styling API: no `className`/`style`.
 
 Variants: kind (insert | delete | move-from | move-to); color (1 | 2 | 3 | 4 | 5 | 6).
 
-Stories: none.
-Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.status.success.fg`, `size.document.clause-indent`, `space.inset.md`.
+**When to use**
+
+- A redline: an agreement compared with an amendment or another version, marked as Microsoft Word marks tracked changes. Insertions underlined and deletions struck through in the author’s `color` (one per reviewer, the same as their signature block), moves green with double lines (`move-from`, `move-to`).
+- A bar in the left margin marks every paragraph that holds a change. A whole clause inserted, deleted or moved takes a `change` on its `Clause`, and keeps its number.
+
+**When not to use**
+
+- Changes an AI proposes before anyone accepts them → `ReviewChanges`
+- Marking a passage for attention → `Highlight`
+
+**Do:** Each change with its author, in that author’s colour.
+
+```tsx
+<DocumentViewer label="Compared">
+  <Text>
+    Liability will not exceed{' '}
+    <Change kind="insert" author="Maya Okafor" color={3}>
+      two times (2×)
+    </Change>{' '}
+    the fees of the prior twelve (12) months.
+  </Text>
+</DocumentViewer>
+```
+
+**Don't:** A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.
+
+```tsx
+<DocumentViewer label="Compared">
+  <Clause id="cap" title="Limitation of Liability">
+    <Text>
+      <Change kind="insert" author="Maya Okafor" color={3}>
+        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.
+      </Change>
+    </Text>
+  </Clause>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A change is an `<ins>` or `<del>`; what it is and who made it (“Deleted by Jon Park”) is announced from CSS, so it never ends up in copied text.
+- Never colour alone: the underline, the strike, the double lines and the margin bar carry each change; the colour only says whose it is. Each author colour passes contrast on the paper in light and dark.
+
+Stories: `components-change--kinds`, `components-change--compared`.
+Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.status.success.fg`, `space.inset.md`.
 
 ### ChatThread
 
@@ -1026,7 +1069,7 @@ Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2
 
 ### ClauseNote
 
-component · `src/components/ClauseNote/ClauseNote.tsx`
+component · `src/components/ClauseNote/ClauseNote.tsx` · usage: `docs/usage/ClauseNote.usage.tsx`
 
 A note about a clause for whoever drafts or reviews the agreement, never part of the signed text: its negotiation position (Balanced, Seller-favored, Buyer-favored) or the contract type it comes from in the clause library. Pass it to a Clause's `note`: it sits in the margin beside the paper when the viewer is wide enough, and under the clause heading when it is not. The words carry the meaning; a source's bar is in its contract type's colour.
 
@@ -1040,7 +1083,42 @@ Closed styling API: no `className`/`style`.
 
 Variants: position (balanced | seller-favored | buyer-favored); color (1 | 2 | 3 | 4 | 5 | 6).
 
-Stories: none.
+**When to use**
+
+- A note on a clause for whoever drafts or reviews the agreement: its negotiation position (`balanced`, `seller-favored`, `buyer-favored`) with one line of why, or the contract type it comes from in the clause library (`source`, in that type’s `color`).
+- Pass it to a `Clause`’s `note`: it sits in the margin beside the paper when the viewer is at least size.breakpoint.lg wide, and under the clause heading when it is narrower. It is never printed.
+
+**When not to use**
+
+- A comment someone left on the text → the app’s comment thread (`ChatThread`, `Message`)
+- Text the parties sign → the clause itself
+
+**Do:** A position named in words, with the reason in one line.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Clause id="cap" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>}>
+    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>
+  </Clause>
+</DocumentViewer>
+```
+
+**Don't:** A drafting remark typed into the clause: it would be signed with the agreement.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Clause id="cap" title="Limitation of Liability">
+    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>
+  </Clause>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A note has role="note" and reads as “Position Balanced …” right after the clause heading, wherever it is drawn.
+- Colour is never the only cue: the words name the position and the source; a source’s bar repeats its contract type’s colour.
+
+Stories: `components-clausenote--kinds`, `components-clausenote--on-clauses`.
 Tokens read: `border.width.change-bar`, `color.border.default`, `color.category.1.border`, `color.category.2.border`, `color.category.3.border`, `color.category.4.border`, `color.category.5.border`, `color.category.6.border`, `color.fg.default`, `color.fg.muted`, `space.gap.2xs`, `space.inset.sm`, `text.caption`, `text.label`.
 
 ### CodeBlock
@@ -1671,7 +1749,7 @@ Tokens read: `color.border.default`.
 
 ### DocumentTitle
 
-component · `src/components/DocumentTitle/DocumentTitle.tsx`
+component · `src/components/DocumentTitle/DocumentTitle.tsx` · usage: `docs/usage/DocumentTitle.usage.tsx`
 
 The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.
 
@@ -1701,7 +1779,44 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
-Stories: none.
+**When to use**
+
+- The top of a generated agreement: `DocumentTitle` for its title and number (centred) and the preamble that names the parties, with each defined term in a `Term define`.
+- `Recitals` for the background before the operative clauses: each `Recital` is written without its “WHEREAS,” (it is added), and `closing` follows “NOW, THEREFORE,”.
+
+**When not to use**
+
+- The page’s own title in an app (the record, the list) → `PageHeader`
+- A heading inside the agreement → `Clause` with a `title`
+
+**Do:** Title, number and preamble, then the recitals: the same structure for every agreement the app generates.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
+    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
+  </DocumentTitle>
+  <Recitals>
+    <Recital>Provider operates a facilities management platform;</Recital>
+  </Recitals>
+</DocumentViewer>
+```
+
+**Don't:** A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Text>MASTER SERVICES AGREEMENT</Text>
+  <Text>Whereas Provider operates a platform…</Text>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.
+- The title block is a `header`; recitals are plain paragraphs in reading order.
+
+Stories: `components-documenttitle--default`, `components-documenttitle--amendment`.
 Composes: Change, Clause, Heading, Text.
 Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
@@ -1898,7 +2013,7 @@ Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `col
 
 ### Exhibit
 
-component · `src/components/Exhibit/Exhibit.tsx`
+component · `src/components/Exhibit/Exhibit.tsx` · usage: `docs/usage/Exhibit.usage.tsx`
 
 An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
 
@@ -1909,7 +2024,48 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
-Stories: none.
+**When to use**
+
+- A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.
+- Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to="dpa" />` names the exhibit itself.
+
+**When not to use**
+
+- A separate agreement that refers to this one (an Order Form, an Amendment) → its own DocumentViewer, naming this agreement in plain text
+- A section of the agreement itself → `Clause`
+
+**Do:** An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Clause id="privacy" title="Data Privacy">
+    <Text>
+      Personal data is processed under <ClauseRef to="dpa" />.
+    </Text>
+  </Clause>
+  <Exhibit id="dpa" title="Data Processing Agreement">
+    <Clause id="roles" title="Roles">
+      <Text>Customer is the controller and Provider the processor.</Text>
+    </Clause>
+  </Exhibit>
+</DocumentViewer>
+```
+
+**Don't:** A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.
+
+```tsx
+<DocumentViewer label="Agreement">
+  <Text>EXHIBIT A — Data Processing Agreement</Text>
+  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.
+- A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content.
+
+Stories: `components-exhibit--default`.
 Composes: Change, Clause, Heading.
 Tokens read: `border.width.change-bar`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.inset.lg`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
@@ -3476,7 +3632,7 @@ Tokens read: `border.width.field`, `color.category.1.bg`, `color.category.1.bord
 
 ### SignaturePage
 
-component · `src/components/SignaturePage/SignaturePage.tsx`
+component · `src/components/SignaturePage/SignaturePage.tsx` · usage: `docs/usage/SignaturePage.usage.tsx`
 
 The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.
 
@@ -3496,7 +3652,45 @@ Props:
 
 Closed styling API: no `className`/`style`.
 
-Stories: none.
+**When to use**
+
+- The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.
+- One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width.
+
+**When not to use**
+
+- One signer’s fields in the middle of a document (initials, a date) → a `SignatureBlock` on its own
+- A list of who has signed so far → `Timeline`
+
+**Do:** One party per SignatureParty, each signer in their own recipient colour.
+
+```tsx
+<SignaturePage>
+  <SignatureParty name="Acme Corp">
+    <SignatureBlock name="Maya Okafor" recipient={3} />
+  </SignatureParty>
+  <SignatureParty name="Globex Inc.">
+    <SignatureBlock name="Jon Park" recipient={1} />
+  </SignatureParty>
+</SignaturePage>
+```
+
+**Don't:** Signers stacked under one typed heading: who signs for which party is lost.
+
+```tsx
+<>
+  <Text>Signatures:</Text>
+  <SignatureBlock name="Maya Okafor" recipient={1} />
+  <SignatureBlock name="Jon Park" recipient={1} />
+</>
+```
+
+**Accessibility**
+
+- The page is a `section` named “Signatures”; each party’s name comes before its block in reading order.
+- The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names.
+
+Stories: `components-signaturepage--two-parties`, `components-signaturepage--one-party`, `components-signaturepage--three-parties`.
 Composes: Text.
 Tokens read: `color.fg.default`, `color.fg.muted`, `size.grid-item.md`, `space.gap.lg`, `space.gap.sm`, `space.gap.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 

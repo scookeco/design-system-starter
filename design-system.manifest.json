@@ -3450,6 +3450,7 @@
       "source": "src/components/Change/Change.tsx",
       "status": null,
       "description": "A tracked change in a document compare view (a redline), marked as Microsoft Word marks it: insertions underlined and deletions struck through in the author's colour, moves in green with double lines, and a bar in the left margin beside every paragraph that holds a change. Renders <ins> or <del>; what the change is and who made it is announced from CSS, so it never ends up in copied text.",
+      "docs": "docs/usage/Change.usage.tsx",
       "props": [
         {
           "name": "kind",
@@ -3518,9 +3519,46 @@
         ]
       },
       "states": [],
+      "usage": {
+        "whenToUse": [
+          "A redline: an agreement compared with an amendment or another version, marked as Microsoft Word marks tracked changes. Insertions underlined and deletions struck through in the author’s `color` (one per reviewer, the same as their signature block), moves green with double lines (`move-from`, `move-to`).",
+          "A bar in the left margin marks every paragraph that holds a change. A whole clause inserted, deleted or moved takes a `change` on its `Clause`, and keeps its number."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Changes an AI proposes before anyone accepts them",
+            "instead": "`ReviewChanges`"
+          },
+          {
+            "situation": "Marking a passage for attention",
+            "instead": "`Highlight`"
+          }
+        ],
+        "do": {
+          "caption": "Each change with its author, in that author’s colour.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Text>\n    Liability will not exceed{' '}\n    <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n      two times (2×)\n    </Change>{' '}\n    the fees of the prior twelve (12) months.\n  </Text>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.",
+          "code": "<DocumentViewer label=\"Compared\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>\n      <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.\n      </Change>\n    </Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A change is an `<ins>` or `<del>`; what it is and who made it (“Deleted by Jon Park”) is announced from CSS, so it never ends up in copied text.",
+          "Never colour alone: the underline, the strike, the double lines and the margin bar carry each change; the colour only says whose it is. Each author colour passes contrast on the paper in light and dark."
+        ]
+      },
       "unit": {
         "dir": "src/components/Change",
-        "stories": [],
+        "stories": [
+          {
+            "id": "components-change--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-change--compared",
+            "name": "Compared"
+          }
+        ],
         "composes": [],
         "tokens": [
           "border.width.change-bar",
@@ -3532,7 +3570,6 @@
           "color.category.6.fg",
           "color.fg.default",
           "color.status.success.fg",
-          "size.document.clause-indent",
           "space.inset.md"
         ]
       }
@@ -4401,6 +4438,7 @@
       "source": "src/components/ClauseNote/ClauseNote.tsx",
       "status": null,
       "description": "A note about a clause for whoever drafts or reviews the agreement, never part of the signed text: its negotiation position (Balanced, Seller-favored, Buyer-favored) or the contract type it comes from in the clause library. Pass it to a Clause's `note`: it sits in the margin beside the paper when the viewer is wide enough, and under the clause heading when it is not. The words carry the meaning; a source's bar is in its contract type's colour.",
+      "docs": "docs/usage/ClauseNote.usage.tsx",
       "props": [
         {
           "name": "position",
@@ -4467,9 +4505,46 @@
         ]
       },
       "states": [],
+      "usage": {
+        "whenToUse": [
+          "A note on a clause for whoever drafts or reviews the agreement: its negotiation position (`balanced`, `seller-favored`, `buyer-favored`) with one line of why, or the contract type it comes from in the clause library (`source`, in that type’s `color`).",
+          "Pass it to a `Clause`’s `note`: it sits in the margin beside the paper when the viewer is at least size.breakpoint.lg wide, and under the clause heading when it is narrower. It is never printed."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A comment someone left on the text",
+            "instead": "the app’s comment thread (`ChatThread`, `Message`)"
+          },
+          {
+            "situation": "Text the parties sign",
+            "instead": "the clause itself"
+          }
+        ],
+        "do": {
+          "caption": "A position named in words, with the reason in one line.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\" note={<ClauseNote position=\"balanced\">Cap at the fees of the prior 12 months</ClauseNote>}>\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A drafting remark typed into the clause: it would be signed with the agreement.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A note has role=\"note\" and reads as “Position Balanced …” right after the clause heading, wherever it is drawn.",
+          "Colour is never the only cue: the words name the position and the source; a source’s bar repeats its contract type’s colour."
+        ]
+      },
       "unit": {
         "dir": "src/components/ClauseNote",
-        "stories": [],
+        "stories": [
+          {
+            "id": "components-clausenote--kinds",
+            "name": "Kinds"
+          },
+          {
+            "id": "components-clausenote--on-clauses",
+            "name": "On Clauses"
+          }
+        ],
         "composes": [],
         "tokens": [
           "border.width.change-bar",
@@ -7327,6 +7402,7 @@
       "source": "src/components/DocumentTitle/DocumentTitle.tsx",
       "status": null,
       "description": "The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
         {
           "name": "title",
@@ -7359,9 +7435,46 @@
       },
       "variants": {},
       "states": [],
+      "usage": {
+        "whenToUse": [
+          "The top of a generated agreement: `DocumentTitle` for its title and number (centred) and the preamble that names the parties, with each defined term in a `Term define`.",
+          "`Recitals` for the background before the operative clauses: each `Recital` is written without its “WHEREAS,” (it is added), and `closing` follows “NOW, THEREFORE,”."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The page’s own title in an app (the record, the list)",
+            "instead": "`PageHeader`"
+          },
+          {
+            "situation": "A heading inside the agreement",
+            "instead": "`Clause` with a `title`"
+          }
+        ],
+        "do": {
+          "caption": "Title, number and preamble, then the recitals: the same structure for every agreement the app generates.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n  </DocumentTitle>\n  <Recitals>\n    <Recital>Provider operates a facilities management platform;</Recital>\n  </Recitals>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>MASTER SERVICES AGREEMENT</Text>\n  <Text>Whereas Provider operates a platform…</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.",
+          "The title block is a `header`; recitals are plain paragraphs in reading order."
+        ]
+      },
       "unit": {
         "dir": "src/components/DocumentTitle",
-        "stories": [],
+        "stories": [
+          {
+            "id": "components-documenttitle--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documenttitle--amendment",
+            "name": "Amendment"
+          }
+        ],
         "composes": [
           "Change",
           "Clause",
@@ -8068,6 +8181,7 @@
       "source": "src/components/Exhibit/Exhibit.tsx",
       "status": null,
       "description": "An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
+      "docs": "docs/usage/Exhibit.usage.tsx",
       "props": [
         {
           "name": "id",
@@ -8100,9 +8214,42 @@
       },
       "variants": {},
       "states": [],
+      "usage": {
+        "whenToUse": [
+          "A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.",
+          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A separate agreement that refers to this one (an Order Form, an Amendment)",
+            "instead": "its own DocumentViewer, naming this agreement in plain text"
+          },
+          {
+            "situation": "A section of the agreement itself",
+            "instead": "`Clause`"
+          }
+        ],
+        "do": {
+          "caption": "An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"privacy\" title=\"Data Privacy\">\n    <Text>\n      Personal data is processed under <ClauseRef to=\"dpa\" />.\n    </Text>\n  </Clause>\n  <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n    <Clause id=\"roles\" title=\"Roles\">\n      <Text>Customer is the controller and Provider the processor.</Text>\n    </Clause>\n  </Exhibit>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.",
+          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>EXHIBIT A — Data Processing Agreement</Text>\n  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.",
+          "A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content."
+        ]
+      },
       "unit": {
         "dir": "src/components/Exhibit",
-        "stories": [],
+        "stories": [
+          {
+            "id": "components-exhibit--default",
+            "name": "Default"
+          }
+        ],
         "composes": [
           "Change",
           "Clause",
@@ -13116,6 +13263,7 @@
       "status": null,
       "description": "One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.",
       "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
         {
           "name": "children",
@@ -13142,6 +13290,7 @@
       "status": null,
       "description": "The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.",
       "partOf": "DocumentTitle",
+      "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
         {
           "name": "children",
@@ -15037,6 +15186,7 @@
       "source": "src/components/SignaturePage/SignaturePage.tsx",
       "status": null,
       "description": "The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
       "props": [
         {
           "name": "witness",
@@ -15062,9 +15212,50 @@
       },
       "variants": {},
       "states": [],
+      "usage": {
+        "whenToUse": [
+          "The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.",
+          "One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One signer’s fields in the middle of a document (initials, a date)",
+            "instead": "a `SignatureBlock` on its own"
+          },
+          {
+            "situation": "A list of who has signed so far",
+            "instead": "`Timeline`"
+          }
+        ],
+        "do": {
+          "caption": "One party per SignatureParty, each signer in their own recipient colour.",
+          "code": "<SignaturePage>\n  <SignatureParty name=\"Acme Corp\">\n    <SignatureBlock name=\"Maya Okafor\" recipient={3} />\n  </SignatureParty>\n  <SignatureParty name=\"Globex Inc.\">\n    <SignatureBlock name=\"Jon Park\" recipient={1} />\n  </SignatureParty>\n</SignaturePage>"
+        },
+        "dont": {
+          "caption": "Signers stacked under one typed heading: who signs for which party is lost.",
+          "code": "<>\n  <Text>Signatures:</Text>\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</>"
+        },
+        "accessibility": [
+          "The page is a `section` named “Signatures”; each party’s name comes before its block in reading order.",
+          "The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names."
+        ]
+      },
       "unit": {
         "dir": "src/components/SignaturePage",
-        "stories": [],
+        "stories": [
+          {
+            "id": "components-signaturepage--two-parties",
+            "name": "Two Parties"
+          },
+          {
+            "id": "components-signaturepage--one-party",
+            "name": "One Party"
+          },
+          {
+            "id": "components-signaturepage--three-parties",
+            "name": "Three Parties"
+          }
+        ],
         "composes": [
           "Text"
         ],
@@ -15098,6 +15289,7 @@
       "status": null,
       "description": "One party on a SignaturePage: its name over its SignatureBlock.",
       "partOf": "SignaturePage",
+      "docs": "docs/usage/SignaturePage.usage.tsx",
       "props": [
         {
           "name": "name",
