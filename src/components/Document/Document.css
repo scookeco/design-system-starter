@@ -22,6 +22,7 @@
   /* A page in a grid document is the fixed page itself, on screen too: where things sit is the form. */
   .document-page[data-shell="grid"] {
     overflow: hidden;
+    align-self: center;
     inline-size: var(--size-page-letter-inline);
     max-inline-size: 100%; /* narrower than a page, it shrinks and keeps the page's proportions */
     aspect-ratio: var(--ratio-page);
