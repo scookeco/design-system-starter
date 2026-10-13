@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Clause, ClauseRef } from '../Clause/Clause';
+import { Clause } from '../Clause/Clause';
+import { Xref } from '../Xref/Xref';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { Heading } from '../Heading/Heading';
 import { Text } from '../Text/Text';
@@ -21,7 +22,7 @@ function Clauses() {
     <DocumentFlow>
       <Clause id="term" title="Term">
         <Text size="body-lg">
-          This Agreement begins on the Effective Date and continues for twenty-four (24) months, subject to <ClauseRef to="termination" />.
+          This Agreement begins on the Effective Date and continues for twenty-four (24) months, subject to <Xref to="termination" />.
         </Text>
       </Clause>
       <Clause id="termination" title="Termination">

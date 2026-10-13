@@ -1,12 +1,12 @@
-import { Clause, ClauseRef, Document, DocumentViewer, Term, Text } from '../../src/index';
+import { Clause, Xref, Document, DocumentViewer, Term, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
-  covers: [Clause, ClauseRef, Term],
+  covers: [Clause, Term],
   whenToUse: [
-    'The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.',
-    '`ClauseRef` wherever the text points at another clause (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.',
-    '`Term define` once where a defined term is defined, `Term` wherever it is used; `name` for a plural or possessive. Undefined or twice-defined terms are marked.',
+    'The numbered body of an agreement in a `Document`: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) are CSS counters drawn from position, never typed, so optional clauses and reordering never leave a gap or a stale number. `numbered={false}` for a clause that takes none.',
+    'Point at a clause with `Xref` (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.',
+    '`Term` where running text defines a term (a party in the preamble: Acme Corp (“Vendor”)); everywhere else the term is an `Xref` to it. A list of definitions is `Definitions`.',
   ],
   whenNotToUse: [
     { situation: 'A reference to another document (“MSA §6” from a DPA)', instead: 'plain text naming that document: references resolve within one DocumentViewer only' },
@@ -20,12 +20,12 @@ export const usage: UsageDoc = {
         <Document label="Agreement">
           <Clause id="fees" title="Fees">
             <Text>
-              The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
+              The <Term>Fees</Term> are due within thirty (30) days, except as in <Xref to="disputes" />.
             </Text>
           </Clause>
           <Clause id="disputes" title="Disputed amounts">
             <Text>
-              <Term>Fees</Term> disputed in good faith may be withheld.
+              <Xref to="def-fees" /> disputed in good faith may be withheld.
             </Text>
           </Clause>
         </Document>
@@ -45,8 +45,8 @@ export const usage: UsageDoc = {
   },
   accessibility: [
     'A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.',
-    'A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).',
-    'Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.',
+    'The number is generated content: screen readers read it with the heading (“3.1 Invoices”), but it is not in copied text or the browser’s find. Every clause is a `section`.',
+    'A clause id used twice and a term defined twice are marked with a wavy underline in the danger colour, so the problem is not shown by colour alone; each is also reported in the console.',
     'A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.',
   ],
 };

@@ -17,9 +17,9 @@ export const usage: UsageDoc = {
       <DocumentViewer>
         <Document label="Agreement">
           <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
-            This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
+            This Agreement is between Acme Corp (<Term>Provider</Term>) and Globex Inc. (<Term>Customer</Term>).
           </DocumentTitle>
-          <Recitals>
+          <Recitals whereas closing="in consideration of the mutual covenants set out below, the Parties agree as follows:">
             <Recital>Provider operates a facilities management platform;</Recital>
           </Recitals>
         </Document>

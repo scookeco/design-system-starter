@@ -1,16 +1,18 @@
-import { useContext, useEffect, useId, type MouseEvent, type ReactNode } from 'react';
+import { useContext, useEffect, useId, type ReactNode } from 'react';
 import { changeLabel, type ChangeColor, type ChangeKind } from '../Change/Change';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
-import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, scopedId, termKey } from '../Document/documentIndex';
+import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, SectionDepthContext, scopedId, termId } from '../Document/documentIndex';
 import './Clause.css';
 
 export interface ClauseProps {
-  /** Stable id that references use (`<ClauseRef to="liability" />`). Unique in the document. Required. */
+  /** Stable id that references use (`<Xref to="liability" />`). Unique in the document. Required. */
   id: string;
   /** The clause's heading ("Limitation of liability"). Sub-items such as (a) usually have none. */
   title?: string;
   /** The clause text: paragraphs, and nested Clauses for its sub-clauses. */
   children: ReactNode;
+  /** False for a clause that takes no number (a heading-only part, a preamble): the ones after it don't skip one. Default true. */
+  numbered?: boolean;
   /** A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not. */
   note?: ReactNode;
   /** Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out. */
@@ -20,33 +22,36 @@ export interface ClauseProps {
 }
 
 /**
- * A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)),
- * never typed, so adding, removing or reordering clauses renumbers the document and every
- * ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
+ * A numbered clause in a Document. Numbers are CSS counters drawn from where the clause is (1.,
+ * 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document
+ * and every Xref. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
  */
-export function Clause({ id, title, children, note, conspicuous = false, change }: ClauseProps) {
+export function Clause({ id, title, children, numbered = true, note, conspicuous = false, change }: ClauseProps) {
   const doc = useContext(DocumentScopeContext);
   const depth = useContext(ClauseDepthContext) + 1;
+  const sections = useContext(SectionDepthContext);
   const inExhibit = useContext(ExhibitContext) !== null;
   const headingId = useId();
   const at = doc?.index.clauses[id];
-  const number = at ? <span className="clause__number">{at.number}</span> : null;
+  // The number is generated content (Clause.css); data-number is the index's copy, for tooling.
+  const number = doc && numbered ? <span className="clause__number" data-depth={String(Math.min(depth, 4))} data-number={at?.number} /> : null;
   // An exhibit's heading takes the document's top level, so its clauses start one below it.
-  const level = Math.min(4, (doc?.headingLevel ?? 2) + depth - 1 + (inExhibit ? 1 : 0)) as HeadingLevel;
-  const Element = title ? 'section' : 'div';
+  const level = Math.min(4, (doc?.headingLevel ?? 2) + depth - 1 + sections + (inExhibit ? 1 : 0)) as HeadingLevel;
 
   useEffect(() => {
     if (at?.duplicate) console.error(`Clause: two clauses in this document have the id "${id}"; references to it are ambiguous.`);
-  }, [at?.duplicate, id]);
+    if (depth > 4) console.error(`Clause: "${id}" is nested ${String(depth)} deep; clauses number four levels (1., 1.1, (a), (i)).`);
+  }, [at?.duplicate, id, depth]);
 
   return (
     <ClauseDepthContext value={depth}>
-      <Element
+      <section
         className="clause"
         data-doc="clause"
         id={doc ? scopedId(doc.scope, 'clause', id) : undefined}
         data-clause={id}
-        data-depth={depth}
+        data-depth={String(depth)}
+        data-unnumbered={numbered ? undefined : 'true'}
         data-duplicate={at?.duplicate ? 'true' : undefined}
         data-conspicuous={conspicuous ? 'true' : undefined}
         data-change={change?.kind}
@@ -64,102 +69,40 @@ export function Clause({ id, title, children, note, conspicuous = false, change 
         )}
         {note ? <div className="clause__note">{note}</div> : null}
         {children}
-      </Element>
+      </section>
     </ClauseDepthContext>
   );
 }
 
-export interface ClauseRefProps {
-  /** The id of the Clause it points to. Required. */
-  to: string;
-  /** The word before the number. Default "Section". */
-  prefix?: string;
-}
-
-/**
- * A reference to another clause in the same document ("Section 3.1(a)"), or to an Exhibit
- * ("Exhibit A"), resolved from where that
- * clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line.
- * It links to the clause and moves focus there. A missing
- * target is marked in the document and reported in the console.
- */
-export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
-  const doc = useContext(DocumentScopeContext);
-  const own = useContext(ExhibitContext);
-  const at = doc?.index.clauses[to];
-  const exhibit = doc?.index.exhibits[to];
-  const missing = Boolean(doc?.index.ready) && !at && !exhibit;
-
-  useEffect(() => {
-    if (missing) console.error(`ClauseRef: no clause "${to}" in this document.`);
-  }, [missing, to]);
-
-  if (!doc || (!at && !exhibit)) {
-    return (
-      <span className="clause-ref" data-doc="xref" data-unresolved={missing ? 'true' : undefined}>
-        {prefix}
-        {missing ? `\u00a0[${to}?]` : ''}
-      </span>
-    );
-  }
-  const target = scopedId(doc.scope, 'clause', to);
-  const jump = (event: MouseEvent<HTMLAnchorElement>) => {
-    const clause = event.currentTarget.ownerDocument.getElementById(target);
-    if (!clause) return;
-    event.preventDefault();
-    clause.tabIndex = -1;
-    clause.focus();
-  };
-  // A reference across scopes says where: into an exhibit, or from one back to the document's body.
-  const letterOf = (id: string) => doc.index.exhibits[id]?.letter ?? '?';
-  const where = at && at.exhibit !== own ? (at.exhibit ? ` of Exhibit\u00a0${letterOf(at.exhibit)}` : ` of ${doc.documentName}`) : '';
-  return (
-    <a className="clause-ref" data-doc="xref" href={`#${target}`} onClick={jump}>
-      {at ? `${prefix}\u00a0${at.ref}${where}` : `Exhibit\u00a0${exhibit?.letter ?? ''}`}
-    </a>
-  );
-}
-
 export interface TermProps {
-  /** The term as written here ("Confidential Information"). Required. */
+  /** The term as defined here ("Confidential Information"). Required. */
   children: string;
-  /** This is where the term is defined: shown in quotes, in bold. Define each term once. */
-  define?: boolean;
-  /** The term this refers to, when the text differs (a plural or possessive: "Customer’s" → "Customer"). */
-  name?: string;
+  /** The id references use (`<Xref to="def-customer" />`). Default: "def-" and the term ("def-confidential-information"). */
+  id?: string;
 }
 
 /**
- * A defined term: defined once (`define`) and used by name everywhere else, so a term used but
- * never defined, or defined twice, is marked in the document and reported in the console.
+ * A term defined in running text, as an agreement's preamble defines its parties: Acme Corp
+ * (“Vendor”). Shown in quotes, in bold, and counted by the document, so a term defined twice is
+ * marked and reported. Refer to it everywhere else with an Xref, which links here. For a list of
+ * definitions, use Definitions.
  */
-export function Term({ children, define = false, name }: TermProps) {
+export function Term({ children, id }: TermProps) {
   const doc = useContext(DocumentScopeContext);
-  const key = termKey(name ?? children);
-  const count = doc?.index.terms[key] ?? 0;
-  const ready = Boolean(doc?.index.ready);
-  const undefinedTerm = ready && !define && count === 0;
-  const twice = define && count > 1;
+  const key = id ?? termId(children);
+  const twice = (doc?.index.terms[key]?.count ?? 0) > 1;
 
   useEffect(() => {
-    if (undefinedTerm) console.error(`Term: "${key}" is used but never defined in this document.`);
-    if (twice) console.error(`Term: "${key}" is defined ${count} times in this document.`);
-  }, [undefinedTerm, twice, key, count]);
+    if (twice) console.error(`Term: "${key}" is defined more than once in this document.`);
+  }, [twice, key]);
 
-  if (define) {
-    return (
-      <>
-        “
-        <dfn className="term" id={doc ? scopedId(doc.scope, 'term', key) : undefined} data-term={key} data-duplicate={twice ? 'true' : undefined}>
-          {children}
-        </dfn>
-        ”
-      </>
-    );
-  }
   return (
-    <span className="term" data-term-use={key} data-unresolved={undefinedTerm ? 'true' : undefined}>
-      {children}
-    </span>
+    <>
+      “
+      <dfn className="term" id={doc ? scopedId(doc.scope, 'term', key) : undefined} data-term={key} data-duplicate={twice ? 'true' : undefined}>
+        {children}
+      </dfn>
+      ”
+    </>
   );
 }

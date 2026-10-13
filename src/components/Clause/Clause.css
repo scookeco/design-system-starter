@@ -19,6 +19,31 @@
     inset-inline-start: 0;
   }
 
+  /*
+   * The second content gives the number as alt text, so it is part of the heading's accessible name:
+   * Chromium leaves counter values out of names otherwise. A browser without the alt syntax drops
+   * that declaration and keeps the first (Guides/Browser support).
+   */
+  .clause__number[data-depth="1"]::before {
+    content: counter(clause-1) ".";
+    content: counter(clause-1) "." / counter(clause-1) ".";
+  }
+
+  .clause__number[data-depth="2"]::before {
+    content: counter(clause-1) "." counter(clause-2);
+    content: counter(clause-1) "." counter(clause-2) / counter(clause-1) "." counter(clause-2);
+  }
+
+  .clause__number[data-depth="3"]::before {
+    content: "(" counter(clause-3, lower-alpha) ")";
+    content: "(" counter(clause-3, lower-alpha) ")" / "(" counter(clause-3, lower-alpha) ")";
+  }
+
+  .clause__number[data-depth="4"]::before {
+    content: "(" counter(clause-4, lower-roman) ")";
+    content: "(" counter(clause-4, lower-roman) ")" / "(" counter(clause-4, lower-roman) ")";
+  }
+
   /* How far a paragraph at this depth reaches back to the paper's margin, for a redline's bar (Change). */
   .clause[data-depth="1"] {
     --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent));
@@ -34,6 +59,26 @@
 
   .clause[data-depth="4"] {
     --change-reach: calc(var(--space-inset-md) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent) + var(--size-document-clause-indent));
+  }
+
+  /* Numbers are counters (the Document resets clause-1, an Exhibit restarts it): 1., 1.1, (a), (i). */
+  .clause[data-depth="1"]:not([data-unnumbered]) {
+    counter-increment: clause-1;
+    counter-reset: clause-2;
+  }
+
+  .clause[data-depth="2"]:not([data-unnumbered]) {
+    counter-increment: clause-2;
+    counter-reset: clause-3;
+  }
+
+  .clause[data-depth="3"]:not([data-unnumbered]) {
+    counter-increment: clause-3;
+    counter-reset: clause-4;
+  }
+
+  .clause[data-depth="4"]:not([data-unnumbered]) {
+    counter-increment: clause-4;
   }
 
   /* A whole clause inserted, deleted or moved in a redline: marked as Change marks text, with the bar. */
@@ -130,25 +175,12 @@
     }
   }
 
-  .clause-ref {
-    border-radius: var(--radius-indicator);
-    color: var(--color-fg-link);
-    text-decoration-line: underline;
-    text-underline-offset: var(--focus-ring-offset);
-  }
-
-  .clause-ref:hover {
-    text-decoration-thickness: var(--focus-ring-width);
-  }
-
   dfn.term {
     font-style: normal;
     font-weight: var(--font-weight-strong);
   }
 
-  /* Something the document can't resolve: a missing clause, an undefined term, a duplicate. */
-  .clause-ref[data-unresolved],
-  .term[data-unresolved],
+  /* Something the document can't resolve: a term defined twice, a duplicate clause id. */
   .term[data-duplicate],
   .clause[data-duplicate] > .clause__number {
     color: var(--color-status-danger-fg);

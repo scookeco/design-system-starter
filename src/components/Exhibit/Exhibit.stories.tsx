@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Clause, ClauseRef } from '../Clause/Clause';
+import { Clause } from '../Clause/Clause';
+import { Xref } from '../Xref/Xref';
 import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { Text } from '../Text/Text';
@@ -22,7 +23,7 @@ export const Default: Story = {
       <Document label="Master services agreement">
         <Clause id="privacy" title="Data Privacy and Security">
           <Text size="body-lg">
-            Processing of Customer personal data is governed by <ClauseRef to="dpa" />, and service levels by <ClauseRef to="sla" />.
+            Processing of Customer personal data is governed by <Xref to="dpa" />, and service levels by <Xref to="sla" />.
           </Text>
         </Clause>
         <Clause id="liability" title="Limitation of Liability">
@@ -34,7 +35,7 @@ export const Default: Story = {
           </Clause>
           <Clause id="dpa-security" title="Security">
             <Text size="body-lg">
-              Provider will maintain the measures described in <ClauseRef to="privacy" />, and notify breaches under <ClauseRef to="dpa-roles" />.
+              Provider will maintain the measures described in <Xref to="privacy" />, and notify breaches under <Xref to="dpa-roles" />.
             </Text>
           </Clause>
         </Exhibit>
@@ -44,9 +45,29 @@ export const Default: Story = {
           </Clause>
           <Clause id="sla-remedy" title="Sole Remedy">
             <Text size="body-lg">
-              Service Credits are Customer’s sole remedy for missed availability, subject to <ClauseRef to="liability" />. Data incidents are
-              handled under <ClauseRef to="dpa-security" />.
+              Service Credits are Customer’s sole remedy for missed availability, subject to <Xref to="liability" />. Data incidents are
+              handled under <Xref to="dpa-security" />.
             </Text>
+          </Clause>
+        </Exhibit>
+      </Document>
+    </DocumentViewer>
+  ),
+};
+
+/** An exhibit with its own label ("SOW-2") instead of the next letter; references use the label too. */
+export const Labelled: Story = {
+  render: () => (
+    <DocumentViewer>
+      <Document label="Master services agreement">
+        <Clause id="services" title="Services">
+          <Text size="body-lg">
+            Provider will perform the work described in <Xref to="sow-2" />.
+          </Text>
+        </Clause>
+        <Exhibit id="sow-2" title="Statement of Work" label="SOW-2">
+          <Clause id="deliverables" title="Deliverables">
+            <Text size="body-lg">A migration plan and a cut-over runbook.</Text>
           </Clause>
         </Exhibit>
       </Document>

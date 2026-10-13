@@ -90,7 +90,12 @@ export {
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
 export { Highlight, type HighlightProps, type HighlightTone } from './Highlight/Highlight';
-export { Clause, ClauseRef, Term, type ClauseProps, type ClauseRefProps, type TermProps } from './Clause/Clause';
+export { Clause, Term, type ClauseProps, type TermProps } from './Clause/Clause';
+export { Xref, type XrefProps } from './Xref/Xref';
+export { Definitions, Definition, type DefinitionProps } from './Definitions/Definitions';
+export { DocumentSection, type DocumentSectionProps } from './DocumentSection/DocumentSection';
+export { Step, type StepProps } from './Step/Step';
+export { Toc, type TocProps } from './Toc/Toc';
 export { SignatureBlock, type SignatureBlockProps, type SignatureRecipient } from './SignatureBlock/SignatureBlock';
 export { SignaturePage, SignatureParty, type SignaturePageProps, type SignaturePartyProps } from './SignaturePage/SignaturePage';
 export { Exhibit, type ExhibitProps } from './Exhibit/Exhibit';

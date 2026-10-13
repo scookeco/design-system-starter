@@ -125,10 +125,12 @@ UI rules (design system v0)
 - [ContextMenu](docs/usage/ContextMenu.usage.tsx): Actions on a thing, where the pointer or focus is: right-click
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [DatePicker](docs/usage/DatePicker.usage.tsx): A calendar date
+- [Definitions](docs/usage/Definitions.usage.tsx): A document's defined terms, as a list
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentSection](docs/usage/DocumentSection.usage.tsx): A titled section of a Document that is not a contract clause
 - [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
@@ -165,6 +167,7 @@ UI rules (design system v0)
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
+- [Step](docs/usage/Step.usage.tsx): A numbered step of a form, flat by design
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
 - [StreamingText](docs/usage/StreamingText.usage.tsx): Text that arrives token by token
 - [Suggestion](docs/usage/Suggestion.usage.tsx): A multi-line text field that can show an inline AI…
@@ -177,9 +180,11 @@ UI rules (design system v0)
 - [Textarea](docs/usage/Textarea.usage.tsx): Multi-line text
 - [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
+- [Toc](docs/usage/Toc.usage.tsx): A Document's table of contents
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
+- [Xref](docs/usage/Xref.usage.tsx): A cross-reference inside a Document
 
 ## Primitives
 
@@ -989,45 +994,35 @@ Tokens read: `color.bg.selected`, `color.bg.surface`, `color.border.default`, `c
 
 component · `src/components/Clause/Clause.tsx` · usage: `docs/usage/Clause.usage.tsx`
 
-A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
+A numbered clause in a Document. Numbers are CSS counters drawn from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every Xref. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
 
 Props:
-- `id: string`: Stable id that references use (`<ClauseRef to="liability" />`). Unique in the document. Required.
+- `id: string`: Stable id that references use (`<Xref to="liability" />`). Unique in the document. Required.
 - `title?: string`: The clause's heading ("Limitation of liability"). Sub-items such as (a) usually have none.
 - `children: ReactNode`: The clause text: paragraphs, and nested Clauses for its sub-clauses.
+- `numbered?: boolean` = `true`: False for a clause that takes no number (a heading-only part, a preamble): the ones after it don't skip one. Default true.
 - `note?: ReactNode`: A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not.
 - `conspicuous?: boolean` = `false`: Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out.
 - `change?: { kind: ChangeKind; author?: string; color?: ChangeColor }`: In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number.
 
 Closed styling API: no `className`/`style`.
-States: conspicuous.
-
-#### ClauseRef
-
-component, part of Clause. A reference to another clause in the same document ("Section 3.1(a)"), or to an Exhibit ("Exhibit A"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.
-
-Props:
-- `to: string`: The id of the Clause it points to. Required.
-- `prefix?: string` = `'Section'`: The word before the number. Default "Section".
-
-Closed styling API: no `className`/`style`.
+States: numbered, conspicuous.
 
 #### Term
 
-component, part of Clause. A defined term: defined once (`define`) and used by name everywhere else, so a term used but never defined, or defined twice, is marked in the document and reported in the console.
+component, part of Clause. A term defined in running text, as an agreement's preamble defines its parties: Acme Corp (“Vendor”). Shown in quotes, in bold, and counted by the document, so a term defined twice is marked and reported. Refer to it everywhere else with an Xref, which links here. For a list of definitions, use Definitions.
 
 Props:
-- `children: string`: The term as written here ("Confidential Information"). Required.
-- `define?: boolean` = `false`: This is where the term is defined: shown in quotes, in bold. Define each term once.
-- `name?: string`: The term this refers to, when the text differs (a plural or possessive: "Customer’s" → "Customer").
+- `children: string`: The term as defined here ("Confidential Information"). Required.
+- `id?: string`: The id references use (`<Xref to="def-customer" />`). Default: "def-" and the term ("def-confidential-information").
 
 Closed styling API: no `className`/`style`.
 
 **When to use**
 
-- The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.
-- `ClauseRef` wherever the text points at another clause (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.
-- `Term define` once where a defined term is defined, `Term` wherever it is used; `name` for a plural or possessive. Undefined or twice-defined terms are marked.
+- The numbered body of an agreement in a `Document`: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) are CSS counters drawn from position, never typed, so optional clauses and reordering never leave a gap or a stale number. `numbered={false}` for a clause that takes none.
+- Point at a clause with `Xref` (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.
+- `Term` where running text defines a term (a party in the preamble: Acme Corp (“Vendor”)); everywhere else the term is an `Xref` to it. A list of definitions is `Definitions`.
 
 **When not to use**
 
@@ -1042,12 +1037,12 @@ Closed styling API: no `className`/`style`.
   <Document label="Agreement">
     <Clause id="fees" title="Fees">
       <Text>
-        The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
+        The <Term>Fees</Term> are due within thirty (30) days, except as in <Xref to="disputes" />.
       </Text>
     </Clause>
     <Clause id="disputes" title="Disputed amounts">
       <Text>
-        <Term>Fees</Term> disputed in good faith may be withheld.
+        <Xref to="def-fees" /> disputed in good faith may be withheld.
       </Text>
     </Clause>
   </Document>
@@ -1068,13 +1063,13 @@ Closed styling API: no `className`/`style`.
 **Accessibility**
 
 - A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.
-- A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).
-- Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.
+- The number is generated content: screen readers read it with the heading (“3.1 Invoices”), but it is not in copied text or the browser’s find. Every clause is a `section`.
+- A clause id used twice and a term defined twice are marked with a wavy underline in the danger colour, so the problem is not shown by colour alone; each is also reported in the console.
 - A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
 
-Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`.
+Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`, `components-clause--unnumbered`.
 Composes: Change, Document, Heading.
-Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### ClauseNote
 
@@ -1572,6 +1567,77 @@ Stories: `components-datepicker--empty`, `components-datepicker--with-value`, `c
 Composes: Field, Icon, Picker.
 Tokens read: `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `ease.enter`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `motion.base`, `radius.control`, `radius.indicator`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
+### Definitions
+
+component · `src/components/Definitions/Definitions.tsx` · usage: `docs/usage/Definitions.usage.tsx`
+
+A document's defined terms, as a list: each Definition is a term and what it means. References to a term (`<Xref to="def-services" />`) link here and read as the term; defining one twice is marked and reported. A term defined in running text (a party in the preamble) is a Term instead.
+
+Props:
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+#### Definition
+
+component, part of Definitions. One defined term in Definitions: the term, in bold, and its meaning.
+
+Props:
+- `term: string`: The term ("Services"). Required.
+- `id?: string`: The id references use. Default: "def-" and the term ("def-services").
+- `children: ReactNode`: What the term means. Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- An agreement’s or a policy’s defined terms, listed: one `Definition` per term, with what it means. References to a term are `Xref`s to its id (“def-services” by default), which read as the term and link here.
+- Put it in a Definitions clause, or on its own before the clauses.
+
+**When not to use**
+
+- A term defined in running text (a party in the preamble) → `Term`
+- Label and value pairs (an invoice’s number and date) → a key-value list
+
+**Do:** Each term defined once, and used through Xref: rename the term and every use follows.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="definitions" title="Definitions">
+      <Definitions>
+        <Definition term="Services">The services described in each Order Form.</Definition>
+        <Definition term="Effective Date">The date of the last signature below.</Definition>
+      </Definitions>
+    </Clause>
+    <Clause id="term" title="Term">
+      <Text>
+        The <Xref to="def-services" /> start on the <Xref to="def-effective-date" />.
+      </Text>
+    </Clause>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Definitions as bold text in a paragraph: nothing counts them, and uses can’t link to them.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>“Services” means the services in each Order Form. “Effective Date” means the date of the last signature.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A description list (`dl`): each term a `dt` holding a `dfn`, its meaning the `dd`, so the pairing is announced.
+- A term defined twice is marked with a wavy underline in the danger colour and reported in the console.
+
+Stories: `components-definitions--default`, `components-definitions--defined-twice`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body-lg`.
+
 ### Dialog
 
 component · `src/components/Dialog/Dialog.tsx` · usage: `docs/usage/Dialog.usage.tsx`
@@ -1859,6 +1925,67 @@ Closed styling API: no `className`/`style`.
 Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`.
 
+### DocumentSection
+
+component · `src/components/DocumentSection/DocumentSection.tsx` · usage: `docs/usage/DocumentSection.usage.tsx`
+
+A titled section of a Document that is not a contract clause: a handbook chapter, a policy's scope, a letter's enclosures. Its heading takes the next outline level; the Toc lists it and an Xref names it by its title. Clauses inside it number as if it weren't there. `numbered` makes it a Clause.
+
+Props:
+- `id: string`: Stable id that references use (`<Xref to="leave" />` reads its title). Unique in the document. Required.
+- `title: string`: The section's heading ("Leave and time off"). Required.
+- `numbered?: boolean` = `false`: Numbered like a top-level clause (it is one). Default false: a section of a handbook, a policy, a letter.
+- `children: ReactNode`: The section's content: paragraphs, lists, tables, and nested sections or clauses.
+
+Closed styling API: no `className`/`style`.
+States: numbered.
+
+**When to use**
+
+- A titled part of a `Document` that is not a contract clause: a handbook chapter, a policy’s scope, a letter’s enclosures. Its heading takes the next outline level; `Toc` lists it and an `Xref` names it by its title.
+- Clauses inside it number as if it weren’t there. `numbered` makes it a numbered `Clause`.
+
+**When not to use**
+
+- A numbered section of an agreement → `Clause`
+- A step of a form → `Step`
+- A section of an app page → `Heading` and the layout primitives
+
+**Do:** A handbook chapter titled, not numbered, with its rules numbered inside it.
+
+```tsx
+<DocumentViewer>
+  <Document label="Employee handbook">
+    <DocumentSection id="leave" title="Leave and time off">
+      <Clause id="vacation" title="Vacation">
+        <Text>Twenty days a year.</Text>
+      </Clause>
+    </DocumentSection>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A section made from bold text: it is not in the outline, the table of contents or any reference.
+
+```tsx
+<DocumentViewer>
+  <Document label="Employee handbook">
+    <Text>
+      <strong>Leave and time off</strong>
+    </Text>
+    <Text>Twenty days a year.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `section` named by its heading, at the next level of the document’s outline; a reference to it moves focus there.
+
+Stories: `components-documentsection--default`, `components-documentsection--numbered`.
+Composes: Change, Clause, Document, Heading.
+Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
 ### DocumentTitle
 
 component · `src/components/DocumentTitle/DocumentTitle.tsx` · usage: `docs/usage/DocumentTitle.usage.tsx`
@@ -1874,7 +2001,7 @@ Closed styling API: no `className`/`style`.
 
 #### Recital
 
-component, part of DocumentTitle. One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.
+component, part of DocumentTitle. One recital: “Provider operates a platform…”. Its letter (and “WHEREAS,” when Recitals asks for it) is added.
 
 Props:
 - `children: ReactNode`
@@ -1883,11 +2010,12 @@ Closed styling API: no `className`/`style`.
 
 #### Recitals
 
-component, part of DocumentTitle. The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.
+component, part of DocumentTitle. The background before an agreement's operative clauses, lettered A., B., C. by a counter (never typed), optionally each “WHEREAS, …;”, then, with `closing`, “NOW, THEREFORE, …”.
 
 Props:
 - `children: ReactNode`: One Recital per piece of background. Required.
-- `closing?: string` = `'in consideration of the mutual covenants set out below, the Parties agree as follows:'`: What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows:
+- `whereas?: boolean` = `false`: Starts each recital “WHEREAS,”, as older agreements write them. Default false: lettered A., B., C. alone.
+- `closing?: string`: What follows “NOW, THEREFORE,” after the recitals. Omit it for none.
 
 Closed styling API: no `className`/`style`.
 
@@ -1907,9 +2035,9 @@ Closed styling API: no `className`/`style`.
 <DocumentViewer>
   <Document label="Agreement">
     <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
-      This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
+      This Agreement is between Acme Corp (<Term>Provider</Term>) and Globex Inc. (<Term>Customer</Term>).
     </DocumentTitle>
-    <Recitals>
+    <Recitals whereas closing="in consideration of the mutual covenants set out below, the Parties agree as follows:">
       <Recital>Provider operates a facilities management platform;</Recital>
     </Recitals>
   </Document>
@@ -1932,7 +2060,7 @@ Closed styling API: no `className`/`style`.
 - The title is a heading one level above the document’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the `Document` `headingLevel={3}` so the title is an h2.
 - The title block is a `header`; recitals are plain paragraphs in reading order.
 
-Stories: `components-documenttitle--default`, `components-documenttitle--amendment`.
+Stories: `components-documenttitle--default`, `components-documenttitle--amendment`, `components-documenttitle--lettered-recitals`.
 Composes: Document, Heading, Text.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
@@ -2132,11 +2260,12 @@ Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `col
 
 component · `src/components/Exhibit/Exhibit.tsx` · usage: `docs/usage/Exhibit.usage.tsx`
 
-An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
+An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters are a counter, in the order exhibits are attached. An Xref into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
 
 Props:
-- `id: string`: Stable id that references use (`<ClauseRef to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required.
+- `id: string`: Stable id that references use (`<Xref to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required.
 - `title: string`: The exhibit's name ("Data Processing Agreement"). Required.
+- `label?: string`: Its own label instead of the next letter ("1", "SOW-2"). Default: lettered A, B, C in the order attached.
 - `children: ReactNode`: The exhibit's clauses: their numbering starts again at 1.
 
 Closed styling API: no `className`/`style`.
@@ -2144,7 +2273,7 @@ Closed styling API: no `className`/`style`.
 **When to use**
 
 - A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.
-- Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<ClauseRef to="dpa" />` names the exhibit itself.
+- Its clauses restart at 1. A `Xref` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<Xref to="dpa" />` names the exhibit itself.
 
 **When not to use**
 
@@ -2158,7 +2287,7 @@ Closed styling API: no `className`/`style`.
   <Document label="Agreement">
     <Clause id="privacy" title="Data Privacy">
       <Text>
-        Personal data is processed under <ClauseRef to="dpa" />.
+        Personal data is processed under <Xref to="dpa" />.
       </Text>
     </Clause>
     <Exhibit id="dpa" title="Data Processing Agreement">
@@ -2186,7 +2315,7 @@ Closed styling API: no `className`/`style`.
 - An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the document’s top heading level; its clauses’ headings start one level below.
 - A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content.
 
-Stories: `components-exhibit--default`.
+Stories: `components-exhibit--default`, `components-exhibit--labelled`.
 Composes: Document, Heading.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
@@ -4025,6 +4154,67 @@ Stories: `components-stat--value-only`, `components-stat--up-positive`, `compone
 Composes: Icon.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.status.danger.fg`, `color.status.success.fg`, `font.weight.strong`, `icon.stroke`, `radius.surface`, `shadow.card`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.xs`, `space.inset.md`, `text.caption`, `text.heading-2`, `text.label`.
 
+### Step
+
+component · `src/components/Step/Step.tsx` · usage: `docs/usage/Step.usage.tsx`
+
+A numbered step of a form (“Step 2: Multiple jobs or spouse works”), flat by design: group the fields inside one with a fieldset. Numbers are a counter, so steps number themselves; `n` fixes one where the form prints it.
+
+Props:
+- `title: string`: What the person does in this step ("Enter personal information"). Required.
+- `n?: number`: The step's number when the form fixes it (a W-4's Step 5 stays 5 when Steps 3 and 4 are skipped). Default: the next.
+- `optional?: boolean` = `false`: The step can be skipped: “(optional)” follows the title.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children?: ReactNode`: The step's fields and instructions, if they sit inside it rather than beside it on the grid.
+
+Closed styling API: no `className`/`style`.
+States: optional.
+
+**When to use**
+
+- The numbered steps of a form (“Step 2: Multiple jobs or spouse works”). Steps number themselves; `n` fixes one where the form prints it, so Step 5 stays 5 when Steps 3 and 4 are skipped. `optional` adds “(optional)”.
+- On a grid page, place it with `area`; its fields can sit beside it on the grid or inside it.
+
+**When not to use**
+
+- The steps of a task in the app (a wizard) → `Stepper` in `FocusedLayout`
+- A clause of an agreement → `Clause`
+- Sub-steps inside a step → a fieldset: steps are flat
+
+**Do:** Steps placed on the form page, each numbered by the document.
+
+```tsx
+<DocumentViewer>
+  <Document label="Employee's withholding certificate" shell="grid" headingLevel={3}>
+    <DocumentPage>
+      <DocumentGrid cols={12}>
+        <Step title="Enter personal information" area={{ row: 1, column: 1, columnSpan: 12 }} />
+        <Step title="Multiple jobs or spouse works" optional area={{ row: 3, column: 1, columnSpan: 12 }} />
+      </DocumentGrid>
+    </DocumentPage>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** “Step 2” typed into text: hide a step and the numbers after it are wrong.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form">
+    <Text>Step 2: Multiple jobs or spouse works</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `section` named by its heading (“Step 2: Multiple jobs or spouse works (optional)”); the number is generated content and is read with the heading.
+- On a grid page, reading order is source order: write steps and their fields in the order a person fills them.
+
+Stories: `components-step--default`.
+Composes: Document, Heading.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.body`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
 ### Stepper
 
 component · `src/components/Stepper/Stepper.tsx` · usage: `docs/usage/Stepper.usage.tsx`
@@ -4821,6 +5011,61 @@ Stories: `components-toast--success`, `components-toast--warning`, `components-t
 Composes: Button, Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.elevated`, `color.bg.subtle`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `color.status.info.fg`, `color.status.neutral.fg`, `color.status.success.fg`, `color.status.warning.fg`, `ease.enter`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.slow`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.label`, `z.toast`.
 
+### Toc
+
+component · `src/components/Toc/Toc.tsx` · usage: `docs/usage/Toc.usage.tsx`
+
+A Document's table of contents, generated from its clauses and exhibits as they are now, never typed: numbers and titles follow every edit. Each entry links to its clause and moves focus there.
+
+Props:
+- `depth?: number` = `2`: How many clause levels it lists. Default 2 (1. and 1.1).
+- `label?: string` = `'Contents'`: Names the list. Default "Contents".
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A table of contents for a long `Document` (an MSA, a handbook), generated from its clauses, sections and exhibits as they are now: numbers and titles follow every edit. `depth` sets how many clause levels it lists (2 by default).
+
+**When not to use**
+
+- Navigation between pages of the app → `Nav` or `NavTabs`
+- A short document of a few clauses → nothing: the headings are enough
+
+**Do:** Generated from the clauses: remove one and the contents renumber with it.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Toc />
+    <Clause id="fees" title="Fees">
+      <Text>Net 30.</Text>
+    </Clause>
+    <Clause id="term" title="Term">
+      <Text>Two years.</Text>
+    </Clause>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A contents list typed by hand: it drifts from the clauses the first time one moves.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>Contents: 1. Fees · 2. Term</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `nav` landmark named “Contents” (or `label`) holding nested ordered lists; each entry is a link that moves focus to its clause.
+
+Stories: `components-toc--default`, `components-toc--top-level-only`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body-lg`.
+
 ### Toggle
 
 component · `src/components/Toggle/Toggle.tsx` · usage: `docs/usage/Toggle.usage.tsx`
@@ -5020,6 +5265,72 @@ States: open, defaultOpen.
 Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-tooltip--open-bottom`, `components-tooltip--with-shortcut`.
 Composes: Kbd.
 Tokens read: `border.width.default`, `color.bg.inverse`, `color.bg.subtle`, `color.border.default`, `color.border.strong`, `color.fg.inverse`, `color.fg.muted`, `ease.enter`, `font.weight.strong`, `motion.fast`, `radius.control`, `shadow.popover`, `size.icon.md`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `z.tooltip`.
+
+### Xref
+
+component · `src/components/Xref/Xref.tsx` · usage: `docs/usage/Xref.usage.tsx`
+
+A cross-reference inside a Document, resolved from what its target is now, so it never goes stale: a clause reads “Section 3.1(a)” (and says which document, across an exhibit's edge), an exhibit “Exhibit A”, an unnumbered section its title, a defined term the term itself. It links to the target and moves focus there; a no-break space keeps “Section” and the number together. A reference with no target is marked in place and reported in the console.
+
+Props:
+- `to: string`: The id of what it refers to: a Clause or DocumentSection ("liability"), an Exhibit ("dpa"), or a defined term ("def-customer"). Required.
+- `prefix?: string` = `'Section'`: The word before a clause's number. Default "Section".
+- `children?: ReactNode`: Text to show instead of the resolved label: a defined term as the sentence needs it ("Customer’s").
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Every reference inside a `Document` to another part of it: a clause (“Section 3.2(a)”), an exhibit (“Exhibit A”), an unnumbered section (its title) or a defined term (the term). It names the target by id and shows what the target is now.
+- Across an exhibit’s edge it says which document it means: “Section 2 of Exhibit B”, “Section 7 of the Agreement” (`documentName` on the `Document`). `prefix` changes the word before a number (“clause 4”).
+- A defined term as the sentence needs it, plural or possessive: `<Xref to="def-customer">Customer’s</Xref>`.
+
+**When not to use**
+
+- A reference to another document (“MSA §6” from a DPA) → plain text naming that document: references resolve within one Document
+- A link to another page of the app → `Link`
+
+**Do:** References by id: move or remove what they point at and every one follows.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="fees" title="Fees">
+      <Text>
+        <Term>Customer</Term> pays the fees, except as in <Xref to="disputes" /> and <Xref to="dpa" />.
+      </Text>
+    </Clause>
+    <Clause id="disputes" title="Disputed amounts">
+      <Text>
+        <Xref to="def-customer">Customer’s</Xref> disputed amounts may be withheld.
+      </Text>
+    </Clause>
+    <Exhibit id="dpa" title="Data Processing Agreement">
+      <Text>Processing terms.</Text>
+    </Exhibit>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A typed “Section 2”: the first clause added before it makes it point at the wrong one.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>Fees are due, except as in Section 2.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `a` named with the full reference (“Section 3.2(a)”); following it moves focus to the target, which scrolls clear of sticky content (scroll padding). A no-break space keeps “Section” and its number on one line.
+- A reference to a term reads as the term, without link colour, and shows it is a link on hover and focus.
+- A reference with no target keeps its text (“Section [pricing?]”) with a wavy underline in the danger colour, so the problem is not shown by colour alone, and is reported in the console.
+
+Stories: `components-xref--default`, `components-xref--broken`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`.
 
 ## Primitives reference
 
@@ -7411,6 +7722,7 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 | `box-decoration-break: clone` | Highlight, and a DataField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
 | `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
 | `@page` with `size` and named pages (`page`) | Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is | Nothing: printing a document took the browser’s default page and margins. | Newly available (2024-12-11); widely available on 2027-06-11 | Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it. |
+| Alt text for generated content (`content: … / …`) | Document numbers drawn by counters: Clause (1., 1.1, (a), (i)), Exhibit letters, Step and Recital numbers | Nothing: Chromium leaves counter values out of accessible names, so “1. Definitions” was announced “. Definitions”. The alt text puts the number back in the heading’s name. | Newly available (2024-07-09); widely available on 2027-01-09 | Each rule declares the plain `content` first; a browser without the alt syntax drops the second declaration and still draws the number. tests/visual/document-numbering.spec.ts reads the numbers from the accessibility tree. |
 | `break-before: page` | DocumentPage: a page in a flow document (a signature page) starts a new printed page | n/a | Widely available | Required for print only: on screen the sheet continues. |
 | Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
 

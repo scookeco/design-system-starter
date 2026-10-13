@@ -4889,7 +4889,6 @@
       "dir": "src/components/Clause",
       "exports": [
         "Clause",
-        "ClauseRef",
         "Term"
       ],
       "stylesheets": [
@@ -5037,15 +5036,6 @@
           ]
         },
         {
-          "token": "color.fg.link",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.focus",
           "readBy": [
             {
@@ -5096,15 +5086,6 @@
         },
         {
           "token": "font.weight.strong",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
           "readBy": [
             {
               "unit": "Clause",
@@ -8718,6 +8699,284 @@
         }
       ]
     },
+    "Definitions": {
+      "kind": "component",
+      "dir": "src/components/Definitions",
+      "exports": [
+        "Definition",
+        "Definitions"
+      ],
+      "stylesheets": [
+        "src/components/Definitions/Definitions.css"
+      ],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Definitions",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Dialog": {
       "kind": "component",
       "dir": "src/components/Dialog",
@@ -9329,6 +9588,482 @@
         }
       ]
     },
+    "DocumentSection": {
+      "kind": "component",
+      "dir": "src/components/DocumentSection",
+      "exports": [
+        "DocumentSection"
+      ],
+      "stylesheets": [
+        "src/components/DocumentSection/DocumentSection.css"
+      ],
+      "composes": [
+        "Clause",
+        "Document",
+        "Heading"
+      ],
+      "composesAll": [
+        "Change",
+        "Clause",
+        "Document",
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.change-bar",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.success.fg",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.strong",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.note",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Change",
+              "how": "css"
+            },
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xl",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.end",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.scroll-padding.start",
+          "readBy": [
+            {
+              "unit": "Clause",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentSection",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "DocumentTitle": {
       "kind": "component",
       "dir": "src/components/DocumentTitle",
@@ -9374,6 +10109,10 @@
           "readBy": [
             {
               "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "DocumentTitle",
               "how": "css"
             },
             {
@@ -9558,6 +10297,10 @@
         {
           "token": "text.body-lg",
           "readBy": [
+            {
+              "unit": "DocumentTitle",
+              "how": "css"
+            },
             {
               "unit": "Text",
               "how": "css"
@@ -22568,6 +23311,254 @@
         }
       ]
     },
+    "Step": {
+      "kind": "component",
+      "dir": "src/components/Step",
+      "exports": [
+        "Step"
+      ],
+      "stylesheets": [
+        "src/components/Step/Step.css"
+      ],
+      "composes": [
+        "Document",
+        "Heading"
+      ],
+      "composesAll": [
+        "Document",
+        "Heading"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Step",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "font.weight.body",
+          "readBy": [
+            {
+              "unit": "Step",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Step",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-1",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-2",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-3",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.heading-4",
+          "readBy": [
+            {
+              "unit": "Heading",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Stepper": {
       "kind": "component",
       "dir": "src/components/Stepper",
@@ -26060,6 +27051,234 @@
         }
       ]
     },
+    "Toc": {
+      "kind": "component",
+      "dir": "src/components/Toc",
+      "exports": [
+        "Toc"
+      ],
+      "stylesheets": [
+        "src/components/Toc/Toc.css"
+      ],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.clause-indent",
+          "readBy": [
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.body-lg",
+          "readBy": [
+            {
+              "unit": "Toc",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Toggle": {
       "kind": "component",
       "dir": "src/components/Toggle",
@@ -26814,6 +28033,235 @@
       "composes": [],
       "composesAll": [],
       "tokens": []
+    },
+    "Xref": {
+      "kind": "component",
+      "dir": "src/components/Xref",
+      "exports": [
+        "Xref"
+      ],
+      "stylesheets": [
+        "src/components/Xref/Xref.css"
+      ],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.link",
+          "readBy": [
+            {
+              "unit": "Xref",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.status.danger.fg",
+          "readBy": [
+            {
+              "unit": "Xref",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Xref",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Xref",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Xref",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        }
+      ]
     }
   },
   "tokens": {
@@ -28426,6 +29874,18 @@
       "chain": [
         "focus.ring.width",
         "border-width.2"
+      ],
+      "modes": {}
+    },
+    "font.weight.body": {
+      "cssVar": "--font-weight-body",
+      "tier": "semantic",
+      "type": "fontWeight",
+      "description": "Running text.",
+      "value": "400",
+      "chain": [
+        "font.weight.body",
+        "font.weight.regular"
       ],
       "modes": {}
     },

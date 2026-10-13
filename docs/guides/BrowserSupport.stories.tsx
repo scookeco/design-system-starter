@@ -79,6 +79,13 @@ const ADOPTED = [
     without: 'Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it.',
   },
   {
+    feature: 'Alt text for generated content (`content: … / …`)',
+    where: 'Document numbers drawn by counters: Clause (1., 1.1, (a), (i)), Exhibit letters, Step and Recital numbers',
+    replaces: 'Nothing: Chromium leaves counter values out of accessible names, so “1. Definitions” was announced “. Definitions”. The alt text puts the number back in the heading’s name.',
+    baseline: 'Newly available (2024-07-09); widely available on 2027-01-09',
+    without: 'Each rule declares the plain `content` first; a browser without the alt syntax drops the second declaration and still draws the number. tests/visual/document-numbering.spec.ts reads the numbers from the accessibility tree.',
+  },
+  {
     feature: '`break-before: page`',
     where: 'DocumentPage: a page in a flow document (a signature page) starts a new printed page',
     replaces: 'n/a',

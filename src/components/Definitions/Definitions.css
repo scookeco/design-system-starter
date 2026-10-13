@@ -1,0 +1,38 @@
+@layer components {
+  /* Defined terms: the term in bold on its own line, its meaning indented under it. */
+  .definitions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+    margin: 0;
+    color: var(--color-fg-default);
+    font: var(--text-body-lg);
+  }
+
+  .definitions__term {
+    scroll-margin-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .definitions__term:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .definitions__dfn {
+    font-style: normal;
+    font-weight: var(--font-weight-strong);
+  }
+
+  .definitions__dfn[data-duplicate] {
+    color: var(--color-status-danger-fg);
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--color-status-danger-fg);
+  }
+
+  .definitions__meaning {
+    margin: 0;
+    margin-block-end: var(--space-gap-sm);
+    padding-inline-start: var(--size-document-clause-indent);
+  }
+}
