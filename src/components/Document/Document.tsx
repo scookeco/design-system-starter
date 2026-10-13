@@ -157,3 +157,19 @@ export function DocumentGrid({ cols = 12, rows, gap, children }: DocumentGridPro
     </div>
   );
 }
+
+export interface DocumentCellProps {
+  /** Where it sits on the DocumentGrid. Required. */
+  area: DocumentArea;
+  /** What sits there: a heading, text, anything without an `area` of its own. */
+  children: ReactNode;
+}
+
+/** Places anything on a DocumentGrid by row and column, for content that takes no `area` itself (a heading, a paragraph). */
+export function DocumentCell({ area, children }: DocumentCellProps) {
+  return (
+    <div className="document-cell" data-doc="cell" style={areaStyle(area)}>
+      {children}
+    </div>
+  );
+}

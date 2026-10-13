@@ -1,0 +1,24 @@
+@layer components {
+  /* In the flow by default; in the margin beside the paper when there is room (DocumentViewer's canvas). */
+  .document-margin {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-xs);
+  }
+
+  @container document-canvas (inline-size >= 75rem) {
+    .document-margin {
+      position: absolute;
+      inset-block-start: 0;
+      inline-size: var(--size-document-note);
+    }
+
+    .document-margin[data-side="end"] {
+      inset-inline-start: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
+    }
+
+    .document-margin[data-side="start"] {
+      inset-inline-end: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
+    }
+  }
+}

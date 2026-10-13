@@ -1,12 +1,13 @@
-import { Clause, Document, DocumentFlow, DocumentGrid, DocumentPage, DocumentViewer, Text } from '../../src/index';
+import { Clause, Document, DocumentCell, DocumentFlow, DocumentGrid, DocumentPage, DocumentViewer, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
-  covers: [Document, DocumentFlow, DocumentPage, DocumentGrid],
+  covers: [Document, DocumentFlow, DocumentPage, DocumentGrid, DocumentCell],
   whenToUse: [
     'The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` ("msa", "w-4"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.',
     'Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.',
     '`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.',
+    'On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph).',
   ],
   whenNotToUse: [
     { situation: 'Showing a document on screen with highlights and the selection menu', instead: '`DocumentViewer` around the `Document`' },

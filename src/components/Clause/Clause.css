@@ -165,16 +165,6 @@
     text-transform: uppercase;
   }
 
-  /* A ClauseNote: under the heading by default; in the margin beside the paper when there is room. */
-  @container document-canvas (inline-size >= 75rem) {
-    .clause__note {
-      position: absolute;
-      inset-block-start: 0;
-      inset-inline-start: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
-      inline-size: var(--size-document-note);
-    }
-  }
-
   dfn.term {
     font-style: normal;
     font-weight: var(--font-weight-strong);

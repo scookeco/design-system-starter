@@ -185,6 +185,10 @@
   "z": {
     "$type": "number",
     "$description": "Stacking order. Never write a raw z-index.",
+    "behind": {
+      "$value": "{layer.behind}",
+      "$description": "Behind content inside an isolated part: a document’s watermark, under its text."
+    },
     "base": {
       "$value": "{layer.0}",
       "$description": "Content in normal flow."

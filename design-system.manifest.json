@@ -879,6 +879,127 @@
       "definition": "interface ActiveShortcut { id: string; keys: string; description: string; scope: string; characterKey: boolean; }"
     },
     {
+      "name": "Address",
+      "kind": "component",
+      "source": "src/components/Address/Address.tsx",
+      "status": null,
+      "description": "A postal address block in a document: an invoice's bill-to, a letter's recipient, an issuer's address.",
+      "docs": "docs/usage/Address.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The data key the address belongs to (\"bill_to\"), for exports and forms that fill it."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "What it is, shown above it (\"Bill to\")."
+        },
+        {
+          "name": "lines",
+          "type": "readonly string[]",
+          "required": true,
+          "default": null,
+          "description": "The address, one line per item (\"Globex Inc.\", \"1 Main St\", \"Seattle, WA 98101\"). Required."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A postal address in a document: an invoice’s bill-to, a letter’s recipient, an issuer’s address. `lines` in order; `label` above it; `name` is its data key for exports."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Collecting an address",
+            "instead": "the address fields of a form"
+          },
+          {
+            "situation": "An email address or a phone number alone",
+            "instead": "text, or a `Link`"
+          }
+        ],
+        "do": {
+          "caption": "One line per item, in an address element.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\">\n    <Address label=\"Bill to\" lines={['Globex Inc.', '1 Main Street', 'Seattle, WA 98101']} />\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "An address run into one line of text: it can’t be read as an address or exported.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\">\n    <Text>Bill to: Globex Inc., 1 Main Street, Seattle, WA 98101</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `address` element with each line on its own line; the label is visible text above it."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Address",
+        "stories": [
+          {
+            "id": "components-address--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-address--unlabelled",
+            "name": "Unlabelled"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.body",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "AddressProps",
+      "kind": "type-only",
+      "source": "src/components/Address/Address.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Address",
+      "propsOf": "Address"
+    },
+    {
       "name": "AiMarker",
       "kind": "component",
       "source": "src/components/AiMarker/AiMarker.tsx",
@@ -2885,6 +3006,156 @@
       "docs": "docs/usage/Icons.usage.tsx"
     },
     {
+      "name": "Callout",
+      "kind": "component",
+      "source": "src/components/Callout/Callout.tsx",
+      "status": null,
+      "description": "A notice inside a document, set apart from its text: a note, a warning, or instructions (a form's “Complete Step 2 only if…”). Part of the document, so it prints with it and never announces itself; for a message about the app, use Banner.",
+      "docs": "docs/usage/Callout.usage.tsx",
+      "props": [
+        {
+          "name": "kind",
+          "type": "CalloutKind",
+          "required": false,
+          "default": "'note'",
+          "description": "Default note.",
+          "values": [
+            "note",
+            "warning",
+            "instruction"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Its own heading instead of the kind's word (\"Before you sign\")."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The text. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "kind": [
+          "note",
+          "warning",
+          "instruction"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A notice that is part of the document, set apart from its text: a note, a warning, or instructions for whoever fills it in (“Complete Step 2 only if…”). `title` replaces the kind’s word."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A message about the app or the task (an error, a save)",
+            "instead": "`Banner`"
+          },
+          {
+            "situation": "A note for whoever drafts the document, not part of it",
+            "instead": "a `ClauseNote` in a `Margin`"
+          }
+        ],
+        "do": {
+          "caption": "Instructions in the document, labelled in words, never by colour alone.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\">\n    <Callout kind=\"instruction\">Complete Step 2 only if you hold more than one job.</Callout>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Instructions in bold capitals in the text: they read as part of what is signed.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\">\n    <Text>COMPLETE STEP 2 ONLY IF YOU HOLD MORE THAN ONE JOB.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `aside` with its kind or `title` as its first line; it never announces itself (unlike a Banner), because it is part of the document."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Callout",
+        "stories": [
+          {
+            "id": "components-callout--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.status.info.border",
+          "color.status.warning.border",
+          "font.weight.strong",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.page.margin",
+          "text.body",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "CalloutKind",
+      "kind": "type-only",
+      "source": "src/components/Callout/Callout.tsx",
+      "status": null,
+      "description": "What a callout is: a note, a warning, or instructions for whoever fills the document in.",
+      "partOf": "Callout",
+      "definition": "type CalloutKind = 'note' | 'warning' | 'instruction'",
+      "values": [
+        "note",
+        "warning",
+        "instruction"
+      ]
+    },
+    {
+      "name": "CalloutProps",
+      "kind": "type-only",
+      "source": "src/components/Callout/Callout.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Callout",
+      "propsOf": "Callout"
+    },
+    {
       "name": "Card",
       "kind": "component",
       "source": "src/components/Card/Card.tsx",
@@ -4324,7 +4595,7 @@
           "type": "ReactNode",
           "required": false,
           "default": null,
-          "description": "A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not."
+          "description": "A ClauseNote for whoever drafts or reviews it, in a Margin: beside the paper when the viewer is wide enough, under the heading when not."
         },
         {
           "name": "conspicuous",
@@ -4411,7 +4682,8 @@
         "composes": [
           "Change",
           "Document",
-          "Heading"
+          "Heading",
+          "Margin"
         ],
         "tokens": [
           "border.width.change-bar",
@@ -4424,6 +4696,7 @@
           "color.category.5.fg",
           "color.category.6.fg",
           "color.fg.default",
+          "color.fg.muted",
           "color.focus",
           "color.status.danger.fg",
           "color.status.success.fg",
@@ -4451,6 +4724,7 @@
           "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
+          "text.caption",
           "text.heading-1",
           "text.heading-2",
           "text.heading-3",
@@ -7044,6 +7318,7 @@
           "color.bg.surface",
           "color.border.default",
           "color.fg.default",
+          "color.fg.muted",
           "color.focus",
           "color.status.danger.fg",
           "focus.ring.offset",
@@ -7067,7 +7342,8 @@
           "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
-          "text.body-lg"
+          "text.body-lg",
+          "text.caption"
         ]
       }
     },
@@ -7635,7 +7911,8 @@
         "whenToUse": [
           "The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` (\"msa\", \"w-4\"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.",
           "Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.",
-          "`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content."
+          "`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.",
+          "On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph)."
         ],
         "whenNotToUse": [
           {
@@ -7690,6 +7967,7 @@
           "color.bg.surface",
           "color.border.default",
           "color.fg.default",
+          "color.fg.muted",
           "ratio.page",
           "ratio.page-landscape",
           "shadow.card",
@@ -7704,7 +7982,8 @@
           "space.gap.sm",
           "space.gap.xl",
           "space.gap.xs",
-          "space.page.margin"
+          "space.page.margin",
+          "text.caption"
         ]
       }
     },
@@ -7716,6 +7995,49 @@
       "description": "Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.",
       "partOf": "Document",
       "definition": "interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }"
+    },
+    {
+      "name": "DocumentCell",
+      "kind": "component",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "Places anything on a DocumentGrid by row and column, for content that takes no `area` itself (a heading, a paragraph).",
+      "partOf": "Document",
+      "docs": "docs/usage/Document.usage.tsx",
+      "props": [
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": true,
+          "default": null,
+          "description": "Where it sits on the DocumentGrid. Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "What sits there: a heading, text, anything without an `area` of its own."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DocumentCellProps",
+      "kind": "type-only",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Document",
+      "propsOf": "DocumentCell"
     },
     {
       "name": "DocumentFlow",
@@ -7743,6 +8065,75 @@
       },
       "variants": {},
       "states": []
+    },
+    {
+      "name": "DocumentFooter",
+      "kind": "component",
+      "source": "src/components/DocumentHeader/DocumentHeader.tsx",
+      "status": null,
+      "description": "A running footer: on screen, a line below the document; in print, the bottom margin of each page it runs on, with the page number when asked (`pageNumber`, from the page counter).",
+      "partOf": "DocumentHeader",
+      "docs": "docs/usage/DocumentHeader.usage.tsx",
+      "props": [
+        {
+          "name": "pages",
+          "type": "RunningPages",
+          "required": false,
+          "default": "'all'",
+          "description": "Which printed pages it runs on. Default all.",
+          "values": [
+            "all",
+            "first",
+            "rest"
+          ]
+        },
+        {
+          "name": "pageNumber",
+          "type": "'page' | 'of'",
+          "required": false,
+          "default": null,
+          "description": "Adds the page number in print: “Page 2”, or with `of`, “Page 2 of 5”.",
+          "values": [
+            "page",
+            "of"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "The running text, if any (\"Acme Corp · MSA v3.2\"). Text only."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "pages": [
+          "all",
+          "first",
+          "rest"
+        ],
+        "pageNumber": [
+          "page",
+          "of"
+        ]
+      },
+      "states": []
+    },
+    {
+      "name": "DocumentFooterProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentHeader/DocumentHeader.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentHeader",
+      "propsOf": "DocumentFooter"
     },
     {
       "name": "DocumentGrid",
@@ -7821,6 +8212,111 @@
       "propsOf": "DocumentGrid"
     },
     {
+      "name": "DocumentHeader",
+      "kind": "component",
+      "source": "src/components/DocumentHeader/DocumentHeader.tsx",
+      "status": null,
+      "description": "A running header: on screen, a line above the document; in print, the top margin of each page it runs on (`pages`: all, first, or every page but the first).",
+      "docs": "docs/usage/DocumentHeader.usage.tsx",
+      "props": [
+        {
+          "name": "pages",
+          "type": "RunningPages",
+          "required": false,
+          "default": "'all'",
+          "description": "Which printed pages it runs on. Default all.",
+          "values": [
+            "all",
+            "first",
+            "rest"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The running text (\"Master Services Agreement · Confidential\"). Text only: print shows it as a string."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "pages": [
+          "all",
+          "first",
+          "rest"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Running text on a document’s printed pages: a header (“Master Services Agreement · Confidential”) and a footer, with the page number from `pageNumber` (“Page 2”, or “Page 2 of 5” with \"of\").",
+          "`pages` says where it runs: all (the default), first, or rest (every page but the first, under a letterhead). On screen each shows once, above or below the document."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The issuer’s block on the first page",
+            "instead": "`Letterhead`"
+          },
+          {
+            "situation": "A document’s title",
+            "instead": "`DocumentTitle`"
+          },
+          {
+            "situation": "A header for an app page",
+            "instead": "`PageHeader`"
+          }
+        ],
+        "do": {
+          "caption": "Text only, with the page number from the page counter.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <DocumentHeader pages=\"rest\">Master Services Agreement · Confidential</DocumentHeader>\n    <Text>The Agreement.</Text>\n    <DocumentFooter pageNumber=\"of\" />\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "“Page 1” typed into the text: it prints on one page and is wrong on all the others.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>The Agreement.</Text>\n    <Text>Page 1</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `header` and a `footer` inside the document’s `article`, so not page landmarks; read once, in order, on screen.",
+          "In print they run in the page margins (Chromium page margin boxes, an enhancement: other browsers print without them). They show text only."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentHeader",
+        "stories": [
+          {
+            "id": "components-documentheader--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentheader--page-number-only",
+            "name": "Page Number Only"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.border.default",
+          "color.fg.muted",
+          "space.inset.sm",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentHeaderProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentHeader/DocumentHeader.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentHeader",
+      "propsOf": "DocumentHeader"
+    },
+    {
       "name": "DocumentLifecycle",
       "kind": "type-only",
       "source": "src/components/Document/documentIndex.ts",
@@ -7833,6 +8329,171 @@
         "filled",
         "negotiated",
         "executed"
+      ]
+    },
+    {
+      "name": "DocumentList",
+      "kind": "component",
+      "source": "src/components/DocumentList/DocumentList.tsx",
+      "status": null,
+      "description": "A list in a document's text that is not part of its structure: the documents to bring, the conditions that all apply. Numbered styles are an ordered list. For numbered provisions use Clause, so they renumber and can be referred to.",
+      "docs": "docs/usage/DocumentList.usage.tsx",
+      "props": [
+        {
+          "name": "listStyle",
+          "type": "DocumentListStyle",
+          "required": false,
+          "default": "'disc'",
+          "description": "The marker: decimal (1. 2.), lower-alpha (a. b.), upper-alpha, lower-roman, disc (bullets, the default) or none.",
+          "values": [
+            "decimal",
+            "lower-alpha",
+            "upper-alpha",
+            "lower-roman",
+            "disc",
+            "none"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One DocumentListItem per item. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "listStyle": [
+          "decimal",
+          "lower-alpha",
+          "upper-alpha",
+          "lower-roman",
+          "disc",
+          "none"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A list in a document’s text that is not part of its structure: what to bring, conditions that all apply. `listStyle` sets the marker; numbered styles are an ordered list."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Numbered provisions people refer to (“Section 4.1(a)”)",
+            "instead": "`Clause`, so they renumber and take references"
+          },
+          {
+            "situation": "Rows of data",
+            "instead": "`Table`"
+          }
+        ],
+        "do": {
+          "caption": "A real list: its items are counted and announced.",
+          "code": "<DocumentViewer>\n  <Document label=\"Offer letter\">\n    <DocumentList>\n      <DocumentListItem>a photo identification;</DocumentListItem>\n      <DocumentListItem>your bank details.</DocumentListItem>\n    </DocumentList>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Numbered provisions as a list: nothing can refer to item 2, and inserting one leaves references wrong.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"termination\" title=\"Termination\">\n      <Text>Either party may end it: 1. for breach; 2. on insolvency.</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `ol` or `ul` with `li` items, so the count and position are announced."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentList",
+        "stories": [
+          {
+            "id": "components-documentlist--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentlist--decimal",
+            "name": "Decimal"
+          },
+          {
+            "id": "components-documentlist--lower-alpha",
+            "name": "Lower Alpha"
+          },
+          {
+            "id": "components-documentlist--upper-alpha",
+            "name": "Upper Alpha"
+          },
+          {
+            "id": "components-documentlist--lower-roman",
+            "name": "Lower Roman"
+          },
+          {
+            "id": "components-documentlist--no-markers",
+            "name": "No Markers"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.fg.default",
+          "size.document.clause-indent",
+          "space.gap.2xs",
+          "text.body-lg"
+        ]
+      }
+    },
+    {
+      "name": "DocumentListItem",
+      "kind": "component",
+      "source": "src/components/DocumentList/DocumentList.tsx",
+      "status": null,
+      "description": "One item of a DocumentList.",
+      "partOf": "DocumentList",
+      "docs": "docs/usage/DocumentList.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DocumentListProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentList/DocumentList.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentList",
+      "propsOf": "DocumentList"
+    },
+    {
+      "name": "DocumentListStyle",
+      "kind": "type-only",
+      "source": "src/components/DocumentList/DocumentList.tsx",
+      "status": null,
+      "description": "How a list marks its items. The numbered ones are an ordered list.",
+      "partOf": "DocumentList",
+      "definition": "type DocumentListStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'disc' | 'none'",
+      "values": [
+        "decimal",
+        "lower-alpha",
+        "upper-alpha",
+        "lower-roman",
+        "disc",
+        "none"
       ]
     },
     {
@@ -8005,7 +8666,8 @@
           "Change",
           "Clause",
           "Document",
-          "Heading"
+          "Heading",
+          "Margin"
         ],
         "tokens": [
           "border.width.change-bar",
@@ -8018,6 +8680,7 @@
           "color.category.5.fg",
           "color.category.6.fg",
           "color.fg.default",
+          "color.fg.muted",
           "color.focus",
           "color.status.danger.fg",
           "color.status.success.fg",
@@ -8045,6 +8708,7 @@
           "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
+          "text.caption",
           "text.heading-1",
           "text.heading-2",
           "text.heading-3",
@@ -8902,6 +9566,7 @@
           "color.bg.surface",
           "color.border.default",
           "color.fg.default",
+          "color.fg.muted",
           "color.focus",
           "focus.ring.offset",
           "focus.ring.width",
@@ -8923,6 +9588,7 @@
           "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
+          "text.caption",
           "text.heading-1",
           "text.heading-2",
           "text.heading-3",
@@ -9150,6 +9816,115 @@
       "description": null,
       "partOf": "Feedback",
       "definition": "interface FeedbackValue { rating: FeedbackRating; reason?: string; }"
+    },
+    {
+      "name": "Figure",
+      "kind": "component",
+      "source": "src/components/Figure/Figure.tsx",
+      "status": null,
+      "description": "An image, a diagram or a chart in a document, with its caption.",
+      "docs": "docs/usage/Figure.usage.tsx",
+      "props": [
+        {
+          "name": "caption",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "What the figure shows, in a sentence, under it."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The image, diagram or chart (an SVG chart prints as it is). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An image, a diagram or a chart in a document, with its `caption`. Charts are SVG drawn from the chart tokens, so they print as drawn."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A chart on an app page",
+            "instead": "the reports example’s charts"
+          },
+          {
+            "situation": "An official seal",
+            "instead": "`Seal`"
+          }
+        ],
+        "do": {
+          "caption": "A described image with a caption.",
+          "code": "<DocumentViewer>\n  <Document label=\"Statement of work\">\n    <Figure caption=\"Figure 1. The three phases.\">\n      <svg viewBox=\"0 0 100 10\" role=\"img\" aria-label=\"Three phases\">\n        <rect width=\"100\" height=\"10\" fill=\"var(--color-chart-categorical-1)\" />\n      </svg>\n    </Figure>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A caption as separate text: it isn’t tied to its figure.",
+          "code": "<DocumentViewer>\n  <Document label=\"Statement of work\">\n    <Text>Figure 1. The three phases.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `figure` with a `figcaption`; the image or chart still needs its own alternative text."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Figure",
+        "stories": [
+          {
+            "id": "components-figure--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "FigureProps",
+      "kind": "type-only",
+      "source": "src/components/Figure/Figure.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Figure",
+      "propsOf": "Figure"
     },
     {
       "name": "FileIcon",
@@ -11036,6 +11811,167 @@
       ]
     },
     {
+      "name": "KeyValue",
+      "kind": "component",
+      "source": "src/components/KeyValue/KeyValue.tsx",
+      "status": null,
+      "description": "Label and value pairs in a document: an invoice's number, date and terms; its subtotal, tax and total. Labels sit beside their values, values aligned at the end.",
+      "docs": "docs/usage/KeyValue.usage.tsx",
+      "props": [
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One KeyValueItem per pair. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Label and value pairs in a document: an invoice’s number, date and terms; subtotal, tax and total (`emphasis` on the total). Format values with useFormat."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A record’s fields in the app",
+            "instead": "the record page’s field list"
+          },
+          {
+            "situation": "Defined terms",
+            "instead": "`Definitions`"
+          },
+          {
+            "situation": "Rows with several columns",
+            "instead": "`Table`"
+          }
+        ],
+        "do": {
+          "caption": "Pairs as a description list, the total set apart.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\">\n    <KeyValue>\n      <KeyValueItem label=\"Subtotal\">$12,000.00</KeyValueItem>\n      <KeyValueItem label=\"Total\" emphasis>\n        $13,020.00\n      </KeyValueItem>\n    </KeyValue>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Pairs as text with colons: labels and values can’t be told apart or exported.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\">\n    <Text>Subtotal: $12,000.00 Total: $13,020.00</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `dl`: each label a `dt`, its value the `dd`, grouped in a `div`, so each pair is announced together."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/KeyValue",
+        "stories": [
+          {
+            "id": "components-keyvalue--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "font.weight.strong",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.xs",
+          "space.page.margin",
+          "text.body",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "KeyValueItem",
+      "kind": "component",
+      "source": "src/components/KeyValue/KeyValue.tsx",
+      "status": null,
+      "description": "One pair of a KeyValue.",
+      "partOf": "KeyValue",
+      "docs": "docs/usage/KeyValue.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The label (\"Invoice\", \"Terms\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The value: text formatted with useFormat, or a computed value."
+        },
+        {
+          "name": "emphasis",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Sets the pair in bold, as a total."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "emphasis"
+      ]
+    },
+    {
+      "name": "KeyValueItemProps",
+      "kind": "type-only",
+      "source": "src/components/KeyValue/KeyValue.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "KeyValue",
+      "propsOf": "KeyValueItem"
+    },
+    {
+      "name": "KeyValueProps",
+      "kind": "type-only",
+      "source": "src/components/KeyValue/KeyValue.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "KeyValue",
+      "propsOf": "KeyValue"
+    },
+    {
       "name": "LayoutElement",
       "kind": "type-only",
       "source": "src/primitives/types.ts",
@@ -11058,6 +11994,91 @@
         "li",
         "dl"
       ]
+    },
+    {
+      "name": "Letterhead",
+      "kind": "component",
+      "source": "src/components/Letterhead/Letterhead.tsx",
+      "status": null,
+      "description": "The issuer's letterhead at the top of a letter, an invoice or a certificate: its mark beside its name and address, above a rule. First page only: running text on later pages is a DocumentHeader.",
+      "docs": "docs/usage/Letterhead.usage.tsx",
+      "props": [
+        {
+          "name": "logo",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "The issuer's mark: a logo image or an Avatar."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The issuer's block: its name and an Address. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The issuer’s block at the top of a letter, an invoice or a certificate: its mark (`logo`), name and `Address`, above a rule. First page only."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Text that runs on every page",
+            "instead": "`DocumentHeader`"
+          },
+          {
+            "situation": "An agreement’s title and parties",
+            "instead": "`DocumentTitle`"
+          }
+        ],
+        "do": {
+          "caption": "The issuer named in text, with its address as an Address.",
+          "code": "<DocumentViewer>\n  <Document label=\"Offer letter\">\n    <Letterhead>\n      <Heading level={2} size={4}>\n        Acme Corp\n      </Heading>\n      <Address lines={['500 Pine Street', 'Seattle, WA 98101']} />\n    </Letterhead>\n    <Text>Dear Maya,</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A letterhead that is only an image: its name and address can’t be read, copied or exported.",
+          "code": "<DocumentViewer>\n  <Document label=\"Offer letter\">\n    <Text>[Letterhead image]</Text>\n    <Text>Dear Maya,</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `header` inside the document’s `article`; the issuer’s name is real text, and a logo image needs its own alternative text."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Letterhead",
+        "stories": [
+          {
+            "id": "components-letterhead--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.border.default",
+          "color.fg.default",
+          "space.gap.2xs",
+          "space.gap.md",
+          "space.inset.md"
+        ]
+      }
+    },
+    {
+      "name": "LetterheadProps",
+      "kind": "type-only",
+      "source": "src/components/Letterhead/Letterhead.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Letterhead",
+      "propsOf": "Letterhead"
     },
     {
       "name": "Link",
@@ -11339,6 +12360,105 @@
       "status": null,
       "description": "Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings (\"$\" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.",
       "definition": "interface LocaleSettings { locale: string; timeZone: string; }"
+    },
+    {
+      "name": "Margin",
+      "kind": "component",
+      "source": "src/components/Margin/Margin.tsx",
+      "status": null,
+      "description": "The margin beside the part of the document it is in: a clause's note for whoever drafts it, the per-page initials slot. It sits in the margin beside the paper when the viewer is wide enough, and in the flow, under what it annotates, when it is not.",
+      "docs": "docs/usage/Margin.usage.tsx",
+      "props": [
+        {
+          "name": "side",
+          "type": "'start' | 'end'",
+          "required": false,
+          "default": "'end'",
+          "description": "Which margin: end (the right in left-to-right text, the default) or start.",
+          "values": [
+            "start",
+            "end"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "What sits in the margin: a ClauseNote, an Initials slot."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "side": [
+          "start",
+          "end"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "What sits beside the text rather than in it: a clause’s note for whoever drafts or reviews it (Clause `note` puts its ClauseNote in a Margin), and the per-page initials slot.",
+          "It sits in the margin beside the paper when the viewer is at least 75rem wide, and in the flow under what it annotates when it is narrower. `side` picks the end (default) or start margin."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A notice that is part of the document",
+            "instead": "`Callout`"
+          },
+          {
+            "situation": "A comment thread on a passage",
+            "instead": "the review tools around the DocumentViewer"
+          }
+        ],
+        "do": {
+          "caption": "A clause note in the margin, through Clause note.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"cap\" title=\"Liability\" note={<ClauseNote position=\"balanced\" />}>\n      <Text>Capped at twelve months of fees.</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A note typed into the clause’s text: it prints and gets signed as part of the agreement.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"cap\" title=\"Liability\">\n      <Text>Capped at twelve months of fees. (Note: balanced position.)</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `aside` in source order right after what it annotates, so it is read next to it at any width.",
+          "Placed by a container query on the viewer’s canvas, not by the viewport."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Margin",
+        "stories": [
+          {
+            "id": "components-margin--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-margin--start-side",
+            "name": "Start Side"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "size.document.note",
+          "space.gap.md",
+          "space.gap.xs",
+          "space.inset.xl"
+        ]
+      }
+    },
+    {
+      "name": "MarginProps",
+      "kind": "type-only",
+      "source": "src/components/Margin/Margin.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Margin",
+      "propsOf": "Margin"
     },
     {
       "name": "Menu",
@@ -14651,6 +15771,20 @@
       "propsOf": "ReviewChanges"
     },
     {
+      "name": "RunningPages",
+      "kind": "type-only",
+      "source": "src/components/DocumentHeader/DocumentHeader.tsx",
+      "status": null,
+      "description": "Which printed pages a running header or footer appears on.",
+      "partOf": "DocumentHeader",
+      "definition": "type RunningPages = 'all' | 'first' | 'rest'",
+      "values": [
+        "all",
+        "first",
+        "rest"
+      ]
+    },
+    {
       "name": "ScrollRegionToken",
       "kind": "type-only",
       "source": "src/tokens/tokens.ts",
@@ -14662,6 +15796,116 @@
         "md",
         "lg"
       ]
+    },
+    {
+      "name": "Seal",
+      "kind": "component",
+      "source": "src/components/Seal/Seal.tsx",
+      "status": null,
+      "description": "An issuer's official seal or stamp on a certificate, a license or a notarised page, named by its issuer.",
+      "docs": "docs/usage/Seal.usage.tsx",
+      "props": [
+        {
+          "name": "issuer",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Who issued it (\"State of Washington\"): names the seal. Required."
+        },
+        {
+          "name": "src",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The seal's image. Required."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An issuer’s official seal or stamp on a certificate, a license or a notarised page, named by its `issuer`, at size.document.seal."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A company logo",
+            "instead": "the `Letterhead` logo"
+          },
+          {
+            "situation": "A signature",
+            "instead": "the signature parts"
+          }
+        ],
+        "do": {
+          "caption": "The seal named by its issuer.",
+          "code": "<DocumentViewer>\n  <Document label=\"Certificate\">\n    <Seal issuer=\"Acme Training Institute\" src={SEAL} />\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "“(SEAL)” as text: nothing shows who issued it.",
+          "code": "<DocumentViewer>\n  <Document label=\"Certificate\">\n    <Text>(SEAL)</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An image named “Seal of <issuer>”."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Seal",
+        "stories": [
+          {
+            "id": "components-seal--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.document.seal",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "SealProps",
+      "kind": "type-only",
+      "source": "src/components/Seal/Seal.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Seal",
+      "propsOf": "Seal"
     },
     {
       "name": "SearchField",
@@ -17300,6 +18544,7 @@
           "space.gap.xl",
           "space.gap.xs",
           "space.page.margin",
+          "text.caption",
           "text.heading-1",
           "text.heading-2",
           "text.heading-3",
@@ -20180,6 +21425,7 @@
           "color.border.default",
           "color.fg.default",
           "color.fg.link",
+          "color.fg.muted",
           "radius.indicator",
           "ratio.page",
           "ratio.page-landscape",
@@ -20197,7 +21443,8 @@
           "space.gap.xl",
           "space.gap.xs",
           "space.page.margin",
-          "text.body-lg"
+          "text.body-lg",
+          "text.caption"
         ]
       }
     },
@@ -20965,6 +22212,120 @@
       "docs": "docs/usage/Icons.usage.tsx"
     },
     {
+      "name": "Watermark",
+      "kind": "component",
+      "source": "src/components/Watermark/Watermark.tsx",
+      "status": null,
+      "description": "A word across the document (“DRAFT”), faint behind the text, on every printed page. By default it shows until the document is executed. It is announced once, as an image named by its word.",
+      "docs": "docs/usage/Watermark.usage.tsx",
+      "props": [
+        {
+          "name": "text",
+          "type": "string",
+          "required": false,
+          "default": "'DRAFT'",
+          "description": "The word across the page (\"DRAFT\", \"CONFIDENTIAL\"). Default \"DRAFT\"."
+        },
+        {
+          "name": "show",
+          "type": "boolean",
+          "required": false,
+          "default": null,
+          "description": "Show it. Default: until the document is executed (`lifecycle` other than \"executed\")."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "show"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `show` overrides that."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A document’s status in the app (Draft, Sent, Signed)",
+            "instead": "a `Badge` in the `PageHeader`"
+          },
+          {
+            "situation": "Marking what changed",
+            "instead": "`Change`"
+          }
+        ],
+        "do": {
+          "caption": "One Watermark, shown by the document’s lifecycle.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\" lifecycle=\"negotiated\">\n    <Watermark />\n    <Text>The Agreement.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "“DRAFT” typed into the text: it stays after signing unless someone remembers to remove it.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>DRAFT</Text>\n    <Text>The Agreement.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An image named by its word, read once at the start of the document. Behind the text, it never blocks selecting or reading it."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Watermark",
+        "stories": [
+          {
+            "id": "components-watermark--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-watermark--confidential",
+            "name": "Confidential"
+          },
+          {
+            "id": "components-watermark--executed",
+            "name": "Executed"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption",
+          "text.heading-1",
+          "z.behind"
+        ]
+      }
+    },
+    {
+      "name": "WatermarkProps",
+      "kind": "type-only",
+      "source": "src/components/Watermark/Watermark.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Watermark",
+      "propsOf": "Watermark"
+    },
+    {
       "name": "Xref",
       "kind": "component",
       "source": "src/components/Xref/Xref.tsx",
@@ -21053,6 +22414,7 @@
           "color.border.default",
           "color.fg.default",
           "color.fg.link",
+          "color.fg.muted",
           "color.status.danger.fg",
           "focus.ring.offset",
           "focus.ring.width",
@@ -21071,7 +22433,8 @@
           "space.gap.sm",
           "space.gap.xl",
           "space.gap.xs",
-          "space.page.margin"
+          "space.page.margin",
+          "text.caption"
         ]
       }
     },
@@ -23233,6 +24596,18 @@
       ],
       "modes": {}
     },
+    "size.document.seal": {
+      "cssVar": "--size-document-seal",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Size of an issuer's seal or stamp on a certificate or license (Seal).",
+      "value": "96px",
+      "chain": [
+        "size.document.seal",
+        "size.24"
+      ],
+      "modes": {}
+    },
     "size.drawer.md": {
       "cssVar": "--size-drawer-md",
       "tier": "semantic",
@@ -23856,6 +25231,18 @@
       "chain": [
         "z.base",
         "layer.0"
+      ],
+      "modes": {}
+    },
+    "z.behind": {
+      "cssVar": "--z-behind",
+      "tier": "semantic",
+      "type": "number",
+      "description": "Behind content inside an isolated part: a document’s watermark, under its text.",
+      "value": "-1",
+      "chain": [
+        "z.behind",
+        "layer.behind"
       ],
       "modes": {}
     },

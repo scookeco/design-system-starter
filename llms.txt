@@ -105,12 +105,14 @@ UI rules (design system v0)
 ## Components
 
 - [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [Address](docs/usage/Address.usage.tsx): A postal address block in a document
 - [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
+- [Callout](docs/usage/Callout.usage.tsx): A notice inside a document, set apart from its text
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
 - [Change](docs/usage/Change.usage.tsx): A tracked change in a document compare view
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
@@ -130,6 +132,8 @@ UI rules (design system v0)
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentHeader](docs/usage/DocumentHeader.usage.tsx): A running header: on screen, a line above the document
+- [DocumentList](docs/usage/DocumentList.usage.tsx): A list in a document's text that is not part of its…
 - [DocumentSection](docs/usage/DocumentSection.usage.tsx): A titled section of a Document that is not a contract clause
 - [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
@@ -137,13 +141,17 @@ UI rules (design system v0)
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
 - [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same Document
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
+- [Figure](docs/usage/Figure.usage.tsx): An image, a diagram or a chart in a document, with its caption
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [Highlight](docs/usage/Highlight.usage.tsx): A highlighted passage
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
+- [KeyValue](docs/usage/KeyValue.usage.tsx): Label and value pairs in a document
+- [Letterhead](docs/usage/Letterhead.usage.tsx): The issuer's letterhead at the top of a letter
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
+- [Margin](docs/usage/Margin.usage.tsx): The margin beside the part of the document it is in
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
@@ -158,6 +166,7 @@ UI rules (design system v0)
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
 - [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
+- [Seal](docs/usage/Seal.usage.tsx): An issuer's official seal or stamp on a certificate
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
@@ -184,6 +193,7 @@ UI rules (design system v0)
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
+- [Watermark](docs/usage/Watermark.usage.tsx): A word across the document, faint behind the text
 - [Xref](docs/usage/Xref.usage.tsx): A cross-reference inside a Document
 
 ## Primitives

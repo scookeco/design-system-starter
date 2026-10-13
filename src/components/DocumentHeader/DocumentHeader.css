@@ -1,0 +1,25 @@
+@layer components {
+  /* On screen: a muted line above or below the document. In print the page margins show them. */
+  .document-header,
+  .document-footer {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .document-header {
+    padding-block-end: var(--space-inset-sm);
+    border-block-end: 1px solid var(--color-border-default);
+  }
+
+  .document-footer {
+    padding-block-start: var(--space-inset-sm);
+    border-block-start: 1px solid var(--color-border-default);
+  }
+
+  @media print {
+    .document-header,
+    .document-footer {
+      display: none;
+    }
+  }
+}

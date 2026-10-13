@@ -1,5 +1,8 @@
 {
   "layer": {
+    "behind": {
+      "$value": -1
+    },
     "0": {
       "$value": 0
     },

@@ -1,0 +1,28 @@
+@layer components {
+  /* Set apart by a bar in its kind's colour and a subtle ground; the title says the kind in words. */
+  .callout {
+    --callout-bar: var(--color-status-info-border);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    padding: var(--space-inset-sm) var(--space-inset-md);
+    border-inline-start: var(--border-width-change-bar) solid var(--callout-bar);
+    background: var(--color-bg-subtle);
+    color: var(--color-fg-default);
+    font: var(--text-body);
+  }
+
+  .callout[data-kind="warning"] {
+    --callout-bar: var(--color-status-warning-border);
+  }
+
+  .callout[data-kind="instruction"] {
+    --callout-bar: var(--color-border-strong);
+  }
+
+  .callout__title {
+    margin: 0;
+    font-weight: var(--font-weight-strong);
+  }
+}

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useId, type ReactNode } from 'react';
 import { changeLabel, type ChangeColor, type ChangeKind } from '../Change/Change';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
+import { Margin } from '../Margin/Margin';
 import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, SectionDepthContext, scopedId, termId } from '../Document/documentIndex';
 import './Clause.css';
 
@@ -13,7 +14,7 @@ export interface ClauseProps {
   children: ReactNode;
   /** False for a clause that takes no number (a heading-only part, a preamble): the ones after it don't skip one. Default true. */
   numbered?: boolean;
-  /** A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not. */
+  /** A ClauseNote for whoever drafts or reviews it, in a Margin: beside the paper when the viewer is wide enough, under the heading when not. */
   note?: ReactNode;
   /** Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out. */
   conspicuous?: boolean;
@@ -67,7 +68,7 @@ export function Clause({ id, title, children, numbered = true, note, conspicuous
         ) : (
           number
         )}
-        {note ? <div className="clause__note">{note}</div> : null}
+        {note ? <Margin>{note}</Margin> : null}
         {children}
       </section>
     </ClauseDepthContext>

@@ -72,8 +72,8 @@ const ADOPTED = [
     without: 'The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead.',
   },
   {
-    feature: '`@page` with `size` and named pages (`page`)',
-    where: 'Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is',
+    feature: '`@page` with `size`, named pages (`page`) and page margin boxes',
+    where: 'Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is. DocumentHeader and DocumentFooter run in the margin boxes (`@top-center`, `@bottom-center`, `counter(page)`), their text handed over in custom properties',
     replaces: 'Nothing: printing a document took the browser’s default page and margins.',
     baseline: 'Newly available (2024-12-11); widely available on 2027-06-11',
     without: 'Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it.',

@@ -11,7 +11,7 @@ import { openStory, stories } from './storybook';
  */
 
 /** Story titles whose stories draw clause numbers or exhibit letters. */
-const DOCUMENT_STORIES = /^Components\/(Clause|Exhibit|Document|DocumentSection|DocumentTitle|DocumentViewer|Toc|Xref|Definitions|Change|ClauseNote|SignaturePage)$/;
+const DOCUMENT_STORIES = /^Components\/(Clause|Exhibit|Document|DocumentSection|DocumentTitle|DocumentViewer|Toc|Xref|Definitions|Change|ClauseNote|SignaturePage|Margin|DocumentHeader|Watermark)$/;
 
 interface Drawn {
   expected: string;
