@@ -12,7 +12,7 @@
       "@internationalized/date"
     ],
     "gzip": true,
-    "limit": "45 kB"
+    "limit": "46 kB"
   },
   {
     "name": "Library CSS (dist/styles.css)",

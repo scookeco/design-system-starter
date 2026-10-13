@@ -105,6 +105,7 @@ UI rules (design system v0)
 ## Components
 
 - [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [Acknowledge](docs/usage/Acknowledge.usage.tsx): The acknowledgement at the end of a policy or handbook
 - [Address](docs/usage/Address.usage.tsx): A postal address block in a document
 - [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
@@ -170,17 +171,20 @@ UI rules (design system v0)
 - [NumberField](docs/usage/NumberField.usage.tsx): A number typed in the reader's own format
 - [PageHeader](docs/usage/PageHeader.usage.tsx): The top of every page
 - [Pagination](docs/usage/Pagination.usage.tsx): Moves through a long, server-paged list
+- [Parties](docs/usage/Parties.usage.tsx): Declares the parties a document names by role
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
 - [Repeat](docs/usage/Repeat.usage.tsx): The same block once per row
 - [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
+- [RoleRegion](docs/usage/RoleRegion.usage.tsx): A part of a document that belongs to one party
 - [Seal](docs/usage/Seal.usage.tsx): An issuer's official seal or stamp on a certificate
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
-- [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
+- [Signature](docs/usage/Signature.usage.tsx): Where a party signs
+- [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): A party's signature block, laid out as e-signature tags it
 - [SignaturePage](docs/usage/SignaturePage.usage.tsx): The execution page that ends an agreement
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range

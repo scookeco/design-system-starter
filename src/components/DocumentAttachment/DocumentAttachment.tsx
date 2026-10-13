@@ -1,7 +1,7 @@
-import { useContext, useId } from 'react';
+import { useId } from 'react';
 import { useFormat } from '../../format/LocaleProvider';
 import { areaStyle, type DocumentArea } from '../Document/Document';
-import { HiddenContext, RoleContext, useField } from '../Document/data';
+import { useCapture, useField } from '../Document/data';
 import '../DocumentField/DocumentField.css';
 
 export interface DocumentAttachmentProps {
@@ -25,10 +25,10 @@ export interface DocumentAttachmentProps {
  * editable, the attached files' names otherwise. Stores names only; the app keeps the files.
  */
 export function DocumentAttachment({ name, label, accept, multiple = false, role, required = false, area }: DocumentAttachmentProps) {
-  const { data, path, value, set } = useField(name);
+  const { path, value, set } = useField(name);
   const format = useFormat();
-  const hidden = useContext(HiddenContext);
-  const inherited = useContext(RoleContext);
+  const capture = useCapture(role);
+  const hidden = capture.hidden;
   const id = useId();
   const names = Array.isArray(value) ? (value as string[]) : [];
   return (
@@ -36,16 +36,16 @@ export function DocumentAttachment({ name, label, accept, multiple = false, role
       className="document-field"
       data-doc="attachment"
       data-name={path}
-      data-role={role ?? inherited ?? undefined}
+      data-role={capture.role}
       data-required={required ? 'true' : undefined}
       data-label-visible="true"
-      data-state={!data.editable && !names.length ? 'blank' : undefined}
+      data-state={!capture.editable && !names.length ? 'blank' : undefined}
       style={areaStyle(area)}
     >
       <label htmlFor={id} className="document-field__label">
         {label}
       </label>
-      {data.editable ? (
+      {capture.editable ? (
         <input
           id={id}
           type="file"

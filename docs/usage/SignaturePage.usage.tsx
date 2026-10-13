@@ -1,37 +1,41 @@
-import { SignatureBlock, SignaturePage, SignatureParty, Text } from '../../src/index';
+import { Document, Parties, Party, SignatureBlock, SignaturePage, SignatureParty, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
   covers: [SignaturePage, SignatureParty],
   whenToUse: [
-    'The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.',
+    'The execution page at the end of an agreement, a page of its own in print: the “IN WITNESS WHEREOF” line, then each party (`role`) by name over its `SignatureBlock`, in its colour.',
     'One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width.',
   ],
   whenNotToUse: [
-    { situation: 'One signer’s fields in the middle of a document (initials, a date)', instead: 'a `SignatureBlock` on its own' },
+    { situation: 'One signer’s fields in the middle of a document (initials, a date)', instead: '`Signature`, `Initials`, `DateSigned`' },
     { situation: 'A list of who has signed so far', instead: '`Timeline`' },
   ],
   do: {
-    caption: 'One party per SignatureParty, each signer in their own recipient colour.',
+    caption: 'Parties declared once, then one SignatureParty each.',
     render: () => (
-      <SignaturePage>
-        <SignatureParty name="Acme Corp">
-          <SignatureBlock name="Maya Okafor" recipient={3} />
-        </SignatureParty>
-        <SignatureParty name="Globex Inc.">
-          <SignatureBlock name="Jon Park" recipient={1} />
-        </SignatureParty>
-      </SignaturePage>
+      <Document label="Agreement">
+        <Parties>
+          <Party role="provider" name="Acme Corp" />
+          <Party role="customer" name="Globex Inc." />
+        </Parties>
+        <SignaturePage>
+          <SignatureParty role="provider" />
+          <SignatureParty role="customer" />
+        </SignaturePage>
+      </Document>
     ),
   },
   dont: {
     caption: 'Signers stacked under one typed heading: who signs for which party is lost.',
     render: () => (
-      <>
+      <Document label="Agreement">
+        <Parties>
+          <Party role="provider" name="Acme Corp" />
+        </Parties>
         <Text>Signatures:</Text>
-        <SignatureBlock name="Maya Okafor" recipient={1} />
-        <SignatureBlock name="Jon Park" recipient={1} />
-      </>
+        <SignatureBlock role="provider" />
+      </Document>
     ),
   },
   accessibility: [

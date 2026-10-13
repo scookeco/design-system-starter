@@ -1,6 +1,6 @@
 import { createContext, useContext, useId, type ReactNode } from 'react';
 import { areaStyle, type DocumentArea } from '../Document/Document';
-import { HiddenContext, RoleContext, useField } from '../Document/data';
+import { useCapture, useField } from '../Document/data';
 import './DocumentRadioGroup.css';
 
 interface Choice {
@@ -31,20 +31,20 @@ export interface DocumentRadioGroupProps {
 
 /** One choice of several in a document (a W-4's filing status), each a radio with its label. */
 export function DocumentRadioGroup({ name, label, role, required = false, area, children }: DocumentRadioGroupProps) {
-  const { data, path, value, set } = useField(name);
-  const hidden = useContext(HiddenContext);
-  const inherited = useContext(RoleContext);
+  const { path, value, set } = useField(name);
+  const capture = useCapture(role);
+  const hidden = capture.hidden;
   return (
     <fieldset
       className="document-radio-group"
       data-doc="radio-group"
       data-name={path}
-      data-role={role ?? inherited ?? undefined}
+      data-role={capture.role}
       data-required={required ? 'true' : undefined}
       style={areaStyle(area)}
     >
       <legend className="document-radio-group__legend">{label}</legend>
-      <ChoiceContext value={{ kind: 'radio', path, value, set, required: required && !hidden, disabled: hidden || !data.editable }}>{children}</ChoiceContext>
+      <ChoiceContext value={{ kind: 'radio', path, value, set, required: required && !hidden, disabled: hidden || !capture.editable }}>{children}</ChoiceContext>
     </fieldset>
   );
 }

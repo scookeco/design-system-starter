@@ -24,6 +24,8 @@ export interface DocumentData {
   /** The currency of currency fields and computed amounts. */
   currency: string;
   printMode: 'all' | 'resolved';
+  /** The party acting now (`actor` on the Document): only its fields are editable. Null: every field. */
+  actor: string | null;
   setValue: (path: string, value: unknown) => void;
   /** What a name means here: a row's value, a field, a computed value, or a list through rows. */
   lookup: (path: readonly string[], row: RowScope | null) => Value;
@@ -87,11 +89,12 @@ export interface DocumentDataProviderProps {
   onValuesChange?: (values: DocumentValues) => void;
   currency: string;
   printMode: 'all' | 'resolved';
+  actor?: string;
   children: ReactNode;
 }
 
 /** Holds a Document's values (controlled with `values`, or its own from `defaultValues`) and its computed formulas. */
-export function DocumentDataProvider({ lifecycle, values: controlled, defaultValues, onValuesChange, currency, printMode, children }: DocumentDataProviderProps) {
+export function DocumentDataProvider({ lifecycle, values: controlled, defaultValues, onValuesChange, currency, printMode, actor, children }: DocumentDataProviderProps) {
   const [own, setOwn] = useState<DocumentValues>(defaultValues ?? {});
   const values = controlled ?? own;
   const latest = useRef(values);
@@ -162,12 +165,13 @@ export function DocumentDataProvider({ lifecycle, values: controlled, defaultVal
       editable: lifecycle === 'filled' || lifecycle === 'negotiated',
       currency,
       printMode,
+      actor: actor ?? null,
       setValue,
       lookup: (path, row) => (path.length === 1 && path[0] === 'lifecycle' ? lifecycle : lookup(path, row)),
       registerComputed,
       announce,
     }),
-    [values, lifecycle, currency, printMode, setValue, lookup, registerComputed, announce],
+    [values, lifecycle, currency, printMode, actor, setValue, lookup, registerComputed, announce],
   );
   return <DocumentDataContext value={data}>{children}</DocumentDataContext>;
 }
@@ -181,6 +185,7 @@ export function useDocumentData(): DocumentData {
       editable: false,
       currency: 'USD',
       printMode: 'all',
+      actor: null,
       setValue: noop,
       lookup: () => null,
       registerComputed: () => noop,
@@ -197,6 +202,20 @@ export function useField(name: string) {
   const value = read(data.values, path.split('.'));
   const set = useCallback((next: unknown) => data.setValue(path, next), [data, path]);
   return { data, row, path, value, set };
+}
+
+/**
+ * Who fills a capture element and whether it can now: its own `role`, else the enclosing fieldset's
+ * or role region's; editable while the document is, by the acting party only (when there is one),
+ * and never inside a Conditional that is off.
+ */
+export function useCapture(role: string | undefined) {
+  const data = useDocumentData();
+  const inherited = useContext(RoleContext);
+  const hidden = useContext(HiddenContext);
+  const resolved = role ?? inherited ?? undefined;
+  const mine = data.actor === null || resolved === undefined || resolved === data.actor;
+  return { role: resolved, hidden, editable: data.editable && mine };
 }
 
 /** Registers a computed formula while it is mounted. */

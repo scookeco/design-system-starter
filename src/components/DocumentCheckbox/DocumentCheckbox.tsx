@@ -1,6 +1,5 @@
-import { useContext } from 'react';
 import { areaStyle, type DocumentArea } from '../Document/Document';
-import { HiddenContext, RoleContext, useField } from '../Document/data';
+import { useCapture, useField } from '../Document/data';
 import './DocumentCheckbox.css';
 
 export interface DocumentCheckboxProps {
@@ -20,15 +19,15 @@ export interface DocumentCheckboxProps {
  * or negotiated; otherwise it shows its state, checked or not, as the printed form does.
  */
 export function DocumentCheckbox({ name, label, role, required = false, area }: DocumentCheckboxProps) {
-  const { data, path, value, set } = useField(name);
-  const hidden = useContext(HiddenContext);
-  const inherited = useContext(RoleContext);
+  const { path, value, set } = useField(name);
+  const capture = useCapture(role);
+  const hidden = capture.hidden;
   return (
     <label
       className="document-checkbox"
       data-doc="checkbox"
       data-name={path}
-      data-role={role ?? inherited ?? undefined}
+      data-role={capture.role}
       data-required={required ? 'true' : undefined}
       style={areaStyle(area)}
     >
@@ -38,7 +37,7 @@ export function DocumentCheckbox({ name, label, role, required = false, area }: 
         name={path}
         checked={value === true}
         required={required && !hidden}
-        disabled={hidden || !data.editable}
+        disabled={hidden || !capture.editable}
         onChange={(event) => set(event.target.checked)}
       />
       {label}

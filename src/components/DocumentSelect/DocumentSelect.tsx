@@ -1,6 +1,6 @@
-import { useContext, useId, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { areaStyle, type DocumentArea } from '../Document/Document';
-import { HiddenContext, RoleContext, useField } from '../Document/data';
+import { useCapture, useField } from '../Document/data';
 import { ChoiceContext } from '../DocumentRadioGroup/DocumentRadioGroup';
 import '../DocumentField/DocumentField.css';
 
@@ -22,21 +22,21 @@ export interface DocumentSelectProps {
 
 /** A choice from a list in a document: a native select while editable, the chosen option's words otherwise. */
 export function DocumentSelect({ name, label, showLabel = false, role, required = false, area, children }: DocumentSelectProps) {
-  const { data, path, value, set } = useField(name);
-  const hidden = useContext(HiddenContext);
-  const inherited = useContext(RoleContext);
+  const { path, value, set } = useField(name);
+  const capture = useCapture(role);
+  const hidden = capture.hidden;
   const id = useId();
   const common = {
     className: 'document-field',
     'data-doc': 'select',
     'data-name': path,
-    'data-role': role ?? inherited ?? undefined,
+    'data-role': capture.role,
     'data-required': required ? 'true' : undefined,
     'data-label-visible': showLabel ? 'true' : undefined,
     style: areaStyle(area),
   } as const;
-  const choice = { kind: 'select' as const, path, value, set, required: required && !hidden, disabled: hidden || !data.editable };
-  if (!data.editable) {
+  const choice = { kind: 'select' as const, path, value, set, required: required && !hidden, disabled: hidden || !capture.editable };
+  if (!capture.editable) {
     // The chosen option's words, read from the options themselves.
     return (
       <span {...common} data-state={value ? undefined : 'blank'}>

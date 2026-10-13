@@ -12,7 +12,8 @@ import {
   Exhibit,
   Recital,
   Recitals,
-  SignatureBlock,
+  Parties,
+  Party,
   SignaturePage,
   SignatureParty,
   Text,
@@ -89,21 +90,23 @@ describe('Exhibit', () => {
 describe('SignaturePage', () => {
   it('puts each party’s name over its block', () => {
     render(
-      <SignaturePage>
-        <SignatureParty name="Acme Corp">
-          <SignatureBlock name="Maya Okafor" />
-        </SignatureParty>
-        <SignatureParty name="Globex Inc.">
-          <SignatureBlock name="Jon Park" />
-        </SignatureParty>
-        <SignatureParty name="Escrow Agent">
-          <SignatureBlock name="Rita Alvarez" />
-        </SignatureParty>
-      </SignaturePage>,
+      <Document label="Escrow agreement">
+        <Parties>
+          <Party role="provider" name="Acme Corp" />
+          <Party role="customer" name="Globex Inc." />
+          <Party role="escrow" name="Escrow Agent" />
+        </Parties>
+        <SignaturePage>
+          <SignatureParty role="provider" />
+          <SignatureParty role="customer" />
+          <SignatureParty role="escrow" />
+        </SignaturePage>
+      </Document>,
     );
     const page = screen.getByRole('region', { name: 'Signatures' });
     expect([...page.querySelectorAll('.signature-party__name')].map((n) => n.textContent)).toEqual(['Acme Corp', 'Globex Inc.', 'Escrow Agent']);
     expect(page.textContent).toContain('IN WITNESS WHEREOF');
+    expect(page.closest('[data-doc="page"]')).toBeTruthy();
   });
 });
 

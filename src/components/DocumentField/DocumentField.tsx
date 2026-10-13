@@ -1,8 +1,8 @@
-import { useContext, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { currencyDigits } from '../../format/format';
 import { useFormat } from '../../format/LocaleProvider';
 import { areaStyle, type DocumentArea } from '../Document/Document';
-import { HiddenContext, RoleContext, useField } from '../Document/data';
+import { useCapture, useField } from '../Document/data';
 import './DocumentField.css';
 
 /** What a field holds, which sets its input, its stored value and how it reads. */
@@ -67,8 +67,8 @@ const editText = (type: DocumentFieldType, value: unknown, currency: string): st
 export function DocumentField({ name, label, showLabel = false, type = 'text', role, required = false, pattern, placeholder, announceAs, area }: DocumentFieldProps) {
   const { data, path, value, set } = useField(name);
   const format = useFormat();
-  const hidden = useContext(HiddenContext);
-  const inherited = useContext(RoleContext);
+  const capture = useCapture(role);
+  const hidden = capture.hidden;
   const id = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const empty = value === null || value === undefined || value === '';
@@ -77,12 +77,12 @@ export function DocumentField({ name, label, showLabel = false, type = 'text', r
   const wasEmpty = useRef(empty);
   const [justFilled, setJustFilled] = useState(false);
   useEffect(() => {
-    if (!data.editable && wasEmpty.current && !empty) {
+    if (!capture.editable && wasEmpty.current && !empty) {
       setJustFilled(true);
       if (announceAs) data.announce(`${announceAs} filled: ${String(value)}`);
     }
     wasEmpty.current = empty;
-  }, [empty, value, announceAs, data]);
+  }, [empty, value, announceAs, data, capture.editable]);
 
   const readable = () => {
     if (type === 'currency' && typeof value === 'number') return format.money(value, data.currency);
@@ -96,13 +96,13 @@ export function DocumentField({ name, label, showLabel = false, type = 'text', r
     'data-doc': 'field',
     'data-name': path,
     'data-type': type,
-    'data-role': role ?? inherited ?? undefined,
+    'data-role': capture.role,
     'data-required': required ? 'true' : undefined,
     'data-label-visible': showLabel ? 'true' : undefined,
     style: areaStyle(area),
   } as const;
 
-  if (!data.editable) {
+  if (!capture.editable) {
     return (
       <span {...common} data-state={empty ? (placeholder ? 'placeholder' : 'blank') : justFilled ? 'filled-now' : undefined} onAnimationEnd={() => setJustFilled(false)}>
         {showLabel ? <span className="document-field__label">{label}</span> : null}

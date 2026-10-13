@@ -1,0 +1,101 @@
+@layer components {
+  /* A signing tab in its party's colour (color.category.N), the same on every field the party completes. */
+  .signature-field {
+    --signature-fg: var(--color-category-1-fg);
+    --signature-bg: var(--color-category-1-bg);
+    --signature-border: var(--color-category-1-border);
+
+    display: inline-flex;
+    align-items: flex-end;
+  }
+
+  .signature-field[data-recipient="2"] {
+    --signature-fg: var(--color-category-2-fg);
+    --signature-bg: var(--color-category-2-bg);
+    --signature-border: var(--color-category-2-border);
+  }
+
+  .signature-field[data-recipient="3"] {
+    --signature-fg: var(--color-category-3-fg);
+    --signature-bg: var(--color-category-3-bg);
+    --signature-border: var(--color-category-3-border);
+  }
+
+  .signature-field[data-recipient="4"] {
+    --signature-fg: var(--color-category-4-fg);
+    --signature-bg: var(--color-category-4-bg);
+    --signature-border: var(--color-category-4-border);
+  }
+
+  .signature-field[data-recipient="5"] {
+    --signature-fg: var(--color-category-5-fg);
+    --signature-bg: var(--color-category-5-bg);
+    --signature-border: var(--color-category-5-border);
+  }
+
+  .signature-field[data-recipient="6"] {
+    --signature-fg: var(--color-category-6-fg);
+    --signature-bg: var(--color-category-6-bg);
+    --signature-border: var(--color-category-6-border);
+  }
+
+  /* The space a signature takes: the same before and after signing, so nothing moves. */
+  .signature-field__slot {
+    display: flex;
+    align-items: flex-end;
+    inline-size: var(--size-signature-slot-inline);
+    block-size: var(--size-signature-slot-block);
+  }
+
+  /*
+   * A field tag, and the plain value that replaces it once signed: the same padding and a border of
+   * the same width (transparent once signed), so the value starts where the tag did.
+   */
+  .signature-field__tag,
+  .signature-field__text {
+    display: inline-flex;
+    align-items: center;
+    padding-block: var(--space-inset-2xs);
+    padding-inline: var(--space-inset-xs);
+    border: var(--border-width-field) solid transparent;
+    border-radius: var(--radius-indicator);
+  }
+
+  .signature-field__tag {
+    border-color: var(--signature-border);
+    background: var(--signature-bg);
+    color: var(--color-fg-default);
+  }
+
+  .signature-field__sign {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-gap-2xs);
+    inline-size: var(--size-signature-tag-inline);
+    block-size: 100%;
+    font: var(--text-label);
+  }
+
+  button.signature-field__sign {
+    cursor: pointer;
+  }
+
+  button.signature-field__sign:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .signature-field__drawn {
+    padding-inline: var(--space-inset-xs);
+    font: var(--text-signature);
+  }
+
+  /* Initials on every printed page: the page's corner, repeated by the print engine. */
+  @media print {
+    .signature-field[data-each-page] {
+      position: fixed;
+      inset-block-end: 0;
+      inset-inline-end: 0;
+    }
+  }
+}

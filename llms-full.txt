@@ -105,6 +105,7 @@ UI rules (design system v0)
 ## Components
 
 - [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [Acknowledge](docs/usage/Acknowledge.usage.tsx): The acknowledgement at the end of a policy or handbook
 - [Address](docs/usage/Address.usage.tsx): A postal address block in a document
 - [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
@@ -170,17 +171,20 @@ UI rules (design system v0)
 - [NumberField](docs/usage/NumberField.usage.tsx): A number typed in the reader's own format
 - [PageHeader](docs/usage/PageHeader.usage.tsx): The top of every page
 - [Pagination](docs/usage/Pagination.usage.tsx): Moves through a long, server-paged list
+- [Parties](docs/usage/Parties.usage.tsx): Declares the parties a document names by role
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
 - [Repeat](docs/usage/Repeat.usage.tsx): The same block once per row
 - [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
+- [RoleRegion](docs/usage/RoleRegion.usage.tsx): A part of a document that belongs to one party
 - [Seal](docs/usage/Seal.usage.tsx): An issuer's official seal or stamp on a certificate
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
-- [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): The signature block at the end of a generated document
+- [Signature](docs/usage/Signature.usage.tsx): Where a party signs
+- [SignatureBlock](docs/usage/SignatureBlock.usage.tsx): A party's signature block, laid out as e-signature tags it
 - [SignaturePage](docs/usage/SignaturePage.usage.tsx): The execution page that ends an agreement
 - [Skeleton](docs/usage/Skeleton.usage.tsx): Placeholder for content on first load
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
@@ -327,6 +331,56 @@ Variants: headingLevel (2 | 3 | 4 | 5 | 6); type (multiple | single).
 Stories: `components-accordion--single`, `components-accordion--multiple`, `components-accordion--all-closed`, `components-accordion--with-disabled-item`.
 Composes: Disclosure, Icon.
 Tokens read: `color.bg.hover`, `color.border.default`, `color.fg.default`, `ease.standard`, `icon.stroke`, `motion.fast`, `radius.control`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.xs`, `text.body`, `text.label`.
+
+### Acknowledge
+
+component · `src/components/Acknowledge/Acknowledge.tsx` · usage: `docs/usage/Acknowledge.usage.tsx`
+
+The acknowledgement at the end of a policy or handbook: a required box to check, a signature and the date signed, all for one party. The box is the document's `<role>_acknowledged` value.
+
+Props:
+- `role: string`: The party acknowledging (a role from Parties). Required.
+- `text: string`: What they acknowledge, as the box's label ("I have read and agree to the Employee Handbook"). Required.
+- `onSign?: () => void`: Starts the app's adopt-signature flow, as Signature's onSign.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- The acknowledgement that ends a policy or a handbook: a required box (`text` is its label), a signature and the date signed, all for one party (`role`). The box is the document’s `<role>_acknowledged` value.
+
+**When not to use**
+
+- An agreement both parties execute → `SignaturePage`
+- A consent box with no signature → `DocumentCheckbox`
+
+**Do:** Read, agreed and signed, by one party.
+
+```tsx
+<Document label="Handbook" lifecycle="filled">
+  <Parties>
+    <Party role="employee" name="Employee" />
+  </Parties>
+  <Acknowledge role="employee" text="I have read and agree to the Employee Handbook" />
+</Document>
+```
+
+**Don't:** “By signing below you agree” and a signature: what was agreed isn’t captured on its own.
+
+```tsx
+<Document label="Handbook">
+  <Text>By signing below you agree to the handbook. Signature: ________</Text>
+</Document>
+```
+
+**Accessibility**
+
+- A fieldset named “Acknowledgement”: the box’s label is the statement agreed to, and the Sign button is named for the party.
+
+Stories: `components-acknowledge--default`.
+Composes: Document, DocumentCheckbox, Icon, Parties, Signature.
+Tokens read: `border.width.field`, `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.xs`, `space.page.margin`, `text.caption`, `text.label`, `text.signature`.
 
 ### Address
 
@@ -2083,6 +2137,7 @@ Props:
 - `onSubmit?: (values: DocumentValues) => void`: Makes the document a form: called with its values when it is submitted and every required field is filled.
 - `formId?: string`: The form's id, for a submit button outside the document (`form` on the button).
 - `currency?: string` = `'USD'`: The currency of currency fields and computed amounts (ISO 4217). Default "USD".
+- `actor?: string`: The party acting now (a role from Parties): only its fields are editable; the others read as text.
 - `printMode?: 'all' | 'resolved'` = `'all'`: In print, every branch of each Conditional (all, the default: a blank form shows every option) or only those that hold (resolved).
 - `children: ReactNode`: The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly.
 
@@ -4358,6 +4413,69 @@ Stories: `components-pagination--first-page`, `components-pagination--middle-pag
 Composes: Icon.
 Tokens read: `color.action.primary`, `color.bg.hover`, `color.bg.selected`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `font.weight.strong`, `icon.stroke`, `radius.control`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.inset.xs`, `text.caption`, `text.label`.
 
+### Parties
+
+component · `src/components/Parties/Parties.tsx` · usage: `docs/usage/Parties.usage.tsx`
+
+Declares the parties a document names by role: who signs, who is copied, who witnesses, in which order. Declare every role before the fields that use it. Not shown: the document names its parties in its own text; this is what fields, signatures and routing read.
+
+Props:
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+#### Party
+
+component, part of Parties. One party in Parties.
+
+Props:
+- `role: string`: The role id fields and signatures use ("customer", "employee"). Required.
+- `name: string`: What the document calls the party ("Fontara, Inc.", "Employee"). Required.
+- `kind?: PartyKind` = `'signer'`: How it takes part. Default signer.
+- `order?: number` = `1`: Routing order: parties with the same order act in parallel. Default 1.
+- `color?: PartyColor`: Its colour. Default: by the order parties are declared.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Every document someone fills or signs: declare its parties once, by role (“employee”, “customer”), before any field that names one. `kind` is signer, cc, witness or approver; `order` is the routing order (the same order signs in parallel). Each party’s colour follows declaration order unless `color` sets it.
+- Fields, signatures and role regions name a party by `role`; the document never names a person. The `Document`’s `actor` says which party is acting now: only its fields are editable.
+
+**When not to use**
+
+- Naming the parties in the text (the preamble) → `DocumentTitle` with `Term`: Parties is not shown
+- Generated documents nobody fills or signs (a statement) → nothing: they have no roles
+
+**Do:** Roles declared once; fields name a role.
+
+```tsx
+<Document label="W-4" lifecycle="filled">
+  <Parties>
+    <Party role="employee" name="Employee" />
+    <Party role="employer" name="Employer" order={2} />
+  </Parties>
+  <DocumentField name="first_name" label="First name" showLabel role="employee" />
+</Document>
+```
+
+**Don't:** A person instead of a role: the template can’t be sent to anyone else without editing it.
+
+```tsx
+<Document label="W-4" lifecycle="filled">
+  <Text>Maya Okafor fills in:</Text>
+  <DocumentField name="first_name" label="First name" showLabel />
+</Document>
+```
+
+**Accessibility**
+
+- Not shown and not announced: the document’s own text names its parties. What the reader sees per party (a colour) always comes with its name.
+
+Stories: `components-parties--default`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### Popover
 
 component · `src/components/Popover/Popover.tsx` · usage: `docs/usage/Popover.usage.tsx`
@@ -4729,6 +4847,57 @@ Stories: `components-reviewchanges--reviewing`, `components-reviewchanges--partl
 Composes: AiMarker, Badge, Button, Icon, Spinner, Toggle.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.border`, `color.status.danger.fg`, `color.status.info.bg`, `color.status.info.border`, `color.status.info.fg`, `color.status.neutral.bg`, `color.status.neutral.border`, `color.status.neutral.fg`, `color.status.success.bg`, `color.status.success.border`, `color.status.success.fg`, `color.status.warning.bg`, `color.status.warning.border`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-4`, `text.label`.
 
+### RoleRegion
+
+component · `src/components/RoleRegion/RoleRegion.tsx` · usage: `docs/usage/RoleRegion.usage.tsx`
+
+A part of a document that belongs to one party (a form's “Employers only” block): every field inside is that party's unless it says otherwise. Assigns the role only; it draws nothing of its own.
+
+Props:
+- `role: string`: The party every field inside is for (a role from Parties). Required.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: Any part of the document: text, fields, steps. Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A part of a document that belongs to one party, with more than fields in it (a heading, instructions): a form’s “Employers only” block. Every field inside is that party’s unless it says otherwise. It draws nothing of its own.
+
+**When not to use**
+
+- Only a group of fields → `DocumentFieldset` with `role`
+- One field → `role` on the field
+
+**Do:** One block assigned to the employer.
+
+```tsx
+<Document label="Form" lifecycle="filled">
+  <Parties>
+    <Party role="employer" name="Employer" />
+  </Parties>
+  <RoleRegion role="employer">
+    <DocumentField name="ein" label="EIN" type="ein" showLabel />
+  </RoleRegion>
+</Document>
+```
+
+**Don't:** A block with no role: its fields go to nobody, and the validator rejects a document to be filled with unassigned fields.
+
+```tsx
+<Document label="Form" lifecycle="filled">
+  <DocumentField name="ein" label="EIN" type="ein" showLabel />
+</Document>
+```
+
+**Accessibility**
+
+- A plain block: headings and fields inside keep their own semantics; nothing is announced for the role.
+
+Stories: `components-roleregion--default`, `components-roleregion--employee-acting`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### Seal
 
 component · `src/components/Seal/Seal.tsx` · usage: `docs/usage/Seal.usage.tsx`
@@ -4954,68 +5123,151 @@ Stories: `components-select--placeholder`, `components-select--with-value`, `com
 Composes: Field, Icon.
 Tokens read: `color.bg.elevated`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `ease.enter`, `icon.stroke`, `motion.base`, `radius.control`, `radius.surface`, `shadow.popover`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.dropdown`.
 
+### Signature
+
+component · `src/components/Signature/Signature.tsx` · usage: `docs/usage/Signature.usage.tsx`
+
+Where a party signs (a sign-here tab): a Sign tag in the party's colour until it is signed, then the signature drawn on its line, in the same space. The adopted signature is the document's `signature.<role>` value.
+
+Props:
+- `role: string`: The party who signs here (a role from Parties). Required.
+- `required?: boolean` = `true`
+- `onSign?: () => void`: Makes the Sign tag a button, while the party can act, that starts the app's adopt-signature flow.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+States: required.
+
+#### DateSigned
+
+component, part of Signature. The date a party signed, filled in at signing (a date-signed tab): a tag until then.
+
+Props:
+- `role: string`: The party whose signing date it is. Required.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+#### Initials
+
+component, part of Signature. Where a party initials (an initial-here tab), in its colour; `eachPage` repeats it on every printed page.
+
+Props:
+- `role: string`: The party who initials (a role from Parties). Required.
+- `eachPage?: boolean` = `false`: One on every printed page, in the page's corner.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Where a party signs (`Signature`), initials (`Initials`, `eachPage` for every printed page) and the date it signed (`DateSigned`), each a tag in the party’s colour until signing fills the document’s values: `signature.<role>`, `initials.<role>`, `date_signed.<role>`.
+- `onSign` makes the Sign tag a button, while that party can act, that starts the app’s adopt-signature flow.
+
+**When not to use**
+
+- A party’s whole block (signature, name, title, date) at the end of an agreement → `SignatureBlock` on a `SignaturePage`
+- Checking a box to agree → `Acknowledge`
+
+**Do:** Tabs bound to a role, in its colour.
+
+```tsx
+<Document label="Form">
+  <Parties>
+    <Party role="employee" name="Employee" />
+  </Parties>
+  <Cluster gap="lg" align="end">
+    <Signature role="employee" />
+    <DateSigned role="employee" />
+    <Initials role="employee" />
+  </Cluster>
+</Document>
+```
+
+**Don't:** A typed signature line: nothing knows who signs there or whether they have.
+
+```tsx
+<Document label="Form">
+  <Text>Signature: ____________________ Date: __________</Text>
+</Document>
+```
+
+**Accessibility**
+
+- With `onSign`, the Sign tag is a button named “Sign as <party>”, at least the minimum target size, with a visible focus ring.
+- Each tab says what it is in words (Sign, Initial, Date Signed); the colour only groups a party’s tabs.
+
+Stories: `components-signature--default`, `components-signature--with-sign-action`, `components-signature--signed`, `components-signature--initials-each-page`.
+Composes: Document, Icon, Parties.
+Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.caption`, `text.label`, `text.signature`.
+
 ### SignatureBlock
 
 component · `src/components/SignatureBlock/SignatureBlock.tsx` · usage: `docs/usage/SignatureBlock.usage.tsx`
 
-The signature block at the end of a generated document, one per signer, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each label followed by a field tag in the recipient's colour. Signed, the signature is drawn on its line and the values read as plain text. Every value keeps the space of the tag it replaces, so nothing moves when the document is signed.
+A party's signature block, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each a tag in the party's colour until it signs. Signed, the signature is drawn on its line and the values read as plain text in the place their tags held. Bound to a role, never a person: the signer's name and title are the document's `<role>_signer_name` and `_signer_title`.
 
 Props:
-- `name: string`: The signer's name, shown once signed ("Maya Okafor"). Also names the Sign button. Required.
-- `title?: string`: The signer's title, shown once signed ("Legal counsel").
-- `signature?: string`: The adopted signature, drawn on the line. Setting it makes the block signed.
-- `date?: string`: The date signed, formatted for the reader (useFormat). Shown once signed.
-- `recipient?: SignatureRecipient` = `1`: The recipient's colour for the field tags. Defaults to 1.
-- `onSign?: () => void`: Makes the Sign tag a button that starts signing (the app's adopt-signature flow).
+- `role: string`: The party who signs here (a role from Parties): its colour, and its signer's details from the document's values. Required.
+- `onSign?: () => void`: Makes the Sign tag a button, while the party can act, that starts the app's adopt-signature flow.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
-Variants: recipient (1 | 2 | 3 | 4 | 5 | 6).
-
 **When to use**
 
-- The end of a generated agreement (a DocumentViewer), one block per signer: Signature, Name, Title and Date Signed.
-- Before signing, each value is a field tag in the recipient’s colour (`recipient`, color.category.*); pass `onSign` to make the Sign tag start the app’s signing flow.
-- Once signed (`signature` set), the signature is drawn on its line and the values read as plain text, each in the space its tag held, so the document does not shift.
+- A party’s signature block in a `Document`: Signature, Name, Title and Date Signed, bound to the party’s `role` from `Parties`, never a person. Its colour is the party’s.
+- Before signing each value is a tag in the party’s colour; with `onSign`, the Sign tag starts the app’s signing flow while that party can act. Signing fills the document’s values (`signature.<role>`, `date_signed.<role>`, `<role>_signer_name`, `<role>_signer_title`), and each value then reads as plain text in the space its tag held.
 
 **When not to use**
 
-- Collecting a signer’s details in a form → the form components (`TextField`, `DatePicker`) on a page
+- Only a signature or a date in a form (a W-4’s Step 5) → `Signature` and `DateSigned`
 - Showing who signed in a list or a record → `Timeline` or a `Table` row
 
-**Do:** One block per signer, side by side, each in its recipient’s colour.
+**Do:** One block per party, each in its party’s colour.
 
 ```tsx
-<Cluster gap="xl">
-  <SignatureBlock name="Maya Okafor" title="Legal counsel" recipient={3} />
-  <SignatureBlock name="Jon Park" title="Operations director" recipient={1} />
-</Cluster>
+<Document label="Agreement">
+  <Parties>
+    <Party role="provider" name="Acme Corp" />
+    <Party role="customer" name="Globex Inc." />
+  </Parties>
+  <Cluster gap="xl">
+    <SignatureBlock role="provider" />
+    <SignatureBlock role="customer" />
+  </Cluster>
+</Document>
 ```
 
-**Don't:** Two signers in one colour: the reader can’t tell whose fields are whose.
+**Don't:** Two parties in one colour: the reader can’t tell whose fields are whose.
 
 ```tsx
-<Cluster gap="xl">
-  <SignatureBlock name="Maya Okafor" recipient={1} />
-  <SignatureBlock name="Jon Park" recipient={1} />
-</Cluster>
+<Document label="Agreement">
+  <Parties>
+    <Party role="provider" name="Acme Corp" color={1} />
+    <Party role="customer" name="Globex Inc." color={1} />
+  </Parties>
+  <Cluster gap="xl">
+    <SignatureBlock role="provider" />
+    <SignatureBlock role="customer" />
+  </Cluster>
+</Document>
 ```
 
 **Accessibility**
 
 - The block is a description list: each label is a `<dt>` and its value a `<dd>`, so screen readers announce them as pairs.
-- With `onSign`, the Sign tag is a button named “Sign as <name>”, at least the minimum target size, with a visible focus ring.
-- A recipient’s colour is never the only cue: each block names its signer once signed, and the document says whose block it is.
+- With `onSign`, the Sign tag is a button named “Sign as <party>”, at least the minimum target size, with a visible focus ring.
+- A party’s colour is never the only cue: the page names each party over its block, and signed values are text.
 
 Stories: `components-signatureblock--unsigned`, `components-signatureblock--with-sign-action`, `components-signatureblock--signed`, `components-signatureblock--before-and-after`, `components-signatureblock--recipients`.
-Composes: Icon.
-Tokens read: `border.width.field`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `size.icon.md`, `size.icon.sm`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.gap.2xs`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `text.body-lg`, `text.label`, `text.signature`.
+Composes: Document, Icon, Parties, Signature.
+Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.body-lg`, `text.caption`, `text.label`, `text.signature`.
 
 ### SignaturePage
 
 component · `src/components/SignaturePage/SignaturePage.tsx` · usage: `docs/usage/SignaturePage.usage.tsx`
 
-The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.
+The execution page that ends an agreement, a DocumentPage of its own (it starts a new printed page): the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.
 
 Props:
 - `witness?: string` = `'IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.'`: The execution line. Default: IN WITNESS WHEREOF, the Parties have executed this Agreement by their duly authorized representatives.
@@ -5028,42 +5280,47 @@ Closed styling API: no `className`/`style`.
 component, part of SignaturePage. One party on a SignaturePage: its name over its SignatureBlock.
 
 Props:
-- `name: string`: The party, as the agreement names it ("Acme Corp"): shown in capitals. Required.
-- `children: ReactNode`: The party's SignatureBlock, in its recipient's colour. Required.
+- `role: string`: The party (a role from Parties): its name, shown in capitals, and its SignatureBlock. Required.
+- `name?: string`: Overrides the name Parties gives it.
+- `children?: ReactNode`: Overrides the party's SignatureBlock (a block with onSign, or two signers for one party).
 
 Closed styling API: no `className`/`style`.
 
 **When to use**
 
-- The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.
+- The execution page at the end of an agreement, a page of its own in print: the “IN WITNESS WHEREOF” line, then each party (`role`) by name over its `SignatureBlock`, in its colour.
 - One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width.
 
 **When not to use**
 
-- One signer’s fields in the middle of a document (initials, a date) → a `SignatureBlock` on its own
+- One signer’s fields in the middle of a document (initials, a date) → `Signature`, `Initials`, `DateSigned`
 - A list of who has signed so far → `Timeline`
 
-**Do:** One party per SignatureParty, each signer in their own recipient colour.
+**Do:** Parties declared once, then one SignatureParty each.
 
 ```tsx
-<SignaturePage>
-  <SignatureParty name="Acme Corp">
-    <SignatureBlock name="Maya Okafor" recipient={3} />
-  </SignatureParty>
-  <SignatureParty name="Globex Inc.">
-    <SignatureBlock name="Jon Park" recipient={1} />
-  </SignatureParty>
-</SignaturePage>
+<Document label="Agreement">
+  <Parties>
+    <Party role="provider" name="Acme Corp" />
+    <Party role="customer" name="Globex Inc." />
+  </Parties>
+  <SignaturePage>
+    <SignatureParty role="provider" />
+    <SignatureParty role="customer" />
+  </SignaturePage>
+</Document>
 ```
 
 **Don't:** Signers stacked under one typed heading: who signs for which party is lost.
 
 ```tsx
-<>
+<Document label="Agreement">
+  <Parties>
+    <Party role="provider" name="Acme Corp" />
+  </Parties>
   <Text>Signatures:</Text>
-  <SignatureBlock name="Maya Okafor" recipient={1} />
-  <SignatureBlock name="Jon Park" recipient={1} />
-</>
+  <SignatureBlock role="provider" />
+</Document>
 ```
 
 **Accessibility**
@@ -5072,8 +5329,8 @@ Closed styling API: no `className`/`style`.
 - The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names.
 
 Stories: `components-signaturepage--two-parties`, `components-signaturepage--one-party`, `components-signaturepage--three-parties`.
-Composes: Text.
-Tokens read: `color.fg.default`, `color.fg.muted`, `size.grid-item.md`, `space.gap.lg`, `space.gap.sm`, `space.gap.xl`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+Composes: Document, Icon, Parties, Signature, SignatureBlock, Text.
+Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.grid-item.md`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `text.signature`.
 
 ### Skeleton
 
@@ -7788,6 +8045,8 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `NavSection` (`src/components/Nav/Nav.tsx`): `interface NavSection { label?: string; items: readonly NavItem[]; }`
 - `NavTab` (`src/components/NavTabs/NavTabs.tsx`): `interface NavTab { label: string; href: string; }`
 - `NegotiationPosition` (`src/components/ClauseNote/ClauseNote.tsx`): `type NegotiationPosition = 'balanced' | 'seller-favored' | 'buyer-favored'` Where a clause sits in negotiation, as each clause in a clause library records it.
+- `PartyColor` (`src/components/Parties/Parties.tsx`): `type PartyColor = 1 | 2 | 3 | 4 | 5 | 6` A party's colour (color.category.N), the same on every field it completes.
+- `PartyKind` (`src/components/Document/documentIndex.ts`): `type PartyKind = 'signer' | 'cc' | 'witness' | 'approver'` What kind of recipient a party is, as eSignature routes it.
 - `ProposedChange` (`src/components/ReviewChanges/ReviewChanges.tsx`): `interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }` One proposed change: a field's old and new value, or a text rewrite shown word by word.
 - `RadioOption` (`src/components/RadioGroup/RadioGroup.tsx`): `interface RadioOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `RatioToken` (`src/tokens/tokens.ts`): `type RatioToken = keyof typeof vars.ratio`
@@ -7798,7 +8057,6 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ShortcutConflict` (`src/components/Shortcuts/registry.ts`): `interface ShortcutConflict { keys: string; kept: string; refused: string; }`
 - `ShortcutDefinition` (`src/components/Shortcuts/registry.ts`): `interface ShortcutDefinition { id: string; keys: string; description: string; scope?: string; handler: (event: KeyboardEvent) => void; allowInInputs?: boolean; allowInDialogs?: boolean; enabled?: boolean; }`
 - `SidebarWidthToken` (`src/tokens/tokens.ts`): `type SidebarWidthToken = keyof typeof vars.size.sidebar`
-- `SignatureRecipient` (`src/components/SignatureBlock/SignatureBlock.tsx`): `type SignatureRecipient = 1 | 2 | 3 | 4 | 5 | 6` A recipient's colour (color.category.*): the same for every field that recipient completes.
 - `SkeletonShape` (`src/components/Skeleton/Skeleton.tsx`): `type SkeletonShape = 'text' | 'block' | 'table-row'`
 - `SortDirection` (`src/components/Table/Table.tsx`): `type SortDirection = 'ascending' | 'descending'`
 - `Source` (`src/components/Citation/Citation.tsx`): `interface Source { title: string; origin: string; excerpt?: string; href?: string; hrefLabel?: string; }`
