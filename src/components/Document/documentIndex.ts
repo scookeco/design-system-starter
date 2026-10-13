@@ -32,6 +32,19 @@ export interface TermPosition {
   count: number;
 }
 
+/** What kind of recipient a party is, as eSignature routes it. */
+export type PartyKind = 'signer' | 'cc' | 'witness' | 'approver';
+
+/** A party the document names by role (Parties): who it is, how it takes part, and its colour. */
+export interface PartyPosition {
+  name: string;
+  kind: PartyKind;
+  /** Routing order: parties with the same order act in parallel. */
+  order: number;
+  /** Its colour (color.category.N), the same on every field it completes. */
+  color: number;
+}
+
 /** One entry of the document's outline, in document order: what a table of contents lists. */
 export interface OutlineEntry {
   id: string;
@@ -47,6 +60,8 @@ export interface DocumentIndex {
   /** Defined terms by id ("def-customer"). */
   terms: Readonly<Record<string, TermPosition>>;
   outline: readonly OutlineEntry[];
+  /** The parties declared in Parties, by role. */
+  parties: Readonly<Record<string, PartyPosition>>;
 }
 
 /** How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms). */
@@ -77,7 +92,7 @@ export const SectionDepthContext = createContext(0);
 /** The id of the Exhibit a clause or reference is inside (null in the body of the document). */
 export const ExhibitContext = createContext<string | null>(null);
 
-const EMPTY: DocumentIndex = { ready: false, clauses: {}, terms: {}, exhibits: {}, outline: [] };
+const EMPTY: DocumentIndex = { ready: false, clauses: {}, terms: {}, exhibits: {}, outline: [], parties: {} };
 
 /** A term's identity: case and spacing don't matter ("Confidential  information" = "confidential information"). */
 export const termKey = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -194,7 +209,17 @@ function read(root: HTMLElement): DocumentIndex {
     if (existing) existing.count += 1;
     else terms[id] = { text: el.textContent?.trim() ?? '', count: ids.has(id) ? 2 : 1 };
   }
-  return { ready: true, clauses, terms, exhibits, outline };
+  const parties: Record<string, PartyPosition> = {};
+  [...root.querySelectorAll<HTMLElement>('[data-doc="party"]')].forEach((el, i) => {
+    const role = el.dataset.role ?? '';
+    parties[role] ??= {
+      name: el.dataset.name ?? role,
+      kind: (el.dataset.kind ?? 'signer') as PartyKind,
+      order: Number(el.dataset.order ?? 1),
+      color: Number(el.dataset.color ?? (i % 6) + 1),
+    };
+  });
+  return { ready: true, clauses, terms, exhibits, outline, parties };
 }
 
 /**
@@ -217,7 +242,7 @@ export function useDocumentIndex(root: RefObject<HTMLElement | null>): DocumentI
     };
     update();
     const observer = new MutationObserver(update);
-    observer.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-off', 'data-unnumbered', 'data-label'] });
+    observer.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-off', 'data-unnumbered', 'data-label', 'data-name', 'data-color'] });
     return () => observer.disconnect();
   }, [root]);
   return index;

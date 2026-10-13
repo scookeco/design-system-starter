@@ -37,6 +37,8 @@ export interface DocumentProps {
   formId?: string;
   /** The currency of currency fields and computed amounts (ISO 4217). Default "USD". */
   currency?: string;
+  /** The party acting now (a role from Parties): only its fields are editable; the others read as text. */
+  actor?: string;
   /** In print, every branch of each Conditional (all, the default: a blank form shows every option) or only those that hold (resolved). */
   printMode?: 'all' | 'resolved';
   /** The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly. */
@@ -65,6 +67,7 @@ export function Document({
   formId,
   currency = 'USD',
   printMode = 'all',
+  actor,
   children,
 }: DocumentProps) {
   const outer = useContext(DocumentScopeContext);
@@ -100,6 +103,7 @@ export function Document({
           onValuesChange={onValuesChange}
           currency={currency}
           printMode={printMode}
+          actor={actor}
         >
           {onSubmit ? (
             <SubmitForm id={formId} onSubmit={onSubmit}>

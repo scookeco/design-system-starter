@@ -175,6 +175,586 @@
         }
       ]
     },
+    "Acknowledge": {
+      "kind": "component",
+      "dir": "src/components/Acknowledge",
+      "exports": [
+        "Acknowledge"
+      ],
+      "stylesheets": [
+        "src/components/Acknowledge/Acknowledge.css"
+      ],
+      "composes": [
+        "Document",
+        "DocumentCheckbox",
+        "Signature"
+      ],
+      "composesAll": [
+        "Document",
+        "DocumentCheckbox",
+        "Icon",
+        "Parties",
+        "Signature"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.field",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.action.primary",
+          "readBy": [
+            {
+              "unit": "DocumentCheckbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "DocumentCheckbox",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "DocumentCheckbox",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "DocumentCheckbox",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.control",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-block",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.tag-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "DocumentCheckbox",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.md",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Acknowledge",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.signature",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Address": {
       "kind": "component",
       "dir": "src/components/Address",
@@ -22450,6 +23030,207 @@
         }
       ]
     },
+    "Parties": {
+      "kind": "component",
+      "dir": "src/components/Parties",
+      "exports": [
+        "Parties",
+        "Party"
+      ],
+      "stylesheets": [],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Picker": {
       "kind": "component",
       "dir": "src/components/Picker",
@@ -24967,6 +25748,216 @@
         }
       ]
     },
+    "RoleRegion": {
+      "kind": "component",
+      "dir": "src/components/RoleRegion",
+      "exports": [
+        "RoleRegion"
+      ],
+      "stylesheets": [
+        "src/components/RoleRegion/RoleRegion.css"
+      ],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "RoleRegion",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "RoleRegion",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Seal": {
       "kind": "component",
       "dir": "src/components/Seal",
@@ -26570,27 +27561,51 @@
         }
       ]
     },
-    "SignatureBlock": {
+    "Signature": {
       "kind": "component",
-      "dir": "src/components/SignatureBlock",
+      "dir": "src/components/Signature",
       "exports": [
-        "SignatureBlock"
+        "DateSigned",
+        "Initials",
+        "Signature"
       ],
       "stylesheets": [
-        "src/components/SignatureBlock/SignatureBlock.css"
+        "src/components/Signature/Signature.css"
       ],
       "composes": [
-        "Icon"
+        "Document",
+        "Icon",
+        "Parties"
       ],
       "composesAll": [
-        "Icon"
+        "Document",
+        "Icon",
+        "Parties"
       ],
       "tokens": [
         {
           "token": "border.width.field",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -26599,7 +27614,7 @@
           "token": "color.category.1.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26608,7 +27623,7 @@
           "token": "color.category.1.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26617,7 +27632,7 @@
           "token": "color.category.1.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26626,7 +27641,7 @@
           "token": "color.category.2.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26635,7 +27650,7 @@
           "token": "color.category.2.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26644,7 +27659,7 @@
           "token": "color.category.2.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26653,7 +27668,7 @@
           "token": "color.category.3.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26662,7 +27677,7 @@
           "token": "color.category.3.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26671,7 +27686,7 @@
           "token": "color.category.3.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26680,7 +27695,7 @@
           "token": "color.category.4.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26689,7 +27704,7 @@
           "token": "color.category.4.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26698,7 +27713,7 @@
           "token": "color.category.4.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26707,7 +27722,7 @@
           "token": "color.category.5.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26716,7 +27731,7 @@
           "token": "color.category.5.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26725,7 +27740,7 @@
           "token": "color.category.5.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26734,7 +27749,7 @@
           "token": "color.category.6.bg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26743,7 +27758,7 @@
           "token": "color.category.6.border",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26752,7 +27767,7 @@
           "token": "color.category.6.fg",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26761,7 +27776,20 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -26770,7 +27798,7 @@
           "token": "color.focus",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26779,7 +27807,7 @@
           "token": "focus.ring.offset",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26788,7 +27816,7 @@
           "token": "focus.ring.width",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26806,7 +27834,43 @@
           "token": "radius.indicator",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -26830,10 +27894,28 @@
           ]
         },
         {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.signature.slot-block",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26842,7 +27924,7 @@
           "token": "size.signature.slot-inline",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26851,8 +27933,26 @@
           "token": "size.signature.tag-inline",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -26860,14 +27960,577 @@
           "token": "space.gap.2xs",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Signature",
               "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
         {
           "token": "space.gap.xs",
           "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.label",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.signature",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
+    "SignatureBlock": {
+      "kind": "component",
+      "dir": "src/components/SignatureBlock",
+      "exports": [
+        "SignatureBlock"
+      ],
+      "stylesheets": [
+        "src/components/SignatureBlock/SignatureBlock.css"
+      ],
+      "composes": [
+        "Document",
+        "Signature"
+      ],
+      "composesAll": [
+        "Document",
+        "Icon",
+        "Parties",
+        "Signature"
+      ],
+      "tokens": [
+        {
+          "token": "border.width.field",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            },
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-block",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.tag-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
             {
               "unit": "SignatureBlock",
               "how": "css"
@@ -26878,7 +28541,7 @@
           "token": "space.inset.2xs",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26887,7 +28550,16 @@
           "token": "space.inset.xs",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -26902,10 +28574,19 @@
           ]
         },
         {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "text.label",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26914,7 +28595,7 @@
           "token": "text.signature",
           "readBy": [
             {
-              "unit": "SignatureBlock",
+              "unit": "Signature",
               "how": "css"
             }
           ]
@@ -26932,15 +28613,224 @@
         "src/components/SignaturePage/SignaturePage.css"
       ],
       "composes": [
+        "Document",
+        "Parties",
+        "SignatureBlock",
         "Text"
       ],
       "composesAll": [
+        "Document",
+        "Icon",
+        "Parties",
+        "Signature",
+        "SignatureBlock",
         "Text"
       ],
       "tokens": [
         {
+          "token": "border.width.field",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.1.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.2.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.3.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.4.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.5.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.bg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.border",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.category.6.fg",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "color.fg.default",
           "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            },
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            },
             {
               "unit": "SignaturePage",
               "how": "css"
@@ -26955,7 +28845,92 @@
           "token": "color.fg.muted",
           "readBy": [
             {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
               "unit": "Text",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.focus",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.offset",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "focus.ring.width",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "icon.stroke",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "radius.indicator",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -26970,8 +28945,106 @@
           ]
         },
         {
+          "token": "size.icon.md",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.icon.sm",
+          "readBy": [
+            {
+              "unit": "Icon",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-block",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.slot-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.signature.tag-inline",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "space.gap.lg",
           "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
             {
               "unit": "SignaturePage",
               "how": "css"
@@ -26979,8 +29052,25 @@
           ]
         },
         {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
           "token": "space.gap.sm",
           "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
             {
               "unit": "SignaturePage",
               "how": "css"
@@ -26991,7 +29081,51 @@
           "token": "space.gap.xl",
           "readBy": [
             {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
               "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
+              "unit": "SignatureBlock",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.2xs",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.inset.xs",
+          "readBy": [
+            {
+              "unit": "Signature",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -27009,6 +29143,10 @@
           "token": "text.body-lg",
           "readBy": [
             {
+              "unit": "SignatureBlock",
+              "how": "css"
+            },
+            {
               "unit": "Text",
               "how": "css"
             }
@@ -27017,6 +29155,10 @@
         {
           "token": "text.caption",
           "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
             {
               "unit": "Text",
               "how": "css"
@@ -27027,7 +29169,20 @@
           "token": "text.label",
           "readBy": [
             {
+              "unit": "Signature",
+              "how": "css"
+            },
+            {
               "unit": "SignaturePage",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.signature",
+          "readBy": [
+            {
+              "unit": "Signature",
               "how": "css"
             }
           ]

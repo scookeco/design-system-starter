@@ -870,6 +870,162 @@
       "propsOf": "Accordion"
     },
     {
+      "name": "Acknowledge",
+      "kind": "component",
+      "source": "src/components/Acknowledge/Acknowledge.tsx",
+      "status": null,
+      "description": "The acknowledgement at the end of a policy or handbook: a required box to check, a signature and the date signed, all for one party. The box is the document's `<role>_acknowledged` value.",
+      "docs": "docs/usage/Acknowledge.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party acknowledging (a role from Parties). Required."
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What they acknowledge, as the box's label (\"I have read and agree to the Employee Handbook\"). Required."
+        },
+        {
+          "name": "onSign",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Starts the app's adopt-signature flow, as Signature's onSign."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The acknowledgement that ends a policy or a handbook: a required box (`text` is its label), a signature and the date signed, all for one party (`role`). The box is the document’s `<role>_acknowledged` value."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "An agreement both parties execute",
+            "instead": "`SignaturePage`"
+          },
+          {
+            "situation": "A consent box with no signature",
+            "instead": "`DocumentCheckbox`"
+          }
+        ],
+        "do": {
+          "caption": "Read, agreed and signed, by one party.",
+          "code": "<Document label=\"Handbook\" lifecycle=\"filled\">\n  <Parties>\n    <Party role=\"employee\" name=\"Employee\" />\n  </Parties>\n  <Acknowledge role=\"employee\" text=\"I have read and agree to the Employee Handbook\" />\n</Document>"
+        },
+        "dont": {
+          "caption": "“By signing below you agree” and a signature: what was agreed isn’t captured on its own.",
+          "code": "<Document label=\"Handbook\">\n  <Text>By signing below you agree to the handbook. Signature: ________</Text>\n</Document>"
+        },
+        "accessibility": [
+          "A fieldset named “Acknowledgement”: the box’s label is the statement agreed to, and the Sign button is named for the party."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Acknowledge",
+        "stories": [
+          {
+            "id": "components-acknowledge--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document",
+          "DocumentCheckbox",
+          "Icon",
+          "Parties",
+          "Signature"
+        ],
+        "tokens": [
+          "border.width.field",
+          "color.action.primary",
+          "color.bg.surface",
+          "color.border.default",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.control",
+          "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "size.signature.slot-block",
+          "size.signature.slot-inline",
+          "size.signature.tag-inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.md",
+          "space.inset.xs",
+          "space.page.margin",
+          "text.caption",
+          "text.label",
+          "text.signature"
+        ]
+      }
+    },
+    {
+      "name": "AcknowledgeProps",
+      "kind": "type-only",
+      "source": "src/components/Acknowledge/Acknowledge.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Acknowledge",
+      "propsOf": "Acknowledge"
+    },
+    {
       "name": "ActiveShortcut",
       "kind": "type-only",
       "source": "src/components/Shortcuts/registry.ts",
@@ -7396,6 +7552,49 @@
       "propsOf": "DateRangePicker"
     },
     {
+      "name": "DateSigned",
+      "kind": "component",
+      "source": "src/components/Signature/Signature.tsx",
+      "status": null,
+      "description": "The date a party signed, filled in at signing (a date-signed tab): a tag until then.",
+      "partOf": "Signature",
+      "docs": "docs/usage/Signature.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party whose signing date it is. Required."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DateSignedProps",
+      "kind": "type-only",
+      "source": "src/components/Signature/Signature.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Signature",
+      "propsOf": "DateSigned"
+    },
+    {
       "name": "DateStyle",
       "kind": "type-only",
       "source": "src/format/format.ts",
@@ -8128,6 +8327,13 @@
           "required": false,
           "default": "'USD'",
           "description": "The currency of currency fields and computed amounts (ISO 4217). Default \"USD\"."
+        },
+        {
+          "name": "actor",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party acting now (a role from Parties): only its fields are editable; the others read as text."
         },
         {
           "name": "printMode",
@@ -12668,6 +12874,58 @@
       "docs": "docs/usage/Icons.usage.tsx"
     },
     {
+      "name": "Initials",
+      "kind": "component",
+      "source": "src/components/Signature/Signature.tsx",
+      "status": null,
+      "description": "Where a party initials (an initial-here tab), in its colour; `eachPage` repeats it on every printed page.",
+      "partOf": "Signature",
+      "docs": "docs/usage/Signature.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party who initials (a role from Parties). Required."
+        },
+        {
+          "name": "eachPage",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "One on every printed page, in the page's corner."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "eachPage"
+      ]
+    },
+    {
+      "name": "InitialsProps",
+      "kind": "type-only",
+      "source": "src/components/Signature/Signature.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Signature",
+      "propsOf": "Initials"
+    },
+    {
       "name": "InlineEdit",
       "kind": "component",
       "source": "src/components/InlineEdit/InlineEdit.tsx",
@@ -15964,6 +16222,218 @@
       "propsOf": "Pagination"
     },
     {
+      "name": "Parties",
+      "kind": "component",
+      "source": "src/components/Parties/Parties.tsx",
+      "status": null,
+      "description": "Declares the parties a document names by role: who signs, who is copied, who witnesses, in which order. Declare every role before the fields that use it. Not shown: the document names its parties in its own text; this is what fields, signatures and routing read.",
+      "docs": "docs/usage/Parties.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Every document someone fills or signs: declare its parties once, by role (“employee”, “customer”), before any field that names one. `kind` is signer, cc, witness or approver; `order` is the routing order (the same order signs in parallel). Each party’s colour follows declaration order unless `color` sets it.",
+          "Fields, signatures and role regions name a party by `role`; the document never names a person. The `Document`’s `actor` says which party is acting now: only its fields are editable."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Naming the parties in the text (the preamble)",
+            "instead": "`DocumentTitle` with `Term`: Parties is not shown"
+          },
+          {
+            "situation": "Generated documents nobody fills or signs (a statement)",
+            "instead": "nothing: they have no roles"
+          }
+        ],
+        "do": {
+          "caption": "Roles declared once; fields name a role.",
+          "code": "<Document label=\"W-4\" lifecycle=\"filled\">\n  <Parties>\n    <Party role=\"employee\" name=\"Employee\" />\n    <Party role=\"employer\" name=\"Employer\" order={2} />\n  </Parties>\n  <DocumentField name=\"first_name\" label=\"First name\" showLabel role=\"employee\" />\n</Document>"
+        },
+        "dont": {
+          "caption": "A person instead of a role: the template can’t be sent to anyone else without editing it.",
+          "code": "<Document label=\"W-4\" lifecycle=\"filled\">\n  <Text>Maya Okafor fills in:</Text>\n  <DocumentField name=\"first_name\" label=\"First name\" showLabel />\n</Document>"
+        },
+        "accessibility": [
+          "Not shown and not announced: the document’s own text names its parties. What the reader sees per party (a colour) always comes with its name."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Parties",
+        "stories": [
+          {
+            "id": "components-parties--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "Party",
+      "kind": "component",
+      "source": "src/components/Parties/Parties.tsx",
+      "status": null,
+      "description": "One party in Parties.",
+      "partOf": "Parties",
+      "docs": "docs/usage/Parties.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The role id fields and signatures use (\"customer\", \"employee\"). Required."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What the document calls the party (\"Fontara, Inc.\", \"Employee\"). Required."
+        },
+        {
+          "name": "kind",
+          "type": "PartyKind",
+          "required": false,
+          "default": "'signer'",
+          "description": "How it takes part. Default signer.",
+          "values": [
+            "signer",
+            "cc",
+            "witness",
+            "approver"
+          ]
+        },
+        {
+          "name": "order",
+          "type": "number",
+          "required": false,
+          "default": "1",
+          "description": "Routing order: parties with the same order act in parallel. Default 1."
+        },
+        {
+          "name": "color",
+          "type": "PartyColor",
+          "required": false,
+          "default": null,
+          "description": "Its colour. Default: by the order parties are declared.",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "kind": [
+          "signer",
+          "cc",
+          "witness",
+          "approver"
+        ],
+        "color": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "states": []
+    },
+    {
+      "name": "PartyColor",
+      "kind": "type-only",
+      "source": "src/components/Parties/Parties.tsx",
+      "status": null,
+      "description": "A party's colour (color.category.N), the same on every field it completes.",
+      "partOf": "Parties",
+      "definition": "type PartyColor = 1 | 2 | 3 | 4 | 5 | 6",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "name": "PartyKind",
+      "kind": "type-only",
+      "source": "src/components/Document/documentIndex.ts",
+      "status": null,
+      "description": "What kind of recipient a party is, as eSignature routes it.",
+      "partOf": "Document",
+      "definition": "type PartyKind = 'signer' | 'cc' | 'witness' | 'approver'",
+      "values": [
+        "signer",
+        "cc",
+        "witness",
+        "approver"
+      ]
+    },
+    {
+      "name": "PartyProps",
+      "kind": "type-only",
+      "source": "src/components/Parties/Parties.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Parties",
+      "propsOf": "Party"
+    },
+    {
       "name": "PlusIcon",
       "kind": "utility",
       "source": "src/components/Icon/icons.ts",
@@ -17412,6 +17882,119 @@
       "propsOf": "ReviewChanges"
     },
     {
+      "name": "RoleRegion",
+      "kind": "component",
+      "source": "src/components/RoleRegion/RoleRegion.tsx",
+      "status": null,
+      "description": "A part of a document that belongs to one party (a form's “Employers only” block): every field inside is that party's unless it says otherwise. Assigns the role only; it draws nothing of its own.",
+      "docs": "docs/usage/RoleRegion.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party every field inside is for (a role from Parties). Required."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "Any part of the document: text, fields, steps. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A part of a document that belongs to one party, with more than fields in it (a heading, instructions): a form’s “Employers only” block. Every field inside is that party’s unless it says otherwise. It draws nothing of its own."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Only a group of fields",
+            "instead": "`DocumentFieldset` with `role`"
+          },
+          {
+            "situation": "One field",
+            "instead": "`role` on the field"
+          }
+        ],
+        "do": {
+          "caption": "One block assigned to the employer.",
+          "code": "<Document label=\"Form\" lifecycle=\"filled\">\n  <Parties>\n    <Party role=\"employer\" name=\"Employer\" />\n  </Parties>\n  <RoleRegion role=\"employer\">\n    <DocumentField name=\"ein\" label=\"EIN\" type=\"ein\" showLabel />\n  </RoleRegion>\n</Document>"
+        },
+        "dont": {
+          "caption": "A block with no role: its fields go to nobody, and the validator rejects a document to be filled with unassigned fields.",
+          "code": "<Document label=\"Form\" lifecycle=\"filled\">\n  <DocumentField name=\"ein\" label=\"EIN\" type=\"ein\" showLabel />\n</Document>"
+        },
+        "accessibility": [
+          "A plain block: headings and fields inside keep their own semantics; nothing is announced for the role."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/RoleRegion",
+        "stories": [
+          {
+            "id": "components-roleregion--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-roleregion--employee-acting",
+            "name": "Employee Acting"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "RoleRegionProps",
+      "kind": "type-only",
+      "source": "src/components/RoleRegion/RoleRegion.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "RoleRegion",
+      "propsOf": "RoleRegion"
+    },
+    {
       "name": "RunningPages",
       "kind": "type-only",
       "source": "src/components/DocumentHeader/DocumentHeader.tsx",
@@ -18536,62 +19119,184 @@
       ]
     },
     {
-      "name": "SignatureBlock",
+      "name": "Signature",
       "kind": "component",
-      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "source": "src/components/Signature/Signature.tsx",
       "status": null,
-      "description": "The signature block at the end of a generated document, one per signer, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each label followed by a field tag in the recipient's colour. Signed, the signature is drawn on its line and the values read as plain text. Every value keeps the space of the tag it replaces, so nothing moves when the document is signed.",
-      "docs": "docs/usage/SignatureBlock.usage.tsx",
+      "description": "Where a party signs (a sign-here tab): a Sign tag in the party's colour until it is signed, then the signature drawn on its line, in the same space. The adopted signature is the document's `signature.<role>` value.",
+      "docs": "docs/usage/Signature.usage.tsx",
       "props": [
         {
-          "name": "name",
+          "name": "role",
           "type": "string",
           "required": true,
           "default": null,
-          "description": "The signer's name, shown once signed (\"Maya Okafor\"). Also names the Sign button. Required."
+          "description": "The party who signs here (a role from Parties). Required."
         },
         {
-          "name": "title",
-          "type": "string",
+          "name": "required",
+          "type": "boolean",
           "required": false,
-          "default": null,
-          "description": "The signer's title, shown once signed (\"Legal counsel\")."
-        },
-        {
-          "name": "signature",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "description": "The adopted signature, drawn on the line. Setting it makes the block signed."
-        },
-        {
-          "name": "date",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "description": "The date signed, formatted for the reader (useFormat). Shown once signed."
-        },
-        {
-          "name": "recipient",
-          "type": "SignatureRecipient",
-          "required": false,
-          "default": "1",
-          "description": "The recipient's colour for the field tags. Defaults to 1.",
-          "values": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6
-          ]
+          "default": "true",
+          "description": null
         },
         {
           "name": "onSign",
           "type": "() => void",
           "required": false,
           "default": null,
-          "description": "Makes the Sign tag a button that starts signing (the app's adopt-signature flow)."
+          "description": "Makes the Sign tag a button, while the party can act, that starts the app's adopt-signature flow."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Where a party signs (`Signature`), initials (`Initials`, `eachPage` for every printed page) and the date it signed (`DateSigned`), each a tag in the party’s colour until signing fills the document’s values: `signature.<role>`, `initials.<role>`, `date_signed.<role>`.",
+          "`onSign` makes the Sign tag a button, while that party can act, that starts the app’s adopt-signature flow."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A party’s whole block (signature, name, title, date) at the end of an agreement",
+            "instead": "`SignatureBlock` on a `SignaturePage`"
+          },
+          {
+            "situation": "Checking a box to agree",
+            "instead": "`Acknowledge`"
+          }
+        ],
+        "do": {
+          "caption": "Tabs bound to a role, in its colour.",
+          "code": "<Document label=\"Form\">\n  <Parties>\n    <Party role=\"employee\" name=\"Employee\" />\n  </Parties>\n  <Cluster gap=\"lg\" align=\"end\">\n    <Signature role=\"employee\" />\n    <DateSigned role=\"employee\" />\n    <Initials role=\"employee\" />\n  </Cluster>\n</Document>"
+        },
+        "dont": {
+          "caption": "A typed signature line: nothing knows who signs there or whether they have.",
+          "code": "<Document label=\"Form\">\n  <Text>Signature: ____________________ Date: __________</Text>\n</Document>"
+        },
+        "accessibility": [
+          "With `onSign`, the Sign tag is a button named “Sign as <party>”, at least the minimum target size, with a visible focus ring.",
+          "Each tab says what it is in words (Sign, Initial, Date Signed); the colour only groups a party’s tabs."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Signature",
+        "stories": [
+          {
+            "id": "components-signature--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-signature--with-sign-action",
+            "name": "With Sign Action"
+          },
+          {
+            "id": "components-signature--signed",
+            "name": "Signed"
+          },
+          {
+            "id": "components-signature--initials-each-page",
+            "name": "Initials Each Page"
+          }
+        ],
+        "composes": [
+          "Document",
+          "Icon",
+          "Parties"
+        ],
+        "tokens": [
+          "border.width.field",
+          "color.bg.surface",
+          "color.border.default",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "size.signature.slot-block",
+          "size.signature.slot-inline",
+          "size.signature.tag-inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.xs",
+          "space.page.margin",
+          "text.caption",
+          "text.label",
+          "text.signature"
+        ]
+      }
+    },
+    {
+      "name": "SignatureBlock",
+      "kind": "component",
+      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "status": null,
+      "description": "A party's signature block, laid out as e-signature tags it: Signature, Name, Title and Date Signed, each a tag in the party's colour until it signs. Signed, the signature is drawn on its line and the values read as plain text in the place their tags held. Bound to a role, never a person: the signer's name and title are the document's `<role>_signer_name` and `_signer_title`.",
+      "docs": "docs/usage/SignatureBlock.usage.tsx",
+      "props": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The party who signs here (a role from Parties): its colour, and its signer's details from the document's values. Required."
+        },
+        {
+          "name": "onSign",
+          "type": "() => void",
+          "required": false,
+          "default": null,
+          "description": "Makes the Sign tag a button, while the party can act, that starts the app's adopt-signature flow."
         }
       ],
       "inherits": [],
@@ -18601,27 +19306,17 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {
-        "recipient": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ]
-      },
+      "variants": {},
       "states": [],
       "usage": {
         "whenToUse": [
-          "The end of a generated agreement (a DocumentViewer), one block per signer: Signature, Name, Title and Date Signed.",
-          "Before signing, each value is a field tag in the recipient’s colour (`recipient`, color.category.*); pass `onSign` to make the Sign tag start the app’s signing flow.",
-          "Once signed (`signature` set), the signature is drawn on its line and the values read as plain text, each in the space its tag held, so the document does not shift."
+          "A party’s signature block in a `Document`: Signature, Name, Title and Date Signed, bound to the party’s `role` from `Parties`, never a person. Its colour is the party’s.",
+          "Before signing each value is a tag in the party’s colour; with `onSign`, the Sign tag starts the app’s signing flow while that party can act. Signing fills the document’s values (`signature.<role>`, `date_signed.<role>`, `<role>_signer_name`, `<role>_signer_title`), and each value then reads as plain text in the space its tag held."
         ],
         "whenNotToUse": [
           {
-            "situation": "Collecting a signer’s details in a form",
-            "instead": "the form components (`TextField`, `DatePicker`) on a page"
+            "situation": "Only a signature or a date in a form (a W-4’s Step 5)",
+            "instead": "`Signature` and `DateSigned`"
           },
           {
             "situation": "Showing who signed in a list or a record",
@@ -18629,17 +19324,17 @@
           }
         ],
         "do": {
-          "caption": "One block per signer, side by side, each in its recipient’s colour.",
-          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" title=\"Legal counsel\" recipient={3} />\n  <SignatureBlock name=\"Jon Park\" title=\"Operations director\" recipient={1} />\n</Cluster>"
+          "caption": "One block per party, each in its party’s colour.",
+          "code": "<Document label=\"Agreement\">\n  <Parties>\n    <Party role=\"provider\" name=\"Acme Corp\" />\n    <Party role=\"customer\" name=\"Globex Inc.\" />\n  </Parties>\n  <Cluster gap=\"xl\">\n    <SignatureBlock role=\"provider\" />\n    <SignatureBlock role=\"customer\" />\n  </Cluster>\n</Document>"
         },
         "dont": {
-          "caption": "Two signers in one colour: the reader can’t tell whose fields are whose.",
-          "code": "<Cluster gap=\"xl\">\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</Cluster>"
+          "caption": "Two parties in one colour: the reader can’t tell whose fields are whose.",
+          "code": "<Document label=\"Agreement\">\n  <Parties>\n    <Party role=\"provider\" name=\"Acme Corp\" color={1} />\n    <Party role=\"customer\" name=\"Globex Inc.\" color={1} />\n  </Parties>\n  <Cluster gap=\"xl\">\n    <SignatureBlock role=\"provider\" />\n    <SignatureBlock role=\"customer\" />\n  </Cluster>\n</Document>"
         },
         "accessibility": [
           "The block is a description list: each label is a `<dt>` and its value a `<dd>`, so screen readers announce them as pairs.",
-          "With `onSign`, the Sign tag is a button named “Sign as <name>”, at least the minimum target size, with a visible focus ring.",
-          "A recipient’s colour is never the only cue: each block names its signer once signed, and the document says whose block it is."
+          "With `onSign`, the Sign tag is a button named “Sign as <party>”, at least the minimum target size, with a visible focus ring.",
+          "A party’s colour is never the only cue: the page names each party over its block, and signed values are text."
         ]
       },
       "unit": {
@@ -18667,10 +19362,15 @@
           }
         ],
         "composes": [
-          "Icon"
+          "Document",
+          "Icon",
+          "Parties",
+          "Signature"
         ],
         "tokens": [
           "border.width.field",
+          "color.bg.surface",
+          "color.border.default",
           "color.category.1.bg",
           "color.category.1.border",
           "color.category.1.fg",
@@ -18690,21 +19390,36 @@
           "color.category.6.border",
           "color.category.6.fg",
           "color.fg.default",
+          "color.fg.muted",
           "color.focus",
           "focus.ring.offset",
           "focus.ring.width",
           "icon.stroke",
           "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
           "size.icon.md",
           "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
           "size.signature.slot-block",
           "size.signature.slot-inline",
           "size.signature.tag-inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
           "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
           "space.gap.xs",
           "space.inset.2xs",
           "space.inset.xs",
+          "space.page.margin",
           "text.body-lg",
+          "text.caption",
           "text.label",
           "text.signature"
         ]
@@ -18724,7 +19439,7 @@
       "kind": "component",
       "source": "src/components/SignaturePage/SignaturePage.tsx",
       "status": null,
-      "description": "The execution page that ends an agreement: the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.",
+      "description": "The execution page that ends an agreement, a DocumentPage of its own (it starts a new printed page): the “IN WITNESS WHEREOF” line, then each party's name and SignatureBlock. Parties sit in equal columns at least size.grid-item.md wide, two on a page: a third moves to the second row, under the first; a single party keeps a column's width.",
       "docs": "docs/usage/SignaturePage.usage.tsx",
       "props": [
         {
@@ -18753,13 +19468,13 @@
       "states": [],
       "usage": {
         "whenToUse": [
-          "The execution page at the end of an agreement: the “IN WITNESS WHEREOF” line, then each party’s name over its `SignatureBlock`, each in its recipient’s colour.",
+          "The execution page at the end of an agreement, a page of its own in print: the “IN WITNESS WHEREOF” line, then each party (`role`) by name over its `SignatureBlock`, in its colour.",
           "One, two or three parties: two sit side by side, a third (an escrow agreement’s agent) moves to the second row under the first, and a single party keeps a column’s width."
         ],
         "whenNotToUse": [
           {
             "situation": "One signer’s fields in the middle of a document (initials, a date)",
-            "instead": "a `SignatureBlock` on its own"
+            "instead": "`Signature`, `Initials`, `DateSigned`"
           },
           {
             "situation": "A list of who has signed so far",
@@ -18767,12 +19482,12 @@
           }
         ],
         "do": {
-          "caption": "One party per SignatureParty, each signer in their own recipient colour.",
-          "code": "<SignaturePage>\n  <SignatureParty name=\"Acme Corp\">\n    <SignatureBlock name=\"Maya Okafor\" recipient={3} />\n  </SignatureParty>\n  <SignatureParty name=\"Globex Inc.\">\n    <SignatureBlock name=\"Jon Park\" recipient={1} />\n  </SignatureParty>\n</SignaturePage>"
+          "caption": "Parties declared once, then one SignatureParty each.",
+          "code": "<Document label=\"Agreement\">\n  <Parties>\n    <Party role=\"provider\" name=\"Acme Corp\" />\n    <Party role=\"customer\" name=\"Globex Inc.\" />\n  </Parties>\n  <SignaturePage>\n    <SignatureParty role=\"provider\" />\n    <SignatureParty role=\"customer\" />\n  </SignaturePage>\n</Document>"
         },
         "dont": {
           "caption": "Signers stacked under one typed heading: who signs for which party is lost.",
-          "code": "<>\n  <Text>Signatures:</Text>\n  <SignatureBlock name=\"Maya Okafor\" recipient={1} />\n  <SignatureBlock name=\"Jon Park\" recipient={1} />\n</>"
+          "code": "<Document label=\"Agreement\">\n  <Parties>\n    <Party role=\"provider\" name=\"Acme Corp\" />\n  </Parties>\n  <Text>Signatures:</Text>\n  <SignatureBlock role=\"provider\" />\n</Document>"
         },
         "accessibility": [
           "The page is a `section` named “Signatures”; each party’s name comes before its block in reading order.",
@@ -18796,19 +19511,70 @@
           }
         ],
         "composes": [
+          "Document",
+          "Icon",
+          "Parties",
+          "Signature",
+          "SignatureBlock",
           "Text"
         ],
         "tokens": [
+          "border.width.field",
+          "color.bg.surface",
+          "color.border.default",
+          "color.category.1.bg",
+          "color.category.1.border",
+          "color.category.1.fg",
+          "color.category.2.bg",
+          "color.category.2.border",
+          "color.category.2.fg",
+          "color.category.3.bg",
+          "color.category.3.border",
+          "color.category.3.fg",
+          "color.category.4.bg",
+          "color.category.4.border",
+          "color.category.4.fg",
+          "color.category.5.bg",
+          "color.category.5.border",
+          "color.category.5.fg",
+          "color.category.6.bg",
+          "color.category.6.border",
+          "color.category.6.fg",
           "color.fg.default",
           "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "icon.stroke",
+          "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
           "size.grid-item.md",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "size.signature.slot-block",
+          "size.signature.slot-inline",
+          "size.signature.tag-inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
           "space.gap.lg",
+          "space.gap.md",
           "space.gap.sm",
           "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.xs",
+          "space.page.margin",
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.label"
+          "text.label",
+          "text.signature"
         ]
       }
     },
@@ -18831,18 +19597,25 @@
       "docs": "docs/usage/SignaturePage.usage.tsx",
       "props": [
         {
-          "name": "name",
+          "name": "role",
           "type": "string",
           "required": true,
           "default": null,
-          "description": "The party, as the agreement names it (\"Acme Corp\"): shown in capitals. Required."
+          "description": "The party (a role from Parties): its name, shown in capitals, and its SignatureBlock. Required."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Overrides the name Parties gives it."
         },
         {
           "name": "children",
           "type": "ReactNode",
-          "required": true,
+          "required": false,
           "default": null,
-          "description": "The party's SignatureBlock, in its recipient's colour. Required."
+          "description": "Overrides the party's SignatureBlock (a block with onSign, or two signers for one party)."
         }
       ],
       "inherits": [],
@@ -18865,21 +19638,13 @@
       "propsOf": "SignatureParty"
     },
     {
-      "name": "SignatureRecipient",
+      "name": "SignatureProps",
       "kind": "type-only",
-      "source": "src/components/SignatureBlock/SignatureBlock.tsx",
+      "source": "src/components/Signature/Signature.tsx",
       "status": null,
-      "description": "A recipient's colour (color.category.*): the same for every field that recipient completes.",
-      "partOf": "SignatureBlock",
-      "definition": "type SignatureRecipient = 1 | 2 | 3 | 4 | 5 | 6",
-      "values": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ]
+      "description": null,
+      "partOf": "Signature",
+      "propsOf": "Signature"
     },
     {
       "name": "Skeleton",
