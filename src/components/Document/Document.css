@@ -3,6 +3,7 @@
   .document {
     display: flex;
     flex-direction: column;
+    flex-grow: 1; /* fills a viewer's sheet, so a Watermark spans the page */
     gap: var(--space-gap-md);
     position: relative;
     isolation: isolate; /* a Watermark sits behind the text, inside the document */
