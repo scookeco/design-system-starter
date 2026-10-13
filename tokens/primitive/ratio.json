@@ -13,6 +13,9 @@
     },
     "letter": {
       "$value": 0.7727
+    },
+    "letter-landscape": {
+      "$value": 1.2941
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useId, type ReactNode } from 'react';
 import { Heading } from '../Heading/Heading';
-import { DocumentScopeContext, ExhibitContext, scopedId } from '../Clause/documentIndex';
+import { DocumentScopeContext, ExhibitContext, scopedId } from '../Document/documentIndex';
 import './Exhibit.css';
 
 export interface ExhibitProps {
@@ -13,7 +13,7 @@ export interface ExhibitProps {
 }
 
 /**
- * An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow
+ * An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow
  * schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters
  * come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”;
  * one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one
@@ -32,6 +32,7 @@ export function Exhibit({ id, title, children }: ExhibitProps) {
     <ExhibitContext value={id}>
       <section
         className="exhibit"
+        data-doc="exhibit"
         id={doc ? scopedId(doc.scope, 'clause', id) : undefined}
         data-exhibit={id}
         data-duplicate={at?.duplicate ? 'true' : undefined}

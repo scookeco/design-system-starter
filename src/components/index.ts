@@ -71,6 +71,18 @@ export { ChatThread, type ChatThreadProps } from './ChatThread/ChatThread';
 export { Composer, type ComposerProps, type ComposerAttachment } from './Composer/Composer';
 export { Citation, SourcesList, type CitationProps, type SourcesListProps, type Source } from './Citation/Citation';
 export {
+  Document,
+  DocumentFlow,
+  DocumentPage,
+  DocumentGrid,
+  type DocumentProps,
+  type DocumentPageProps,
+  type DocumentGridProps,
+  type DocumentArea,
+  type DocumentLifecycle,
+  type DocumentShell,
+} from './Document/Document';
+export {
   DocumentViewer,
   DataField,
   type DocumentViewerProps,

@@ -1,8 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
-import { DocumentScopeContext, useDocumentIndex } from '../Clause/documentIndex';
-import type { HeadingLevel } from '../Heading/Heading';
 import { CopyIcon, EditIcon } from '../Icon/icons';
 import { useShortcut } from '../Shortcuts/Shortcuts';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
@@ -21,9 +19,7 @@ export interface DocumentSelection {
 }
 
 export interface DocumentViewerProps extends EscapeHatch {
-  /** The document's name: labels the document region ("Master services agreement"). Required. */
-  label: string;
-  /** The generated document: headings and paragraphs, with DataField and Highlight inside. */
+  /** The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required. */
   children: ReactNode;
   /**
    * Called with the reader's selection when they choose Highlight (from the menu above a selection,
@@ -31,10 +27,6 @@ export interface DocumentViewerProps extends EscapeHatch {
    * default tone). Without it, selecting text is plain native selection with no menu.
    */
   onHighlight?: (selection: DocumentSelection) => void;
-  /** The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1). */
-  headingLevel?: Exclude<HeadingLevel, 1>;
-  /** How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement". */
-  documentName?: string;
 }
 
 /** The keys that highlight the selection: shown in the menu, registered only while there is one. */
@@ -51,28 +43,19 @@ interface MenuState extends DocumentSelection {
 }
 
 /**
- * A document the app generates from data, shown as one continuous sheet (at least a page tall) on a
- * canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the
- * document area only: the page around it holds any toolbar (Find, Download).
+ * Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a
+ * canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the
+ * reader's selection. The viewer is the screen render target and its review tools only; the Document
+ * inside holds the content and numbering, and prints without it. The page around it holds any
+ * toolbar (Find, Download).
  * Selecting is the browser's own (::selection is not styled); fields and placeholders are not
  * part of a selection. Placeholders that fill in place are announced in a polite live region.
  */
-export function DocumentViewer({
-  label,
-  children,
-  onHighlight,
-  headingLevel = 2,
-  documentName = 'the Agreement',
-  UNSAFE_className,
-  UNSAFE_style,
-}: DocumentViewerProps) {
+export function DocumentViewer({ children, onHighlight, UNSAFE_className, UNSAFE_style }: DocumentViewerProps) {
   const [message, setMessage] = useState('');
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [hasSelection, setHasSelection] = useState(false);
-  const paper = useRef<HTMLElement>(null);
-  const scope = useId();
-  const index = useDocumentIndex(paper);
-  const documentScope = useMemo(() => ({ scope, headingLevel, documentName, index }), [scope, headingLevel, documentName, index]);
+  const paper = useRef<HTMLDivElement>(null);
 
   const announce = useCallback((text: string) => setMessage(text), []);
   const context = useMemo(() => ({ announce }), [announce]);
@@ -126,9 +109,9 @@ export function DocumentViewer({
       <div className={cx('document-viewer', UNSAFE_className)} style={UNSAFE_style}>
         {onHighlight && hasSelection ? <HighlightShortcut onPress={() => highlight(readSelection())} /> : null}
         <div className="document-viewer__canvas">
-          <article ref={paper} className="document-viewer__paper" aria-label={label} onMouseUp={selectionEnded} onKeyUp={(event) => event.shiftKey && selectionEnded()}>
-            <DocumentScopeContext value={documentScope}>{children}</DocumentScopeContext>
-          </article>
+          <div ref={paper} className="document-viewer__paper" onMouseUp={selectionEnded} onKeyUp={(event) => event.shiftKey && selectionEnded()}>
+            {children}
+          </div>
         </div>
         <span className="visually-hidden" aria-live="polite">
           {message}

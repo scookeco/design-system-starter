@@ -188,6 +188,12 @@ export const vars = {
     },
     "mark": {
       "overhang": "var(--space-mark-overhang)"
+    },
+    "page": {
+      "margin": "var(--space-page-margin)"
+    },
+    "document": {
+      "grid-gap": "var(--space-document-grid-gap)"
     }
   },
   "size": {
@@ -258,12 +264,19 @@ export const vars = {
     "document": {
       "measure": "var(--size-document-measure)",
       "clause-indent": "var(--size-document-clause-indent)",
-      "note": "var(--size-document-note)"
+      "note": "var(--size-document-note)",
+      "grid-row": "var(--size-document-grid-row)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",
       "slot-block": "var(--size-signature-slot-block)",
       "tag-inline": "var(--size-signature-tag-inline)"
+    },
+    "page": {
+      "letter": {
+        "inline": "var(--size-page-letter-inline)",
+        "block": "var(--size-page-letter-block)"
+      }
     }
   },
   "radius": {
@@ -331,7 +344,8 @@ export const vars = {
     "square": "var(--ratio-square)",
     "landscape": "var(--ratio-landscape)",
     "wide": "var(--ratio-wide)",
-    "page": "var(--ratio-page)"
+    "page": "var(--ratio-page)",
+    "page-landscape": "var(--ratio-page-landscape)"
   },
   "text": {
     "body": "var(--text-body)",

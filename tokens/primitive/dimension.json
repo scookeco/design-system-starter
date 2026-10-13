@@ -278,5 +278,27 @@
         "unit": "dvh"
       }
     }
+  },
+  "paper": {
+    "$type": "dimension",
+    "$description": "Physical paper, for printed documents and fixed form pages.",
+    "letter-inline": {
+      "$value": {
+        "value": 8.5,
+        "unit": "in"
+      }
+    },
+    "letter-block": {
+      "$value": {
+        "value": 11,
+        "unit": "in"
+      }
+    },
+    "margin": {
+      "$value": {
+        "value": 1,
+        "unit": "in"
+      }
+    }
   }
 }

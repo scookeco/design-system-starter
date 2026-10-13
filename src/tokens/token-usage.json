@@ -4897,10 +4897,12 @@
       ],
       "composes": [
         "Change",
+        "Document",
         "Heading"
       ],
       "composesAll": [
         "Change",
+        "Document",
         "Heading"
       ],
       "tokens": [
@@ -4913,6 +4915,24 @@
             },
             {
               "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -5007,6 +5027,10 @@
               "how": "css"
             },
             {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
               "unit": "Heading",
               "how": "css"
             }
@@ -5089,10 +5113,46 @@
           ]
         },
         {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
           "token": "size.document.clause-indent",
           "readBy": [
             {
               "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -5107,11 +5167,73 @@
           ]
         },
         {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
           "token": "space.gap.md",
           "readBy": [
             {
               "unit": "Clause",
               "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -5121,6 +5243,28 @@
             {
               "unit": "Clause",
               "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -5142,6 +5286,15 @@
           "readBy": [
             {
               "unit": "Clause",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -8993,6 +9146,189 @@
         }
       ]
     },
+    "Document": {
+      "kind": "component",
+      "dir": "src/components/Document",
+      "exports": [
+        "Document",
+        "DocumentFlow",
+        "DocumentGrid",
+        "DocumentPage"
+      ],
+      "stylesheets": [
+        "src/components/Document/Document.css"
+      ],
+      "composes": [],
+      "composesAll": [],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "DocumentTitle": {
       "kind": "component",
       "dir": "src/components/DocumentTitle",
@@ -9005,104 +9341,30 @@
         "src/components/DocumentTitle/DocumentTitle.css"
       ],
       "composes": [
-        "Clause",
+        "Document",
         "Heading",
         "Text"
       ],
       "composesAll": [
-        "Change",
-        "Clause",
+        "Document",
         "Heading",
         "Text"
       ],
       "tokens": [
         {
-          "token": "border.width.change-bar",
+          "token": "color.bg.surface",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "color.category.1.fg",
+          "token": "color.border.default",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -9111,11 +9373,7 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             },
             {
@@ -9124,15 +9382,6 @@
             },
             {
               "unit": "Text",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.fg.link",
-          "readBy": [
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9147,87 +9396,92 @@
           ]
         },
         {
-          "token": "color.focus",
+          "token": "ratio.page",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "color.status.danger.fg",
+          "token": "ratio.page-landscape",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "color.status.success.fg",
+          "token": "shadow.card",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "focus.ring.offset",
+          "token": "size.document.grid-row",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "focus.ring.width",
+          "token": "size.page.letter.block",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "font.weight.strong",
+          "token": "size.page.letter.inline",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "radius.indicator",
+          "token": "space.document.grid-gap",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "size.document.clause-indent",
+          "token": "space.gap.2xl",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
         {
-          "token": "size.document.note",
+          "token": "space.gap.2xs",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -9235,8 +9489,12 @@
           "token": "space.gap.md",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
             },
             {
               "unit": "DocumentTitle",
@@ -9248,12 +9506,21 @@
           "token": "space.gap.sm",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
+              "unit": "Document",
+              "how": "prop"
             },
             {
               "unit": "DocumentTitle",
               "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -9261,47 +9528,20 @@
           "token": "space.gap.xs",
           "readBy": [
             {
+              "unit": "Document",
+              "how": "prop"
+            },
+            {
               "unit": "DocumentTitle",
               "how": "css"
             }
           ]
         },
         {
-          "token": "space.inset.md",
+          "token": "space.page.margin",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.inset.xl",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.scroll-padding.end",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.scroll-padding.start",
-          "readBy": [
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -9382,16 +9622,12 @@
         "src/components/DocumentViewer/DocumentViewer.css"
       ],
       "composes": [
-        "Clause",
         "Icon",
         "Shortcuts",
         "Toolbar"
       ],
       "composesAll": [
-        "Change",
-        "Clause",
         "Dialog",
-        "Heading",
         "Icon",
         "Kbd",
         "Shortcuts",
@@ -9400,19 +9636,6 @@
         "Tooltip"
       ],
       "tokens": [
-        {
-          "token": "border.width.change-bar",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
         {
           "token": "border.width.default",
           "readBy": [
@@ -9561,84 +9784,6 @@
           ]
         },
         {
-          "token": "color.category.1.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.data-field.bg",
           "readBy": [
             {
@@ -9669,23 +9814,11 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
-            {
               "unit": "Dialog",
               "how": "css"
             },
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            },
-            {
-              "unit": "Heading",
               "how": "css"
             },
             {
@@ -9721,15 +9854,6 @@
           ]
         },
         {
-          "token": "color.fg.link",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.fg.muted",
           "readBy": [
             {
@@ -9760,36 +9884,10 @@
           ]
         },
         {
-          "token": "color.focus",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.status.danger.fg",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
-            },
-            {
               "unit": "Toolbar",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.status.success.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -9817,30 +9915,8 @@
           ]
         },
         {
-          "token": "focus.ring.offset",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "focus.ring.width",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "font.weight.strong",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Kbd",
               "how": "css"
@@ -9899,15 +9975,6 @@
             },
             {
               "unit": "Tooltip",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "radius.indicator",
-          "readBy": [
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -10024,28 +10091,10 @@
           ]
         },
         {
-          "token": "size.document.clause-indent",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "size.document.measure",
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "size.document.note",
-          "readBy": [
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -10115,10 +10164,6 @@
           "token": "space.gap.md",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
-            },
-            {
               "unit": "Dialog",
               "how": "css"
             },
@@ -10139,10 +10184,6 @@
         {
           "token": "space.gap.sm",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Dialog",
               "how": "css"
@@ -10200,14 +10241,6 @@
           "token": "space.inset.md",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
-            {
               "unit": "Dialog",
               "how": "css"
             },
@@ -10233,10 +10266,6 @@
         {
           "token": "space.inset.xl",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "DocumentViewer",
               "how": "css"
@@ -10265,24 +10294,6 @@
           "readBy": [
             {
               "unit": "DocumentViewer",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.scroll-padding.end",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.scroll-padding.start",
-          "readBy": [
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -10335,41 +10346,10 @@
           ]
         },
         {
-          "token": "text.heading-1",
-          "readBy": [
-            {
-              "unit": "Heading",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.heading-2",
-          "readBy": [
-            {
-              "unit": "Heading",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "text.heading-3",
           "readBy": [
             {
               "unit": "Dialog",
-              "how": "css"
-            },
-            {
-              "unit": "Heading",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "text.heading-4",
-          "readBy": [
-            {
-              "unit": "Heading",
               "how": "css"
             }
           ]
@@ -10924,24 +10904,19 @@
         "src/components/Exhibit/Exhibit.css"
       ],
       "composes": [
-        "Clause",
+        "Document",
         "Heading"
       ],
       "composesAll": [
-        "Change",
-        "Clause",
+        "Document",
         "Heading"
       ],
       "tokens": [
         {
-          "token": "border.width.change-bar",
+          "token": "color.bg.surface",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -10950,85 +10925,11 @@
           "token": "color.border.default",
           "readBy": [
             {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
               "unit": "Exhibit",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.1.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.2.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.3.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.4.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.5.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.category.6.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
               "how": "css"
             }
           ]
@@ -11037,11 +10938,7 @@
           "token": "color.fg.default",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             },
             {
@@ -11051,21 +10948,8 @@
           ]
         },
         {
-          "token": "color.fg.link",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "color.focus",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Exhibit",
               "how": "css"
@@ -11073,34 +10957,8 @@
           ]
         },
         {
-          "token": "color.status.danger.fg",
-          "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "color.status.success.fg",
-          "readBy": [
-            {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
           "token": "focus.ring.offset",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Exhibit",
               "how": "css"
@@ -11111,48 +10969,98 @@
           "token": "focus.ring.width",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
-            },
-            {
               "unit": "Exhibit",
               "how": "css"
             }
           ]
         },
         {
-          "token": "font.weight.strong",
+          "token": "ratio.page",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "radius.indicator",
+          "token": "ratio.page-landscape",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "size.document.clause-indent",
+          "token": "shadow.card",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
         },
         {
-          "token": "size.document.note",
+          "token": "size.document.grid-row",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -11160,8 +11068,12 @@
           "token": "space.gap.md",
           "readBy": [
             {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
             },
             {
               "unit": "Exhibit",
@@ -11173,8 +11085,26 @@
           "token": "space.gap.sm",
           "readBy": [
             {
-              "unit": "Clause",
-              "how": "css"
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
             }
           ]
         },
@@ -11188,23 +11118,10 @@
           ]
         },
         {
-          "token": "space.inset.md",
+          "token": "space.page.margin",
           "readBy": [
             {
-              "unit": "Change",
-              "how": "css"
-            },
-            {
-              "unit": "Clause",
-              "how": "css"
-            }
-          ]
-        },
-        {
-          "token": "space.inset.xl",
-          "readBy": [
-            {
-              "unit": "Clause",
+              "unit": "Document",
               "how": "css"
             }
           ]
@@ -11212,10 +11129,6 @@
         {
           "token": "space.scroll-padding.end",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Exhibit",
               "how": "css"
@@ -11225,10 +11138,6 @@
         {
           "token": "space.scroll-padding.start",
           "readBy": [
-            {
-              "unit": "Clause",
-              "how": "css"
-            },
             {
               "unit": "Exhibit",
               "how": "css"
@@ -13016,6 +12925,15 @@
         },
         {
           "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Frame",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
           "readBy": [
             {
               "unit": "Frame",
@@ -28699,6 +28617,18 @@
       ],
       "modes": {}
     },
+    "ratio.page-landscape": {
+      "cssVar": "--ratio-page-landscape",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A landscape page (US Letter turned, 11 × 8.5): a landscape DocumentPage in a grid document.",
+      "value": "1.2941",
+      "chain": [
+        "ratio.page-landscape",
+        "aspect.letter-landscape"
+      ],
+      "modes": {}
+    },
     "ratio.square": {
       "cssVar": "--ratio-square",
       "tier": "semantic",
@@ -28972,6 +28902,18 @@
       ],
       "modes": {}
     },
+    "size.document.grid-row": {
+      "cssVar": "--size-document-grid-row",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.",
+      "value": "32px",
+      "chain": [
+        "size.document.grid-row",
+        "size.8"
+      ],
+      "modes": {}
+    },
     "size.document.measure": {
       "cssVar": "--size-document-measure",
       "tier": "semantic",
@@ -29089,6 +29031,30 @@
       "chain": [
         "size.overlay-max",
         "container.sm"
+      ],
+      "modes": {}
+    },
+    "size.page.letter.block": {
+      "cssVar": "--size-page-letter-block",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Height of a US Letter page.",
+      "value": "11in",
+      "chain": [
+        "size.page.letter.block",
+        "paper.letter-block"
+      ],
+      "modes": {}
+    },
+    "size.page.letter.inline": {
+      "cssVar": "--size-page-letter-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Width of a US Letter page.",
+      "value": "8.5in",
+      "chain": [
+        "size.page.letter.inline",
+        "paper.letter-inline"
       ],
       "modes": {}
     },
@@ -29245,6 +29211,18 @@
       "chain": [
         "size.viewport.block",
         "viewport.block"
+      ],
+      "modes": {}
+    },
+    "space.document.grid-gap": {
+      "cssVar": "--space-document-grid-gap",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Gap between the cells of a DocumentGrid.",
+      "value": "4px",
+      "chain": [
+        "space.document.grid-gap",
+        "space.1"
       ],
       "modes": {}
     },
@@ -29413,6 +29391,18 @@
       "chain": [
         "space.mark.overhang",
         "space.half"
+      ],
+      "modes": {}
+    },
+    "space.page.margin": {
+      "cssVar": "--space-page-margin",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Margin around a printed page's content, and inside a fixed form page.",
+      "value": "1in",
+      "chain": [
+        "space.page.margin",
+        "paper.margin"
       ],
       "modes": {}
     },

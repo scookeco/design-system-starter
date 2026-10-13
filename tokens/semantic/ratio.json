@@ -17,6 +17,10 @@
     "page": {
       "$value": "{aspect.letter}",
       "$description": "A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows."
+    },
+    "page-landscape": {
+      "$value": "{aspect.letter-landscape}",
+      "$description": "A landscape page (US Letter turned, 11 × 8.5): a landscape DocumentPage in a grid document."
     }
   }
 }

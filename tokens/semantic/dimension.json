@@ -67,6 +67,20 @@
         "$value": "{space.half}",
         "$description": "How far a highlight’s or a data field’s background reaches past its text on each side, without moving the text."
       }
+    },
+    "page": {
+      "$description": "A printed page.",
+      "margin": {
+        "$value": "{paper.margin}",
+        "$description": "Margin around a printed page's content, and inside a fixed form page."
+      }
+    },
+    "document": {
+      "$description": "A generated document's layout.",
+      "grid-gap": {
+        "$value": "{space.1}",
+        "$description": "Gap between the cells of a DocumentGrid."
+      }
     }
   },
   "size": {
@@ -245,6 +259,10 @@
       "note": {
         "$value": "{container.3xs}",
         "$description": "Inline size of a clause note in the margin beside the paper (ClauseNote)."
+      },
+      "grid-row": {
+        "$value": "{size.8}",
+        "$description": "Height of one row in a DocumentGrid: the coordinate system a form page places its fields on."
       }
     },
     "signature": {
@@ -260,6 +278,19 @@
       "tag-inline": {
         "$value": "{size.24}",
         "$description": "Inline size of the Sign tag inside the slot: half of it."
+      }
+    },
+    "page": {
+      "$description": "A printed page, and a fixed form page (DocumentPage in a grid document).",
+      "letter": {
+        "inline": {
+          "$value": "{paper.letter-inline}",
+          "$description": "Width of a US Letter page."
+        },
+        "block": {
+          "$value": "{paper.letter-block}",
+          "$description": "Height of a US Letter page."
+        }
       }
     }
   },

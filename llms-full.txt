@@ -116,7 +116,7 @@ UI rules (design system v0)
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
-- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
+- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a Document
 - [ClauseNote](docs/usage/ClauseNote.usage.tsx): A note about a clause for whoever drafts or reviews the…
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
@@ -128,11 +128,12 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
-- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a DocumentViewer
-- [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
+- [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
+- [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
-- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same…
+- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same Document
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
@@ -763,28 +764,32 @@ Variants: kind (insert | delete | move-from | move-to); color (1 | 2 | 3 | 4 | 5
 **Do:** Each change with its author, in that author’s colour.
 
 ```tsx
-<DocumentViewer label="Compared">
-  <Text>
-    Liability will not exceed{' '}
-    <Change kind="insert" author="Maya Okafor" color={3}>
-      two times (2×)
-    </Change>{' '}
-    the fees of the prior twelve (12) months.
-  </Text>
+<DocumentViewer>
+  <Document label="Compared">
+    <Text>
+      Liability will not exceed{' '}
+      <Change kind="insert" author="Maya Okafor" color={3}>
+        two times (2×)
+      </Change>{' '}
+      the fees of the prior twelve (12) months.
+    </Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.
 
 ```tsx
-<DocumentViewer label="Compared">
-  <Clause id="cap" title="Limitation of Liability">
-    <Text>
-      <Change kind="insert" author="Maya Okafor" color={3}>
-        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.
-      </Change>
-    </Text>
-  </Clause>
+<DocumentViewer>
+  <Document label="Compared">
+    <Clause id="cap" title="Limitation of Liability">
+      <Text>
+        <Change kind="insert" author="Maya Okafor" color={3}>
+          Liability will not exceed two times (2×) the fees of the prior twelve (12) months.
+        </Change>
+      </Text>
+    </Clause>
+  </Document>
 </DocumentViewer>
 ```
 
@@ -984,7 +989,7 @@ Tokens read: `color.bg.selected`, `color.bg.surface`, `color.border.default`, `c
 
 component · `src/components/Clause/Clause.tsx` · usage: `docs/usage/Clause.usage.tsx`
 
-A numbered clause in a DocumentViewer. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.
+A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
 
 Props:
 - `id: string`: Stable id that references use (`<ClauseRef to="liability" />`). Unique in the document. Required.
@@ -1033,39 +1038,43 @@ Closed styling API: no `className`/`style`.
 **Do:** Clauses by id, references by id: remove or move a clause and every number follows.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Clause id="fees" title="Fees">
-    <Text>
-      The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
-    </Text>
-  </Clause>
-  <Clause id="disputes" title="Disputed amounts">
-    <Text>
-      <Term>Fees</Term> disputed in good faith may be withheld.
-    </Text>
-  </Clause>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="fees" title="Fees">
+      <Text>
+        The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
+      </Text>
+    </Clause>
+    <Clause id="disputes" title="Disputed amounts">
+      <Text>
+        <Term>Fees</Term> disputed in good faith may be withheld.
+      </Text>
+    </Clause>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** Numbers typed into headings and text: the first clause added or removed leaves them wrong.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>
-  <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>
+    <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Accessibility**
 
-- A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the viewer’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.
+- A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.
 - A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).
 - Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.
 - A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
 
 Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`.
-Composes: Change, Heading.
-Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Change, Document, Heading.
+Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### ClauseNote
 
@@ -1096,20 +1105,24 @@ Variants: position (balanced | seller-favored | buyer-favored); color (1 | 2 | 3
 **Do:** A position named in words, with the reason in one line.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Clause id="cap" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>}>
-    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>
-  </Clause>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="cap" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>}>
+      <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>
+    </Clause>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** A drafting remark typed into the clause: it would be signed with the agreement.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Clause id="cap" title="Limitation of Liability">
-    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>
-  </Clause>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="cap" title="Limitation of Liability">
+      <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>
+    </Clause>
+  </Document>
 </DocumentViewer>
 ```
 
@@ -1747,11 +1760,110 @@ States: decorative.
 Stories: `components-divider--horizontal`, `components-divider--vertical`, `components-divider--semantic`.
 Tokens read: `color.border.default`.
 
+### Document
+
+component · `src/components/Document/Document.tsx` · usage: `docs/usage/Document.usage.tsx`
+
+The root of a document: exactly one per document. It names the document, says how it is laid out (`shell`) and where it is in its life (`lifecycle`), and numbers what it holds: Clauses, Exhibits and their references resolve inside it. Show it on screen in a DocumentViewer; the same markup prints, with pages from DocumentPage and the print stylesheet.
+
+Props:
+- `label: string`: The document's name: labels the document ("Master services agreement"). Required.
+- `type?: string`: What kind of document it is, stable and lowercase-kebab ("msa", "w-4", "invoice"): the key workflows and exports use.
+- `version?: string`: The template's version ("3.2", "2026").
+- `lifecycle?: DocumentLifecycle` = `'generated'`: Where it is in its life: generated from data (the default), filled in, negotiated or executed.
+- `lang?: string`: The document's language, when it differs from the page's ("fr").
+- `shell?: DocumentShell` = `'flow'`: flow (the default): content reflows, and pages break only in print. grid: fixed DocumentPages that place content on a DocumentGrid.
+- `headingLevel?: Exclude<HeadingLevel, 1>` = `2`: The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).
+- `documentName?: string` = `'the Agreement'`: How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement".
+- `children: ReactNode`: The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly.
+
+Closed styling API: no `className`/`style`.
+
+Variants: lifecycle (generated | filled | negotiated | executed); shell (flow | grid); headingLevel (2 | 3 | 4).
+
+#### DocumentFlow
+
+component, part of Document. A normal-flow run of content: it reflows, and in print breaks into pages wherever the text falls.
+
+Props:
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+#### DocumentGrid
+
+component, part of Document. The coordinate system of a form page: equal columns and fixed-height rows that children place themselves on with `area`. One per DocumentPage.
+
+Props:
+- `cols?: number` = `12`: Columns. Default 12.
+- `rows?: number`: Rows, each size.document.grid-row tall. Default: as many as the content needs.
+- `gap?: GapToken`: Space between cells. Default space.document.grid-gap.
+- `children: ReactNode`: The page's content; document parts that take `area` sit where it says, the rest fill in order.
+
+Closed styling API: no `className`/`style`.
+
+#### DocumentPage
+
+component, part of Document. An explicit page. In a flow document it starts a new page in print and continues the sheet on screen (a signature page, an exhibit that must start fresh). In a grid document it is the fixed page itself, on screen too, because where things sit is part of the form.
+
+Props:
+- `size?: 'letter'` = `'letter'`: The paper. Default letter.
+- `orientation?: 'portrait' | 'landscape'` = `'portrait'`: Default portrait.
+- `n?: number`: The page's number, when the document fixes it (a form's "Page 2").
+- `children: ReactNode`: What the page holds: a DocumentGrid in a grid document, or flowing content.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` ("msa", "w-4"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.
+- Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.
+- `DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.
+
+**When not to use**
+
+- Showing a document on screen with highlights and the selection menu → `DocumentViewer` around the `Document`
+- A scanned form or an image of one → an image or PDF preview: only documents authored from structured source are in scope
+- A grid to lay out an app page → the `Grid` or `Switcher` primitive
+
+**Do:** One Document root, its type and lifecycle declared, in a viewer on screen.
+
+```tsx
+<DocumentViewer>
+  <Document label="Master services agreement" type="msa" lifecycle="negotiated">
+    <DocumentFlow>
+      <Clause id="term" title="Term">
+        <Text>Twenty-four (24) months from the Effective Date.</Text>
+      </Clause>
+    </DocumentFlow>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Clauses straight in the viewer with no Document root: nothing numbers them, and no reference can resolve.
+
+```tsx
+<DocumentViewer>
+  <Clause id="term" title="Term">
+    <Text>Twenty-four (24) months from the Effective Date.</Text>
+  </Clause>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- The root is an `article` named by `label`; `lang` marks a document in another language than the page.
+- A grid page is a `section` whose reading order is its source order, never its visual placement: write fields in the order a person fills them.
+- Print is an enhancement: the same markup reads and works without the print stylesheet.
+
+Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`.
+
 ### DocumentTitle
 
 component · `src/components/DocumentTitle/DocumentTitle.tsx` · usage: `docs/usage/DocumentTitle.usage.tsx`
 
-The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.
+The top of an agreement in a Document: its title and number, centred, then the preamble that names the parties. The title is one level above the document's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the Document headingLevel={3}. Recitals follow it.
 
 Props:
 - `title: string`: The agreement's title ("Master Services Agreement"). Required.
@@ -1792,50 +1904,49 @@ Closed styling API: no `className`/`style`.
 **Do:** Title, number and preamble, then the recitals: the same structure for every agreement the app generates.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
-    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
-  </DocumentTitle>
-  <Recitals>
-    <Recital>Provider operates a facilities management platform;</Recital>
-  </Recitals>
+<DocumentViewer>
+  <Document label="Agreement">
+    <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
+      This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
+    </DocumentTitle>
+    <Recitals>
+      <Recital>Provider operates a facilities management platform;</Recital>
+    </Recitals>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Text>MASTER SERVICES AGREEMENT</Text>
-  <Text>Whereas Provider operates a platform…</Text>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>MASTER SERVICES AGREEMENT</Text>
+    <Text>Whereas Provider operates a platform…</Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Accessibility**
 
-- The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.
+- The title is a heading one level above the document’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the `Document` `headingLevel={3}` so the title is an h2.
 - The title block is a `header`; recitals are plain paragraphs in reading order.
 
 Stories: `components-documenttitle--default`, `components-documenttitle--amendment`.
-Composes: Change, Clause, Heading, Text.
-Tokens read: `border.width.change-bar`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Document, Heading, Text.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### DocumentViewer
 
 component · `src/components/DocumentViewer/DocumentViewer.tsx` · usage: `docs/usage/DocumentViewer.usage.tsx`
 
-A document the app generates from data, shown as one continuous sheet (at least a page tall) on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the document area only: the page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
+Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
 
 Props:
-- `label: string`: The document's name: labels the document region ("Master services agreement"). Required.
-- `children: ReactNode`: The generated document: headings and paragraphs, with DataField and Highlight inside.
+- `children: ReactNode`: The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required.
 - `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
-- `headingLevel?: Exclude<HeadingLevel, 1>` = `2`: The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).
-- `documentName?: string` = `'the Agreement'`: How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement".
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
-
-Variants: headingLevel (2 | 3 | 4).
 
 #### DataField
 
@@ -1850,7 +1961,8 @@ Closed styling API: no `className`/`style`.
 
 **When to use**
 
-- A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.
+- Showing one `Document` on screen for people to read and highlight: an agreement, an order form, a policy. The viewer is the screen render target only; the `Document` inside holds the content and numbering, with `DataField` and `Highlight` inline.
+- A flow document is one continuous sheet on screen, at least a page tall; its pages break only in print. A grid document shows its fixed pages. Highlight, Change and the selection menu are a review layer on top of any document.
 - Highlights (`Highlight`) can show together in their own colours: the reader’s own (yellow), Find’s matches (blue), what an AI answer cites (purple). Pass `onHighlight` to let readers keep a selection as a highlight.
 
 **When not to use**
@@ -1858,35 +1970,40 @@ Closed styling API: no `className`/`style`.
 - A form with no document around it → the form components (`Field`, `TextField`, `Select`…) on a page
 - A PDF or a scanned file → a preview in `Frame` that opens the file
 - A short note or an AI answer → `Text` or `StreamingText`
+- Printing or exporting the document → the `Document` alone: the viewer’s canvas and sheet drop away in print
 
 **Do:** Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.
 
 ```tsx
-<DocumentViewer label="Order form">
-  <Text size="body-lg">
-    Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by Maya Okafor.
-  </Text>
+<DocumentViewer>
+  <Document label="Order form">
+    <Text size="body-lg">
+      Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by Maya Okafor.
+    </Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** Flagging an empty value inside the document: fix the data in the form that collected it.
 
 ```tsx
-<DocumentViewer label="Order form">
-  <Text size="body-lg">
-    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.
-  </Text>
+<DocumentViewer>
+  <Document label="Order form">
+    <Text size="body-lg">
+      Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.
+    </Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Accessibility**
 
-- The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.
+- The document is the `Document`’s `article`, named by its `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Change, Clause, Dialog, Heading, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
-Tokens read: `border.width.change-bar`, `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.link`, `color.fg.muted`, `color.fg.on-action`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `ease.enter`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.indicator`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.clause-indent`, `size.document.measure`, `size.document.note`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
+Composes: Dialog, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
 
@@ -2015,7 +2132,7 @@ Tokens read: `color.bg.subtle`, `color.border.default`, `color.fg.default`, `col
 
 component · `src/components/Exhibit/Exhibit.tsx` · usage: `docs/usage/Exhibit.usage.tsx`
 
-An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
+An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.
 
 Props:
 - `id: string`: Stable id that references use (`<ClauseRef to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required.
@@ -2027,7 +2144,7 @@ Closed styling API: no `className`/`style`.
 **When to use**
 
 - A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.
-- Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to="dpa" />` names the exhibit itself.
+- Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<ClauseRef to="dpa" />` names the exhibit itself.
 
 **When not to use**
 
@@ -2037,37 +2154,41 @@ Closed styling API: no `className`/`style`.
 **Do:** An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Clause id="privacy" title="Data Privacy">
-    <Text>
-      Personal data is processed under <ClauseRef to="dpa" />.
-    </Text>
-  </Clause>
-  <Exhibit id="dpa" title="Data Processing Agreement">
-    <Clause id="roles" title="Roles">
-      <Text>Customer is the controller and Provider the processor.</Text>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="privacy" title="Data Privacy">
+      <Text>
+        Personal data is processed under <ClauseRef to="dpa" />.
+      </Text>
     </Clause>
-  </Exhibit>
+    <Exhibit id="dpa" title="Data Processing Agreement">
+      <Clause id="roles" title="Roles">
+        <Text>Customer is the controller and Provider the processor.</Text>
+      </Clause>
+    </Exhibit>
+  </Document>
 </DocumentViewer>
 ```
 
 **Don't:** A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.
 
 ```tsx
-<DocumentViewer label="Agreement">
-  <Text>EXHIBIT A — Data Processing Agreement</Text>
-  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>EXHIBIT A — Data Processing Agreement</Text>
+    <Text>26. Roles. Customer is the controller and Provider the processor.</Text>
+  </Document>
 </DocumentViewer>
 ```
 
 **Accessibility**
 
-- An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.
+- An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the document’s top heading level; its clauses’ headings start one level below.
 - A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content.
 
 Stories: `components-exhibit--default`.
-Composes: Change, Clause, Heading.
-Tokens read: `border.width.change-bar`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.link`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `radius.indicator`, `size.document.clause-indent`, `size.document.note`, `space.gap.md`, `space.gap.sm`, `space.inset.lg`, `space.inset.md`, `space.inset.xl`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Document, Heading.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Feedback
 
@@ -5155,7 +5276,7 @@ Props:
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
 
-Variants: ratio (square | landscape | wide | page).
+Variants: ratio (square | landscape | wide | page | page-landscape).
 
 **When to use**
 
@@ -5196,7 +5317,7 @@ Variants: ratio (square | landscape | wide | page).
 - Layout only. The media keeps its own alternative: `alt=""` when a visible name sits beside it, a real description when it carries information.
 
 Stories: `primitives-frame--landscape`, `primitives-frame--square`, `primitives-frame--wide`, `primitives-frame--centred-content`.
-Tokens read: `ratio.landscape`, `ratio.page`, `ratio.square`, `ratio.wide`.
+Tokens read: `ratio.landscape`, `ratio.page`, `ratio.page-landscape`, `ratio.square`, `ratio.wide`.
 
 ### Grid
 
@@ -6136,7 +6257,10 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
 - `DateRange` (`src/components/DatePicker/DatePicker.tsx`): `interface DateRange { start: IsoDate; end: IsoDate; }`
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long' | 'month'` short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period).
+- `DocumentArea` (`src/components/Document/Document.tsx`): `interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }` Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.
+- `DocumentLifecycle` (`src/components/Document/documentIndex.ts`): `type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed'` Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed).
 - `DocumentSelection` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSelection { text: string; range: Range; }` The text the reader selected in the document, and the range it covers (to store as a highlight).
+- `DocumentShell` (`src/components/Document/documentIndex.ts`): `type DocumentShell = 'flow' | 'grid'` How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms).
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
 - `FeedbackRating` (`src/components/Feedback/Feedback.tsx`): `type FeedbackRating = 'up' | 'down'`
@@ -7277,7 +7401,7 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 
 | Feature | Where | What it replaces or fixes | Baseline | Without it |
 |---|---|---|---|---|
-| `:has()` | PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main | Data attributes set from props only to describe the markup (`data-nav`, `data-aside`, `data-removable`, `data-assistant`): the CSS reads the markup itself, so the two can’t disagree. | Widely available (2026-06-19) | Required: no fallback. |
+| `:has()` | PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main; DocumentViewer’s sheet around a grid document | Data attributes set from props only to describe the markup (`data-nav`, `data-aside`, `data-removable`, `data-assistant`): the CSS reads the markup itself, so the two can’t disagree. | Widely available (2026-06-19) | Required: no fallback. |
 | `@starting-style` with transitions | Entry of Popover, Tooltip, HoverCard, Menu, ContextMenu, Select, the pickers (Combobox, MultiSelect, DatePicker), Dialog, Drawer, CommandPalette and Toast | Nothing: overlays appeared at once. They now fade (a toast rises, a drawer slides from its edge) over motion tokens, with no JavaScript and no change to Radix or React Aria. | Newly available (2024-08-06) | The rule is ignored and the overlay appears at once, as before. Reduced motion makes the duration 0ms. |
 | Same-document view transitions | The example app: route changes and a list’s display switch (table ↔ board), through `withViewTransition` in `src/app/viewTransition.ts` | Nothing: the page swapped at once. Now it cross-fades over `motion.view`. | Newly available (2025-10-14) | The helper checks for `document.startViewTransition` and runs the update directly. It also skips under reduced motion and when `html[data-view-transitions="off"]` (the test harness sets it). |
 | `text-wrap: balance` | Headings, h1 to h4 (reset layer) | Ragged two-line headings with one word on the second line. | Newly available (2024-05-13) | Ignored: headings wrap normally. |
@@ -7286,6 +7410,8 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 | `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
 | `box-decoration-break: clone` | Highlight, and a DataField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
 | `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
+| `@page` with `size` and named pages (`page`) | Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is | Nothing: printing a document took the browser’s default page and margins. | Newly available (2024-12-11); widely available on 2027-06-11 | Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it. |
+| `break-before: page` | DocumentPage: a page in a flow document (a signature page) starts a new printed page | n/a | Widely available | Required for print only: on screen the sheet continues. |
 | Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
 
 #### Overlays: native popover and anchor positioning
@@ -7864,6 +7990,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `radius.surface` `var(--radius-surface)`: `8px`. Cards, tables, dialogs, popovers.
 - `ratio.landscape` `var(--ratio-landscape)`: `1.3333`. File and document previews.
 - `ratio.page` `var(--ratio-page)`: `0.7727`. A page (US Letter, 8.5 × 11). DocumentViewer's paper is at least this tall: a short document still reads as a page, a longer one grows.
+- `ratio.page-landscape` `var(--ratio-page-landscape)`: `1.2941`. A landscape page (US Letter turned, 11 × 8.5): a landscape DocumentPage in a grid document.
 - `ratio.square` `var(--ratio-square)`: `1`. Avatars, logos, square thumbnails.
 - `ratio.wide` `var(--ratio-wide)`: `1.7778`. Video, cover images, banners.
 - `shadow.card` `var(--shadow-card)`: `0 1px 2px 0 #0206171a`. Resting surfaces on the canvas: cards, tables.
@@ -7890,6 +8017,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.dialog.md` `var(--size-dialog-md)`: `36rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.sm` `var(--size-dialog-sm)`: `28rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.document.clause-indent` `var(--size-document-clause-indent)`: `48px`. The gutter a clause number hangs in (Clause); each nested clause indents one more.
+- `size.document.grid-row` `var(--size-document-grid-row)`: `32px`. Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.
 - `size.document.measure` `var(--size-document-measure)`: `48rem`. Max inline size of the paper: one continuous surface, centred, no page breaks.
 - `size.document.note` `var(--size-document-note)`: `12rem`. Inline size of a clause note in the margin beside the paper (ClauseNote).
 - `size.drawer.md` `var(--size-drawer-md)`: `28rem`. Drawer widths: sm for navigation, md for details and filters.
@@ -7900,6 +8028,8 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.icon.md` `var(--size-icon-md)`: `20px`. Icon sizes: sm inline with body text and in controls, md beside larger text.
 - `size.icon.sm` `var(--size-icon-sm)`: `16px`. Icon sizes: sm inline with body text and in controls, md beside larger text.
 - `size.overlay-max` `var(--size-overlay-max)`: `24rem`. Max width for tooltips and toasts.
+- `size.page.letter.block` `var(--size-page-letter-block)`: `11in`. Height of a US Letter page.
+- `size.page.letter.inline` `var(--size-page-letter-inline)`: `8.5in`. Width of a US Letter page.
 - `size.rail` `var(--size-rail)`: `48px`. Width of AppShell’s collapsed sidebar: the icon rail.
 - `size.scroll-region.lg` `var(--size-scroll-region-lg)`: `48rem`. Max block size for scrollable regions such as tables.
 - `size.scroll-region.md` `var(--size-scroll-region-md)`: `36rem`. Max block size for scrollable regions such as tables.
@@ -7913,6 +8043,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.skeleton.block` `var(--size-skeleton-block)`: `12rem`. Default height of a block skeleton (card, chart, image).
 - `size.target-min` `var(--size-target-min)`: `24px`. WCAG 2.2 minimum target size (24px).
 - `size.viewport.block` `var(--size-viewport-block)`: `100dvh`. Full viewport height: the app shell's block size.
+- `space.document.grid-gap` `var(--space-document-grid-gap)`: `4px`. Gap between the cells of a DocumentGrid.
 - `space.gap.2xl` `var(--space-gap-2xl)`: `48px`. Space between siblings. Layout primitives take these as gap.
 - `space.gap.2xs` `var(--space-gap-2xs)`: `4px`. Space between siblings. Layout primitives take these as gap.
 - `space.gap.lg` `var(--space-gap-lg)`: `24px`. Space between siblings. Layout primitives take these as gap.
@@ -7927,6 +8058,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `space.inset.xl` `var(--space-inset-xl)`: `32px`. Padding inside a box.
 - `space.inset.xs` `var(--space-inset-xs)`: `4px`. Padding inside a box.
 - `space.mark.overhang` `var(--space-mark-overhang)`: `2px`. How far a highlight’s or a data field’s background reaches past its text on each side, without moving the text.
+- `space.page.margin` `var(--space-page-margin)`: `1in`. Margin around a printed page's content, and inside a fixed form page.
 - `space.scroll-padding.end` `var(--space-scroll-padding-end)`: `80px`. Above a sticky action bar (AppShell, FocusedLayout and Drawer footers). At least the tallest bar.
 - `space.scroll-padding.start` `var(--space-scroll-padding-start)`: `48px`. Below a sticky header row (Table). At least the header's height.
 - `space.scroll-padding.toast` `var(--space-scroll-padding-toast)`: `128px`. Above an open toast (AppShell’s toast region, fixed at the end of main), so focus scrolls clear of it. At least one toast with an action.
