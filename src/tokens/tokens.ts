@@ -266,7 +266,8 @@ export const vars = {
       "clause-indent": "var(--size-document-clause-indent)",
       "note": "var(--size-document-note)",
       "grid-row": "var(--size-document-grid-row)",
-      "seal": "var(--size-document-seal)"
+      "seal": "var(--size-document-seal)",
+      "field": "var(--size-document-field)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",

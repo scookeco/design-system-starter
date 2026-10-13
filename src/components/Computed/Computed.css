@@ -1,0 +1,5 @@
+@layer components {
+  .computed {
+    font-variant-numeric: tabular-nums;
+  }
+}

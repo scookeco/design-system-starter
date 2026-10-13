@@ -1,0 +1,14 @@
+@layer components {
+  .line-items {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-gap-sm);
+  }
+
+  @media print {
+    .line-items__actions {
+      display: none;
+    }
+  }
+}

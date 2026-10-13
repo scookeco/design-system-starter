@@ -1,0 +1,33 @@
+@layer components {
+  .document-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-gap-xs) var(--space-gap-md);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .document-radio-group__legend {
+    padding: 0;
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  .document-radio-group__option {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-gap-xs);
+  }
+
+  .document-radio-group__radio {
+    margin: 0;
+    accent-color: var(--color-action-primary);
+  }
+
+  .document-radio-group__radio:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

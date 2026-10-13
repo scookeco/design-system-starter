@@ -134,8 +134,8 @@ function position(counters: readonly number[]): { number: string; ref: string } 
   return { number, ref };
 }
 
-/** Hidden content (a Conditional that is off) takes no number, as `display: none` takes no counter. */
-const shown = (el: Element) => !el.closest('[hidden]');
+/** Hidden content (a Conditional that is off, anything `hidden`) takes no number, as `display: none` takes no counter. */
+const shown = (el: Element) => !el.closest('[hidden], [data-off]');
 
 /** The heading's own text: the number is generated content, so textContent is the title alone. */
 const titleOf = (el: Element) => el.querySelector(':scope > :is(h1, h2, h3, h4, h5, h6)')?.textContent?.trim() ?? '';
@@ -217,7 +217,7 @@ export function useDocumentIndex(root: RefObject<HTMLElement | null>): DocumentI
     };
     update();
     const observer = new MutationObserver(update);
-    observer.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-unnumbered', 'data-label'] });
+    observer.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-off', 'data-unnumbered', 'data-label'] });
     return () => observer.disconnect();
   }, [root]);
   return index;

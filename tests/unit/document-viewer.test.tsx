@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DataField, Document, DocumentViewer, Highlight, Text } from '../../src/index';
+import { Document, DocumentViewer, Highlight, Text } from '../../src/index';
 
 afterEach(cleanup);
 
@@ -73,40 +72,5 @@ describe('DocumentViewer highlights', () => {
     });
     fireEvent.keyDown(document.body, { key: 'h' });
     expect(onHighlight).not.toHaveBeenCalled();
-  });
-});
-
-describe('DataField', () => {
-  it('is plain text when filled, blank when empty, and a placeholder when one is given', () => {
-    const { container } = render(
-      <Text>
-        A <DataField value="Acme Corp" /> B <DataField value="" /> C <DataField placeholder="Signer’s name" />
-      </Text>,
-    );
-    expect(container.textContent).toBe('A Acme Corp B  C Signer’s name');
-    expect(container.querySelector('[data-state="placeholder"]')?.textContent).toBe('Signer’s name');
-    expect(container.querySelectorAll('.document-data')).toHaveLength(2);
-  });
-
-  it('announces a placeholder that fills, once, in the live region', () => {
-    function Filling() {
-      const [value, setValue] = useState<string | undefined>();
-      return (
-        <DocumentViewer>
-          <Document label="Agreement">
-            <Text>
-              Effective <DataField value={value} placeholder="when signed" announceAs="Effective date" />
-            </Text>
-            <button type="button" onClick={() => setValue('14 October 2026')}>
-              Sign
-            </button>
-          </Document>
-        </DocumentViewer>
-      );
-    }
-    const { container } = render(<Filling />);
-    fireEvent.click(screen.getByRole('button', { name: 'Sign' }));
-    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('Effective date filled: 14 October 2026');
-    expect(container.querySelector('[data-state="filled-now"]')?.textContent).toBe('14 October 2026');
   });
 });

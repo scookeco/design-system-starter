@@ -9,6 +9,11 @@
     counter-reset: clause-1 exhibit step; /* every number in the document starts here (Clause, Exhibit, Step) */
   }
 
+  /* A document that is a form: the form is only a wrapper, laid out as the document is. */
+  .document-form {
+    display: contents;
+  }
+
   .document-flow {
     display: flex;
     flex-direction: column;

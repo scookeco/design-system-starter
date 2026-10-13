@@ -6,7 +6,8 @@ import { Heading } from '../Heading/Heading';
 import { Highlight } from '../Highlight/Highlight';
 import { Text } from '../Text/Text';
 import { Document } from '../Document/Document';
-import { DataField, DocumentViewer } from './DocumentViewer';
+import { DocumentField } from '../DocumentField/DocumentField';
+import { DocumentViewer } from './DocumentViewer';
 
 const meta = {
   title: 'Components/DocumentViewer',
@@ -18,19 +19,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The generated agreement every story shows. `effective` is the merged value; empty shows the placeholder. */
-function Agreement({ effective, signerName, title }: { effective?: string; signerName?: string; title?: string }) {
+/** The values merged into the agreement; the effective date and the second signer's fill later. */
+const MERGED = { vendor: 'Acme Corp', customer: 'Globex Inc.', initial_term: '24 months' };
+const SIGNED = { effective: '14 October 2026', signer_name: 'Jon Park', signer_title: 'Operations director' };
+
+/** The generated agreement every story shows: values by name from the Document; an empty one shows its placeholder. */
+function Agreement() {
   return (
     <>
       <Heading level={1}>Master services agreement</Heading>
       <Text size="body-lg">
-        This agreement is between <DataField value="Acme Corp" />, a Delaware corporation, and <DataField value="Globex Inc." />, a
+        This agreement is between <DocumentField name="vendor" label="Vendor" />, a Delaware corporation, and <DocumentField name="customer" label="Customer" />, a
         Washington corporation, effective{' '}
-        <DataField value={effective} placeholder="the date the last party signs" announceAs="Effective date" />.
+        <DocumentField name="effective" label="Effective date" placeholder="the date the last party signs" announceAs="Effective date" />.
       </Text>
       <Clause id="term" title="Term and renewal">
         <Text size="body-lg">
-          The initial term is <DataField value="24 months" /> from the Effective date. The agreement then{' '}
+          The initial term is <DocumentField name="initial_term" label="Initial term" /> from the Effective date. The agreement then{' '}
           <Highlight tone="ai">automatically renews</Highlight> for successive 12-month terms unless either party gives{' '}
           <Highlight>sixty days’ notice</Highlight>{' '}
           before the renewal date. Either party may end it for material breach that is{' '}
@@ -45,8 +50,8 @@ function Agreement({ effective, signerName, title }: { effective?: string; signe
       <Text size="body-lg">Signed for Acme Corp by Maya Okafor, Legal counsel.</Text>
       <Text size="body-lg">
         Signed for Globex Inc. by{' '}
-        <DataField value={signerName} placeholder="Signer’s name" announceAs="Signer’s name" />,{' '}
-        <DataField value={title} placeholder="Title" announceAs="Title" />
+        <DocumentField name="signer_name" label="Signer’s name" placeholder="Signer’s name" announceAs="Signer’s name" />,{' '}
+        <DocumentField name="signer_title" label="Title" placeholder="Title" announceAs="Title" />
       </Text>
     </>
   );
@@ -57,7 +62,7 @@ function Interactive() {
   return (
     <Stack gap="md">
       <DocumentViewer onHighlight={({ text }) => setSaved((list) => [...list, text])}>
-        <Document label="Master services agreement">
+        <Document label="Master services agreement" values={MERGED}>
           <Agreement />
         </Document>
       </DocumentViewer>
@@ -73,7 +78,7 @@ export const Default: Story = { render: () => <Interactive /> };
 export const Placeholders: Story = {
   render: () => (
     <DocumentViewer>
-      <Document label="Master services agreement">
+      <Document label="Master services agreement" values={MERGED}>
         <Agreement />
       </Document>
     </DocumentViewer>
@@ -83,12 +88,12 @@ export const Placeholders: Story = {
 /** The same document once Jon Park signs: each placeholder fills in place, tinted for a moment, and is announced. */
 export const PlaceholdersFilled: Story = {
   render: function Filled() {
-    const [values, setValues] = useState<{ effective?: string; signerName?: string; title?: string }>({});
-    useEffect(() => setValues({ effective: '14 October 2026', signerName: 'Jon Park', title: 'Operations director' }), []);
+    const [values, setValues] = useState<Record<string, string>>(MERGED);
+    useEffect(() => setValues({ ...MERGED, ...SIGNED }), []);
     return (
       <DocumentViewer>
-        <Document label="Master services agreement">
-          <Agreement {...values} />
+        <Document label="Master services agreement" values={values}>
+          <Agreement />
         </Document>
       </DocumentViewer>
     );

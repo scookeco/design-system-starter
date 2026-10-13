@@ -6066,6 +6066,269 @@
       "propsOf": "Composer"
     },
     {
+      "name": "Computed",
+      "kind": "component",
+      "source": "src/components/Computed/Computed.tsx",
+      "status": null,
+      "description": "A value derived from others (an invoice line's amount, its total), recomputed on every change and never typed. It reads like a filled field. Money is integer minor units, as currency fields store it.",
+      "docs": "docs/usage/Computed.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Its data key: other formulas use it (\"subtotal\"; in a Repeat row, per row: \"amount\", read as items.amount). Required."
+        },
+        {
+          "name": "formula",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The expression it is (\"qty * unit_price\", \"sum(items.amount)\", \"subtotal + tax\"). Required."
+        },
+        {
+          "name": "format",
+          "type": "ComputedFormat",
+          "required": false,
+          "default": "'number'",
+          "description": "Default number.",
+          "values": [
+            "number",
+            "currency",
+            "percent",
+            "text"
+          ]
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The currency for format currency. Default: the Document's."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "format": [
+          "number",
+          "currency",
+          "percent",
+          "text"
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A value derived from others, never typed: a line’s amount (`qty * unit_price`), a subtotal (`sum(items.amount)`), tax and total. It recomputes on every change and reads like a filled field, formatted as a number, currency (integer minor units), a percentage or text.",
+          "Other formulas use it by `name`; inside a Repeat row it computes per row, and `sum(items.amount)` totals the rows."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A value a person types",
+            "instead": "`DocumentField`"
+          },
+          {
+            "situation": "A total the app already has",
+            "instead": "a `DocumentField` merged from data"
+          }
+        ],
+        "do": {
+          "caption": "Totals as formulas over the values: change a line and they follow.",
+          "code": "<DocumentViewer>\n  <Document label=\"Quote\" values={{ subtotal: 100000 }}>\n    <KeyValue>\n      <KeyValueItem label=\"Tax\">\n        <Computed name=\"tax\" formula=\"subtotal * 0.085\" format=\"currency\" />\n      </KeyValueItem>\n    </KeyValue>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A total typed in: it is wrong the moment a line changes.",
+          "code": "<DocumentViewer>\n  <Document label=\"Quote\">\n    <Text>Tax: $85.00</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `output` element, read as text; it is never focusable or editable. A formula that doesn’t parse is reported in the console and shows nothing."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Computed",
+        "stories": [
+          {
+            "id": "components-computed--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-computed--formats",
+            "name": "Formats"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "ComputedFormat",
+      "kind": "type-only",
+      "source": "src/components/Computed/Computed.tsx",
+      "status": null,
+      "description": "How a computed value reads: a plain number, money (integer minor units), a percentage (0.085 → 8.5%), or as it is.",
+      "partOf": "Computed",
+      "definition": "type ComputedFormat = 'number' | 'currency' | 'percent' | 'text'",
+      "values": [
+        "number",
+        "currency",
+        "percent",
+        "text"
+      ]
+    },
+    {
+      "name": "ComputedProps",
+      "kind": "type-only",
+      "source": "src/components/Computed/Computed.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Computed",
+      "propsOf": "Computed"
+    },
+    {
+      "name": "Conditional",
+      "kind": "component",
+      "source": "src/components/Conditional/Conditional.tsx",
+      "status": null,
+      "description": "Shows its content only while `when` holds, live as the document is filled in. While it is off, its fields are disabled and not required, and its clauses take no number. In print every branch shows (a blank form offers all of them) unless the Document's printMode is \"resolved\".",
+      "docs": "docs/usage/Conditional.usage.tsx",
+      "props": [
+        {
+          "name": "when",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "When it shows: an expression over the document's values (\"multiple_jobs == true\", \"lifecycle != 'executed'\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "Any block: a field, a step, a clause, a table. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A block that applies only sometimes: an optional step, a clause for one jurisdiction, a field that follows an answer. `when` is an expression over the document’s values (and `lifecycle`): “multiple_jobs == true”, “state == 'CA' and employees > 50”.",
+          "While it is off, its fields are disabled and not required and its clauses take no number. In print every branch shows unless the `Document`’s `printMode` is \"resolved\"."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Showing or hiding app UI",
+            "instead": "ordinary rendering in the page"
+          },
+          {
+            "situation": "Two versions of one sentence",
+            "instead": "a `DocumentSelect` or a value merged from data"
+          }
+        ],
+        "do": {
+          "caption": "One block, shown by the answer it depends on.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\" defaultValues={{ multiple_jobs: true }}>\n    <DocumentCheckbox name=\"multiple_jobs\" label=\"I hold more than one job\" />\n    <Conditional when=\"multiple_jobs == true\">\n      <DocumentField name=\"other_jobs\" label=\"Pay from other jobs\" type=\"currency\" showLabel />\n    </Conditional>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A field that is always there and always required: people who don’t need it can’t submit.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\">\n    <DocumentField name=\"other_jobs\" label=\"Pay from other jobs (if any)\" type=\"currency\" showLabel required />\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An off block is not displayed, so it isn’t read or reachable; what controls it (the checkbox) comes before it in the reading order."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Conditional",
+        "stories": [
+          {
+            "id": "components-conditional--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-conditional--on",
+            "name": "On"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "ConditionalProps",
+      "kind": "type-only",
+      "source": "src/components/Conditional/Conditional.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Conditional",
+      "propsOf": "Conditional"
+    },
+    {
       "name": "ContentWidthToken",
       "kind": "type-only",
       "source": "src/tokens/tokens.ts",
@@ -6607,56 +6870,6 @@
       "description": null,
       "partOf": "Icon",
       "docs": "docs/usage/Icons.usage.tsx"
-    },
-    {
-      "name": "DataField",
-      "kind": "component",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": "A value merged into a generated document from data. Filled, it is plain document text; empty, it is blank (the form that collected it validates it). A placeholder fills in place, briefly tinted.",
-      "partOf": "DocumentViewer",
-      "docs": "docs/usage/DocumentViewer.usage.tsx",
-      "props": [
-        {
-          "name": "value",
-          "type": "string | null | undefined",
-          "required": false,
-          "default": null,
-          "description": "The merged value, as the reader should see it (format it with useFormat first). Empty → blank."
-        },
-        {
-          "name": "placeholder",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "description": "For a value that fills later (a signer's name, the date signed, an effective date set by a rule): shown until it does."
-        },
-        {
-          "name": "announceAs",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "description": "What to call it when it fills, for the live region: \"Effective date\" → “Effective date filled: 14 October 2026”."
-        }
-      ],
-      "inherits": [],
-      "closedApi": {
-        "className": false,
-        "style": false,
-        "UNSAFE_className": false,
-        "UNSAFE_style": false
-      },
-      "variants": {},
-      "states": []
-    },
-    {
-      "name": "DataFieldProps",
-      "kind": "type-only",
-      "source": "src/components/DocumentViewer/DocumentViewer.tsx",
-      "status": null,
-      "description": null,
-      "partOf": "DocumentViewer",
-      "propsOf": "DataField"
     },
     {
       "name": "DateInput",
@@ -7875,6 +8088,59 @@
           "description": "How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default \"the Agreement\"."
         },
         {
+          "name": "values",
+          "type": "DocumentValues",
+          "required": false,
+          "default": null,
+          "description": "Its captured values by field name (controlled). A Repeat's rows are a list under its name."
+        },
+        {
+          "name": "defaultValues",
+          "type": "DocumentValues",
+          "required": false,
+          "default": null,
+          "description": "Its starting values, when the Document keeps them itself."
+        },
+        {
+          "name": "onValuesChange",
+          "type": "(values: DocumentValues) => void",
+          "required": false,
+          "default": null,
+          "description": "Called with all the values after each change a person makes."
+        },
+        {
+          "name": "onSubmit",
+          "type": "(values: DocumentValues) => void",
+          "required": false,
+          "default": null,
+          "description": "Makes the document a form: called with its values when it is submitted and every required field is filled."
+        },
+        {
+          "name": "formId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The form's id, for a submit button outside the document (`form` on the button)."
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "required": false,
+          "default": "'USD'",
+          "description": "The currency of currency fields and computed amounts (ISO 4217). Default \"USD\"."
+        },
+        {
+          "name": "printMode",
+          "type": "'all' | 'resolved'",
+          "required": false,
+          "default": "'all'",
+          "description": "In print, every branch of each Conditional (all, the default: a blank form shows every option) or only those that hold (resolved).",
+          "values": [
+            "all",
+            "resolved"
+          ]
+        },
+        {
           "name": "children",
           "type": "ReactNode",
           "required": true,
@@ -7904,6 +8170,10 @@
           2,
           3,
           4
+        ],
+        "printMode": [
+          "all",
+          "resolved"
         ]
       },
       "states": [],
@@ -7997,6 +8267,163 @@
       "definition": "interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }"
     },
     {
+      "name": "DocumentAttachment",
+      "kind": "component",
+      "source": "src/components/DocumentAttachment/DocumentAttachment.tsx",
+      "status": null,
+      "description": "A supporting file attached to a document (a signer attachment): a native file input while editable, the attached files' names otherwise. Stores names only; the app keeps the files.",
+      "docs": "docs/usage/DocumentAttachment.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key: the attached files' names. Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What to attach (\"Proof of address\"). Required."
+        },
+        {
+          "name": "accept",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The file types accepted (\".pdf,image/*\")."
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "More than one file."
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who attaches it. Default: the enclosing fieldset's or role region's."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "multiple",
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A supporting file the person attaches to the document (proof of address, a certificate): `accept` limits the types, `multiple` allows several. The document stores the names; the app keeps the files."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Uploading files in the app",
+            "instead": "`FileUpload`"
+          },
+          {
+            "situation": "An image that is part of the document",
+            "instead": "`Figure`"
+          }
+        ],
+        "do": {
+          "caption": "A labelled file input that says what to attach.",
+          "code": "<DocumentViewer>\n  <Document label=\"Application\" lifecycle=\"filled\">\n    <DocumentAttachment name=\"proof\" label=\"Proof of address\" accept=\".pdf,image/*\" />\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "“Attach proof of address” as text: nothing collects it or knows it’s missing.",
+          "code": "<DocumentViewer>\n  <Document label=\"Application\">\n    <Text>Please attach proof of address.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A native file input named by its visible label; `required` until a file is attached."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentAttachment",
+        "stories": [
+          {
+            "id": "components-documentattachment--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentattachment--executed",
+            "name": "Executed"
+          }
+        ],
+        "composes": [
+          "Document",
+          "DocumentField"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.data-field.bg",
+          "color.data-field.bg-filled",
+          "color.data-field.fg",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "ease.exit",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "motion.slow",
+          "radius.control",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.field",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.mark.overhang",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentAttachmentProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentAttachment/DocumentAttachment.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentAttachment",
+      "propsOf": "DocumentAttachment"
+    },
+    {
       "name": "DocumentCell",
       "kind": "component",
       "source": "src/components/Document/Document.tsx",
@@ -8038,6 +8465,497 @@
       "description": null,
       "partOf": "Document",
       "propsOf": "DocumentCell"
+    },
+    {
+      "name": "DocumentCheckbox",
+      "kind": "component",
+      "source": "src/components/DocumentCheckbox/DocumentCheckbox.tsx",
+      "status": null,
+      "description": "A box to check in a document, with its label beside it. Editable while the Document is filled or negotiated; otherwise it shows its state, checked or not, as the printed form does.",
+      "docs": "docs/usage/DocumentCheckbox.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key (true when checked). Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What checking it says (\"I hold more than one job\"), beside the box. Required."
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who checks it. Default: the enclosing fieldset's or role region's."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A yes or no in a document, stored as true or false under `name`: “I hold more than one job”, a consent box. Its label sits beside the box."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "One choice of several",
+            "instead": "`DocumentRadioGroup`"
+          },
+          {
+            "situation": "A setting in the app",
+            "instead": "`Checkbox` or `Switch`"
+          },
+          {
+            "situation": "An acknowledgement with a signature",
+            "instead": "the acknowledge part of the roles layer"
+          }
+        ],
+        "do": {
+          "caption": "A native box with its label beside it.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\">\n    <DocumentCheckbox name=\"consent\" label=\"I consent to electronic delivery\" />\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A typed box: it can’t be checked, and what it means isn’t captured.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\">\n    <Text>[ ] I consent to electronic delivery</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A native checkbox inside its label, so the label is its name and clicking it checks the box. Not editable, it shows its state disabled."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentCheckbox",
+        "stories": [
+          {
+            "id": "components-documentcheckbox--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentcheckbox--executed",
+            "name": "Executed"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentCheckboxProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentCheckbox/DocumentCheckbox.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentCheckbox",
+      "propsOf": "DocumentCheckbox"
+    },
+    {
+      "name": "DocumentField",
+      "kind": "component",
+      "source": "src/components/DocumentField/DocumentField.tsx",
+      "status": null,
+      "description": "A value in a document, bound to a data key: a blank that is filled, or a value merged from data. While the Document is editable (lifecycle filled or negotiated) it is an input in the line of text or the box of the form; otherwise it reads as plain document text, formatted for its type, and an empty one is a blank line (or its placeholder). In print an input is a line to write on.",
+      "docs": "docs/usage/DocumentField.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key it reads and writes (\"first_name\"; in a Repeat row, the row's own key). Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What it is, as a person filling it in needs it named (\"First name and middle initial\"). Required."
+        },
+        {
+          "name": "showLabel",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Show the label above the field, as a form's box does. Default: named for assistive technology only (a blank in a sentence)."
+        },
+        {
+          "name": "type",
+          "type": "DocumentFieldType",
+          "required": false,
+          "default": "'text'",
+          "description": "Default text.",
+          "values": [
+            "text",
+            "number",
+            "currency",
+            "date",
+            "duration",
+            "email",
+            "phone",
+            "ssn",
+            "ein",
+            "textarea"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who fills it in (a role from Parties). Default: the enclosing fieldset's or role region's."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "pattern",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "A pattern the value must match (ssn and ein have one)."
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Shown while the value is empty and the document is not editable (“the date the last party signs”)."
+        },
+        {
+          "name": "announceAs",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "When it fills while shown, say so in the viewer's live region: \"Effective date\" → “Effective date filled: …”."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "type": [
+          "text",
+          "number",
+          "currency",
+          "date",
+          "duration",
+          "email",
+          "phone",
+          "ssn",
+          "ein",
+          "textarea"
+        ]
+      },
+      "states": [
+        "showLabel",
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "Every value a document captures or merges, bound to a data key (`name`): text, number, currency (stored in integer minor units), date, duration, email, phone, ssn, ein, textarea. The `Document`’s values hold it.",
+          "How it shows follows the `Document`’s lifecycle: an input while filled or negotiated; formatted text when generated or executed, an empty one a blank line (or its `placeholder`, filling in place with `announceAs`). `showLabel` puts the label above it, as a form’s box.",
+          "`role` names the party who fills it; a `DocumentFieldset` (or a role region) gives one to every field inside it."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A form in the app, not a document",
+            "instead": "`TextField`, `NumberField`, `DatePicker` in a form"
+          },
+          {
+            "situation": "A value derived from others",
+            "instead": "`Computed`"
+          },
+          {
+            "situation": "A yes/no, a choice, a file",
+            "instead": "`DocumentCheckbox`, `DocumentRadioGroup` or `DocumentSelect`, `DocumentAttachment`"
+          }
+        ],
+        "do": {
+          "caption": "Values by name: the same markup is a merged document or a form to fill.",
+          "code": "<DocumentViewer>\n  <Document label=\"Order form\" values={{ customer: 'Globex Inc.', fee: 1250000 }}>\n    <Text>\n      <DocumentField name=\"customer\" label=\"Customer\" /> pays <DocumentField name=\"fee\" label=\"Annual fee\" type=\"currency\" /> a year.\n    </Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A value typed into the text: it can’t be exported, filled or checked, and every copy of the template needs editing.",
+          "code": "<DocumentViewer>\n  <Document label=\"Order form\">\n    <Text>Globex Inc. pays $12,500.00 a year.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "Every input has a label (`label`): shown above it with `showLabel`, or named for assistive technology when it is a blank in a sentence.",
+          "Native constraints: `required`, a pattern for ssn and ein, numeric keyboards for numbers and money. Inside a Conditional that is off it is disabled and not required.",
+          "A placeholder is a highlight, never part of a selection; one that fills is announced once in the viewer’s live region."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentField",
+        "stories": [
+          {
+            "id": "components-documentfield--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentfield--fillable",
+            "name": "Fillable"
+          },
+          {
+            "id": "components-documentfield--on-a-form-page",
+            "name": "On A Form Page"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.data-field.bg",
+          "color.data-field.bg-filled",
+          "color.data-field.fg",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "ease.exit",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "motion.slow",
+          "radius.control",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.field",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.mark.overhang",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentFieldProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentField/DocumentField.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentField",
+      "propsOf": "DocumentField"
+    },
+    {
+      "name": "DocumentFieldType",
+      "kind": "type-only",
+      "source": "src/components/DocumentField/DocumentField.tsx",
+      "status": null,
+      "description": "What a field holds, which sets its input, its stored value and how it reads.",
+      "partOf": "DocumentField",
+      "definition": "type DocumentFieldType = 'text' | 'number' | 'currency' | 'date' | 'duration' | 'email' | 'phone' | 'ssn' | 'ein' | 'textarea'",
+      "values": [
+        "text",
+        "number",
+        "currency",
+        "date",
+        "duration",
+        "email",
+        "phone",
+        "ssn",
+        "ein",
+        "textarea"
+      ]
+    },
+    {
+      "name": "DocumentFieldset",
+      "kind": "component",
+      "source": "src/components/DocumentFieldset/DocumentFieldset.tsx",
+      "status": null,
+      "description": "A group of related fields in a document, named by its legend; `role` assigns them all to one party.",
+      "docs": "docs/usage/DocumentFieldset.usage.tsx",
+      "props": [
+        {
+          "name": "legend",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What the fields are together (\"Employer\"). Required."
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who fills these in: every field inside takes it unless it says otherwise."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The fields. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Related fields named together (“Employer”, an address): a `legend` over them. `role` gives every field inside to one party unless a field says otherwise."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A numbered step of a form",
+            "instead": "`Step` (with a fieldset inside if it groups fields)"
+          },
+          {
+            "situation": "A whole part of the document for one party, not just fields",
+            "instead": "a role region"
+          }
+        ],
+        "do": {
+          "caption": "The employer’s fields grouped and assigned once.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\">\n    <DocumentFieldset legend=\"Employers only\" role=\"employer\">\n      <DocumentField name=\"ein\" label=\"EIN\" type=\"ein\" showLabel />\n    </DocumentFieldset>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "The same role repeated on every field: one missed field goes to the wrong party.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\">\n    <DocumentField name=\"ein\" label=\"EIN\" type=\"ein\" showLabel role=\"employer\" />\n    <DocumentField name=\"employer_name\" label=\"Employer\" showLabel />\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A native `fieldset` named by its `legend`, so each field inside is announced with it."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentFieldset",
+        "stories": [
+          {
+            "id": "components-documentfieldset--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "radius.control",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.2xs",
+          "space.inset.sm",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentFieldsetProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentFieldset/DocumentFieldset.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentFieldset",
+      "propsOf": "DocumentFieldset"
     },
     {
       "name": "DocumentFlow",
@@ -8497,6 +9415,49 @@
       ]
     },
     {
+      "name": "DocumentOption",
+      "kind": "component",
+      "source": "src/components/DocumentRadioGroup/DocumentRadioGroup.tsx",
+      "status": null,
+      "description": "One choice in a DocumentRadioGroup (a radio and its label) or a DocumentSelect (an option).",
+      "partOf": "DocumentRadioGroup",
+      "docs": "docs/usage/DocumentRadioGroup.usage.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What is stored when it is chosen (\"single\"). Required."
+        },
+        {
+          "name": "children",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What it says (\"Single or Married filing separately\"). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DocumentOptionProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentRadioGroup/DocumentRadioGroup.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentRadioGroup",
+      "propsOf": "DocumentOption"
+    },
+    {
       "name": "DocumentPage",
       "kind": "component",
       "source": "src/components/Document/Document.tsx",
@@ -8570,6 +9531,143 @@
       "description": null,
       "partOf": "Document",
       "propsOf": "Document"
+    },
+    {
+      "name": "DocumentRadioGroup",
+      "kind": "component",
+      "source": "src/components/DocumentRadioGroup/DocumentRadioGroup.tsx",
+      "status": null,
+      "description": "One choice of several in a document (a W-4's filing status), each a radio with its label.",
+      "docs": "docs/usage/DocumentRadioGroup.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key (the chosen option's value). Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The question the options answer (\"Filing status\"). Required."
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who chooses. Default: the enclosing fieldset's or role region's."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One DocumentOption per choice. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "One choice of a few in a document, all visible (a W-4’s filing status): a `DocumentOption` per choice, its value stored under `name`.",
+          "`DocumentOption` is also a `DocumentSelect`’s option."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Many choices, or a long list",
+            "instead": "`DocumentSelect`"
+          },
+          {
+            "situation": "Yes or no",
+            "instead": "`DocumentCheckbox`"
+          }
+        ],
+        "do": {
+          "caption": "A group named by its question, one radio per answer.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\" lifecycle=\"filled\">\n    <DocumentRadioGroup name=\"status\" label=\"Filing status\">\n      <DocumentOption value=\"single\">Single</DocumentOption>\n      <DocumentOption value=\"joint\">Married filing jointly</DocumentOption>\n    </DocumentRadioGroup>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Choices as text to circle: nothing records which one was chosen.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\">\n    <Text>Filing status (circle one): Single / Married filing jointly</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `fieldset` named by its `legend` (`label`); native radios, so arrow keys move between them. `required` asks for one."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentRadioGroup",
+        "stories": [
+          {
+            "id": "components-documentradiogroup--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentRadioGroupProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentRadioGroup/DocumentRadioGroup.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentRadioGroup",
+      "propsOf": "DocumentRadioGroup"
     },
     {
       "name": "DocumentSection",
@@ -8726,6 +9824,165 @@
       "propsOf": "DocumentSection"
     },
     {
+      "name": "DocumentSelect",
+      "kind": "component",
+      "source": "src/components/DocumentSelect/DocumentSelect.tsx",
+      "status": null,
+      "description": "A choice from a list in a document: a native select while editable, the chosen option's words otherwise.",
+      "docs": "docs/usage/DocumentSelect.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key (the chosen option's value). Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What is chosen (\"State\"). Required."
+        },
+        {
+          "name": "showLabel",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Show the label above it, as a form's box does. Default: named for assistive technology only."
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The party who chooses. Default: the enclosing fieldset's or role region's."
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": null
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "One DocumentOption per choice. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "showLabel",
+        "required"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A choice from a longer list in a document (governing law, a state): a native select while editable, the chosen option’s words otherwise. Options are `DocumentOption`s."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Two to four choices worth seeing at once",
+            "instead": "`DocumentRadioGroup`"
+          },
+          {
+            "situation": "A choice in the app",
+            "instead": "`Select` or `Combobox`"
+          }
+        ],
+        "do": {
+          "caption": "A select in the sentence, read as its words once generated.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\" lifecycle=\"filled\">\n    <Text>\n      Governed by the laws of{' '}\n      <DocumentSelect name=\"law\" label=\"Governing law\">\n        <DocumentOption value=\"WA\">Washington</DocumentOption>\n        <DocumentOption value=\"NY\">New York</DocumentOption>\n      </DocumentSelect>\n      .\n    </Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A blank where a fixed list belongs: people type “Wash.”, “WA” and “Washington State”.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>Governed by the laws of ____________.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A native select named by `label` (shown with `showLabel`); its first option asks for a choice."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentSelect",
+        "stories": [
+          {
+            "id": "components-documentselect--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentselect--generated",
+            "name": "Generated"
+          }
+        ],
+        "composes": [
+          "Document",
+          "DocumentField",
+          "DocumentRadioGroup"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.bg.surface",
+          "color.border.default",
+          "color.border.strong",
+          "color.data-field.bg",
+          "color.data-field.bg-filled",
+          "color.data-field.fg",
+          "color.fg.default",
+          "color.fg.muted",
+          "color.focus",
+          "ease.exit",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "motion.slow",
+          "radius.control",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.field",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.mark.overhang",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "DocumentSelectProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentSelect/DocumentSelect.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentSelect",
+      "propsOf": "DocumentSelect"
+    },
+    {
       "name": "DocumentSelection",
       "kind": "type-only",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
@@ -8875,11 +10132,20 @@
       "propsOf": "DocumentTitle"
     },
     {
+      "name": "DocumentValues",
+      "kind": "type-only",
+      "source": "src/components/Document/data.tsx",
+      "status": null,
+      "description": "A document's captured values by name. A Repeat's rows are a list of objects under its name.",
+      "partOf": "Document",
+      "definition": "type DocumentValues = Readonly<Record<string, unknown>>"
+    },
+    {
       "name": "DocumentViewer",
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
+      "description": "Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Fields that fill in place (DocumentField announceAs) are announced in a polite live region.",
       "docs": "docs/usage/DocumentViewer.usage.tsx",
       "props": [
         {
@@ -8887,7 +10153,7 @@
           "type": "ReactNode",
           "required": true,
           "default": null,
-          "description": "The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required."
+          "description": "The one Document to show: its clauses and paragraphs, with DocumentField and Highlight inside. Required."
         },
         {
           "name": "onHighlight",
@@ -8932,7 +10198,7 @@
         ],
         "do": {
           "caption": "Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.",
-          "code": "<DocumentViewer>\n  <Document label=\"Order form\">\n    <Text size=\"body-lg\">\n      Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n    </Text>\n  </Document>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Order form\" values={{ customer: 'Acme Corp' }}>\n    <Text size=\"body-lg\">\n      Ordered by <DocumentField name=\"customer\" label=\"Customer\" /> on <DocumentField name=\"signed_on\" label=\"Date signed\" placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n    </Text>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "Flagging an empty value inside the document: fix the data in the form that collected it.",
@@ -8965,6 +10231,7 @@
         ],
         "composes": [
           "Dialog",
+          "Document",
           "Icon",
           "Kbd",
           "Shortcuts",
@@ -8984,9 +10251,6 @@
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
-          "color.data-field.bg",
-          "color.data-field.bg-filled",
-          "color.data-field.fg",
           "color.fg.default",
           "color.fg.disabled",
           "color.fg.inverse",
@@ -8994,7 +10258,6 @@
           "color.fg.on-action",
           "color.status.danger.fg",
           "ease.enter",
-          "ease.exit",
           "font.weight.strong",
           "icon.stroke",
           "motion.fast",
@@ -9003,6 +10266,7 @@
           "radius.pill",
           "radius.surface",
           "ratio.page",
+          "ratio.page-landscape",
           "shadow.card",
           "shadow.modal",
           "shadow.popover",
@@ -9011,14 +10275,21 @@
           "size.dialog.lg",
           "size.dialog.md",
           "size.dialog.sm",
+          "size.document.grid-row",
           "size.document.measure",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
+          "size.page.letter.block",
+          "size.page.letter.inline",
           "size.target-min",
+          "space.document.grid-gap",
+          "space.gap.2xl",
           "space.gap.2xs",
+          "space.gap.lg",
           "space.gap.md",
           "space.gap.sm",
+          "space.gap.xl",
           "space.gap.xs",
           "space.inset.2xs",
           "space.inset.lg",
@@ -9026,7 +10297,7 @@
           "space.inset.sm",
           "space.inset.xl",
           "space.inset.xs",
-          "space.mark.overhang",
+          "space.page.margin",
           "text.body",
           "text.body-lg",
           "text.caption",
@@ -12079,6 +13350,211 @@
       "description": null,
       "partOf": "Letterhead",
       "propsOf": "Letterhead"
+    },
+    {
+      "name": "LineItems",
+      "kind": "component",
+      "source": "src/components/LineItems/LineItems.tsx",
+      "status": null,
+      "description": "An invoice's or a quote's lines: a table that repeats a row template (a Repeat as a table), with a Computed amount per line that totals can sum (`sum(items.amount)`).",
+      "docs": "docs/usage/LineItems.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key: the rows (\"items\"). Required."
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The table's name (\"Line items\"). Required."
+        },
+        {
+          "name": "columns",
+          "type": "readonly LineItemsColumn[]",
+          "required": true,
+          "default": null,
+          "description": "One per cell of the row template, in order. Required."
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "required": false,
+          "default": "1",
+          "description": "Rows shown even when empty. Default 1."
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "required": false,
+          "default": "50",
+          "description": "Most rows. Default 50."
+        },
+        {
+          "name": "addLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Add line'",
+          "description": "The add button's label. Default \"Add line\"."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The row template: one field or Computed per column (\"description\", \"qty\", \"unit_price\", then the amount). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An invoice’s, a quote’s or a purchase order’s lines: a table repeating a row template (one field or `Computed` per column), with a Computed amount per line that totals sum (`sum(items.amount)`)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Rows that aren’t a table (employment history)",
+            "instead": "`Repeat`"
+          },
+          {
+            "situation": "A static table in a document",
+            "instead": "`Table`"
+          }
+        ],
+        "do": {
+          "caption": "Lines as data, amounts computed.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\" values={{ items: [{ description: 'Setup', qty: 1, unit_price: 50000 }] }}>\n    <LineItems name=\"items\" caption=\"Line items\" columns={[{ label: 'Description' }, { label: 'Qty', numeric: true }, { label: 'Unit price', numeric: true }, { label: 'Amount', numeric: true }]}>\n      <DocumentField name=\"description\" label=\"Description\" />\n      <DocumentField name=\"qty\" label=\"Qty\" type=\"number\" />\n      <DocumentField name=\"unit_price\" label=\"Unit price\" type=\"currency\" />\n      <Computed name=\"amount\" formula=\"qty * unit_price\" format=\"currency\" />\n    </LineItems>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Lines and amounts typed into text: nothing adds up when one changes.",
+          "code": "<DocumentViewer>\n  <Document label=\"Invoice\">\n    <Text>Setup × 1 @ $500.00 = $500.00</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `Table` named by `caption` (visually hidden), with column headers; each input is named by its column’s label, and each Remove by its line."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/LineItems",
+        "stories": [
+          {
+            "id": "components-lineitems--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-lineitems--fillable",
+            "name": "Fillable"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Document",
+          "Icon",
+          "Repeat",
+          "Spinner",
+          "Table",
+          "VisuallyHidden"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.hover",
+          "color.bg.selected",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "radius.surface",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.document.grid-row",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "size.scroll-region.lg",
+          "size.scroll-region.md",
+          "size.scroll-region.sm",
+          "size.target-min",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.page.margin",
+          "space.scroll-padding.start",
+          "text.body",
+          "text.body-lg",
+          "text.caption",
+          "text.label",
+          "z.sticky"
+        ]
+      }
+    },
+    {
+      "name": "LineItemsColumn",
+      "kind": "type-only",
+      "source": "src/components/LineItems/LineItems.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "LineItems",
+      "definition": "interface LineItemsColumn { label: string; numeric?: boolean; }"
+    },
+    {
+      "name": "LineItemsProps",
+      "kind": "type-only",
+      "source": "src/components/LineItems/LineItems.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "LineItems",
+      "propsOf": "LineItems"
     },
     {
       "name": "Link",
@@ -15262,6 +16738,171 @@
       "description": null,
       "partOf": "Reel",
       "propsOf": "Reel"
+    },
+    {
+      "name": "Repeat",
+      "kind": "component",
+      "source": "src/components/Repeat/Repeat.tsx",
+      "status": null,
+      "description": "The same block once per row: employment history, checklist items, schedules. Each row's fields read and write that row's values, and a Computed in it computes per row. While editable, people add rows up to `max` and remove them down to `min`; in print, `min` blank rows show.",
+      "docs": "docs/usage/Repeat.usage.tsx",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The data key: a list of rows, each an object of the row's fields. Required."
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "description": "Rows shown even when empty (a printed form's blank rows). Default 0."
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "required": false,
+          "default": "20",
+          "description": "Most rows a person can add. Default 20."
+        },
+        {
+          "name": "addLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Add'",
+          "description": "The add button's label. Default \"Add\"."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The row: fields and computed values named for one row (\"employer\", not \"employment_history.0.employer\"). Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The same block once per row: employment history, checklist items, dependants. The rows are a list under `name`; fields inside are named for one row. `min` rows always show (blank ones print), and people add rows up to `max`.",
+          "An invoice’s lines are `LineItems`: a Repeat as a table."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Rows of data the app generated",
+            "instead": "`Table`"
+          },
+          {
+            "situation": "A Repeat inside a Repeat",
+            "instead": "flatten the rows: rows don’t nest"
+          }
+        ],
+        "do": {
+          "caption": "One row template; the rows are data.",
+          "code": "<DocumentViewer>\n  <Document label=\"Application\" lifecycle=\"filled\">\n    <Repeat name=\"references\" min={1} max={3} addLabel=\"Add reference\">\n      <DocumentField name=\"name\" label=\"Reference’s name\" showLabel />\n    </Repeat>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Three copies of the same fields: a fourth reference doesn’t fit, and the data comes out as reference1, reference2…",
+          "code": "<DocumentViewer>\n  <Document label=\"Application\" lifecycle=\"filled\">\n    <DocumentField name=\"reference1\" label=\"Reference 1\" showLabel />\n    <Text>…</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "Add and Remove are Buttons; each Remove is named with its row (“Remove row 2”). Neither prints."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Repeat",
+        "stories": [
+          {
+            "id": "components-repeat--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-repeat--generated",
+            "name": "Generated"
+          }
+        ],
+        "composes": [
+          "Button",
+          "Document",
+          "Icon",
+          "Spinner",
+          "VisuallyHidden"
+        ],
+        "tokens": [
+          "button.danger.bg",
+          "button.danger.bg-hover",
+          "button.danger.fg",
+          "button.ghost.bg-hover",
+          "button.ghost.fg",
+          "button.primary.bg",
+          "button.primary.bg-hover",
+          "button.primary.fg",
+          "button.secondary.bg",
+          "button.secondary.bg-hover",
+          "button.secondary.border",
+          "button.secondary.fg",
+          "color.bg.subtle",
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.disabled",
+          "color.fg.muted",
+          "ease.linear",
+          "ease.standard",
+          "focus.ring.width",
+          "icon.stroke",
+          "motion.fast",
+          "motion.spin",
+          "radius.control",
+          "radius.pill",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.control.lg",
+          "size.control.md",
+          "size.control.sm",
+          "size.document.grid-row",
+          "size.icon.md",
+          "size.icon.sm",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "size.target-min",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.lg",
+          "space.inset.md",
+          "space.inset.sm",
+          "space.page.margin",
+          "text.body-lg",
+          "text.caption",
+          "text.label"
+        ]
+      }
+    },
+    {
+      "name": "RepeatProps",
+      "kind": "type-only",
+      "source": "src/components/Repeat/Repeat.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Repeat",
+      "propsOf": "Repeat"
     },
     {
       "name": "ResultList",
@@ -22216,7 +23857,7 @@
       "kind": "component",
       "source": "src/components/Watermark/Watermark.tsx",
       "status": null,
-      "description": "A word across the document (“DRAFT”), faint behind the text, on every printed page. By default it shows until the document is executed. It is announced once, as an image named by its word.",
+      "description": "A word across the document (“DRAFT”), faint behind the text, on every printed page, while `when` holds: by default until the document is executed. It is announced once, as an image named by its word.",
       "docs": "docs/usage/Watermark.usage.tsx",
       "props": [
         {
@@ -22227,11 +23868,11 @@
           "description": "The word across the page (\"DRAFT\", \"CONFIDENTIAL\"). Default \"DRAFT\"."
         },
         {
-          "name": "show",
-          "type": "boolean",
+          "name": "when",
+          "type": "string",
           "required": false,
-          "default": null,
-          "description": "Show it. Default: until the document is executed (`lifecycle` other than \"executed\")."
+          "default": "\"lifecycle != 'executed'\"",
+          "description": "When it shows: an expression over the document's values and `lifecycle`. Default \"lifecycle != 'executed'\"."
         }
       ],
       "inherits": [],
@@ -22242,12 +23883,10 @@
         "UNSAFE_style": false
       },
       "variants": {},
-      "states": [
-        "show"
-      ],
+      "states": [],
       "usage": {
         "whenToUse": [
-          "A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `show` overrides that."
+          "A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `when` takes any expression over its values and `lifecycle`."
         ],
         "whenNotToUse": [
           {
@@ -24557,6 +26196,18 @@
       "chain": [
         "size.document.clause-indent",
         "size.12"
+      ],
+      "modes": {}
+    },
+    "size.document.field": {
+      "cssVar": "--size-document-field",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Least width of a field to fill in a document, and of the blank line an empty one prints as (DocumentField).",
+      "value": "96px",
+      "chain": [
+        "size.document.field",
+        "size.24"
       ],
       "modes": {}
     },

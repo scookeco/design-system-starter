@@ -66,37 +66,4 @@
     background: var(--color-bg-elevated);
     box-shadow: var(--shadow-popover);
   }
-
-  /* DataField: plain text when filled; a placeholder and the moment it fills look like a highlight. */
-  .document-data[data-state] {
-    --mark-pull: calc(var(--space-mark-overhang) * -1);
-
-    margin-inline: var(--mark-pull);
-    padding-inline: var(--space-mark-overhang);
-    border-radius: var(--radius-control);
-    box-decoration-break: clone;
-  }
-
-  .document-data[data-state="placeholder"] {
-    background: var(--color-data-field-bg);
-    color: var(--color-data-field-fg);
-    user-select: none;
-  }
-
-  .document-data[data-state="filled-now"] {
-    animation-name: document-data-filled;
-    animation-duration: var(--motion-slow);
-    animation-timing-function: var(--ease-exit);
-    animation-fill-mode: both;
-  }
-
-  @keyframes document-data-filled {
-    from {
-      background: var(--color-data-field-bg-filled);
-    }
-
-    to {
-      background: transparent;
-    }
-  }
 }

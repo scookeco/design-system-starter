@@ -1,21 +1,23 @@
 import { useContext } from 'react';
-import { DocumentScopeContext } from '../Document/documentIndex';
+import { RowContext, useDocumentData } from '../Document/data';
+import { holds } from '../Document/expression';
 import './Watermark.css';
 
 export interface WatermarkProps {
   /** The word across the page ("DRAFT", "CONFIDENTIAL"). Default "DRAFT". */
   text?: string;
-  /** Show it. Default: until the document is executed (`lifecycle` other than "executed"). */
-  show?: boolean;
+  /** When it shows: an expression over the document's values and `lifecycle`. Default "lifecycle != 'executed'". */
+  when?: string;
 }
 
 /**
- * A word across the document (“DRAFT”), faint behind the text, on every printed page. By default it
- * shows until the document is executed. It is announced once, as an image named by its word.
+ * A word across the document (“DRAFT”), faint behind the text, on every printed page, while `when`
+ * holds: by default until the document is executed. It is announced once, as an image named by its word.
  */
-export function Watermark({ text = 'DRAFT', show }: WatermarkProps) {
-  const doc = useContext(DocumentScopeContext);
-  if (!(show ?? doc?.lifecycle !== 'executed')) return null;
+export function Watermark({ text = 'DRAFT', when = "lifecycle != 'executed'" }: WatermarkProps) {
+  const data = useDocumentData();
+  const row = useContext(RowContext);
+  if (!holds(when, (path) => data.lookup(path, row))) return null;
   return (
     <div className="watermark" data-doc="watermark">
       <svg className="watermark__mark" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label={text}>

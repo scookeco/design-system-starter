@@ -267,6 +267,10 @@
       "seal": {
         "$value": "{size.24}",
         "$description": "Size of an issuer's seal or stamp on a certificate or license (Seal)."
+      },
+      "field": {
+        "$value": "{size.24}",
+        "$description": "Least width of a field to fill in a document, and of the blank line an empty one prints as (DocumentField)."
       }
     },
     "signature": {

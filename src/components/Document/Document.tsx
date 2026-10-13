@@ -2,10 +2,11 @@ import { useContext, useEffect, useId, useMemo, useRef, type CSSProperties, type
 import { tokenStyle } from '../../internal/closed-api';
 import { vars, type GapToken } from '../../tokens/tokens';
 import type { HeadingLevel } from '../Heading/Heading';
+import { DocumentDataProvider, useDocumentData, type DocumentValues } from './data';
 import { DocumentScopeContext, useDocumentIndex, type DocumentLifecycle, type DocumentShell } from './documentIndex';
 import './Document.css';
 
-export type { DocumentLifecycle, DocumentShell };
+export type { DocumentLifecycle, DocumentShell, DocumentValues };
 
 export interface DocumentProps {
   /** The document's name: labels the document ("Master services agreement"). Required. */
@@ -24,6 +25,20 @@ export interface DocumentProps {
   headingLevel?: Exclude<HeadingLevel, 1>;
   /** How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement". */
   documentName?: string;
+  /** Its captured values by field name (controlled). A Repeat's rows are a list under its name. */
+  values?: DocumentValues;
+  /** Its starting values, when the Document keeps them itself. */
+  defaultValues?: DocumentValues;
+  /** Called with all the values after each change a person makes. */
+  onValuesChange?: (values: DocumentValues) => void;
+  /** Makes the document a form: called with its values when it is submitted and every required field is filled. */
+  onSubmit?: (values: DocumentValues) => void;
+  /** The form's id, for a submit button outside the document (`form` on the button). */
+  formId?: string;
+  /** The currency of currency fields and computed amounts (ISO 4217). Default "USD". */
+  currency?: string;
+  /** In print, every branch of each Conditional (all, the default: a blank form shows every option) or only those that hold (resolved). */
+  printMode?: 'all' | 'resolved';
   /** The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly. */
   children: ReactNode;
 }
@@ -43,6 +58,13 @@ export function Document({
   shell = 'flow',
   headingLevel = 2,
   documentName = 'the Agreement',
+  values,
+  defaultValues,
+  onValuesChange,
+  onSubmit,
+  formId,
+  currency = 'USD',
+  printMode = 'all',
   children,
 }: DocumentProps) {
   const outer = useContext(DocumentScopeContext);
@@ -70,8 +92,42 @@ export function Document({
       lang={lang}
       aria-label={label}
     >
-      <DocumentScopeContext value={value}>{children}</DocumentScopeContext>
+      <DocumentScopeContext value={value}>
+        <DocumentDataProvider
+          lifecycle={lifecycle}
+          values={values}
+          defaultValues={defaultValues}
+          onValuesChange={onValuesChange}
+          currency={currency}
+          printMode={printMode}
+        >
+          {onSubmit ? (
+            <SubmitForm id={formId} onSubmit={onSubmit}>
+              {children}
+            </SubmitForm>
+          ) : (
+            children
+          )}
+        </DocumentDataProvider>
+      </DocumentScopeContext>
     </article>
+  );
+}
+
+/** The document as a form: the browser checks required fields and patterns before it submits. */
+function SubmitForm({ id, onSubmit, children }: { id: string | undefined; onSubmit: (values: DocumentValues) => void; children: ReactNode }) {
+  const data = useDocumentData();
+  return (
+    <form
+      id={id}
+      className="document-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit(data.values);
+      }}
+    >
+      {children}
+    </form>
   );
 }
 

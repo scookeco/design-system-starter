@@ -4,7 +4,7 @@ import type { UsageDoc } from './types';
 export const usage: UsageDoc = {
   covers: [Watermark],
   whenToUse: [
-    'A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `show` overrides that.',
+    'A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `when` takes any expression over its values and `lifecycle`.',
   ],
   whenNotToUse: [
     { situation: 'A document’s status in the app (Draft, Sent, Signed)', instead: 'a `Badge` in the `PageHeader`' },

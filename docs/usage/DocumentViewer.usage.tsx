@@ -1,8 +1,8 @@
-import { DataField, Document, DocumentViewer, Text } from '../../src/index';
+import { Document, DocumentField, DocumentViewer, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
-  covers: [DocumentViewer, DataField],
+  covers: [DocumentViewer],
   whenToUse: [
     'Showing one `Document` on screen for people to read and highlight: an agreement, an order form, a policy. The viewer is the screen render target only; the `Document` inside holds the content and numbering, with `DataField` and `Highlight` inline.',
     'A flow document is one continuous sheet on screen, at least a page tall; its pages break only in print. A grid document shows its fixed pages. Highlight, Change and the selection menu are a review layer on top of any document.',
@@ -18,9 +18,9 @@ export const usage: UsageDoc = {
     caption: 'Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.',
     render: () => (
       <DocumentViewer>
-        <Document label="Order form">
+        <Document label="Order form" values={{ customer: 'Acme Corp' }}>
           <Text size="body-lg">
-            Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by Maya Okafor.
+            Ordered by <DocumentField name="customer" label="Customer" /> on <DocumentField name="signed_on" label="Date signed" placeholder="the date it is signed" />. Signed by Maya Okafor.
           </Text>
         </Document>
       </DocumentViewer>

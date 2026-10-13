@@ -1,0 +1,16 @@
+@layer components {
+  .conditional {
+    display: contents;
+  }
+
+  .conditional[data-off] {
+    display: none;
+  }
+
+  /* A printed blank form shows every branch (printMode all). */
+  @media print {
+    .conditional[data-off][data-print="all"] {
+      display: contents;
+    }
+  }
+}

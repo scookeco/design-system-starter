@@ -1,16 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cx, type EscapeHatch } from '../../internal/closed-api';
+import { AnnounceContext } from '../Document/data';
 import { CopyIcon, EditIcon } from '../Icon/icons';
 import { useShortcut } from '../Shortcuts/Shortcuts';
 import { Toolbar, ToolbarButton } from '../Toolbar/Toolbar';
 import './DocumentViewer.css';
-
-interface ViewerContext {
-  announce: (message: string) => void;
-}
-
-const DocumentContext = createContext<ViewerContext>({ announce: () => undefined });
 
 /** The text the reader selected in the document, and the range it covers (to store as a highlight). */
 export interface DocumentSelection {
@@ -19,7 +14,7 @@ export interface DocumentSelection {
 }
 
 export interface DocumentViewerProps extends EscapeHatch {
-  /** The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required. */
+  /** The one Document to show: its clauses and paragraphs, with DocumentField and Highlight inside. Required. */
   children: ReactNode;
   /**
    * Called with the reader's selection when they choose Highlight (from the menu above a selection,
@@ -49,7 +44,7 @@ interface MenuState extends DocumentSelection {
  * inside holds the content and numbering, and prints without it. The page around it holds any
  * toolbar (Find, Download).
  * Selecting is the browser's own (::selection is not styled); fields and placeholders are not
- * part of a selection. Placeholders that fill in place are announced in a polite live region.
+ * part of a selection. Fields that fill in place (DocumentField announceAs) are announced in a polite live region.
  */
 export function DocumentViewer({ children, onHighlight, UNSAFE_className, UNSAFE_style }: DocumentViewerProps) {
   const [message, setMessage] = useState('');
@@ -58,7 +53,6 @@ export function DocumentViewer({ children, onHighlight, UNSAFE_className, UNSAFE
   const paper = useRef<HTMLDivElement>(null);
 
   const announce = useCallback((text: string) => setMessage(text), []);
-  const context = useMemo(() => ({ announce }), [announce]);
 
   /** The selection, if it is non-empty and inside the paper. */
   const readSelection = useCallback((): DocumentSelection | null => {
@@ -105,7 +99,7 @@ export function DocumentViewer({ children, onHighlight, UNSAFE_className, UNSAFE
   };
 
   return (
-    <DocumentContext.Provider value={context}>
+    <AnnounceContext value={announce}>
       <div className={cx('document-viewer', UNSAFE_className)} style={UNSAFE_style}>
         {onHighlight && hasSelection ? <HighlightShortcut onPress={() => highlight(readSelection())} /> : null}
         <div className="document-viewer__canvas">
@@ -141,50 +135,6 @@ export function DocumentViewer({ children, onHighlight, UNSAFE_className, UNSAFE
           </PopoverPrimitive.Root>
         ) : null}
       </div>
-    </DocumentContext.Provider>
+    </AnnounceContext>
   );
-}
-
-export interface DataFieldProps {
-  /** The merged value, as the reader should see it (format it with useFormat first). Empty → blank. */
-  value?: string | null | undefined;
-  /** For a value that fills later (a signer's name, the date signed, an effective date set by a rule): shown until it does. */
-  placeholder?: string;
-  /** What to call it when it fills, for the live region: "Effective date" → “Effective date filled: 14 October 2026”. */
-  announceAs?: string;
-}
-
-/**
- * A value merged into a generated document from data. Filled, it is plain document text; empty, it
- * is blank (the form that collected it validates it). A placeholder fills in place, briefly tinted.
- */
-export function DataField({ value, placeholder, announceAs }: DataFieldProps) {
-  const { announce } = useContext(DocumentContext);
-  const filled = Boolean(value);
-  const wasFilled = useRef(filled);
-  const [justFilled, setJustFilled] = useState(false);
-
-  useEffect(() => {
-    if (filled && !wasFilled.current) {
-      setJustFilled(true);
-      if (announceAs) announce(`${announceAs} filled: ${value ?? ''}`);
-    }
-    wasFilled.current = filled;
-  }, [filled, value, announceAs, announce]);
-
-  if (filled) {
-    return (
-      <span className="document-data" data-state={justFilled ? 'filled-now' : undefined} onAnimationEnd={() => setJustFilled(false)}>
-        {value}
-      </span>
-    );
-  }
-  if (placeholder) {
-    return (
-      <span className="document-data" data-state="placeholder">
-        {placeholder}
-      </span>
-    );
-  }
-  return null;
 }
