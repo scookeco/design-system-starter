@@ -1,0 +1,20 @@
+@layer components {
+  .document-checkbox {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-gap-xs);
+    color: inherit;
+    font: inherit;
+  }
+
+  /* The native box, in the system's accent: it prints as a box to tick. */
+  .document-checkbox__box {
+    margin: 0;
+    accent-color: var(--color-action-primary);
+  }
+
+  .document-checkbox__box:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

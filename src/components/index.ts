@@ -83,12 +83,11 @@ export {
   type DocumentArea,
   type DocumentLifecycle,
   type DocumentShell,
+  type DocumentValues,
 } from './Document/Document';
 export {
   DocumentViewer,
-  DataField,
   type DocumentViewerProps,
-  type DataFieldProps,
   type DocumentSelection,
 } from './DocumentViewer/DocumentViewer';
 export { Highlight, type HighlightProps, type HighlightTone } from './Highlight/Highlight';
@@ -108,6 +107,16 @@ export { KeyValue, KeyValueItem, type KeyValueProps, type KeyValueItemProps } fr
 export { Address, type AddressProps } from './Address/Address';
 export { Figure, type FigureProps } from './Figure/Figure';
 export { Seal, type SealProps } from './Seal/Seal';
+export { DocumentField, type DocumentFieldProps, type DocumentFieldType } from './DocumentField/DocumentField';
+export { DocumentCheckbox, type DocumentCheckboxProps } from './DocumentCheckbox/DocumentCheckbox';
+export { DocumentRadioGroup, DocumentOption, type DocumentRadioGroupProps, type DocumentOptionProps } from './DocumentRadioGroup/DocumentRadioGroup';
+export { DocumentSelect, type DocumentSelectProps } from './DocumentSelect/DocumentSelect';
+export { DocumentFieldset, type DocumentFieldsetProps } from './DocumentFieldset/DocumentFieldset';
+export { DocumentAttachment, type DocumentAttachmentProps } from './DocumentAttachment/DocumentAttachment';
+export { Repeat, type RepeatProps } from './Repeat/Repeat';
+export { Conditional, type ConditionalProps } from './Conditional/Conditional';
+export { Computed, type ComputedProps, type ComputedFormat } from './Computed/Computed';
+export { LineItems, type LineItemsProps, type LineItemsColumn } from './LineItems/LineItems';
 export { SignatureBlock, type SignatureBlockProps, type SignatureRecipient } from './SignatureBlock/SignatureBlock';
 export { SignaturePage, SignatureParty, type SignaturePageProps, type SignaturePartyProps } from './SignaturePage/SignaturePage';
 export { Exhibit, type ExhibitProps } from './Exhibit/Exhibit';

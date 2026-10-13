@@ -124,6 +124,8 @@ UI rules (design system v0)
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
 - [CommandPalette](docs/usage/CommandPalette.usage.tsx): The command palette
 - [Composer](docs/usage/Composer.usage.tsx): Where the person writes to the assistant
+- [Computed](docs/usage/Computed.usage.tsx): A value derived from others
+- [Conditional](docs/usage/Conditional.usage.tsx): Shows its content only while `when` holds
 - [ContextMenu](docs/usage/ContextMenu.usage.tsx): Actions on a thing, where the pointer or focus is: right-click
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [DatePicker](docs/usage/DatePicker.usage.tsx): A calendar date
@@ -132,9 +134,15 @@ UI rules (design system v0)
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentAttachment](docs/usage/DocumentAttachment.usage.tsx): A supporting file attached to a document
+- [DocumentCheckbox](docs/usage/DocumentCheckbox.usage.tsx): A box to check in a document, with its label beside it
+- [DocumentField](docs/usage/DocumentField.usage.tsx): A value in a document, bound to a data key
+- [DocumentFieldset](docs/usage/DocumentFieldset.usage.tsx): A group of related fields in a document, named by its legend
 - [DocumentHeader](docs/usage/DocumentHeader.usage.tsx): A running header: on screen, a line above the document
 - [DocumentList](docs/usage/DocumentList.usage.tsx): A list in a document's text that is not part of its…
+- [DocumentRadioGroup](docs/usage/DocumentRadioGroup.usage.tsx): One choice of several in a document, each a radio with its label
 - [DocumentSection](docs/usage/DocumentSection.usage.tsx): A titled section of a Document that is not a contract clause
+- [DocumentSelect](docs/usage/DocumentSelect.usage.tsx): A choice from a list in a document
 - [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
@@ -150,6 +158,7 @@ UI rules (design system v0)
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
 - [KeyValue](docs/usage/KeyValue.usage.tsx): Label and value pairs in a document
 - [Letterhead](docs/usage/Letterhead.usage.tsx): The issuer's letterhead at the top of a letter
+- [LineItems](docs/usage/LineItems.usage.tsx): An invoice's or a quote's lines
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
 - [Margin](docs/usage/Margin.usage.tsx): The margin beside the part of the document it is in
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
@@ -164,6 +173,7 @@ UI rules (design system v0)
 - [Popover](docs/usage/Popover.usage.tsx): A small non-modal panel anchored to its trigger, for a few controls
 - [Progress](docs/usage/Progress.usage.tsx): Determinate progress through a task
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
+- [Repeat](docs/usage/Repeat.usage.tsx): The same block once per row
 - [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
 - [Seal](docs/usage/Seal.usage.tsx): An issuer's official seal or stamp on a certificate
@@ -1480,6 +1490,118 @@ Stories: `components-composer--empty`, `components-composer--with-text`, `compon
 Composes: Button, Icon, Kbd, Spinner, Tag.
 Tokens read: `border.width.default`, `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.hover`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.scroll-region.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
 
+### Computed
+
+component · `src/components/Computed/Computed.tsx` · usage: `docs/usage/Computed.usage.tsx`
+
+A value derived from others (an invoice line's amount, its total), recomputed on every change and never typed. It reads like a filled field. Money is integer minor units, as currency fields store it.
+
+Props:
+- `name: string`: Its data key: other formulas use it ("subtotal"; in a Repeat row, per row: "amount", read as items.amount). Required.
+- `formula: string`: The expression it is ("qty * unit_price", "sum(items.amount)", "subtotal + tax"). Required.
+- `format?: ComputedFormat` = `'number'`: Default number.
+- `currency?: string`: The currency for format currency. Default: the Document's.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+Variants: format (number | currency | percent | text).
+
+**When to use**
+
+- A value derived from others, never typed: a line’s amount (`qty * unit_price`), a subtotal (`sum(items.amount)`), tax and total. It recomputes on every change and reads like a filled field, formatted as a number, currency (integer minor units), a percentage or text.
+- Other formulas use it by `name`; inside a Repeat row it computes per row, and `sum(items.amount)` totals the rows.
+
+**When not to use**
+
+- A value a person types → `DocumentField`
+- A total the app already has → a `DocumentField` merged from data
+
+**Do:** Totals as formulas over the values: change a line and they follow.
+
+```tsx
+<DocumentViewer>
+  <Document label="Quote" values={{ subtotal: 100000 }}>
+    <KeyValue>
+      <KeyValueItem label="Tax">
+        <Computed name="tax" formula="subtotal * 0.085" format="currency" />
+      </KeyValueItem>
+    </KeyValue>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A total typed in: it is wrong the moment a line changes.
+
+```tsx
+<DocumentViewer>
+  <Document label="Quote">
+    <Text>Tax: $85.00</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `output` element, read as text; it is never focusable or editable. A formula that doesn’t parse is reported in the console and shows nothing.
+
+Stories: `components-computed--default`, `components-computed--formats`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
+### Conditional
+
+component · `src/components/Conditional/Conditional.tsx` · usage: `docs/usage/Conditional.usage.tsx`
+
+Shows its content only while `when` holds, live as the document is filled in. While it is off, its fields are disabled and not required, and its clauses take no number. In print every branch shows (a blank form offers all of them) unless the Document's printMode is "resolved".
+
+Props:
+- `when: string`: When it shows: an expression over the document's values ("multiple_jobs == true", "lifecycle != 'executed'"). Required.
+- `children: ReactNode`: Any block: a field, a step, a clause, a table. Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A block that applies only sometimes: an optional step, a clause for one jurisdiction, a field that follows an answer. `when` is an expression over the document’s values (and `lifecycle`): “multiple_jobs == true”, “state == 'CA' and employees > 50”.
+- While it is off, its fields are disabled and not required and its clauses take no number. In print every branch shows unless the `Document`’s `printMode` is "resolved".
+
+**When not to use**
+
+- Showing or hiding app UI → ordinary rendering in the page
+- Two versions of one sentence → a `DocumentSelect` or a value merged from data
+
+**Do:** One block, shown by the answer it depends on.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled" defaultValues={{ multiple_jobs: true }}>
+    <DocumentCheckbox name="multiple_jobs" label="I hold more than one job" />
+    <Conditional when="multiple_jobs == true">
+      <DocumentField name="other_jobs" label="Pay from other jobs" type="currency" showLabel />
+    </Conditional>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A field that is always there and always required: people who don’t need it can’t submit.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled">
+    <DocumentField name="other_jobs" label="Pay from other jobs (if any)" type="currency" showLabel required />
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An off block is not displayed, so it isn’t read or reachable; what controls it (the checkbox) comes before it in the reading order.
+
+Stories: `components-conditional--default`, `components-conditional--on`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### ContextMenu
 
 component · `src/components/ContextMenu/ContextMenu.tsx` · usage: `docs/usage/ContextMenu.usage.tsx`
@@ -1955,11 +2077,18 @@ Props:
 - `shell?: DocumentShell` = `'flow'`: flow (the default): content reflows, and pages break only in print. grid: fixed DocumentPages that place content on a DocumentGrid.
 - `headingLevel?: Exclude<HeadingLevel, 1>` = `2`: The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).
 - `documentName?: string` = `'the Agreement'`: How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default "the Agreement".
+- `values?: DocumentValues`: Its captured values by field name (controlled). A Repeat's rows are a list under its name.
+- `defaultValues?: DocumentValues`: Its starting values, when the Document keeps them itself.
+- `onValuesChange?: (values: DocumentValues) => void`: Called with all the values after each change a person makes.
+- `onSubmit?: (values: DocumentValues) => void`: Makes the document a form: called with its values when it is submitted and every required field is filled.
+- `formId?: string`: The form's id, for a submit button outside the document (`form` on the button).
+- `currency?: string` = `'USD'`: The currency of currency fields and computed amounts (ISO 4217). Default "USD".
+- `printMode?: 'all' | 'resolved'` = `'all'`: In print, every branch of each Conditional (all, the default: a blank form shows every option) or only those that hold (resolved).
 - `children: ReactNode`: The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly.
 
 Closed styling API: no `className`/`style`.
 
-Variants: lifecycle (generated | filled | negotiated | executed); shell (flow | grid); headingLevel (2 | 3 | 4).
+Variants: lifecycle (generated | filled | negotiated | executed); shell (flow | grid); headingLevel (2 | 3 | 4); printMode (all | resolved).
 
 #### DocumentCell
 
@@ -2049,6 +2178,236 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
+### DocumentAttachment
+
+component · `src/components/DocumentAttachment/DocumentAttachment.tsx` · usage: `docs/usage/DocumentAttachment.usage.tsx`
+
+A supporting file attached to a document (a signer attachment): a native file input while editable, the attached files' names otherwise. Stores names only; the app keeps the files.
+
+Props:
+- `name: string`: The data key: the attached files' names. Required.
+- `label: string`: What to attach ("Proof of address"). Required.
+- `accept?: string`: The file types accepted (".pdf,image/*").
+- `multiple?: boolean` = `false`: More than one file.
+- `role?: string`: The party who attaches it. Default: the enclosing fieldset's or role region's.
+- `required?: boolean` = `false`
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+States: multiple, required.
+
+**When to use**
+
+- A supporting file the person attaches to the document (proof of address, a certificate): `accept` limits the types, `multiple` allows several. The document stores the names; the app keeps the files.
+
+**When not to use**
+
+- Uploading files in the app → `FileUpload`
+- An image that is part of the document → `Figure`
+
+**Do:** A labelled file input that says what to attach.
+
+```tsx
+<DocumentViewer>
+  <Document label="Application" lifecycle="filled">
+    <DocumentAttachment name="proof" label="Proof of address" accept=".pdf,image/*" />
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** “Attach proof of address” as text: nothing collects it or knows it’s missing.
+
+```tsx
+<DocumentViewer>
+  <Document label="Application">
+    <Text>Please attach proof of address.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A native file input named by its visible label; `required` until a file is attached.
+
+Stories: `components-documentattachment--default`, `components-documentattachment--executed`.
+Composes: Document, DocumentField.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
+
+### DocumentCheckbox
+
+component · `src/components/DocumentCheckbox/DocumentCheckbox.tsx` · usage: `docs/usage/DocumentCheckbox.usage.tsx`
+
+A box to check in a document, with its label beside it. Editable while the Document is filled or negotiated; otherwise it shows its state, checked or not, as the printed form does.
+
+Props:
+- `name: string`: The data key (true when checked). Required.
+- `label: string`: What checking it says ("I hold more than one job"), beside the box. Required.
+- `role?: string`: The party who checks it. Default: the enclosing fieldset's or role region's.
+- `required?: boolean` = `false`
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+States: required.
+
+**When to use**
+
+- A yes or no in a document, stored as true or false under `name`: “I hold more than one job”, a consent box. Its label sits beside the box.
+
+**When not to use**
+
+- One choice of several → `DocumentRadioGroup`
+- A setting in the app → `Checkbox` or `Switch`
+- An acknowledgement with a signature → the acknowledge part of the roles layer
+
+**Do:** A native box with its label beside it.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled">
+    <DocumentCheckbox name="consent" label="I consent to electronic delivery" />
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A typed box: it can’t be checked, and what it means isn’t captured.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form">
+    <Text>[ ] I consent to electronic delivery</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A native checkbox inside its label, so the label is its name and clicking it checks the box. Not editable, it shows its state disabled.
+
+Stories: `components-documentcheckbox--default`, `components-documentcheckbox--executed`.
+Composes: Document.
+Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
+### DocumentField
+
+component · `src/components/DocumentField/DocumentField.tsx` · usage: `docs/usage/DocumentField.usage.tsx`
+
+A value in a document, bound to a data key: a blank that is filled, or a value merged from data. While the Document is editable (lifecycle filled or negotiated) it is an input in the line of text or the box of the form; otherwise it reads as plain document text, formatted for its type, and an empty one is a blank line (or its placeholder). In print an input is a line to write on.
+
+Props:
+- `name: string`: The data key it reads and writes ("first_name"; in a Repeat row, the row's own key). Required.
+- `label: string`: What it is, as a person filling it in needs it named ("First name and middle initial"). Required.
+- `showLabel?: boolean` = `false`: Show the label above the field, as a form's box does. Default: named for assistive technology only (a blank in a sentence).
+- `type?: DocumentFieldType` = `'text'`: Default text.
+- `role?: string`: The party who fills it in (a role from Parties). Default: the enclosing fieldset's or role region's.
+- `required?: boolean` = `false`
+- `pattern?: string`: A pattern the value must match (ssn and ein have one).
+- `placeholder?: string`: Shown while the value is empty and the document is not editable (“the date the last party signs”).
+- `announceAs?: string`: When it fills while shown, say so in the viewer's live region: "Effective date" → “Effective date filled: …”.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+Variants: type (text | number | currency | date | duration | email | phone | ssn | ein | textarea).
+States: showLabel, required.
+
+**When to use**
+
+- Every value a document captures or merges, bound to a data key (`name`): text, number, currency (stored in integer minor units), date, duration, email, phone, ssn, ein, textarea. The `Document`’s values hold it.
+- How it shows follows the `Document`’s lifecycle: an input while filled or negotiated; formatted text when generated or executed, an empty one a blank line (or its `placeholder`, filling in place with `announceAs`). `showLabel` puts the label above it, as a form’s box.
+- `role` names the party who fills it; a `DocumentFieldset` (or a role region) gives one to every field inside it.
+
+**When not to use**
+
+- A form in the app, not a document → `TextField`, `NumberField`, `DatePicker` in a form
+- A value derived from others → `Computed`
+- A yes/no, a choice, a file → `DocumentCheckbox`, `DocumentRadioGroup` or `DocumentSelect`, `DocumentAttachment`
+
+**Do:** Values by name: the same markup is a merged document or a form to fill.
+
+```tsx
+<DocumentViewer>
+  <Document label="Order form" values={{ customer: 'Globex Inc.', fee: 1250000 }}>
+    <Text>
+      <DocumentField name="customer" label="Customer" /> pays <DocumentField name="fee" label="Annual fee" type="currency" /> a year.
+    </Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A value typed into the text: it can’t be exported, filled or checked, and every copy of the template needs editing.
+
+```tsx
+<DocumentViewer>
+  <Document label="Order form">
+    <Text>Globex Inc. pays $12,500.00 a year.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- Every input has a label (`label`): shown above it with `showLabel`, or named for assistive technology when it is a blank in a sentence.
+- Native constraints: `required`, a pattern for ssn and ein, numeric keyboards for numbers and money. Inside a Conditional that is off it is disabled and not required.
+- A placeholder is a highlight, never part of a selection; one that fills is announced once in the viewer’s live region.
+
+Stories: `components-documentfield--default`, `components-documentfield--fillable`, `components-documentfield--on-a-form-page`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
+
+### DocumentFieldset
+
+component · `src/components/DocumentFieldset/DocumentFieldset.tsx` · usage: `docs/usage/DocumentFieldset.usage.tsx`
+
+A group of related fields in a document, named by its legend; `role` assigns them all to one party.
+
+Props:
+- `legend: string`: What the fields are together ("Employer"). Required.
+- `role?: string`: The party who fills these in: every field inside takes it unless it says otherwise.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: The fields. Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Related fields named together (“Employer”, an address): a `legend` over them. `role` gives every field inside to one party unless a field says otherwise.
+
+**When not to use**
+
+- A numbered step of a form → `Step` (with a fieldset inside if it groups fields)
+- A whole part of the document for one party, not just fields → a role region
+
+**Do:** The employer’s fields grouped and assigned once.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled">
+    <DocumentFieldset legend="Employers only" role="employer">
+      <DocumentField name="ein" label="EIN" type="ein" showLabel />
+    </DocumentFieldset>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** The same role repeated on every field: one missed field goes to the wrong party.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled">
+    <DocumentField name="ein" label="EIN" type="ein" showLabel role="employer" />
+    <DocumentField name="employer_name" label="Employer" showLabel />
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A native `fieldset` named by its `legend`, so each field inside is announced with it.
+
+Stories: `components-documentfieldset--default`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.page.margin`, `text.caption`.
 
 ### DocumentHeader
 
@@ -2181,6 +2540,74 @@ Closed styling API: no `className`/`style`.
 Stories: `components-documentlist--default`, `components-documentlist--decimal`, `components-documentlist--lower-alpha`, `components-documentlist--upper-alpha`, `components-documentlist--lower-roman`, `components-documentlist--no-markers`.
 Tokens read: `color.fg.default`, `size.document.clause-indent`, `space.gap.2xs`, `text.body-lg`.
 
+### DocumentRadioGroup
+
+component · `src/components/DocumentRadioGroup/DocumentRadioGroup.tsx` · usage: `docs/usage/DocumentRadioGroup.usage.tsx`
+
+One choice of several in a document (a W-4's filing status), each a radio with its label.
+
+Props:
+- `name: string`: The data key (the chosen option's value). Required.
+- `label: string`: The question the options answer ("Filing status"). Required.
+- `role?: string`: The party who chooses. Default: the enclosing fieldset's or role region's.
+- `required?: boolean` = `false`
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: One DocumentOption per choice. Required.
+
+Closed styling API: no `className`/`style`.
+States: required.
+
+#### DocumentOption
+
+component, part of DocumentRadioGroup. One choice in a DocumentRadioGroup (a radio and its label) or a DocumentSelect (an option).
+
+Props:
+- `value: string`: What is stored when it is chosen ("single"). Required.
+- `children: string`: What it says ("Single or Married filing separately"). Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- One choice of a few in a document, all visible (a W-4’s filing status): a `DocumentOption` per choice, its value stored under `name`.
+- `DocumentOption` is also a `DocumentSelect`’s option.
+
+**When not to use**
+
+- Many choices, or a long list → `DocumentSelect`
+- Yes or no → `DocumentCheckbox`
+
+**Do:** A group named by its question, one radio per answer.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form" lifecycle="filled">
+    <DocumentRadioGroup name="status" label="Filing status">
+      <DocumentOption value="single">Single</DocumentOption>
+      <DocumentOption value="joint">Married filing jointly</DocumentOption>
+    </DocumentRadioGroup>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Choices as text to circle: nothing records which one was chosen.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form">
+    <Text>Filing status (circle one): Single / Married filing jointly</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `fieldset` named by its `legend` (`label`); native radios, so arrow keys move between them. `required` asks for one.
+
+Stories: `components-documentradiogroup--default`.
+Composes: Document.
+Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### DocumentSection
 
 component · `src/components/DocumentSection/DocumentSection.tsx` · usage: `docs/usage/DocumentSection.usage.tsx`
@@ -2241,6 +2668,68 @@ States: numbered.
 Stories: `components-documentsection--default`, `components-documentsection--numbered`.
 Composes: Change, Clause, Document, Heading, Margin.
 Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+
+### DocumentSelect
+
+component · `src/components/DocumentSelect/DocumentSelect.tsx` · usage: `docs/usage/DocumentSelect.usage.tsx`
+
+A choice from a list in a document: a native select while editable, the chosen option's words otherwise.
+
+Props:
+- `name: string`: The data key (the chosen option's value). Required.
+- `label: string`: What is chosen ("State"). Required.
+- `showLabel?: boolean` = `false`: Show the label above it, as a form's box does. Default: named for assistive technology only.
+- `role?: string`: The party who chooses. Default: the enclosing fieldset's or role region's.
+- `required?: boolean` = `false`
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: One DocumentOption per choice. Required.
+
+Closed styling API: no `className`/`style`.
+States: showLabel, required.
+
+**When to use**
+
+- A choice from a longer list in a document (governing law, a state): a native select while editable, the chosen option’s words otherwise. Options are `DocumentOption`s.
+
+**When not to use**
+
+- Two to four choices worth seeing at once → `DocumentRadioGroup`
+- A choice in the app → `Select` or `Combobox`
+
+**Do:** A select in the sentence, read as its words once generated.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement" lifecycle="filled">
+    <Text>
+      Governed by the laws of{' '}
+      <DocumentSelect name="law" label="Governing law">
+        <DocumentOption value="WA">Washington</DocumentOption>
+        <DocumentOption value="NY">New York</DocumentOption>
+      </DocumentSelect>
+      .
+    </Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A blank where a fixed list belongs: people type “Wash.”, “WA” and “Washington State”.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>Governed by the laws of ____________.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A native select named by `label` (shown with `showLabel`); its first option asks for a choice.
+
+Stories: `components-documentselect--default`, `components-documentselect--generated`.
+Composes: Document, DocumentField, DocumentRadioGroup.
+Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
 
 ### DocumentTitle
 
@@ -2324,24 +2813,13 @@ Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `co
 
 component · `src/components/DocumentViewer/DocumentViewer.tsx` · usage: `docs/usage/DocumentViewer.usage.tsx`
 
-Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.
+Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Fields that fill in place (DocumentField announceAs) are announced in a polite live region.
 
 Props:
-- `children: ReactNode`: The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required.
+- `children: ReactNode`: The one Document to show: its clauses and paragraphs, with DocumentField and Highlight inside. Required.
 - `onHighlight?: (selection: DocumentSelection) => void`: Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu.
 
 Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` escape hatches (need a reasoned lint disable).
-
-#### DataField
-
-component, part of DocumentViewer. A value merged into a generated document from data. Filled, it is plain document text; empty, it is blank (the form that collected it validates it). A placeholder fills in place, briefly tinted.
-
-Props:
-- `value?: string | null | undefined`: The merged value, as the reader should see it (format it with useFormat first). Empty → blank.
-- `placeholder?: string`: For a value that fills later (a signer's name, the date signed, an effective date set by a rule): shown until it does.
-- `announceAs?: string`: What to call it when it fills, for the live region: "Effective date" → “Effective date filled: 14 October 2026”.
-
-Closed styling API: no `className`/`style`.
 
 **When to use**
 
@@ -2360,9 +2838,9 @@ Closed styling API: no `className`/`style`.
 
 ```tsx
 <DocumentViewer>
-  <Document label="Order form">
+  <Document label="Order form" values={{ customer: 'Acme Corp' }}>
     <Text size="body-lg">
-      Ordered by <DataField value="Acme Corp" /> on <DataField placeholder="the date it is signed" />. Signed by Maya Okafor.
+      Ordered by <DocumentField name="customer" label="Customer" /> on <DocumentField name="signed_on" label="Date signed" placeholder="the date it is signed" />. Signed by Maya Okafor.
     </Text>
   </Document>
 </DocumentViewer>
@@ -2386,8 +2864,8 @@ Closed styling API: no `className`/`style`.
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Dialog, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
-Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `ease.exit`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.mark.overhang`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
+Composes: Dialog, Document, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.grid-row`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.page.letter.block`, `size.page.letter.inline`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
 
@@ -3163,6 +3641,66 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-letterhead--default`.
 Tokens read: `color.border.default`, `color.fg.default`, `space.gap.2xs`, `space.gap.md`, `space.inset.md`.
+
+### LineItems
+
+component · `src/components/LineItems/LineItems.tsx` · usage: `docs/usage/LineItems.usage.tsx`
+
+An invoice's or a quote's lines: a table that repeats a row template (a Repeat as a table), with a Computed amount per line that totals can sum (`sum(items.amount)`).
+
+Props:
+- `name: string`: The data key: the rows ("items"). Required.
+- `caption: string`: The table's name ("Line items"). Required.
+- `columns: readonly LineItemsColumn[]`: One per cell of the row template, in order. Required.
+- `min?: number` = `1`: Rows shown even when empty. Default 1.
+- `max?: number` = `50`: Most rows. Default 50.
+- `addLabel?: string` = `'Add line'`: The add button's label. Default "Add line".
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: The row template: one field or Computed per column ("description", "qty", "unit_price", then the amount). Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- An invoice’s, a quote’s or a purchase order’s lines: a table repeating a row template (one field or `Computed` per column), with a Computed amount per line that totals sum (`sum(items.amount)`).
+
+**When not to use**
+
+- Rows that aren’t a table (employment history) → `Repeat`
+- A static table in a document → `Table`
+
+**Do:** Lines as data, amounts computed.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice" values={{ items: [{ description: 'Setup', qty: 1, unit_price: 50000 }] }}>
+    <LineItems name="items" caption="Line items" columns={[{ label: 'Description' }, { label: 'Qty', numeric: true }, { label: 'Unit price', numeric: true }, { label: 'Amount', numeric: true }]}>
+      <DocumentField name="description" label="Description" />
+      <DocumentField name="qty" label="Qty" type="number" />
+      <DocumentField name="unit_price" label="Unit price" type="currency" />
+      <Computed name="amount" formula="qty * unit_price" format="currency" />
+    </LineItems>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Lines and amounts typed into text: nothing adds up when one changes.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice">
+    <Text>Setup × 1 @ $500.00 = $500.00</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `Table` named by `caption` (visually hidden), with column headers; each input is named by its column’s label, and each Remove by its line.
+
+Stories: `components-lineitems--default`, `components-lineitems--fillable`.
+Composes: Button, Document, Icon, Repeat, Spinner, Table, VisuallyHidden.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.scroll-region.lg`, `size.scroll-region.md`, `size.scroll-region.sm`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.sticky`.
 
 ### Link
 
@@ -3986,6 +4524,62 @@ States: hideLabel, disabled.
 Stories: `components-radiogroup--unselected`, `components-radiogroup--selected`, `components-radiogroup--with-description`, `components-radiogroup--with-error`, `components-radiogroup--horizontal`, `components-radiogroup--disabled-option`, `components-radiogroup--disabled`.
 Composes: Field, Icon.
 Tokens read: `color.action.primary`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `icon.stroke`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `space.gap.2xs`, `space.gap.md`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
+### Repeat
+
+component · `src/components/Repeat/Repeat.tsx` · usage: `docs/usage/Repeat.usage.tsx`
+
+The same block once per row: employment history, checklist items, schedules. Each row's fields read and write that row's values, and a Computed in it computes per row. While editable, people add rows up to `max` and remove them down to `min`; in print, `min` blank rows show.
+
+Props:
+- `name: string`: The data key: a list of rows, each an object of the row's fields. Required.
+- `min?: number` = `0`: Rows shown even when empty (a printed form's blank rows). Default 0.
+- `max?: number` = `20`: Most rows a person can add. Default 20.
+- `addLabel?: string` = `'Add'`: The add button's label. Default "Add".
+- `children: ReactNode`: The row: fields and computed values named for one row ("employer", not "employment_history.0.employer"). Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- The same block once per row: employment history, checklist items, dependants. The rows are a list under `name`; fields inside are named for one row. `min` rows always show (blank ones print), and people add rows up to `max`.
+- An invoice’s lines are `LineItems`: a Repeat as a table.
+
+**When not to use**
+
+- Rows of data the app generated → `Table`
+- A Repeat inside a Repeat → flatten the rows: rows don’t nest
+
+**Do:** One row template; the rows are data.
+
+```tsx
+<DocumentViewer>
+  <Document label="Application" lifecycle="filled">
+    <Repeat name="references" min={1} max={3} addLabel="Add reference">
+      <DocumentField name="name" label="Reference’s name" showLabel />
+    </Repeat>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Three copies of the same fields: a fourth reference doesn’t fit, and the data comes out as reference1, reference2…
+
+```tsx
+<DocumentViewer>
+  <Document label="Application" lifecycle="filled">
+    <DocumentField name="reference1" label="Reference 1" showLabel />
+    <Text>…</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- Add and Remove are Buttons; each Remove is named with its row (“Remove row 2”). Neither prints.
+
+Stories: `components-repeat--default`, `components-repeat--generated`.
+Composes: Button, Document, Icon, Spinner, VisuallyHidden.
+Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `text.body-lg`, `text.caption`, `text.label`.
 
 ### ResultList
 
@@ -5807,18 +6401,17 @@ Tokens read: `border.width.default`, `color.bg.inverse`, `color.bg.subtle`, `col
 
 component · `src/components/Watermark/Watermark.tsx` · usage: `docs/usage/Watermark.usage.tsx`
 
-A word across the document (“DRAFT”), faint behind the text, on every printed page. By default it shows until the document is executed. It is announced once, as an image named by its word.
+A word across the document (“DRAFT”), faint behind the text, on every printed page, while `when` holds: by default until the document is executed. It is announced once, as an image named by its word.
 
 Props:
 - `text?: string` = `'DRAFT'`: The word across the page ("DRAFT", "CONFIDENTIAL"). Default "DRAFT".
-- `show?: boolean`: Show it. Default: until the document is executed (`lifecycle` other than "executed").
+- `when?: string` = `"lifecycle != 'executed'"`: When it shows: an expression over the document's values and `lifecycle`. Default "lifecycle != 'executed'".
 
 Closed styling API: no `className`/`style`.
-States: show.
 
 **When to use**
 
-- A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `show` overrides that.
+- A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `when` takes any expression over its values and `lifecycle`.
 
 **When not to use**
 
@@ -7154,15 +7747,18 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `CommandGroup` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandGroup { id: string; label: string; items: readonly CommandItem[]; filter?: 'local' | 'none'; }`
 - `CommandItem` (`src/components/CommandPalette/CommandPalette.tsx`): `interface CommandItem { id: string; label: string; description?: string; icon?: IconDefinition; keywords?: readonly string[]; shortcut?: string; onSelect: () => void; }`
 - `ComposerAttachment` (`src/components/Composer/Composer.tsx`): `interface ComposerAttachment { id: string; name: string; }`
+- `ComputedFormat` (`src/components/Computed/Computed.tsx`): `type ComputedFormat = 'number' | 'currency' | 'percent' | 'text'` How a computed value reads: a plain number, money (integer minor units), a percentage (0.085 → 8.5%), or as it is.
 - `ContentWidthToken` (`src/tokens/tokens.ts`): `type ContentWidthToken = keyof typeof vars.size.content`
 - `DateInput` (`src/format/format.ts`): `type DateInput = string | number | Date` An instant (ISO timestamp, epoch ms or Date), or a calendar date with no zone ("2026-09-30").
 - `DateRange` (`src/components/DatePicker/DatePicker.tsx`): `interface DateRange { start: IsoDate; end: IsoDate; }`
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long' | 'month'` short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period).
 - `DocumentArea` (`src/components/Document/Document.tsx`): `interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }` Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.
+- `DocumentFieldType` (`src/components/DocumentField/DocumentField.tsx`): `type DocumentFieldType = 'text' | 'number' | 'currency' | 'date' | 'duration' | 'email' | 'phone' | 'ssn' | 'ein' | 'textarea'` What a field holds, which sets its input, its stored value and how it reads.
 - `DocumentLifecycle` (`src/components/Document/documentIndex.ts`): `type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed'` Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed).
 - `DocumentListStyle` (`src/components/DocumentList/DocumentList.tsx`): `type DocumentListStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'disc' | 'none'` How a list marks its items. The numbered ones are an ordered list.
 - `DocumentSelection` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSelection { text: string; range: Range; }` The text the reader selected in the document, and the range it covers (to store as a highlight).
 - `DocumentShell` (`src/components/Document/documentIndex.ts`): `type DocumentShell = 'flow' | 'grid'` How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms).
+- `DocumentValues` (`src/components/Document/data.tsx`): `type DocumentValues = Readonly<Record<string, unknown>>` A document's captured values by name. A Repeat's rows are a list of objects under its name.
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
 - `FeedbackRating` (`src/components/Feedback/Feedback.tsx`): `type FeedbackRating = 'up' | 'down'`
@@ -7179,6 +7775,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `IsoDate` (`src/components/DatePicker/DatePicker.tsx`): `type IsoDate = string` A calendar date as the system passes it: ISO "2026-09-25", no time, no zone.
 - `KeyPlatform` (`src/components/Kbd/Kbd.tsx`): `type KeyPlatform = 'mac' | 'other'` Where a shortcut is shown: Apple keyboards name modifiers with symbols (⌘ ⇧ ⌥ ⌃), everyone else with words (Ctrl, Shift, Alt). `mod` is the platform's command key: ⌘ on a Mac, Ctrl elsewhere.
 - `LayoutElement` (`src/primitives/types.ts`): `type LayoutElement = 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav' | 'form' | 'fieldset' | 'ul' | 'ol' | 'li' | 'dl'` Elements a layout primitive may render as. Closed on purpose: layout, not widgets.
+- `LineItemsColumn` (`src/components/LineItems/LineItems.tsx`): `interface LineItemsColumn { label: string; numeric?: boolean; }`
 - `LinkComponent` (`src/components/Link/Link.tsx`): `type LinkComponent = ComponentType<LinkComponentProps>` An app's router link, adapted to take `href`: React Router's `<Link to>`, Next's `<Link href>`.
 - `LinkComponentProps` (`src/components/Link/Link.tsx`): `type LinkComponentProps = Omit<ComponentPropsWithRef<'a'>, 'href'> & { href: string; }` What the system hands an app's link component: every anchor prop, with `href` always set and `ref` included. The component must spread the rest onto its anchor and forward `ref` (tooltips and focus management attach to it).
 - `LocaleSettings` (`src/format/format.ts`): `interface LocaleSettings { locale: string; timeZone: string; }` Locale formatting over Intl. Every number, date, amount and list a user reads goes through one of these named formats, so the same concept looks the same on every screen and follows the reader's locale and time zone. No hand-built strings ("$" + n, toFixed, toISOString). Formatter instances are cached per locale and options: building one per table cell is slow.
@@ -8311,7 +8908,7 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 | `text-wrap: pretty` | Body copy: p, li, dd, blockquote, figcaption (reset layer) | A single word left alone on a paragraph’s or a list item’s last line. | Limited: Chrome, Edge and Safari; not Firefox | Ignored: text wraps normally. |
 | `scrollbar-gutter: stable` | AppShell’s main, SplitView’s panes, CommandPalette’s results, ChatThread | Content shifting sideways when a classic (non-overlay) scrollbar appears: a list loading, results filtering, an answer streaming in. | Newly available (2024-12-11) | Ignored: the shift comes back on platforms with classic scrollbars. Overlay scrollbars (macOS, phones, headless test browsers) never had it. |
 | `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
-| `box-decoration-break: clone` | Highlight, and a DataField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
+| `box-decoration-break: clone` | Highlight, and a DocumentField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
 | `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
 | `@page` with `size`, named pages (`page`) and page margin boxes | Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is. DocumentHeader and DocumentFooter run in the margin boxes (`@top-center`, `@bottom-center`, `counter(page)`), their text handed over in custom properties | Nothing: printing a document took the browser’s default page and margins. | Newly available (2024-12-11); widely available on 2027-06-11 | Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it. |
 | Alt text for generated content (`content: … / …`) | Document numbers drawn by counters: Clause (1., 1.1, (a), (i)), Exhibit letters, Step and Recital numbers | Nothing: Chromium leaves counter values out of accessible names, so “1. Definitions” was announced “. Definitions”. The alt text puts the number back in the heading’s name. | Newly available (2024-07-09); widely available on 2027-01-09 | Each rule declares the plain `content` first; a browser without the alt syntax drops the second declaration and still draws the number. tests/visual/document-numbering.spec.ts reads the numbers from the accessibility tree. |
@@ -8921,6 +9518,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.dialog.md` `var(--size-dialog-md)`: `36rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.sm` `var(--size-dialog-sm)`: `28rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.document.clause-indent` `var(--size-document-clause-indent)`: `48px`. The gutter a clause number hangs in (Clause); each nested clause indents one more.
+- `size.document.field` `var(--size-document-field)`: `96px`. Least width of a field to fill in a document, and of the blank line an empty one prints as (DocumentField).
 - `size.document.grid-row` `var(--size-document-grid-row)`: `32px`. Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.
 - `size.document.measure` `var(--size-document-measure)`: `48rem`. Max inline size of the paper: one continuous surface, centred, no page breaks.
 - `size.document.note` `var(--size-document-note)`: `12rem`. Inline size of a clause note in the margin beside the paper (ClauseNote).

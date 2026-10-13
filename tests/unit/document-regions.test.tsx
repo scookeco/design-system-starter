@@ -74,7 +74,7 @@ describe('Watermark', () => {
     expect(screen.queryByRole('img')).toBeNull();
     rerender(
       <Document label="MSA" lifecycle="executed">
-        <Watermark text="COPY" show />
+        <Watermark text="COPY" when="true" />
       </Document>,
     );
     expect(screen.getByRole('img', { name: 'COPY' })).toBeTruthy();

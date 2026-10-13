@@ -1,0 +1,81 @@
+@layer components {
+  /* A field in a line of text (inline) or in a form's box (label shown above it). */
+  .document-field {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    min-inline-size: 0;
+    vertical-align: baseline;
+  }
+
+  .document-field[data-label-visible] {
+    display: flex;
+  }
+
+  .document-field__label {
+    color: var(--color-fg-muted);
+    font: var(--text-caption);
+  }
+
+  /* An input is a line to write on: no box, a rule under it, the document's own type. */
+  .document-field__input {
+    min-inline-size: var(--size-document-field);
+    padding: 0;
+    border: none;
+    border-block-end: 1px solid var(--color-border-strong);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .document-field__input:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .document-field__input:disabled {
+    border-block-end-style: dashed;
+    color: var(--color-fg-muted);
+  }
+
+  /* Empty and not editable: a blank line, as the printed form has. */
+  .document-field[data-state="blank"] .document-field__value {
+    display: inline-block;
+    min-inline-size: var(--size-document-field);
+    border-block-end: 1px solid var(--color-border-strong);
+  }
+
+  /* A placeholder, and the moment it fills, look like a highlight. */
+  .document-field[data-state="placeholder"] .document-field__value,
+  .document-field[data-state="filled-now"] .document-field__value {
+    --mark-pull: calc(var(--space-mark-overhang) * -1);
+
+    margin-inline: var(--mark-pull);
+    padding-inline: var(--space-mark-overhang);
+    border-radius: var(--radius-control);
+    box-decoration-break: clone;
+  }
+
+  .document-field[data-state="placeholder"] .document-field__value {
+    background: var(--color-data-field-bg);
+    color: var(--color-data-field-fg);
+    user-select: none;
+  }
+
+  .document-field[data-state="filled-now"] .document-field__value {
+    animation-name: document-field-filled;
+    animation-duration: var(--motion-slow);
+    animation-timing-function: var(--ease-exit);
+    animation-fill-mode: both;
+  }
+
+  @keyframes document-field-filled {
+    from {
+      background: var(--color-data-field-bg-filled);
+    }
+
+    to {
+      background: transparent;
+    }
+  }
+}

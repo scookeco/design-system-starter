@@ -1,0 +1,23 @@
+@layer components {
+  .repeat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-gap-sm);
+  }
+
+  .repeat__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-gap-sm) var(--space-gap-md);
+    inline-size: 100%;
+  }
+
+  /* Adding and removing rows is for the screen; print shows the rows. */
+  @media print {
+    .repeat__actions {
+      display: none;
+    }
+  }
+}
