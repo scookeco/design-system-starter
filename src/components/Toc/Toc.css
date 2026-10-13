@@ -1,0 +1,35 @@
+@layer components {
+  .toc {
+    color: var(--color-fg-default);
+    font: var(--text-body-lg);
+  }
+
+  .toc__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-2xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* A nested level indents one clause gutter. */
+  .toc__item > .toc__list {
+    margin-block-start: var(--space-gap-2xs);
+    padding-inline-start: var(--size-document-clause-indent);
+  }
+
+  .toc__link {
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    text-decoration-line: none;
+  }
+
+  .toc__link:hover {
+    text-decoration-line: underline;
+  }
+
+  .toc__number {
+    font-variant-numeric: tabular-nums;
+  }
+}

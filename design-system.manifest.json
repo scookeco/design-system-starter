@@ -4288,7 +4288,7 @@
       "kind": "component",
       "source": "src/components/Clause/Clause.tsx",
       "status": null,
-      "description": "A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.",
+      "description": "A numbered clause in a Document. Numbers are CSS counters drawn from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every Xref. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.",
       "docs": "docs/usage/Clause.usage.tsx",
       "props": [
         {
@@ -4296,7 +4296,7 @@
           "type": "string",
           "required": true,
           "default": null,
-          "description": "Stable id that references use (`<ClauseRef to=\"liability\" />`). Unique in the document. Required."
+          "description": "Stable id that references use (`<Xref to=\"liability\" />`). Unique in the document. Required."
         },
         {
           "name": "title",
@@ -4311,6 +4311,13 @@
           "required": true,
           "default": null,
           "description": "The clause text: paragraphs, and nested Clauses for its sub-clauses."
+        },
+        {
+          "name": "numbered",
+          "type": "boolean",
+          "required": false,
+          "default": "true",
+          "description": "False for a clause that takes no number (a heading-only part, a preamble): the ones after it don't skip one. Default true."
         },
         {
           "name": "note",
@@ -4343,13 +4350,14 @@
       },
       "variants": {},
       "states": [
+        "numbered",
         "conspicuous"
       ],
       "usage": {
         "whenToUse": [
-          "The numbered body of a generated agreement in a DocumentViewer: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) come from position, so optional clauses and reordering never leave a gap or a stale number.",
-          "`ClauseRef` wherever the text points at another clause (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.",
-          "`Term define` once where a defined term is defined, `Term` wherever it is used; `name` for a plural or possessive. Undefined or twice-defined terms are marked."
+          "The numbered body of an agreement in a `Document`: one `Clause` per section, nested for sub-clauses. Numbers (1., 1.1, (a), (i)) are CSS counters drawn from position, never typed, so optional clauses and reordering never leave a gap or a stale number. `numbered={false}` for a clause that takes none.",
+          "Point at a clause with `Xref` (“subject to Section 3.2(a)”): it names the clause by id and always shows its current number.",
+          "`Term` where running text defines a term (a party in the preamble: Acme Corp (“Vendor”)); everywhere else the term is an `Xref` to it. A list of definitions is `Definitions`."
         ],
         "whenNotToUse": [
           {
@@ -4367,7 +4375,7 @@
         ],
         "do": {
           "caption": "Clauses by id, references by id: remove or move a clause and every number follows.",
-          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"fees\" title=\"Fees\">\n      <Text>\n        The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to=\"disputes\" />.\n      </Text>\n    </Clause>\n    <Clause id=\"disputes\" title=\"Disputed amounts\">\n      <Text>\n        <Term>Fees</Term> disputed in good faith may be withheld.\n      </Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"fees\" title=\"Fees\">\n      <Text>\n        The <Term>Fees</Term> are due within thirty (30) days, except as in <Xref to=\"disputes\" />.\n      </Text>\n    </Clause>\n    <Clause id=\"disputes\" title=\"Disputed amounts\">\n      <Text>\n        <Xref to=\"def-fees\" /> disputed in good faith may be withheld.\n      </Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "Numbers typed into headings and text: the first clause added or removed leaves them wrong.",
@@ -4375,8 +4383,8 @@
         },
         "accessibility": [
           "A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.",
-          "A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).",
-          "Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.",
+          "The number is generated content: screen readers read it with the heading (“3.1 Invoices”), but it is not in copied text or the browser’s find. Every clause is a `section`.",
+          "A clause id used twice and a term defined twice are marked with a wavy underline in the danger colour, so the problem is not shown by colour alone; each is also reported in the console.",
           "A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition."
         ]
       },
@@ -4394,6 +4402,10 @@
           {
             "id": "components-clause--unresolved",
             "name": "Unresolved"
+          },
+          {
+            "id": "components-clause--unnumbered",
+            "name": "Unnumbered"
           }
         ],
         "composes": [
@@ -4412,14 +4424,12 @@
           "color.category.5.fg",
           "color.category.6.fg",
           "color.fg.default",
-          "color.fg.link",
           "color.focus",
           "color.status.danger.fg",
           "color.status.success.fg",
           "focus.ring.offset",
           "focus.ring.width",
           "font.weight.strong",
-          "radius.indicator",
           "ratio.page",
           "ratio.page-landscape",
           "shadow.card",
@@ -4597,49 +4607,6 @@
       "description": null,
       "partOf": "Clause",
       "propsOf": "Clause"
-    },
-    {
-      "name": "ClauseRef",
-      "kind": "component",
-      "source": "src/components/Clause/Clause.tsx",
-      "status": null,
-      "description": "A reference to another clause in the same document (\"Section 3.1(a)\"), or to an Exhibit (\"Exhibit A\"), resolved from where that clause is now, so it never goes stale; a no-break space keeps “Section” and the number on one line. It links to the clause and moves focus there. A missing target is marked in the document and reported in the console.",
-      "partOf": "Clause",
-      "docs": "docs/usage/Clause.usage.tsx",
-      "props": [
-        {
-          "name": "to",
-          "type": "string",
-          "required": true,
-          "default": null,
-          "description": "The id of the Clause it points to. Required."
-        },
-        {
-          "name": "prefix",
-          "type": "string",
-          "required": false,
-          "default": "'Section'",
-          "description": "The word before the number. Default \"Section\"."
-        }
-      ],
-      "inherits": [],
-      "closedApi": {
-        "className": false,
-        "style": false,
-        "UNSAFE_className": false,
-        "UNSAFE_style": false
-      },
-      "variants": {},
-      "states": []
-    },
-    {
-      "name": "ClauseRefProps",
-      "kind": "type-only",
-      "source": "src/components/Clause/Clause.tsx",
-      "status": null,
-      "description": null,
-      "partOf": "Clause",
-      "propsOf": "ClauseRef"
     },
     {
       "name": "ClauseSourceColor",
@@ -6956,6 +6923,155 @@
       ]
     },
     {
+      "name": "Definition",
+      "kind": "component",
+      "source": "src/components/Definitions/Definitions.tsx",
+      "status": null,
+      "description": "One defined term in Definitions: the term, in bold, and its meaning.",
+      "partOf": "Definitions",
+      "docs": "docs/usage/Definitions.usage.tsx",
+      "props": [
+        {
+          "name": "term",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The term (\"Services\"). Required."
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The id references use. Default: \"def-\" and the term (\"def-services\")."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "What the term means. Required."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DefinitionProps",
+      "kind": "type-only",
+      "source": "src/components/Definitions/Definitions.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Definitions",
+      "propsOf": "Definition"
+    },
+    {
+      "name": "Definitions",
+      "kind": "component",
+      "source": "src/components/Definitions/Definitions.tsx",
+      "status": null,
+      "description": "A document's defined terms, as a list: each Definition is a term and what it means. References to a term (`<Xref to=\"def-services\" />`) link here and read as the term; defining one twice is marked and reported. A term defined in running text (a party in the preamble) is a Term instead.",
+      "docs": "docs/usage/Definitions.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "An agreement’s or a policy’s defined terms, listed: one `Definition` per term, with what it means. References to a term are `Xref`s to its id (“def-services” by default), which read as the term and link here.",
+          "Put it in a Definitions clause, or on its own before the clauses."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A term defined in running text (a party in the preamble)",
+            "instead": "`Term`"
+          },
+          {
+            "situation": "Label and value pairs (an invoice’s number and date)",
+            "instead": "a key-value list"
+          }
+        ],
+        "do": {
+          "caption": "Each term defined once, and used through Xref: rename the term and every use follows.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"definitions\" title=\"Definitions\">\n      <Definitions>\n        <Definition term=\"Services\">The services described in each Order Form.</Definition>\n        <Definition term=\"Effective Date\">The date of the last signature below.</Definition>\n      </Definitions>\n    </Clause>\n    <Clause id=\"term\" title=\"Term\">\n      <Text>\n        The <Xref to=\"def-services\" /> start on the <Xref to=\"def-effective-date\" />.\n      </Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Definitions as bold text in a paragraph: nothing counts them, and uses can’t link to them.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>“Services” means the services in each Order Form. “Effective Date” means the date of the last signature.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A description list (`dl`): each term a `dt` holding a `dfn`, its meaning the `dd`, so the pairing is announced.",
+          "A term defined twice is marked with a wavy underline in the danger colour and reported in the console."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Definitions",
+        "stories": [
+          {
+            "id": "components-definitions--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-definitions--defined-twice",
+            "name": "Defined Twice"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.focus",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.clause-indent",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.body-lg"
+        ]
+      }
+    },
+    {
       "name": "Dialog",
       "kind": "component",
       "source": "src/components/Dialog/Dialog.tsx",
@@ -7795,6 +7911,157 @@
       "propsOf": "Document"
     },
     {
+      "name": "DocumentSection",
+      "kind": "component",
+      "source": "src/components/DocumentSection/DocumentSection.tsx",
+      "status": null,
+      "description": "A titled section of a Document that is not a contract clause: a handbook chapter, a policy's scope, a letter's enclosures. Its heading takes the next outline level; the Toc lists it and an Xref names it by its title. Clauses inside it number as if it weren't there. `numbered` makes it a Clause.",
+      "docs": "docs/usage/DocumentSection.usage.tsx",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Stable id that references use (`<Xref to=\"leave\" />` reads its title). Unique in the document. Required."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The section's heading (\"Leave and time off\"). Required."
+        },
+        {
+          "name": "numbered",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Numbered like a top-level clause (it is one). Default false: a section of a handbook, a policy, a letter."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The section's content: paragraphs, lists, tables, and nested sections or clauses."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "numbered"
+      ],
+      "usage": {
+        "whenToUse": [
+          "A titled part of a `Document` that is not a contract clause: a handbook chapter, a policy’s scope, a letter’s enclosures. Its heading takes the next outline level; `Toc` lists it and an `Xref` names it by its title.",
+          "Clauses inside it number as if it weren’t there. `numbered` makes it a numbered `Clause`."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A numbered section of an agreement",
+            "instead": "`Clause`"
+          },
+          {
+            "situation": "A step of a form",
+            "instead": "`Step`"
+          },
+          {
+            "situation": "A section of an app page",
+            "instead": "`Heading` and the layout primitives"
+          }
+        ],
+        "do": {
+          "caption": "A handbook chapter titled, not numbered, with its rules numbered inside it.",
+          "code": "<DocumentViewer>\n  <Document label=\"Employee handbook\">\n    <DocumentSection id=\"leave\" title=\"Leave and time off\">\n      <Clause id=\"vacation\" title=\"Vacation\">\n        <Text>Twenty days a year.</Text>\n      </Clause>\n    </DocumentSection>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A section made from bold text: it is not in the outline, the table of contents or any reference.",
+          "code": "<DocumentViewer>\n  <Document label=\"Employee handbook\">\n    <Text>\n      <strong>Leave and time off</strong>\n    </Text>\n    <Text>Twenty days a year.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `section` named by its heading, at the next level of the document’s outline; a reference to it moves focus there."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/DocumentSection",
+        "stories": [
+          {
+            "id": "components-documentsection--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-documentsection--numbered",
+            "name": "Numbered"
+          }
+        ],
+        "composes": [
+          "Change",
+          "Clause",
+          "Document",
+          "Heading"
+        ],
+        "tokens": [
+          "border.width.change-bar",
+          "color.bg.surface",
+          "color.border.default",
+          "color.category.1.fg",
+          "color.category.2.fg",
+          "color.category.3.fg",
+          "color.category.4.fg",
+          "color.category.5.fg",
+          "color.category.6.fg",
+          "color.fg.default",
+          "color.focus",
+          "color.status.danger.fg",
+          "color.status.success.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "font.weight.strong",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.clause-indent",
+          "size.document.grid-row",
+          "size.document.note",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.inset.md",
+          "space.inset.xl",
+          "space.page.margin",
+          "space.scroll-padding.end",
+          "space.scroll-padding.start",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "DocumentSectionProps",
+      "kind": "type-only",
+      "source": "src/components/DocumentSection/DocumentSection.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentSection",
+      "propsOf": "DocumentSection"
+    },
+    {
       "name": "DocumentSelection",
       "kind": "type-only",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
@@ -7872,7 +8139,7 @@
         ],
         "do": {
           "caption": "Title, number and preamble, then the recitals: the same structure for every agreement the app generates.",
-          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n      This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n    </DocumentTitle>\n    <Recitals>\n      <Recital>Provider operates a facilities management platform;</Recital>\n    </Recitals>\n  </Document>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n      This Agreement is between Acme Corp (<Term>Provider</Term>) and Globex Inc. (<Term>Customer</Term>).\n    </DocumentTitle>\n    <Recitals whereas closing=\"in consideration of the mutual covenants set out below, the Parties agree as follows:\">\n      <Recital>Provider operates a facilities management platform;</Recital>\n    </Recitals>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.",
@@ -7893,6 +8160,10 @@
           {
             "id": "components-documenttitle--amendment",
             "name": "Amendment"
+          },
+          {
+            "id": "components-documenttitle--lettered-recitals",
+            "name": "Lettered Recitals"
           }
         ],
         "composes": [
@@ -8542,7 +8813,7 @@
       "kind": "component",
       "source": "src/components/Exhibit/Exhibit.tsx",
       "status": null,
-      "description": "An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
+      "description": "An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters are a counter, in the order exhibits are attached. An Xref into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
       "docs": "docs/usage/Exhibit.usage.tsx",
       "props": [
         {
@@ -8550,7 +8821,7 @@
           "type": "string",
           "required": true,
           "default": null,
-          "description": "Stable id that references use (`<ClauseRef to=\"dpa\" />` → “Exhibit A”). Unique among clauses and exhibits. Required."
+          "description": "Stable id that references use (`<Xref to=\"dpa\" />` → “Exhibit A”). Unique among clauses and exhibits. Required."
         },
         {
           "name": "title",
@@ -8558,6 +8829,13 @@
           "required": true,
           "default": null,
           "description": "The exhibit's name (\"Data Processing Agreement\"). Required."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "Its own label instead of the next letter (\"1\", \"SOW-2\"). Default: lettered A, B, C in the order attached."
         },
         {
           "name": "children",
@@ -8579,7 +8857,7 @@
       "usage": {
         "whenToUse": [
           "A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.",
-          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
+          "Its clauses restart at 1. A `Xref` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<Xref to=\"dpa\" />` names the exhibit itself."
         ],
         "whenNotToUse": [
           {
@@ -8593,7 +8871,7 @@
         ],
         "do": {
           "caption": "An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.",
-          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"privacy\" title=\"Data Privacy\">\n      <Text>\n        Personal data is processed under <ClauseRef to=\"dpa\" />.\n      </Text>\n    </Clause>\n    <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n      <Clause id=\"roles\" title=\"Roles\">\n        <Text>Customer is the controller and Provider the processor.</Text>\n      </Clause>\n    </Exhibit>\n  </Document>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"privacy\" title=\"Data Privacy\">\n      <Text>\n        Personal data is processed under <Xref to=\"dpa\" />.\n      </Text>\n    </Clause>\n    <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n      <Clause id=\"roles\" title=\"Roles\">\n        <Text>Customer is the controller and Provider the processor.</Text>\n      </Clause>\n    </Exhibit>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.",
@@ -8610,6 +8888,10 @@
           {
             "id": "components-exhibit--default",
             "name": "Default"
+          },
+          {
+            "id": "components-exhibit--labelled",
+            "name": "Labelled"
           }
         ],
         "composes": [
@@ -13624,7 +13906,7 @@
       "kind": "component",
       "source": "src/components/DocumentTitle/DocumentTitle.tsx",
       "status": null,
-      "description": "One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”.",
+      "description": "One recital: “Provider operates a platform…”. Its letter (and “WHEREAS,” when Recitals asks for it) is added.",
       "partOf": "DocumentTitle",
       "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
@@ -13651,7 +13933,7 @@
       "kind": "component",
       "source": "src/components/DocumentTitle/DocumentTitle.tsx",
       "status": null,
-      "description": "The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”.",
+      "description": "The background before an agreement's operative clauses, lettered A., B., C. by a counter (never typed), optionally each “WHEREAS, …;”, then, with `closing`, “NOW, THEREFORE, …”.",
       "partOf": "DocumentTitle",
       "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
@@ -13663,11 +13945,18 @@
           "description": "One Recital per piece of background. Required."
         },
         {
+          "name": "whereas",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Starts each recital “WHEREAS,”, as older agreements write them. Default false: lettered A., B., C. alone."
+        },
+        {
           "name": "closing",
           "type": "string",
           "required": false,
-          "default": "'in consideration of the mutual covenants set out below, the Parties agree as follows:'",
-          "description": "What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows:"
+          "default": null,
+          "description": "What follows “NOW, THEREFORE,” after the recitals. Omit it for none."
         }
       ],
       "inherits": [],
@@ -13678,7 +13967,9 @@
         "UNSAFE_style": false
       },
       "variants": {},
-      "states": []
+      "states": [
+        "whereas"
+      ]
     },
     {
       "name": "RecitalsProps",
@@ -16890,6 +17181,142 @@
       ]
     },
     {
+      "name": "Step",
+      "kind": "component",
+      "source": "src/components/Step/Step.tsx",
+      "status": null,
+      "description": "A numbered step of a form (“Step 2: Multiple jobs or spouse works”), flat by design: group the fields inside one with a fieldset. Numbers are a counter, so steps number themselves; `n` fixes one where the form prints it.",
+      "docs": "docs/usage/Step.usage.tsx",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What the person does in this step (\"Enter personal information\"). Required."
+        },
+        {
+          "name": "n",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "The step's number when the form fixes it (a W-4's Step 5 stays 5 when Steps 3 and 4 are skipped). Default: the next."
+        },
+        {
+          "name": "optional",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "The step can be skipped: “(optional)” follows the title."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "The step's fields and instructions, if they sit inside it rather than beside it on the grid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [
+        "optional"
+      ],
+      "usage": {
+        "whenToUse": [
+          "The numbered steps of a form (“Step 2: Multiple jobs or spouse works”). Steps number themselves; `n` fixes one where the form prints it, so Step 5 stays 5 when Steps 3 and 4 are skipped. `optional` adds “(optional)”.",
+          "On a grid page, place it with `area`; its fields can sit beside it on the grid or inside it."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "The steps of a task in the app (a wizard)",
+            "instead": "`Stepper` in `FocusedLayout`"
+          },
+          {
+            "situation": "A clause of an agreement",
+            "instead": "`Clause`"
+          },
+          {
+            "situation": "Sub-steps inside a step",
+            "instead": "a fieldset: steps are flat"
+          }
+        ],
+        "do": {
+          "caption": "Steps placed on the form page, each numbered by the document.",
+          "code": "<DocumentViewer>\n  <Document label=\"Employee's withholding certificate\" shell=\"grid\" headingLevel={3}>\n    <DocumentPage>\n      <DocumentGrid cols={12}>\n        <Step title=\"Enter personal information\" area={{ row: 1, column: 1, columnSpan: 12 }} />\n        <Step title=\"Multiple jobs or spouse works\" optional area={{ row: 3, column: 1, columnSpan: 12 }} />\n      </DocumentGrid>\n    </DocumentPage>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "“Step 2” typed into text: hide a step and the numbers after it are wrong.",
+          "code": "<DocumentViewer>\n  <Document label=\"Form\">\n    <Text>Step 2: Multiple jobs or spouse works</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `section` named by its heading (“Step 2: Multiple jobs or spouse works (optional)”); the number is generated content and is read with the heading.",
+          "On a grid page, reading order is source order: write steps and their fields in the order a person fills them."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Step",
+        "stories": [
+          {
+            "id": "components-step--default",
+            "name": "Default"
+          }
+        ],
+        "composes": [
+          "Document",
+          "Heading"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "font.weight.body",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.heading-1",
+          "text.heading-2",
+          "text.heading-3",
+          "text.heading-4"
+        ]
+      }
+    },
+    {
+      "name": "StepProps",
+      "kind": "type-only",
+      "source": "src/components/Step/Step.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Step",
+      "propsOf": "Step"
+    },
+    {
       "name": "Stepper",
       "kind": "component",
       "source": "src/components/Stepper/Stepper.tsx",
@@ -18617,7 +19044,7 @@
       "kind": "component",
       "source": "src/components/Clause/Clause.tsx",
       "status": null,
-      "description": "A defined term: defined once (`define`) and used by name everywhere else, so a term used but never defined, or defined twice, is marked in the document and reported in the console.",
+      "description": "A term defined in running text, as an agreement's preamble defines its parties: Acme Corp (“Vendor”). Shown in quotes, in bold, and counted by the document, so a term defined twice is marked and reported. Refer to it everywhere else with an Xref, which links here. For a list of definitions, use Definitions.",
       "partOf": "Clause",
       "docs": "docs/usage/Clause.usage.tsx",
       "props": [
@@ -18626,21 +19053,14 @@
           "type": "string",
           "required": true,
           "default": null,
-          "description": "The term as written here (\"Confidential Information\"). Required."
+          "description": "The term as defined here (\"Confidential Information\"). Required."
         },
         {
-          "name": "define",
-          "type": "boolean",
-          "required": false,
-          "default": "false",
-          "description": "This is where the term is defined: shown in quotes, in bold. Define each term once."
-        },
-        {
-          "name": "name",
+          "name": "id",
           "type": "string",
           "required": false,
           "default": null,
-          "description": "The term this refers to, when the text differs (a plural or possessive: \"Customer’s\" → \"Customer\")."
+          "description": "The id references use (`<Xref to=\"def-customer\" />`). Default: \"def-\" and the term (\"def-confidential-information\")."
         }
       ],
       "inherits": [],
@@ -18651,9 +19071,7 @@
         "UNSAFE_style": false
       },
       "variants": {},
-      "states": [
-        "define"
-      ]
+      "states": []
     },
     {
       "name": "TermProps",
@@ -19685,6 +20103,114 @@
       ]
     },
     {
+      "name": "Toc",
+      "kind": "component",
+      "source": "src/components/Toc/Toc.tsx",
+      "status": null,
+      "description": "A Document's table of contents, generated from its clauses and exhibits as they are now, never typed: numbers and titles follow every edit. Each entry links to its clause and moves focus there.",
+      "docs": "docs/usage/Toc.usage.tsx",
+      "props": [
+        {
+          "name": "depth",
+          "type": "number",
+          "required": false,
+          "default": "2",
+          "description": "How many clause levels it lists. Default 2 (1. and 1.1)."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Contents'",
+          "description": "Names the list. Default \"Contents\"."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A table of contents for a long `Document` (an MSA, a handbook), generated from its clauses, sections and exhibits as they are now: numbers and titles follow every edit. `depth` sets how many clause levels it lists (2 by default)."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Navigation between pages of the app",
+            "instead": "`Nav` or `NavTabs`"
+          },
+          {
+            "situation": "A short document of a few clauses",
+            "instead": "nothing: the headings are enough"
+          }
+        ],
+        "do": {
+          "caption": "Generated from the clauses: remove one and the contents renumber with it.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Toc />\n    <Clause id=\"fees\" title=\"Fees\">\n      <Text>Net 30.</Text>\n    </Clause>\n    <Clause id=\"term\" title=\"Term\">\n      <Text>Two years.</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A contents list typed by hand: it drifts from the clauses the first time one moves.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>Contents: 1. Fees · 2. Term</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "A `nav` landmark named “Contents” (or `label`) holding nested ordered lists; each entry is a link that moves focus to its clause."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Toc",
+        "stories": [
+          {
+            "id": "components-toc--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-toc--top-level-only",
+            "name": "Top Level Only"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.link",
+          "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.clause-indent",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.body-lg"
+        ]
+      }
+    },
+    {
+      "name": "TocProps",
+      "kind": "type-only",
+      "source": "src/components/Toc/Toc.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Toc",
+      "propsOf": "Toc"
+    },
+    {
       "name": "Toggle",
       "kind": "component",
       "source": "src/components/Toggle/Toggle.tsx",
@@ -20437,6 +20963,126 @@
       "description": null,
       "partOf": "Icon",
       "docs": "docs/usage/Icons.usage.tsx"
+    },
+    {
+      "name": "Xref",
+      "kind": "component",
+      "source": "src/components/Xref/Xref.tsx",
+      "status": null,
+      "description": "A cross-reference inside a Document, resolved from what its target is now, so it never goes stale: a clause reads “Section 3.1(a)” (and says which document, across an exhibit's edge), an exhibit “Exhibit A”, an unnumbered section its title, a defined term the term itself. It links to the target and moves focus there; a no-break space keeps “Section” and the number together. A reference with no target is marked in place and reported in the console.",
+      "docs": "docs/usage/Xref.usage.tsx",
+      "props": [
+        {
+          "name": "to",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The id of what it refers to: a Clause or DocumentSection (\"liability\"), an Exhibit (\"dpa\"), or a defined term (\"def-customer\"). Required."
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "required": false,
+          "default": "'Section'",
+          "description": "The word before a clause's number. Default \"Section\"."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Text to show instead of the resolved label: a defined term as the sentence needs it (\"Customer’s\")."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "Every reference inside a `Document` to another part of it: a clause (“Section 3.2(a)”), an exhibit (“Exhibit A”), an unnumbered section (its title) or a defined term (the term). It names the target by id and shows what the target is now.",
+          "Across an exhibit’s edge it says which document it means: “Section 2 of Exhibit B”, “Section 7 of the Agreement” (`documentName` on the `Document`). `prefix` changes the word before a number (“clause 4”).",
+          "A defined term as the sentence needs it, plural or possessive: `<Xref to=\"def-customer\">Customer’s</Xref>`."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A reference to another document (“MSA §6” from a DPA)",
+            "instead": "plain text naming that document: references resolve within one Document"
+          },
+          {
+            "situation": "A link to another page of the app",
+            "instead": "`Link`"
+          }
+        ],
+        "do": {
+          "caption": "References by id: move or remove what they point at and every one follows.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"fees\" title=\"Fees\">\n      <Text>\n        <Term>Customer</Term> pays the fees, except as in <Xref to=\"disputes\" /> and <Xref to=\"dpa\" />.\n      </Text>\n    </Clause>\n    <Clause id=\"disputes\" title=\"Disputed amounts\">\n      <Text>\n        <Xref to=\"def-customer\">Customer’s</Xref> disputed amounts may be withheld.\n      </Text>\n    </Clause>\n    <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n      <Text>Processing terms.</Text>\n    </Exhibit>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "A typed “Section 2”: the first clause added before it makes it point at the wrong one.",
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>Fees are due, except as in Section 2.</Text>\n  </Document>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "An `a` named with the full reference (“Section 3.2(a)”); following it moves focus to the target, which scrolls clear of sticky content (scroll padding). A no-break space keeps “Section” and its number on one line.",
+          "A reference to a term reads as the term, without link colour, and shows it is a link on hover and focus.",
+          "A reference with no target keeps its text (“Section [pricing?]”) with a wavy underline in the danger colour, so the problem is not shown by colour alone, and is reported in the console."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Xref",
+        "stories": [
+          {
+            "id": "components-xref--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-xref--broken",
+            "name": "Broken"
+          }
+        ],
+        "composes": [
+          "Document"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.link",
+          "color.status.danger.fg",
+          "focus.ring.offset",
+          "focus.ring.width",
+          "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin"
+        ]
+      }
+    },
+    {
+      "name": "XrefProps",
+      "kind": "type-only",
+      "source": "src/components/Xref/Xref.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Xref",
+      "propsOf": "Xref"
     },
     {
       "name": "ariaKeyShortcuts",

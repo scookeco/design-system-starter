@@ -1,0 +1,32 @@
+@layer components {
+  /* A reference to a clause, section or exhibit: a link. */
+  .xref {
+    border-radius: var(--radius-indicator);
+    color: var(--color-fg-link);
+    text-decoration-line: underline;
+    text-underline-offset: var(--focus-ring-offset);
+  }
+
+  .xref:hover {
+    text-decoration-thickness: var(--focus-ring-width);
+  }
+
+  /* A defined term reads as the text it is; it shows it is a link on hover and focus. */
+  .xref[data-kind="term"] {
+    color: inherit;
+    text-decoration-line: none;
+  }
+
+  .xref[data-kind="term"]:is(:hover, :focus-visible) {
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+  }
+
+  /* A reference with no target in the document. */
+  .xref[data-broken] {
+    color: var(--color-status-danger-fg);
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--color-status-danger-fg);
+  }
+}

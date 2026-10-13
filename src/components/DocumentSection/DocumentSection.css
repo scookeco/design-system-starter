@@ -1,0 +1,13 @@
+@layer components {
+  .document-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    scroll-margin-block: var(--space-scroll-padding-start) var(--space-scroll-padding-end);
+  }
+
+  .document-section:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

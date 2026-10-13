@@ -1,0 +1,19 @@
+@layer components {
+  /* A form step: its number is a counter the Document resets ("Step 2: …"). */
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-sm);
+    counter-increment: step;
+  }
+
+  .step__number::before {
+    content: "Step " counter(step) ": ";
+    content: "Step " counter(step) ": " / "Step " counter(step) ": ";
+  }
+
+  .step__optional {
+    color: var(--color-fg-muted);
+    font-weight: var(--font-weight-body);
+  }
+}

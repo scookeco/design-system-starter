@@ -4,10 +4,12 @@ import { DocumentScopeContext, ExhibitContext, scopedId } from '../Document/docu
 import './Exhibit.css';
 
 export interface ExhibitProps {
-  /** Stable id that references use (`<ClauseRef to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required. */
+  /** Stable id that references use (`<Xref to="dpa" />` → “Exhibit A”). Unique among clauses and exhibits. Required. */
   id: string;
   /** The exhibit's name ("Data Processing Agreement"). Required. */
   title: string;
+  /** Its own label instead of the next letter ("1", "SOW-2"). Default: lettered A, B, C in the order attached. */
+  label?: string;
   /** The exhibit's clauses: their numbering starts again at 1. */
   children: ReactNode;
 }
@@ -15,11 +17,11 @@ export interface ExhibitProps {
 /**
  * An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow
  * schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters
- * come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”;
+ * are a counter, in the order exhibits are attached. An Xref into it reads “Section 2 of Exhibit B”;
  * one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one
  * continuous surface: an exhibit is a section, not a new page.
  */
-export function Exhibit({ id, title, children }: ExhibitProps) {
+export function Exhibit({ id, title, label, children }: ExhibitProps) {
   const doc = useContext(DocumentScopeContext);
   const headingId = useId();
   const at = doc?.index.exhibits[id];
@@ -35,11 +37,15 @@ export function Exhibit({ id, title, children }: ExhibitProps) {
         data-doc="exhibit"
         id={doc ? scopedId(doc.scope, 'clause', id) : undefined}
         data-exhibit={id}
+        data-label={label}
+        data-title={title}
         data-duplicate={at?.duplicate ? 'true' : undefined}
         aria-labelledby={headingId}
       >
         <Heading level={doc?.headingLevel ?? 2} size={2} id={headingId}>
-          <span className="exhibit__letter">Exhibit{at ? `\u00a0${at.letter}` : ''}</span>
+          <span className="exhibit__letter" data-label={label} data-letter={at?.letter}>
+            {label === undefined ? 'Exhibit' : `Exhibit\u00a0${label}`}
+          </span>
           <span className="exhibit__title">{title}</span>
         </Heading>
         {children}

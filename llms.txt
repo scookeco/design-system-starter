@@ -125,10 +125,12 @@ UI rules (design system v0)
 - [ContextMenu](docs/usage/ContextMenu.usage.tsx): Actions on a thing, where the pointer or focus is: right-click
 - [CopyButton](docs/usage/CopyButton.usage.tsx): Copies a value to the clipboard
 - [DatePicker](docs/usage/DatePicker.usage.tsx): A calendar date
+- [Definitions](docs/usage/Definitions.usage.tsx): A document's defined terms, as a list
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentSection](docs/usage/DocumentSection.usage.tsx): A titled section of a Document that is not a contract clause
 - [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
@@ -165,6 +167,7 @@ UI rules (design system v0)
 - [Slider](docs/usage/Slider.usage.tsx): Picks a number, or a range
 - [Spinner](docs/usage/Spinner.usage.tsx): Indeterminate progress for short or briefly unpredictable waits
 - [Stat](docs/usage/Stat.usage.tsx): One headline number in a tile: label, value and an optional change
+- [Step](docs/usage/Step.usage.tsx): A numbered step of a form, flat by design
 - [Stepper](docs/usage/Stepper.usage.tsx): Where someone is in an ordered task
 - [StreamingText](docs/usage/StreamingText.usage.tsx): Text that arrives token by token
 - [Suggestion](docs/usage/Suggestion.usage.tsx): A multi-line text field that can show an inline AI…
@@ -177,9 +180,11 @@ UI rules (design system v0)
 - [Textarea](docs/usage/Textarea.usage.tsx): Multi-line text
 - [Timeline](docs/usage/Timeline.usage.tsx): A dated list of events: a record's activity, an audit trail, a feed
 - [Toast](docs/usage/Toast.usage.tsx): Declarative toast
+- [Toc](docs/usage/Toc.usage.tsx): A Document's table of contents
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
+- [Xref](docs/usage/Xref.usage.tsx): A cross-reference inside a Document
 
 ## Primitives
 

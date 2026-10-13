@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Clause, ClauseRef, Document, DocumentViewer, Term, Text } from '../../src/index';
+import { Clause, Definition, Definitions, Document, DocumentViewer, Term, Text, Xref } from '../../src/index';
 
 let errors: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
@@ -18,7 +18,7 @@ function Msa({ withFees = true }: { withFees?: boolean }) {
       <Document label="Master services agreement">
         <Clause id="definitions" title="Definitions">
           <Text>
-            <Term define>Confidential Information</Term> means non-public information a party discloses.
+            <Term>Confidential Information</Term> means non-public information a party discloses.
           </Text>
         </Clause>
         {withFees ? (
@@ -36,7 +36,7 @@ function Msa({ withFees = true }: { withFees?: boolean }) {
             </Clause>
             <Clause id="insolvency">
               <Text>
-                on insolvency, subject to <ClauseRef to="breach" /> and the <Term>confidential information</Term> survives.
+                on insolvency, subject to <Xref to="breach" /> and the <Xref to="def-confidential-information" /> survives.
               </Text>
             </Clause>
           </Clause>
@@ -46,14 +46,16 @@ function Msa({ withFees = true }: { withFees?: boolean }) {
   );
 }
 
-const numbers = (container: HTMLElement) => [...container.querySelectorAll('.clause__number')].map((n) => n.textContent);
+/** The numbers the index computed: CSS draws them (Clause.css), and tests/visual/document-numbering.spec.ts checks the two agree. */
+const numbers = (container: HTMLElement) => [...container.querySelectorAll<HTMLElement>('.clause__number')].map((n) => n.dataset.number);
 
 describe('Clause', () => {
   it('numbers clauses from where they are: 1., 1.1, (a)', () => {
     const { container } = render(<Msa />);
     expect(numbers(container)).toEqual(['1.', '2.', '3.', '3.1', '3.2', '(a)', '(b)']);
-    expect(screen.getByRole('heading', { level: 2, name: '3.Term and termination' })).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 3, name: '3.1Initial term' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 2, name: 'Term and termination' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: 'Initial term' })).toBeTruthy();
+    expect([...container.querySelectorAll<HTMLElement>('.clause__number')].map((n) => n.dataset.depth)).toEqual(['1', '1', '1', '2', '2', '3', '3']);
   });
 
   it('renumbers the document and its references when a clause is removed', async () => {
@@ -94,7 +96,7 @@ describe('Clause', () => {
   });
 });
 
-describe('ClauseRef', () => {
+describe('Xref', () => {
   it('links to the clause and moves focus there', () => {
     render(<Msa />);
     const link = screen.getByRole('link', { name: 'Section\u00a03.2(a)' });
@@ -108,28 +110,28 @@ describe('ClauseRef', () => {
       <DocumentViewer>
         <Document label="Agreement">
           <Text>
-            See <ClauseRef to="warranty" />.
+            See <Xref to="warranty" />.
           </Text>
         </Document>
       </DocumentViewer>,
     );
-    const ref = container.querySelector('.clause-ref');
-    expect(ref?.getAttribute('data-unresolved')).toBe('true');
+    const ref = container.querySelector('.xref');
+    expect(ref?.getAttribute('data-broken')).toBe('true');
     expect(ref?.textContent).toBe('Section\u00a0[warranty?]');
     expect(screen.queryByRole('link')).toBeNull();
-    expect(errors).toHaveBeenCalledWith(expect.stringContaining('no clause "warranty"'));
+    expect(errors).toHaveBeenCalledWith(expect.stringContaining('nothing in this document has the id "warranty"'));
   });
 
   it('takes another word before the number', () => {
     render(<Msa />);
-    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(2);
     cleanup();
     render(
       <DocumentViewer>
         <Document label="Agreement">
           <Clause id="fees" title="Fees">
             <Text>
-              As in <ClauseRef to="fees" prefix="clause" />.
+              As in <Xref to="fees" prefix="clause" />.
             </Text>
           </Clause>
         </Document>
@@ -139,31 +141,62 @@ describe('ClauseRef', () => {
   });
 });
 
-describe('Term', () => {
-  it('defines a term once, in quotes and bold, and matches uses whatever their case', () => {
+describe('Term, Definitions and Xref to a term', () => {
+  it('defines a term in running text, in quotes and bold; a reference reads as the term and links to it', () => {
     const { container } = render(<Msa />);
     const dfn = container.querySelector('dfn');
     expect(dfn?.textContent).toBe('Confidential Information');
+    expect(dfn?.dataset.term).toBe('def-confidential-information');
     expect(dfn?.parentElement?.textContent).toContain('“Confidential Information”');
-    expect(container.querySelector('[data-term-use]')?.hasAttribute('data-unresolved')).toBe(false);
+    const link = screen.getByRole('link', { name: 'Confidential Information' });
+    expect(link.getAttribute('href')).toBe(`#${dfn?.id ?? ''}`);
     expect(errors).not.toHaveBeenCalled();
   });
 
-  it('marks a term used but never defined, and one defined twice', () => {
+  it('a reference can say the term as the sentence needs it', () => {
+    render(
+      <Document label="Agreement">
+        <Text>
+          <Term>Customer</Term> pays. <Xref to="def-customer">Customer’s</Xref> invoices.
+        </Text>
+      </Document>,
+    );
+    expect(screen.getByRole('link', { name: 'Customer’s' })).toBeTruthy();
+  });
+
+  it('lists definitions, each a term references link to', () => {
+    const { container } = render(
+      <Document label="Agreement">
+        <Definitions>
+          <Definition term="Services">The services in each order form.</Definition>
+          <Definition term="Effective Date" id="effective">
+            The date of the last signature.
+          </Definition>
+        </Definitions>
+        <Text>
+          The <Xref to="def-services" /> start on the <Xref to="effective" />.
+        </Text>
+      </Document>,
+    );
+    expect(container.querySelector('dl[data-doc="definitions"]')).toBeTruthy();
+    expect([...container.querySelectorAll('dt')].map((dt) => dt.textContent)).toEqual(['Services', 'Effective Date']);
+    expect(screen.getByRole('link', { name: 'Effective Date' }).getAttribute('href')).toBe(`#${container.querySelectorAll('dt')[1]?.id ?? ''}`);
+  });
+
+  it('marks a reference to an undefined term, and a term defined twice', () => {
     const { container } = render(
       <DocumentViewer>
         <Document label="Agreement">
           <Text>
-            The <Term>Services</Term> and the <Term define>Fees</Term> and the <Term define>Fees</Term>; the{' '}
-            <Term name="Fees">Fees’</Term> due date.
+            The <Xref to="def-services" /> and the <Term>Fees</Term> and the <Term>Fees</Term>; the <Xref to="def-fees">Fees’</Xref> due date.
           </Text>
         </Document>
       </DocumentViewer>,
     );
-    expect(container.querySelector('[data-term-use="services"]')?.getAttribute('data-unresolved')).toBe('true');
-    expect(container.querySelector('[data-term-use="fees"]')?.hasAttribute('data-unresolved')).toBe(false);
+    expect(container.querySelector('.xref[data-broken]')?.textContent).toBe('Section\u00a0[def-services?]');
+    expect(screen.getByRole('link', { name: 'Fees’' })).toBeTruthy();
     expect(container.querySelectorAll('dfn[data-duplicate]')).toHaveLength(2);
-    expect(errors).toHaveBeenCalledWith(expect.stringContaining('"services" is used but never defined'));
-    expect(errors).toHaveBeenCalledWith(expect.stringContaining('"fees" is defined 2 times'));
+    expect(errors).toHaveBeenCalledWith(expect.stringContaining('"def-services"'));
+    expect(errors).toHaveBeenCalledWith(expect.stringContaining('"def-fees" is defined more than once'));
   });
 });

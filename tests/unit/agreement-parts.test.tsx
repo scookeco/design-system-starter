@@ -5,7 +5,7 @@ import {
   Change,
   Clause,
   ClauseNote,
-  ClauseRef,
+  Xref,
   DocumentTitle,
   Document,
   DocumentViewer,
@@ -27,7 +27,7 @@ afterEach(() => {
   errors.mockRestore();
 });
 
-const numbers = (root: ParentNode) => [...root.querySelectorAll('.clause__number')].map((n) => n.textContent);
+const numbers = (root: ParentNode) => [...root.querySelectorAll<HTMLElement>('.clause__number')].map((n) => n.dataset.number);
 const nb = (s: string) => s.replace(/ /g, ' ');
 
 describe('Exhibit', () => {
@@ -37,7 +37,7 @@ describe('Exhibit', () => {
         <Document label="Agreement">
           <Clause id="privacy" title="Privacy">
             <Text>
-              See <ClauseRef to="dpa" /> and <ClauseRef to="dpa-roles" />.
+              See <Xref to="dpa" /> and <Xref to="dpa-roles" />.
             </Text>
           </Clause>
           <Clause id="cap" title="Liability">
@@ -46,7 +46,7 @@ describe('Exhibit', () => {
           <Exhibit id="dpa" title="Data Processing Agreement">
             <Clause id="dpa-roles" title="Roles">
               <Text>
-                As in <ClauseRef to="privacy" />.
+                As in <Xref to="privacy" />.
               </Text>
             </Clause>
           </Exhibit>
@@ -56,7 +56,7 @@ describe('Exhibit', () => {
             </Clause>
             <Clause id="sla-b" title="Remedy">
               <Text>
-                See <ClauseRef to="sla-a" /> and <ClauseRef to="dpa-roles" />.
+                See <Xref to="sla-a" /> and <Xref to="dpa-roles" />.
               </Text>
             </Clause>
           </Exhibit>
@@ -67,10 +67,10 @@ describe('Exhibit', () => {
 
   it('letters exhibits in order and restarts numbering in each', () => {
     const { container } = render(<Msa />);
-    expect([...container.querySelectorAll('.exhibit__letter')].map((n) => n.textContent)).toEqual([nb('Exhibit A'), nb('Exhibit B')]);
+    expect([...container.querySelectorAll<HTMLElement>('.exhibit__letter')].map((n) => n.dataset.letter)).toEqual(['A', 'B']);
     expect(numbers(container)).toEqual(['1.', '2.', '1.', '1.', '2.']);
-    expect(screen.getByRole('heading', { level: 2, name: `${nb('Exhibit A')}Data Processing Agreement` })).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 3, name: '1.Roles' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 2, name: 'ExhibitData Processing Agreement' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: 'Roles' })).toBeTruthy();
   });
 
   it('names where a reference goes when it crosses into or out of an exhibit', () => {
@@ -115,7 +115,7 @@ describe('DocumentTitle and Recitals', () => {
           <DocumentTitle title="Master Services Agreement" number="No. MSA-1">
             Between Acme and Globex.
           </DocumentTitle>
-          <Recitals closing="the Parties agree:">
+          <Recitals whereas closing="the Parties agree:">
             <Recital>Provider operates a platform;</Recital>
           </Recitals>
         </Document>

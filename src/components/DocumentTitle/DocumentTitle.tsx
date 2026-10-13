@@ -1,4 +1,4 @@
-import { useContext, type ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
 import { DocumentScopeContext } from '../Document/documentIndex';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
 import { Text } from '../Text/Text';
@@ -38,21 +38,31 @@ export function DocumentTitle({ title, number, children }: DocumentTitleProps) {
 export interface RecitalsProps {
   /** One Recital per piece of background. Required. */
   children: ReactNode;
-  /** What follows “NOW, THEREFORE,”. Default: in consideration of the mutual covenants set out below, the Parties agree as follows: */
+  /** Starts each recital “WHEREAS,”, as older agreements write them. Default false: lettered A., B., C. alone. */
+  whereas?: boolean;
+  /** What follows “NOW, THEREFORE,” after the recitals. Omit it for none. */
   closing?: string;
 }
 
-/** The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”. */
-export function Recitals({ children, closing = 'in consideration of the mutual covenants set out below, the Parties agree as follows:' }: RecitalsProps) {
+const WhereasContext = createContext(false);
+
+/**
+ * The background before an agreement's operative clauses, lettered A., B., C. by a counter (never
+ * typed), optionally each “WHEREAS, …;”, then, with `closing`, “NOW, THEREFORE, …”.
+ */
+export function Recitals({ children, whereas = false, closing }: RecitalsProps) {
   return (
-    <div className="recitals" data-doc="recitals">
-      {children}
-      <Text size="body-lg">NOW, THEREFORE, {closing}</Text>
-    </div>
+    <WhereasContext value={whereas}>
+      <section className="recitals" data-doc="recitals">
+        {children}
+        {closing ? <Text size="body-lg">NOW, THEREFORE, {closing}</Text> : null}
+      </section>
+    </WhereasContext>
   );
 }
 
-/** One recital, written without its “WHEREAS,” (it is added): “Provider operates a platform…;”. */
+/** One recital: “Provider operates a platform…”. Its letter (and “WHEREAS,” when Recitals asks for it) is added. */
 export function Recital({ children }: { children: ReactNode }) {
-  return <Text size="body-lg">WHEREAS, {children}</Text>;
+  const whereas = useContext(WhereasContext);
+  return <p className="recital">{whereas ? <>WHEREAS, {children}</> : children}</p>;
 }

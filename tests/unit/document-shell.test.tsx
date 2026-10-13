@@ -2,7 +2,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { areaStyle } from '../../src/components/Document/Document';
-import { Clause, ClauseRef, Document, DocumentFlow, DocumentGrid, DocumentPage, Text } from '../../src/index';
+import { Clause, Xref, Document, DocumentFlow, DocumentGrid, DocumentPage, Text } from '../../src/index';
 
 afterEach(() => {
   cleanup();
@@ -32,7 +32,7 @@ describe('Document shell', () => {
         <DocumentFlow>
           <Clause id="term" title="Term">
             <Text>
-              See <ClauseRef to="end" />.
+              See <Xref to="end" />.
             </Text>
           </Clause>
           <Clause id="end" title="Termination">

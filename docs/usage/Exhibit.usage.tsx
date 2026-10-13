@@ -1,11 +1,11 @@
-import { Clause, ClauseRef, Document, DocumentViewer, Exhibit, Text } from '../../src/index';
+import { Clause, Xref, Document, DocumentViewer, Exhibit, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
   covers: [Exhibit],
   whenToUse: [
     'A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.',
-    'Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<ClauseRef to="dpa" />` names the exhibit itself.',
+    'Its clauses restart at 1. A `Xref` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<Xref to="dpa" />` names the exhibit itself.',
   ],
   whenNotToUse: [
     { situation: 'A separate agreement that refers to this one (an Order Form, an Amendment)', instead: 'its own DocumentViewer, naming this agreement in plain text' },
@@ -18,7 +18,7 @@ export const usage: UsageDoc = {
         <Document label="Agreement">
           <Clause id="privacy" title="Data Privacy">
             <Text>
-              Personal data is processed under <ClauseRef to="dpa" />.
+              Personal data is processed under <Xref to="dpa" />.
             </Text>
           </Clause>
           <Exhibit id="dpa" title="Data Processing Agreement">
