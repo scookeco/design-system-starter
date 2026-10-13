@@ -1,4 +1,4 @@
-import { Clause, ClauseRef, DocumentViewer, Term, Text } from '../../src/index';
+import { Clause, ClauseRef, Document, DocumentViewer, Term, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -16,31 +16,35 @@ export const usage: UsageDoc = {
   do: {
     caption: 'Clauses by id, references by id: remove or move a clause and every number follows.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <Clause id="fees" title="Fees">
-          <Text>
-            The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
-          </Text>
-        </Clause>
-        <Clause id="disputes" title="Disputed amounts">
-          <Text>
-            <Term>Fees</Term> disputed in good faith may be withheld.
-          </Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="fees" title="Fees">
+            <Text>
+              The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to="disputes" />.
+            </Text>
+          </Clause>
+          <Clause id="disputes" title="Disputed amounts">
+            <Text>
+              <Term>Fees</Term> disputed in good faith may be withheld.
+            </Text>
+          </Clause>
+        </Document>
       </DocumentViewer>
     ),
   },
   dont: {
     caption: 'Numbers typed into headings and text: the first clause added or removed leaves them wrong.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>
-        <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>
+          <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>
+        </Document>
       </DocumentViewer>
     ),
   },
   accessibility: [
-    'A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the viewer’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.',
+    'A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.',
     'A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).',
     'Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.',
     'A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.',

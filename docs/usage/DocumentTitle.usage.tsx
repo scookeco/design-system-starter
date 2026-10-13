@@ -1,4 +1,4 @@
-import { DocumentTitle, DocumentViewer, Recital, Recitals, Term, Text } from '../../src/index';
+import { DocumentTitle, Document, DocumentViewer, Recital, Recitals, Term, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -14,27 +14,31 @@ export const usage: UsageDoc = {
   do: {
     caption: 'Title, number and preamble, then the recitals: the same structure for every agreement the app generates.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
-          This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
-        </DocumentTitle>
-        <Recitals>
-          <Recital>Provider operates a facilities management platform;</Recital>
-        </Recitals>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <DocumentTitle title="Master Services Agreement" number="Agreement No. MSA-2026-0142">
+            This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).
+          </DocumentTitle>
+          <Recitals>
+            <Recital>Provider operates a facilities management platform;</Recital>
+          </Recitals>
+        </Document>
       </DocumentViewer>
     ),
   },
   dont: {
     caption: 'A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <Text>MASTER SERVICES AGREEMENT</Text>
-        <Text>Whereas Provider operates a platform…</Text>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Text>MASTER SERVICES AGREEMENT</Text>
+          <Text>Whereas Provider operates a platform…</Text>
+        </Document>
       </DocumentViewer>
     ),
   },
   accessibility: [
-    'The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.',
+    'The title is a heading one level above the document’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the `Document` `headingLevel={3}` so the title is an h2.',
     'The title block is a `header`; recitals are plain paragraphs in reading order.',
   ],
 };

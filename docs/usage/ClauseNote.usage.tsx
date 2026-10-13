@@ -1,4 +1,4 @@
-import { Clause, ClauseNote, DocumentViewer, Text } from '../../src/index';
+import { Clause, ClauseNote, Document, DocumentViewer, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -14,20 +14,24 @@ export const usage: UsageDoc = {
   do: {
     caption: 'A position named in words, with the reason in one line.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <Clause id="cap" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>}>
-          <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="cap" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>}>
+            <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>
+          </Clause>
+        </Document>
       </DocumentViewer>
     ),
   },
   dont: {
     caption: 'A drafting remark typed into the clause: it would be signed with the agreement.',
     render: () => (
-      <DocumentViewer label="Agreement">
-        <Clause id="cap" title="Limitation of Liability">
-          <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="cap" title="Limitation of Liability">
+            <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>
+          </Clause>
+        </Document>
       </DocumentViewer>
     ),
   },

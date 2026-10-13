@@ -1,4 +1,4 @@
-import { Change, Clause, DocumentViewer, Text } from '../../src/index';
+import { Change, Clause, Document, DocumentViewer, Text } from '../../src/index';
 import type { UsageDoc } from './types';
 
 export const usage: UsageDoc = {
@@ -14,28 +14,32 @@ export const usage: UsageDoc = {
   do: {
     caption: 'Each change with its author, in that author’s colour.',
     render: () => (
-      <DocumentViewer label="Compared">
-        <Text>
-          Liability will not exceed{' '}
-          <Change kind="insert" author="Maya Okafor" color={3}>
-            two times (2×)
-          </Change>{' '}
-          the fees of the prior twelve (12) months.
-        </Text>
+      <DocumentViewer>
+        <Document label="Compared">
+          <Text>
+            Liability will not exceed{' '}
+            <Change kind="insert" author="Maya Okafor" color={3}>
+              two times (2×)
+            </Change>{' '}
+            the fees of the prior twelve (12) months.
+          </Text>
+        </Document>
       </DocumentViewer>
     ),
   },
   dont: {
     caption: 'A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.',
     render: () => (
-      <DocumentViewer label="Compared">
-        <Clause id="cap" title="Limitation of Liability">
-          <Text>
-            <Change kind="insert" author="Maya Okafor" color={3}>
-              Liability will not exceed two times (2×) the fees of the prior twelve (12) months.
-            </Change>
-          </Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Compared">
+          <Clause id="cap" title="Limitation of Liability">
+            <Text>
+              <Change kind="insert" author="Maya Okafor" color={3}>
+                Liability will not exceed two times (2×) the fees of the prior twelve (12) months.
+              </Change>
+            </Text>
+          </Clause>
+        </Document>
       </DocumentViewer>
     ),
   },

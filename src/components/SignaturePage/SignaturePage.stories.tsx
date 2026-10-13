@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { SignatureBlock } from '../SignatureBlock/SignatureBlock';
 import { SignaturePage, SignatureParty } from './SignaturePage';
@@ -32,11 +33,13 @@ const escrow = (
 /** Two parties side by side: the usual bilateral agreement. */
 export const TwoParties: Story = {
   render: () => (
-    <DocumentViewer label="Master services agreement">
-      <SignaturePage>
-        {acme}
-        {globex}
-      </SignaturePage>
+    <DocumentViewer>
+      <Document label="Master services agreement">
+        <SignaturePage>
+          {acme}
+          {globex}
+        </SignaturePage>
+      </Document>
     </DocumentViewer>
   ),
 };
@@ -44,8 +47,10 @@ export const TwoParties: Story = {
 /** One party keeps a column's width: a notice or a certificate. */
 export const OneParty: Story = {
   render: () => (
-    <DocumentViewer label="Certificate">
-      <SignaturePage witness="IN WITNESS WHEREOF, the undersigned has executed this instrument by its duly authorized representative.">{acme}</SignaturePage>
+    <DocumentViewer>
+      <Document label="Certificate">
+        <SignaturePage witness="IN WITNESS WHEREOF, the undersigned has executed this instrument by its duly authorized representative.">{acme}</SignaturePage>
+      </Document>
     </DocumentViewer>
   ),
 };
@@ -53,12 +58,14 @@ export const OneParty: Story = {
 /** Three parties: the third moves to the second row, under the first (an escrow agreement). */
 export const ThreeParties: Story = {
   render: () => (
-    <DocumentViewer label="Escrow agreement">
-      <SignaturePage>
-        {acme}
-        {globex}
-        {escrow}
-      </SignaturePage>
+    <DocumentViewer>
+      <Document label="Escrow agreement">
+        <SignaturePage>
+          {acme}
+          {globex}
+          {escrow}
+        </SignaturePage>
+      </Document>
     </DocumentViewer>
   ),
 };

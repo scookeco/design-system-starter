@@ -2,17 +2,19 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DataField, DocumentViewer, Highlight, Text } from '../../src/index';
+import { DataField, Document, DocumentViewer, Highlight, Text } from '../../src/index';
 
 afterEach(cleanup);
 
 describe('DocumentViewer highlights', () => {
   it('shows every tone together, each as a mark with its tone', () => {
     const { container } = render(
-      <DocumentViewer label="Agreement">
-        <Text>
-          <Highlight>mine</Highlight> <Highlight tone="search">found</Highlight> <Highlight tone="ai">cited</Highlight>
-        </Text>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Text>
+            <Highlight>mine</Highlight> <Highlight tone="search">found</Highlight> <Highlight tone="ai">cited</Highlight>
+          </Text>
+        </Document>
       </DocumentViewer>,
     );
     const marks = [...container.querySelectorAll('mark')];
@@ -30,8 +32,10 @@ describe('DocumentViewer highlights', () => {
   it('keeps a selection inside the document as a highlight, with H', () => {
     const onHighlight = vi.fn();
     render(
-      <DocumentViewer label="Agreement" onHighlight={onHighlight}>
-        <Text>The agreement automatically renews every year.</Text>
+      <DocumentViewer onHighlight={onHighlight}>
+        <Document label="Agreement">
+          <Text>The agreement automatically renews every year.</Text>
+        </Document>
       </DocumentViewer>,
     );
     expect(screen.queryByRole('button', { name: 'Highlight' })).toBeNull();
@@ -53,8 +57,10 @@ describe('DocumentViewer highlights', () => {
     render(
       <>
         <p>Outside text</p>
-        <DocumentViewer label="Agreement" onHighlight={onHighlight}>
-          <Text>Inside text</Text>
+        <DocumentViewer onHighlight={onHighlight}>
+          <Document label="Agreement">
+            <Text>Inside text</Text>
+          </Document>
         </DocumentViewer>
       </>,
     );
@@ -86,13 +92,15 @@ describe('DataField', () => {
     function Filling() {
       const [value, setValue] = useState<string | undefined>();
       return (
-        <DocumentViewer label="Agreement">
-          <Text>
-            Effective <DataField value={value} placeholder="when signed" announceAs="Effective date" />
-          </Text>
-          <button type="button" onClick={() => setValue('14 October 2026')}>
-            Sign
-          </button>
+        <DocumentViewer>
+          <Document label="Agreement">
+            <Text>
+              Effective <DataField value={value} placeholder="when signed" announceAs="Effective date" />
+            </Text>
+            <button type="button" onClick={() => setValue('14 October 2026')}>
+              Sign
+            </button>
+          </Document>
         </DocumentViewer>
       );
     }

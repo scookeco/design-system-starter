@@ -27,9 +27,17 @@ export interface DocumentIndex {
   terms: Readonly<Record<string, number>>;
 }
 
+/** How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms). */
+export type DocumentShell = 'flow' | 'grid';
+
+/** Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed). */
+export type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed';
+
 /** The document a Clause, ClauseRef or Term is inside: its id scope, outline level and index. */
 export interface DocumentScope {
   scope: string;
+  shell: DocumentShell;
+  lifecycle: DocumentLifecycle;
   headingLevel: HeadingLevel;
   /** How a reference from an exhibit names the body of the document ("the Agreement"). */
   documentName: string;

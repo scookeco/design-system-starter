@@ -7,6 +7,7 @@ import {
   ClauseNote,
   ClauseRef,
   DocumentTitle,
+  Document,
   DocumentViewer,
   Exhibit,
   Recital,
@@ -32,32 +33,34 @@ const nb = (s: string) => s.replace(/ /g, ' ');
 describe('Exhibit', () => {
   function Msa() {
     return (
-      <DocumentViewer label="Agreement">
-        <Clause id="privacy" title="Privacy">
-          <Text>
-            See <ClauseRef to="dpa" /> and <ClauseRef to="dpa-roles" />.
-          </Text>
-        </Clause>
-        <Clause id="cap" title="Liability">
-          <Text>Capped.</Text>
-        </Clause>
-        <Exhibit id="dpa" title="Data Processing Agreement">
-          <Clause id="dpa-roles" title="Roles">
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="privacy" title="Privacy">
             <Text>
-              As in <ClauseRef to="privacy" />.
+              See <ClauseRef to="dpa" /> and <ClauseRef to="dpa-roles" />.
             </Text>
           </Clause>
-        </Exhibit>
-        <Exhibit id="sla" title="Service Level Agreement">
-          <Clause id="sla-a" title="Availability">
-            <Text>99.9%.</Text>
+          <Clause id="cap" title="Liability">
+            <Text>Capped.</Text>
           </Clause>
-          <Clause id="sla-b" title="Remedy">
-            <Text>
-              See <ClauseRef to="sla-a" /> and <ClauseRef to="dpa-roles" />.
-            </Text>
-          </Clause>
-        </Exhibit>
+          <Exhibit id="dpa" title="Data Processing Agreement">
+            <Clause id="dpa-roles" title="Roles">
+              <Text>
+                As in <ClauseRef to="privacy" />.
+              </Text>
+            </Clause>
+          </Exhibit>
+          <Exhibit id="sla" title="Service Level Agreement">
+            <Clause id="sla-a" title="Availability">
+              <Text>99.9%.</Text>
+            </Clause>
+            <Clause id="sla-b" title="Remedy">
+              <Text>
+                See <ClauseRef to="sla-a" /> and <ClauseRef to="dpa-roles" />.
+              </Text>
+            </Clause>
+          </Exhibit>
+        </Document>
       </DocumentViewer>
     );
   }
@@ -107,13 +110,15 @@ describe('SignaturePage', () => {
 describe('DocumentTitle and Recitals', () => {
   it('titles the document one level above its clauses and prefixes each recital', () => {
     render(
-      <DocumentViewer label="Agreement">
-        <DocumentTitle title="Master Services Agreement" number="No. MSA-1">
-          Between Acme and Globex.
-        </DocumentTitle>
-        <Recitals closing="the Parties agree:">
-          <Recital>Provider operates a platform;</Recital>
-        </Recitals>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <DocumentTitle title="Master Services Agreement" number="No. MSA-1">
+            Between Acme and Globex.
+          </DocumentTitle>
+          <Recitals closing="the Parties agree:">
+            <Recital>Provider operates a platform;</Recital>
+          </Recitals>
+        </Document>
       </DocumentViewer>,
     );
     expect(screen.getByRole('heading', { level: 1, name: 'Master Services Agreement' })).toBeTruthy();
@@ -144,16 +149,18 @@ describe('Change', () => {
 
   it('a deleted clause keeps its number, and the clauses after it keep theirs', () => {
     const { container } = render(
-      <DocumentViewer label="Compared">
-        <Clause id="a" title="One">
-          <Text>One.</Text>
-        </Clause>
-        <Clause id="b" title="Two" change={{ kind: 'delete', author: 'Jon Park' }}>
-          <Text>Two.</Text>
-        </Clause>
-        <Clause id="c" title="Three">
-          <Text>Three.</Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Compared">
+          <Clause id="a" title="One">
+            <Text>One.</Text>
+          </Clause>
+          <Clause id="b" title="Two" change={{ kind: 'delete', author: 'Jon Park' }}>
+            <Text>Two.</Text>
+          </Clause>
+          <Clause id="c" title="Three">
+            <Text>Three.</Text>
+          </Clause>
+        </Document>
       </DocumentViewer>,
     );
     expect(numbers(container)).toEqual(['1.', '2.', '3.']);
@@ -166,13 +173,15 @@ describe('Change', () => {
 describe('ClauseNote', () => {
   it('is a note after the clause heading, naming the position or the source in words', () => {
     render(
-      <DocumentViewer label="Agreement">
-        <Clause id="cap" title="Liability" note={<ClauseNote position="seller-favored">Short cap</ClauseNote>}>
-          <Text>Capped.</Text>
-        </Clause>
-        <Clause id="sub" title="Sub-processors" note={<ClauseNote source="DPA" color={5} />}>
-          <Text>Listed.</Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="cap" title="Liability" note={<ClauseNote position="seller-favored">Short cap</ClauseNote>}>
+            <Text>Capped.</Text>
+          </Clause>
+          <Clause id="sub" title="Sub-processors" note={<ClauseNote source="DPA" color={5} />}>
+            <Text>Listed.</Text>
+          </Clause>
+        </Document>
       </DocumentViewer>,
     );
     const notes = screen.getAllByRole('note');

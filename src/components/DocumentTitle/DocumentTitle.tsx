@@ -1,5 +1,5 @@
 import { useContext, type ReactNode } from 'react';
-import { DocumentScopeContext } from '../Clause/documentIndex';
+import { DocumentScopeContext } from '../Document/documentIndex';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
 import { Text } from '../Text/Text';
 import './DocumentTitle.css';
@@ -14,10 +14,10 @@ export interface DocumentTitleProps {
 }
 
 /**
- * The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble
- * that names the parties. The title is one level above the viewer's clauses (an h1 with the
- * default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer
- * headingLevel={3}. Recitals follow it.
+ * The top of an agreement in a Document: its title and number, centred, then the preamble
+ * that names the parties. The title is one level above the document's clauses (an h1 with the
+ * default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the
+ * Document headingLevel={3}. Recitals follow it.
  */
 export function DocumentTitle({ title, number, children }: DocumentTitleProps) {
   const doc = useContext(DocumentScopeContext);
@@ -45,7 +45,7 @@ export interface RecitalsProps {
 /** The background before an agreement's operative clauses: “WHEREAS, …;” for each Recital, then “NOW, THEREFORE, …”. */
 export function Recitals({ children, closing = 'in consideration of the mutual covenants set out below, the Parties agree as follows:' }: RecitalsProps) {
   return (
-    <div className="recitals">
+    <div className="recitals" data-doc="recitals">
       {children}
       <Text size="body-lg">NOW, THEREFORE, {closing}</Text>
     </div>

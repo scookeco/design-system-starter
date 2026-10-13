@@ -5,12 +5,13 @@ import { Clause } from '../Clause/Clause';
 import { Heading } from '../Heading/Heading';
 import { Highlight } from '../Highlight/Highlight';
 import { Text } from '../Text/Text';
+import { Document } from '../Document/Document';
 import { DataField, DocumentViewer } from './DocumentViewer';
 
 const meta = {
   title: 'Components/DocumentViewer',
   component: DocumentViewer,
-  args: { label: 'Master services agreement', children: null },
+  args: { children: null },
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof DocumentViewer>;
 
@@ -55,8 +56,10 @@ function Interactive() {
   const [saved, setSaved] = useState<string[]>([]);
   return (
     <Stack gap="md">
-      <DocumentViewer label="Master services agreement" onHighlight={({ text }) => setSaved((list) => [...list, text])}>
-        <Agreement />
+      <DocumentViewer onHighlight={({ text }) => setSaved((list) => [...list, text])}>
+        <Document label="Master services agreement">
+          <Agreement />
+        </Document>
       </DocumentViewer>
       {saved.length ? <Text tone="muted">Highlighted: {saved.join(' · ')}</Text> : null}
     </Stack>
@@ -69,8 +72,10 @@ export const Default: Story = { render: () => <Interactive /> };
 /** Placeholders for values that fill later: the effective date, the second signer's name and title. */
 export const Placeholders: Story = {
   render: () => (
-    <DocumentViewer label="Master services agreement">
-      <Agreement />
+    <DocumentViewer>
+      <Document label="Master services agreement">
+        <Agreement />
+      </Document>
     </DocumentViewer>
   ),
 };
@@ -81,8 +86,10 @@ export const PlaceholdersFilled: Story = {
     const [values, setValues] = useState<{ effective?: string; signerName?: string; title?: string }>({});
     useEffect(() => setValues({ effective: '14 October 2026', signerName: 'Jon Park', title: 'Operations director' }), []);
     return (
-      <DocumentViewer label="Master services agreement">
-        <Agreement {...values} />
+      <DocumentViewer>
+        <Document label="Master services agreement">
+          <Agreement {...values} />
+        </Document>
       </DocumentViewer>
     );
   },

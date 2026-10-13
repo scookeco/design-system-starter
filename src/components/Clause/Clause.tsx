@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, type MouseEvent, type ReactNode } from 'react';
 import { changeLabel, type ChangeColor, type ChangeKind } from '../Change/Change';
 import { Heading, type HeadingLevel } from '../Heading/Heading';
-import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, scopedId, termKey } from './documentIndex';
+import { ClauseDepthContext, DocumentScopeContext, ExhibitContext, scopedId, termKey } from '../Document/documentIndex';
 import './Clause.css';
 
 export interface ClauseProps {
@@ -20,9 +20,9 @@ export interface ClauseProps {
 }
 
 /**
- * A numbered clause in a DocumentViewer. Numbers come from where the clause is (1., 1.1, (a), (i)),
+ * A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)),
  * never typed, so adding, removing or reordering clauses renumbers the document and every
- * ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.
+ * ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.
  */
 export function Clause({ id, title, children, note, conspicuous = false, change }: ClauseProps) {
   const doc = useContext(DocumentScopeContext);
@@ -43,6 +43,7 @@ export function Clause({ id, title, children, note, conspicuous = false, change 
     <ClauseDepthContext value={depth}>
       <Element
         className="clause"
+        data-doc="clause"
         id={doc ? scopedId(doc.scope, 'clause', id) : undefined}
         data-clause={id}
         data-depth={depth}
@@ -95,7 +96,7 @@ export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
 
   if (!doc || (!at && !exhibit)) {
     return (
-      <span className="clause-ref" data-unresolved={missing ? 'true' : undefined}>
+      <span className="clause-ref" data-doc="xref" data-unresolved={missing ? 'true' : undefined}>
         {prefix}
         {missing ? `\u00a0[${to}?]` : ''}
       </span>
@@ -113,7 +114,7 @@ export function ClauseRef({ to, prefix = 'Section' }: ClauseRefProps) {
   const letterOf = (id: string) => doc.index.exhibits[id]?.letter ?? '?';
   const where = at && at.exhibit !== own ? (at.exhibit ? ` of Exhibit\u00a0${letterOf(at.exhibit)}` : ` of ${doc.documentName}`) : '';
   return (
-    <a className="clause-ref" href={`#${target}`} onClick={jump}>
+    <a className="clause-ref" data-doc="xref" href={`#${target}`} onClick={jump}>
       {at ? `${prefix}\u00a0${at.ref}${where}` : `Exhibit\u00a0${exhibit?.letter ?? ''}`}
     </a>
   );

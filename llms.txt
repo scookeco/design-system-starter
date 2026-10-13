@@ -116,7 +116,7 @@ UI rules (design system v0)
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
 - [Checkbox](docs/usage/Checkbox.usage.tsx): An independent yes/no inside a form that is saved with the form
 - [Citation](docs/usage/Citation.usage.tsx): A numbered inline citation, [1]
-- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a DocumentViewer
+- [Clause](docs/usage/Clause.usage.tsx): A numbered clause in a Document
 - [ClauseNote](docs/usage/ClauseNote.usage.tsx): A note about a clause for whoever drafts or reviews the…
 - [CodeBlock](docs/usage/CodeBlock.usage.tsx): Monospaced code in a keyboard-scrollable region
 - [Combobox](docs/usage/Combobox.usage.tsx): A text field with a list of options that narrows as you type
@@ -128,11 +128,12 @@ UI rules (design system v0)
 - [Dialog](docs/usage/Dialog.usage.tsx): Modal dialog
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
-- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a DocumentViewer
-- [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): A document the app generates from data
+- [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
+- [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
 - [Drawer](docs/usage/Drawer.usage.tsx): Modal side sheet over a scrim
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
-- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same…
+- [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same Document
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order

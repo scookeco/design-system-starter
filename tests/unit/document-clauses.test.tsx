@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Clause, ClauseRef, DocumentViewer, Term, Text } from '../../src/index';
+import { Clause, ClauseRef, Document, DocumentViewer, Term, Text } from '../../src/index';
 
 let errors: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
@@ -14,32 +14,34 @@ afterEach(() => {
 
 function Msa({ withFees = true }: { withFees?: boolean }) {
   return (
-    <DocumentViewer label="Master services agreement">
-      <Clause id="definitions" title="Definitions">
-        <Text>
-          <Term define>Confidential Information</Term> means non-public information a party discloses.
-        </Text>
-      </Clause>
-      {withFees ? (
-        <Clause id="fees" title="Fees">
-          <Text>Fees are due net 30.</Text>
+    <DocumentViewer>
+      <Document label="Master services agreement">
+        <Clause id="definitions" title="Definitions">
+          <Text>
+            <Term define>Confidential Information</Term> means non-public information a party discloses.
+          </Text>
         </Clause>
-      ) : null}
-      <Clause id="term" title="Term and termination">
-        <Clause id="term-initial" title="Initial term">
-          <Text>Twenty-four months.</Text>
-        </Clause>
-        <Clause id="term-end" title="Ending it">
-          <Clause id="breach">
-            <Text>for material breach;</Text>
+        {withFees ? (
+          <Clause id="fees" title="Fees">
+            <Text>Fees are due net 30.</Text>
           </Clause>
-          <Clause id="insolvency">
-            <Text>
-              on insolvency, subject to <ClauseRef to="breach" /> and the <Term>confidential information</Term> survives.
-            </Text>
+        ) : null}
+        <Clause id="term" title="Term and termination">
+          <Clause id="term-initial" title="Initial term">
+            <Text>Twenty-four months.</Text>
+          </Clause>
+          <Clause id="term-end" title="Ending it">
+            <Clause id="breach">
+              <Text>for material breach;</Text>
+            </Clause>
+            <Clause id="insolvency">
+              <Text>
+                on insolvency, subject to <ClauseRef to="breach" /> and the <Term>confidential information</Term> survives.
+              </Text>
+            </Clause>
           </Clause>
         </Clause>
-      </Clause>
+      </Document>
     </DocumentViewer>
   );
 }
@@ -76,13 +78,15 @@ describe('Clause', () => {
 
   it('flags two clauses with one id', () => {
     const { container } = render(
-      <DocumentViewer label="Agreement">
-        <Clause id="fees" title="Fees">
-          <Text>One.</Text>
-        </Clause>
-        <Clause id="fees" title="Fees again">
-          <Text>Two.</Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="fees" title="Fees">
+            <Text>One.</Text>
+          </Clause>
+          <Clause id="fees" title="Fees again">
+            <Text>Two.</Text>
+          </Clause>
+        </Document>
       </DocumentViewer>,
     );
     expect(container.querySelectorAll('.clause[data-duplicate]')).toHaveLength(2);
@@ -101,10 +105,12 @@ describe('ClauseRef', () => {
 
   it('marks and reports a reference to a clause the document does not have', () => {
     const { container } = render(
-      <DocumentViewer label="Agreement">
-        <Text>
-          See <ClauseRef to="warranty" />.
-        </Text>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Text>
+            See <ClauseRef to="warranty" />.
+          </Text>
+        </Document>
       </DocumentViewer>,
     );
     const ref = container.querySelector('.clause-ref');
@@ -119,12 +125,14 @@ describe('ClauseRef', () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
     cleanup();
     render(
-      <DocumentViewer label="Agreement">
-        <Clause id="fees" title="Fees">
-          <Text>
-            As in <ClauseRef to="fees" prefix="clause" />.
-          </Text>
-        </Clause>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Clause id="fees" title="Fees">
+            <Text>
+              As in <ClauseRef to="fees" prefix="clause" />.
+            </Text>
+          </Clause>
+        </Document>
       </DocumentViewer>,
     );
     expect(screen.getByRole('link', { name: 'clause\u00a01' })).toBeTruthy();
@@ -143,11 +151,13 @@ describe('Term', () => {
 
   it('marks a term used but never defined, and one defined twice', () => {
     const { container } = render(
-      <DocumentViewer label="Agreement">
-        <Text>
-          The <Term>Services</Term> and the <Term define>Fees</Term> and the <Term define>Fees</Term>; the{' '}
-          <Term name="Fees">Fees’</Term> due date.
-        </Text>
+      <DocumentViewer>
+        <Document label="Agreement">
+          <Text>
+            The <Term>Services</Term> and the <Term define>Fees</Term> and the <Term define>Fees</Term>; the{' '}
+            <Term name="Fees">Fees’</Term> due date.
+          </Text>
+        </Document>
       </DocumentViewer>,
     );
     expect(container.querySelector('[data-term-use="services"]')?.getAttribute('data-unresolved')).toBe('true');

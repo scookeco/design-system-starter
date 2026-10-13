@@ -31,6 +31,32 @@
     box-shadow: var(--shadow-card);
   }
 
+  /* A grid document brings its own fixed pages: the viewer only lays them out on the canvas. */
+  .document-viewer__paper:has(> [data-shell="grid"]) {
+    max-inline-size: none;
+    aspect-ratio: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* Print is the Document's own: the canvas and the sheet's screen chrome drop away. */
+  @media print {
+    .document-viewer__canvas {
+      padding: 0;
+      background: transparent;
+    }
+
+    .document-viewer__paper {
+      max-inline-size: none;
+      aspect-ratio: auto;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
   /* The menu above a selection: a toolbar on the elevated surface. */
   .document-viewer__menu {
     z-index: var(--z-dropdown);

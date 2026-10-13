@@ -3536,11 +3536,11 @@
         ],
         "do": {
           "caption": "Each change with its author, in that author’s colour.",
-          "code": "<DocumentViewer label=\"Compared\">\n  <Text>\n    Liability will not exceed{' '}\n    <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n      two times (2×)\n    </Change>{' '}\n    the fees of the prior twelve (12) months.\n  </Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Compared\">\n    <Text>\n      Liability will not exceed{' '}\n      <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n        two times (2×)\n      </Change>{' '}\n      the fees of the prior twelve (12) months.\n    </Text>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A whole clause rewritten as one insertion: mark the words that changed, or the clause with `change`.",
-          "code": "<DocumentViewer label=\"Compared\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>\n      <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n        Liability will not exceed two times (2×) the fees of the prior twelve (12) months.\n      </Change>\n    </Text>\n  </Clause>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Compared\">\n    <Clause id=\"cap\" title=\"Limitation of Liability\">\n      <Text>\n        <Change kind=\"insert\" author=\"Maya Okafor\" color={3}>\n          Liability will not exceed two times (2×) the fees of the prior twelve (12) months.\n        </Change>\n      </Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
           "A change is an `<ins>` or `<del>`; what it is and who made it (“Deleted by Jon Park”) is announced from CSS, so it never ends up in copied text.",
@@ -4288,7 +4288,7 @@
       "kind": "component",
       "source": "src/components/Clause/Clause.tsx",
       "status": null,
-      "description": "A numbered clause in a DocumentViewer. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a DocumentViewer it renders unnumbered.",
+      "description": "A numbered clause in a Document. Numbers come from where the clause is (1., 1.1, (a), (i)), never typed, so adding, removing or reordering clauses renumbers the document and every ClauseRef. Nest Clauses for sub-clauses. Outside a Document it renders unnumbered.",
       "docs": "docs/usage/Clause.usage.tsx",
       "props": [
         {
@@ -4367,14 +4367,14 @@
         ],
         "do": {
           "caption": "Clauses by id, references by id: remove or move a clause and every number follows.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"fees\" title=\"Fees\">\n    <Text>\n      The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to=\"disputes\" />.\n    </Text>\n  </Clause>\n  <Clause id=\"disputes\" title=\"Disputed amounts\">\n    <Text>\n      <Term>Fees</Term> disputed in good faith may be withheld.\n    </Text>\n  </Clause>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"fees\" title=\"Fees\">\n      <Text>\n        The <Term define>Fees</Term> are due within thirty (30) days, except as in <ClauseRef to=\"disputes\" />.\n      </Text>\n    </Clause>\n    <Clause id=\"disputes\" title=\"Disputed amounts\">\n      <Text>\n        <Term>Fees</Term> disputed in good faith may be withheld.\n      </Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "Numbers typed into headings and text: the first clause added or removed leaves them wrong.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>\n  <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>1. Fees. The Fees are due within thirty (30) days, except as in Section 2.</Text>\n    <Text>2. Disputed amounts. Fees disputed in good faith may be withheld.</Text>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
-          "A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the viewer’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.",
+          "A titled clause is a `section` named by its heading, and the heading holds the number, so the outline reads “3.1 Invoices”. Heading levels start at the Document’s `headingLevel` (2 by default, under the page’s h1) and go one deeper per nesting.",
           "A `ClauseRef` is a link named with the full reference (“Section 3.2(a)”); following it moves focus to the clause, which scrolls clear of sticky content (scroll padding).",
           "Unresolved references and terms are marked with a wavy underline in the danger colour and keep their text (“Section [pricing?]”), so the problem is not shown by colour alone; each is also reported in the console.",
           "A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition."
@@ -4398,10 +4398,13 @@
         ],
         "composes": [
           "Change",
+          "Document",
           "Heading"
         ],
         "tokens": [
           "border.width.change-bar",
+          "color.bg.surface",
+          "color.border.default",
           "color.category.1.fg",
           "color.category.2.fg",
           "color.category.3.fg",
@@ -4417,12 +4420,25 @@
           "focus.ring.width",
           "font.weight.strong",
           "radius.indicator",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
           "size.document.clause-indent",
+          "size.document.grid-row",
           "size.document.note",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
           "space.gap.md",
           "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
           "space.inset.md",
           "space.inset.xl",
+          "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
           "text.heading-1",
@@ -4522,11 +4538,11 @@
         ],
         "do": {
           "caption": "A position named in words, with the reason in one line.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\" note={<ClauseNote position=\"balanced\">Cap at the fees of the prior 12 months</ClauseNote>}>\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>\n  </Clause>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"cap\" title=\"Limitation of Liability\" note={<ClauseNote position=\"balanced\">Cap at the fees of the prior 12 months</ClauseNote>}>\n      <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months.</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A drafting remark typed into the clause: it would be signed with the agreement.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"cap\" title=\"Limitation of Liability\">\n    <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>\n  </Clause>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"cap\" title=\"Limitation of Liability\">\n      <Text>Each Party’s liability is capped at the fees of the prior twelve (12) months. [Balanced — check with legal]</Text>\n    </Clause>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
           "A note has role=\"note\" and reads as “Position Balanced …” right after the clause heading, wherever it is drawn.",
@@ -7388,6 +7404,397 @@
       "propsOf": "Divider"
     },
     {
+      "name": "Document",
+      "kind": "component",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "The root of a document: exactly one per document. It names the document, says how it is laid out (`shell`) and where it is in its life (`lifecycle`), and numbers what it holds: Clauses, Exhibits and their references resolve inside it. Show it on screen in a DocumentViewer; the same markup prints, with pages from DocumentPage and the print stylesheet.",
+      "docs": "docs/usage/Document.usage.tsx",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "The document's name: labels the document (\"Master services agreement\"). Required."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "What kind of document it is, stable and lowercase-kebab (\"msa\", \"w-4\", \"invoice\"): the key workflows and exports use."
+        },
+        {
+          "name": "version",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The template's version (\"3.2\", \"2026\")."
+        },
+        {
+          "name": "lifecycle",
+          "type": "DocumentLifecycle",
+          "required": false,
+          "default": "'generated'",
+          "description": "Where it is in its life: generated from data (the default), filled in, negotiated or executed.",
+          "values": [
+            "generated",
+            "filled",
+            "negotiated",
+            "executed"
+          ]
+        },
+        {
+          "name": "lang",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "description": "The document's language, when it differs from the page's (\"fr\")."
+        },
+        {
+          "name": "shell",
+          "type": "DocumentShell",
+          "required": false,
+          "default": "'flow'",
+          "description": "flow (the default): content reflows, and pages break only in print. grid: fixed DocumentPages that place content on a DocumentGrid.",
+          "values": [
+            "flow",
+            "grid"
+          ]
+        },
+        {
+          "name": "headingLevel",
+          "type": "Exclude<HeadingLevel, 1>",
+          "required": false,
+          "default": "2",
+          "description": "The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).",
+          "values": [
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "documentName",
+          "type": "string",
+          "required": false,
+          "default": "'the Agreement'",
+          "description": "How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default \"the Agreement\"."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The document: a DocumentFlow, DocumentPages, or clauses and paragraphs directly."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "lifecycle": [
+          "generated",
+          "filled",
+          "negotiated",
+          "executed"
+        ],
+        "shell": [
+          "flow",
+          "grid"
+        ],
+        "headingLevel": [
+          2,
+          3,
+          4
+        ]
+      },
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` (\"msa\", \"w-4\"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.",
+          "Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.",
+          "`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "Showing a document on screen with highlights and the selection menu",
+            "instead": "`DocumentViewer` around the `Document`"
+          },
+          {
+            "situation": "A scanned form or an image of one",
+            "instead": "an image or PDF preview: only documents authored from structured source are in scope"
+          },
+          {
+            "situation": "A grid to lay out an app page",
+            "instead": "the `Grid` or `Switcher` primitive"
+          }
+        ],
+        "do": {
+          "caption": "One Document root, its type and lifecycle declared, in a viewer on screen.",
+          "code": "<DocumentViewer>\n  <Document label=\"Master services agreement\" type=\"msa\" lifecycle=\"negotiated\">\n    <DocumentFlow>\n      <Clause id=\"term\" title=\"Term\">\n        <Text>Twenty-four (24) months from the Effective Date.</Text>\n      </Clause>\n    </DocumentFlow>\n  </Document>\n</DocumentViewer>"
+        },
+        "dont": {
+          "caption": "Clauses straight in the viewer with no Document root: nothing numbers them, and no reference can resolve.",
+          "code": "<DocumentViewer>\n  <Clause id=\"term\" title=\"Term\">\n    <Text>Twenty-four (24) months from the Effective Date.</Text>\n  </Clause>\n</DocumentViewer>"
+        },
+        "accessibility": [
+          "The root is an `article` named by `label`; `lang` marks a document in another language than the page.",
+          "A grid page is a `section` whose reading order is its source order, never its visual placement: write fields in the order a person fills them.",
+          "Print is an enhancement: the same markup reads and works without the print stylesheet."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Document",
+        "stories": [
+          {
+            "id": "components-document--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-document--without-viewer",
+            "name": "Without Viewer"
+          },
+          {
+            "id": "components-document--grid-page",
+            "name": "Grid Page"
+          },
+          {
+            "id": "components-document--grid-page-landscape",
+            "name": "Grid Page Landscape"
+          }
+        ],
+        "composes": [],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin"
+        ]
+      }
+    },
+    {
+      "name": "DocumentArea",
+      "kind": "type-only",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.",
+      "partOf": "Document",
+      "definition": "interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }"
+    },
+    {
+      "name": "DocumentFlow",
+      "kind": "component",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "A normal-flow run of content: it reflows, and in print breaks into pages wherever the text falls.",
+      "partOf": "Document",
+      "docs": "docs/usage/Document.usage.tsx",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": null
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": []
+    },
+    {
+      "name": "DocumentGrid",
+      "kind": "component",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "The coordinate system of a form page: equal columns and fixed-height rows that children place themselves on with `area`. One per DocumentPage.",
+      "partOf": "Document",
+      "docs": "docs/usage/Document.usage.tsx",
+      "props": [
+        {
+          "name": "cols",
+          "type": "number",
+          "required": false,
+          "default": "12",
+          "description": "Columns. Default 12."
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "Rows, each size.document.grid-row tall. Default: as many as the content needs."
+        },
+        {
+          "name": "gap",
+          "type": "GapToken",
+          "required": false,
+          "default": null,
+          "description": "Space between cells. Default space.document.grid-gap.",
+          "values": [
+            "2xs",
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "2xl"
+          ]
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The page's content; document parts that take `area` sit where it says, the rest fill in order."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "gap": [
+          "2xs",
+          "xs",
+          "sm",
+          "md",
+          "lg",
+          "xl",
+          "2xl"
+        ]
+      },
+      "states": []
+    },
+    {
+      "name": "DocumentGridProps",
+      "kind": "type-only",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Document",
+      "propsOf": "DocumentGrid"
+    },
+    {
+      "name": "DocumentLifecycle",
+      "kind": "type-only",
+      "source": "src/components/Document/documentIndex.ts",
+      "status": null,
+      "description": "Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed).",
+      "partOf": "Document",
+      "definition": "type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed'",
+      "values": [
+        "generated",
+        "filled",
+        "negotiated",
+        "executed"
+      ]
+    },
+    {
+      "name": "DocumentPage",
+      "kind": "component",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": "An explicit page. In a flow document it starts a new page in print and continues the sheet on screen (a signature page, an exhibit that must start fresh). In a grid document it is the fixed page itself, on screen too, because where things sit is part of the form.",
+      "partOf": "Document",
+      "docs": "docs/usage/Document.usage.tsx",
+      "props": [
+        {
+          "name": "size",
+          "type": "'letter'",
+          "required": false,
+          "default": "'letter'",
+          "description": "The paper. Default letter."
+        },
+        {
+          "name": "orientation",
+          "type": "'portrait' | 'landscape'",
+          "required": false,
+          "default": "'portrait'",
+          "description": "Default portrait.",
+          "values": [
+            "portrait",
+            "landscape"
+          ]
+        },
+        {
+          "name": "n",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "description": "The page's number, when the document fixes it (a form's \"Page 2\")."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "What the page holds: a DocumentGrid in a grid document, or flowing content."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {
+        "orientation": [
+          "portrait",
+          "landscape"
+        ]
+      },
+      "states": []
+    },
+    {
+      "name": "DocumentPageProps",
+      "kind": "type-only",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Document",
+      "propsOf": "DocumentPage"
+    },
+    {
+      "name": "DocumentProps",
+      "kind": "type-only",
+      "source": "src/components/Document/Document.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Document",
+      "propsOf": "Document"
+    },
+    {
       "name": "DocumentSelection",
       "kind": "type-only",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
@@ -7397,11 +7804,24 @@
       "definition": "interface DocumentSelection { text: string; range: Range; }"
     },
     {
+      "name": "DocumentShell",
+      "kind": "type-only",
+      "source": "src/components/Document/documentIndex.ts",
+      "status": null,
+      "description": "How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms).",
+      "partOf": "Document",
+      "definition": "type DocumentShell = 'flow' | 'grid'",
+      "values": [
+        "flow",
+        "grid"
+      ]
+    },
+    {
       "name": "DocumentTitle",
       "kind": "component",
       "source": "src/components/DocumentTitle/DocumentTitle.tsx",
       "status": null,
-      "description": "The top of an agreement in a DocumentViewer: its title and number, centred, then the preamble that names the parties. The title is one level above the viewer's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the viewer headingLevel={3}. Recitals follow it.",
+      "description": "The top of an agreement in a Document: its title and number, centred, then the preamble that names the parties. The title is one level above the document's clauses (an h1 with the default headingLevel of 2); inside AppShell, where PageHeader owns the h1, give the Document headingLevel={3}. Recitals follow it.",
       "docs": "docs/usage/DocumentTitle.usage.tsx",
       "props": [
         {
@@ -7452,14 +7872,14 @@
         ],
         "do": {
           "caption": "Title, number and preamble, then the recitals: the same structure for every agreement the app generates.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n    This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n  </DocumentTitle>\n  <Recitals>\n    <Recital>Provider operates a facilities management platform;</Recital>\n  </Recitals>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <DocumentTitle title=\"Master Services Agreement\" number=\"Agreement No. MSA-2026-0142\">\n      This Agreement is between Acme Corp (“<Term define>Provider</Term>”) and Globex Inc. (“<Term define>Customer</Term>”).\n    </DocumentTitle>\n    <Recitals>\n      <Recital>Provider operates a facilities management platform;</Recital>\n    </Recitals>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A title set as body text and recitals typed with their own “WHEREAS”: inconsistent from one generated document to the next.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>MASTER SERVICES AGREEMENT</Text>\n  <Text>Whereas Provider operates a platform…</Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>MASTER SERVICES AGREEMENT</Text>\n    <Text>Whereas Provider operates a platform…</Text>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
-          "The title is a heading one level above the viewer’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the viewer `headingLevel={3}` so the title is an h2.",
+          "The title is a heading one level above the document’s clauses (an h1 with the default `headingLevel` of 2). Inside AppShell, where `PageHeader` owns the h1, give the `Document` `headingLevel={3}` so the title is an h2.",
           "The title block is a `header`; recitals are plain paragraphs in reading order."
         ]
       },
@@ -7476,38 +7896,30 @@
           }
         ],
         "composes": [
-          "Change",
-          "Clause",
+          "Document",
           "Heading",
           "Text"
         ],
         "tokens": [
-          "border.width.change-bar",
-          "color.category.1.fg",
-          "color.category.2.fg",
-          "color.category.3.fg",
-          "color.category.4.fg",
-          "color.category.5.fg",
-          "color.category.6.fg",
+          "color.bg.surface",
+          "color.border.default",
           "color.fg.default",
-          "color.fg.link",
           "color.fg.muted",
-          "color.focus",
-          "color.status.danger.fg",
-          "color.status.success.fg",
-          "focus.ring.offset",
-          "focus.ring.width",
-          "font.weight.strong",
-          "radius.indicator",
-          "size.document.clause-indent",
-          "size.document.note",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
           "space.gap.md",
           "space.gap.sm",
+          "space.gap.xl",
           "space.gap.xs",
-          "space.inset.md",
-          "space.inset.xl",
-          "space.scroll-padding.end",
-          "space.scroll-padding.start",
+          "space.page.margin",
           "text.body",
           "text.body-lg",
           "text.caption",
@@ -7532,22 +7944,15 @@
       "kind": "component",
       "source": "src/components/DocumentViewer/DocumentViewer.tsx",
       "status": null,
-      "description": "A document the app generates from data, shown as one continuous sheet (at least a page tall) on a canvas, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the document area only: the page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
+      "description": "Shows one Document on screen: a flow document as one continuous sheet (at least a page tall) on a canvas, a grid document as its fixed pages, with, when `onHighlight` is set, a menu above the reader's selection. The viewer is the screen render target and its review tools only; the Document inside holds the content and numbering, and prints without it. The page around it holds any toolbar (Find, Download). Selecting is the browser's own (::selection is not styled); fields and placeholders are not part of a selection. Placeholders that fill in place are announced in a polite live region.",
       "docs": "docs/usage/DocumentViewer.usage.tsx",
       "props": [
-        {
-          "name": "label",
-          "type": "string",
-          "required": true,
-          "default": null,
-          "description": "The document's name: labels the document region (\"Master services agreement\"). Required."
-        },
         {
           "name": "children",
           "type": "ReactNode",
           "required": true,
           "default": null,
-          "description": "The generated document: headings and paragraphs, with DataField and Highlight inside."
+          "description": "The one Document to show: its clauses and paragraphs, with DataField and Highlight inside. Required."
         },
         {
           "name": "onHighlight",
@@ -7555,25 +7960,6 @@
           "required": false,
           "default": null,
           "description": "Called with the reader's selection when they choose Highlight (from the menu above a selection, or with H while text in the document is selected). Store it and render it as a Highlight (the default tone). Without it, selecting text is plain native selection with no menu."
-        },
-        {
-          "name": "headingLevel",
-          "type": "Exclude<HeadingLevel, 1>",
-          "required": false,
-          "default": "2",
-          "description": "The outline level of a top-level Clause's heading; sub-clauses go one deeper. Default 2 (under the page's h1).",
-          "values": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "name": "documentName",
-          "type": "string",
-          "required": false,
-          "default": "'the Agreement'",
-          "description": "How a reference from an Exhibit names the body of the document: “Section 7 of the Agreement”. Default \"the Agreement\"."
         }
       ],
       "inherits": [],
@@ -7583,17 +7969,12 @@
         "UNSAFE_className": true,
         "UNSAFE_style": true
       },
-      "variants": {
-        "headingLevel": [
-          2,
-          3,
-          4
-        ]
-      },
+      "variants": {},
       "states": [],
       "usage": {
         "whenToUse": [
-          "A document the app generates from data (an agreement, an order form, a policy) for people to read and highlight. The document is the app’s own HTML: headings and `Text`, with `DataField` and `Highlight` inline.",
+          "Showing one `Document` on screen for people to read and highlight: an agreement, an order form, a policy. The viewer is the screen render target only; the `Document` inside holds the content and numbering, with `DataField` and `Highlight` inline.",
+          "A flow document is one continuous sheet on screen, at least a page tall; its pages break only in print. A grid document shows its fixed pages. Highlight, Change and the selection menu are a review layer on top of any document.",
           "Highlights (`Highlight`) can show together in their own colours: the reader’s own (yellow), Find’s matches (blue), what an AI answer cites (purple). Pass `onHighlight` to let readers keep a selection as a highlight."
         ],
         "whenNotToUse": [
@@ -7608,18 +7989,22 @@
           {
             "situation": "A short note or an AI answer",
             "instead": "`Text` or `StreamingText`"
+          },
+          {
+            "situation": "Printing or exporting the document",
+            "instead": "the `Document` alone: the viewer’s canvas and sheet drop away in print"
           }
         ],
         "do": {
           "caption": "Merged values read as plain text; a value that fills later is a placeholder in the sentence it belongs to.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n  </Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Order form\">\n    <Text size=\"body-lg\">\n      Ordered by <DataField value=\"Acme Corp\" /> on <DataField placeholder=\"the date it is signed\" />. Signed by Maya Okafor.\n    </Text>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "Flagging an empty value inside the document: fix the data in the form that collected it.",
-          "code": "<DocumentViewer label=\"Order form\">\n  <Text size=\"body-lg\">\n    Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.\n  </Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Order form\">\n    <Text size=\"body-lg\">\n      Ordered by Acme Corp on [MISSING DATE]. Either party may cancel with sixty days’ notice.\n    </Text>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
-          "The paper is an `article` named by `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.",
+          "The document is the `Document`’s `article`, named by its `label`. Selecting text is native (::selection is not styled), so keyboard selection, copy and screen-reader reading all work as on any page; the menu’s Highlight is mirrored by H (useShortcut, shown in the menu’s tooltip, and switchable off in the ? overlay), registered only while text in the document is selected.",
           "A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test)."
         ]
       },
@@ -7644,10 +8029,7 @@
           }
         ],
         "composes": [
-          "Change",
-          "Clause",
           "Dialog",
-          "Heading",
           "Icon",
           "Kbd",
           "Shortcuts",
@@ -7656,7 +8038,6 @@
           "Tooltip"
         ],
         "tokens": [
-          "border.width.change-bar",
           "border.width.default",
           "color.action.primary",
           "color.bg.elevated",
@@ -7668,34 +8049,22 @@
           "color.bg.surface",
           "color.border.default",
           "color.border.strong",
-          "color.category.1.fg",
-          "color.category.2.fg",
-          "color.category.3.fg",
-          "color.category.4.fg",
-          "color.category.5.fg",
-          "color.category.6.fg",
           "color.data-field.bg",
           "color.data-field.bg-filled",
           "color.data-field.fg",
           "color.fg.default",
           "color.fg.disabled",
           "color.fg.inverse",
-          "color.fg.link",
           "color.fg.muted",
           "color.fg.on-action",
-          "color.focus",
           "color.status.danger.fg",
-          "color.status.success.fg",
           "ease.enter",
           "ease.exit",
-          "focus.ring.offset",
-          "focus.ring.width",
           "font.weight.strong",
           "icon.stroke",
           "motion.fast",
           "motion.slow",
           "radius.control",
-          "radius.indicator",
           "radius.pill",
           "radius.surface",
           "ratio.page",
@@ -7707,9 +8076,7 @@
           "size.dialog.lg",
           "size.dialog.md",
           "size.dialog.sm",
-          "size.document.clause-indent",
           "size.document.measure",
-          "size.document.note",
           "size.icon.md",
           "size.icon.sm",
           "size.overlay-max",
@@ -7725,15 +8092,10 @@
           "space.inset.xl",
           "space.inset.xs",
           "space.mark.overhang",
-          "space.scroll-padding.end",
-          "space.scroll-padding.start",
           "text.body",
           "text.body-lg",
           "text.caption",
-          "text.heading-1",
-          "text.heading-2",
           "text.heading-3",
-          "text.heading-4",
           "text.label",
           "z.dropdown",
           "z.modal",
@@ -8180,7 +8542,7 @@
       "kind": "component",
       "source": "src/components/Exhibit/Exhibit.tsx",
       "status": null,
-      "description": "An exhibit attached to an agreement in the same DocumentViewer (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
+      "description": "An exhibit attached to an agreement in the same Document (a DPA, an SLA, an escrow schedule): a rule, “Exhibit A” and its name, then its own clauses, numbered from 1. Letters come from the order exhibits are attached. A ClauseRef into it reads “Section 2 of Exhibit B”; one from it to the document's body reads “Section 7 of the Agreement”. The sheet stays one continuous surface: an exhibit is a section, not a new page.",
       "docs": "docs/usage/Exhibit.usage.tsx",
       "props": [
         {
@@ -8217,7 +8579,7 @@
       "usage": {
         "whenToUse": [
           "A schedule attached to an agreement and generated with it: a DPA (Exhibit A), an SLA (Exhibit B), an escrow schedule. Letters come from the order attached.",
-          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the viewer), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
+          "Its clauses restart at 1. A `ClauseRef` into it reads “Section 2 of Exhibit B”, one from it to the body reads “Section 7 of the Agreement” (`documentName` on the `Document`), and `<ClauseRef to=\"dpa\" />` names the exhibit itself."
         ],
         "whenNotToUse": [
           {
@@ -8231,14 +8593,14 @@
         ],
         "do": {
           "caption": "An exhibit named by reference, never by a typed letter: attach another before it and every “Exhibit A” follows.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Clause id=\"privacy\" title=\"Data Privacy\">\n    <Text>\n      Personal data is processed under <ClauseRef to=\"dpa\" />.\n    </Text>\n  </Clause>\n  <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n    <Clause id=\"roles\" title=\"Roles\">\n      <Text>Customer is the controller and Provider the processor.</Text>\n    </Clause>\n  </Exhibit>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Clause id=\"privacy\" title=\"Data Privacy\">\n      <Text>\n        Personal data is processed under <ClauseRef to=\"dpa\" />.\n      </Text>\n    </Clause>\n    <Exhibit id=\"dpa\" title=\"Data Processing Agreement\">\n      <Clause id=\"roles\" title=\"Roles\">\n        <Text>Customer is the controller and Provider the processor.</Text>\n      </Clause>\n    </Exhibit>\n  </Document>\n</DocumentViewer>"
         },
         "dont": {
           "caption": "A typed “Exhibit A” heading and numbers that carry on from the body: references to it break the first time the order changes.",
-          "code": "<DocumentViewer label=\"Agreement\">\n  <Text>EXHIBIT A — Data Processing Agreement</Text>\n  <Text>26. Roles. Customer is the controller and Provider the processor.</Text>\n</DocumentViewer>"
+          "code": "<DocumentViewer>\n  <Document label=\"Agreement\">\n    <Text>EXHIBIT A — Data Processing Agreement</Text>\n    <Text>26. Roles. Customer is the controller and Provider the processor.</Text>\n  </Document>\n</DocumentViewer>"
         },
         "accessibility": [
-          "An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the viewer’s top heading level; its clauses’ headings start one level below.",
+          "An exhibit is a `section` named by its heading (“Exhibit A Data Processing Agreement”) at the document’s top heading level; its clauses’ headings start one level below.",
           "A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content."
         ]
       },
@@ -8251,35 +8613,32 @@
           }
         ],
         "composes": [
-          "Change",
-          "Clause",
+          "Document",
           "Heading"
         ],
         "tokens": [
-          "border.width.change-bar",
+          "color.bg.surface",
           "color.border.default",
-          "color.category.1.fg",
-          "color.category.2.fg",
-          "color.category.3.fg",
-          "color.category.4.fg",
-          "color.category.5.fg",
-          "color.category.6.fg",
           "color.fg.default",
-          "color.fg.link",
           "color.focus",
-          "color.status.danger.fg",
-          "color.status.success.fg",
           "focus.ring.offset",
           "focus.ring.width",
-          "font.weight.strong",
-          "radius.indicator",
-          "size.document.clause-indent",
-          "size.document.note",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
           "space.gap.md",
           "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
           "space.inset.lg",
-          "space.inset.md",
-          "space.inset.xl",
+          "space.page.margin",
           "space.scroll-padding.end",
           "space.scroll-padding.start",
           "text.heading-1",
@@ -9023,7 +9382,8 @@
             "square",
             "landscape",
             "wide",
-            "page"
+            "page",
+            "page-landscape"
           ]
         }
       ],
@@ -9043,7 +9403,8 @@
           "square",
           "landscape",
           "wide",
-          "page"
+          "page",
+          "page-landscape"
         ]
       },
       "states": [],
@@ -9098,6 +9459,7 @@
         "tokens": [
           "ratio.landscape",
           "ratio.page",
+          "ratio.page-landscape",
           "ratio.square",
           "ratio.wide"
         ]
@@ -13253,7 +13615,8 @@
         "square",
         "landscape",
         "wide",
-        "page"
+        "page",
+        "page-landscape"
       ]
     },
     {
@@ -21867,6 +22230,18 @@
       ],
       "modes": {}
     },
+    "ratio.page-landscape": {
+      "cssVar": "--ratio-page-landscape",
+      "tier": "semantic",
+      "type": "number",
+      "description": "A landscape page (US Letter turned, 11 × 8.5): a landscape DocumentPage in a grid document.",
+      "value": "1.2941",
+      "chain": [
+        "ratio.page-landscape",
+        "aspect.letter-landscape"
+      ],
+      "modes": {}
+    },
     "ratio.square": {
       "cssVar": "--ratio-square",
       "tier": "semantic",
@@ -22176,6 +22551,18 @@
       ],
       "modes": {}
     },
+    "size.document.grid-row": {
+      "cssVar": "--size-document-grid-row",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.",
+      "value": "32px",
+      "chain": [
+        "size.document.grid-row",
+        "size.8"
+      ],
+      "modes": {}
+    },
     "size.document.measure": {
       "cssVar": "--size-document-measure",
       "tier": "semantic",
@@ -22293,6 +22680,30 @@
       "chain": [
         "size.overlay-max",
         "container.sm"
+      ],
+      "modes": {}
+    },
+    "size.page.letter.block": {
+      "cssVar": "--size-page-letter-block",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Height of a US Letter page.",
+      "value": "11in",
+      "chain": [
+        "size.page.letter.block",
+        "paper.letter-block"
+      ],
+      "modes": {}
+    },
+    "size.page.letter.inline": {
+      "cssVar": "--size-page-letter-inline",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Width of a US Letter page.",
+      "value": "8.5in",
+      "chain": [
+        "size.page.letter.inline",
+        "paper.letter-inline"
       ],
       "modes": {}
     },
@@ -22449,6 +22860,18 @@
       "chain": [
         "size.viewport.block",
         "viewport.block"
+      ],
+      "modes": {}
+    },
+    "space.document.grid-gap": {
+      "cssVar": "--space-document-grid-gap",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Gap between the cells of a DocumentGrid.",
+      "value": "4px",
+      "chain": [
+        "space.document.grid-gap",
+        "space.1"
       ],
       "modes": {}
     },
@@ -22617,6 +23040,18 @@
       "chain": [
         "space.mark.overhang",
         "space.half"
+      ],
+      "modes": {}
+    },
+    "space.page.margin": {
+      "cssVar": "--space-page-margin",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Margin around a printed page's content, and inside a fixed form page.",
+      "value": "1in",
+      "chain": [
+        "space.page.margin",
+        "paper.margin"
       ],
       "modes": {}
     },

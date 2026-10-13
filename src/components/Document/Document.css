@@ -1,0 +1,90 @@
+@layer components {
+  /* The root: a flow document's content runs top to bottom; its pages break only in print. */
+  .document {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+  }
+
+  .document-flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+  }
+
+  /* A page in a flow document: on screen the sheet continues. */
+  .document-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-gap-md);
+  }
+
+  /* A page in a grid document is the fixed page itself, on screen too: where things sit is the form. */
+  .document-page[data-shell="grid"] {
+    overflow: hidden;
+    align-self: center;
+    inline-size: var(--size-page-letter-inline);
+    max-inline-size: 100%; /* narrower than a page, it shrinks and keeps the page's proportions */
+    aspect-ratio: var(--ratio-page);
+    padding: var(--space-page-margin);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    color: var(--color-fg-default);
+    box-shadow: var(--shadow-card);
+  }
+
+  .document-page[data-shell="grid"][data-orientation="landscape"] {
+    inline-size: var(--size-page-letter-block);
+    aspect-ratio: var(--ratio-page-landscape);
+  }
+
+  /* A form page's coordinate system: fixed-height rows; its columns (a count, so data) are set inline. */
+  .document-grid {
+    --document-grid-gap: var(--space-document-grid-gap);
+
+    display: grid;
+    grid-auto-rows: var(--size-document-grid-row);
+    gap: var(--document-grid-gap);
+  }
+
+  /* Print: a flow document paginates by paged media; a grid page is one printed page, edge to edge. */
+  @media print {
+    .document {
+      page: document;
+    }
+
+    .document-page {
+      break-before: page;
+    }
+
+    /* Exactly the paper, not the ratio's rounding: a hair over would print a blank page after it. */
+    .document-page[data-shell="grid"] {
+      page: document-form;
+      block-size: var(--size-page-letter-block);
+      aspect-ratio: auto;
+      border: none;
+      box-shadow: none;
+    }
+
+    .document-page[data-shell="grid"][data-orientation="landscape"] {
+      page: document-form-landscape;
+      block-size: var(--size-page-letter-inline);
+    }
+  }
+
+  /* Named pages (Chromium reads tokens here): a flow document's margins, and a form page that is its own margin. */
+  @page document {
+    size: letter;
+    margin: var(--space-page-margin);
+  }
+
+  @page document-form {
+    size: letter;
+    margin: 0;
+  }
+
+  @page document-form-landscape {
+    size: letter landscape;
+    margin: 0;
+  }
+}

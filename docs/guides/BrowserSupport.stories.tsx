@@ -10,7 +10,7 @@ const SOURCE = 'web-features 3.40.0, read on 2026-09-29';
 const ADOPTED = [
   {
     feature: '`:has()`',
-    where: 'PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main',
+    where: 'PageLayout (which regions are present), Tag (a remove button), AppShell (an assistant column); sticky footers’ scroll padding; invalid and disabled fields; room for a toast in AppShell’s main; DocumentViewer’s sheet around a grid document',
     replaces: 'Data attributes set from props only to describe the markup (`data-nav`, `data-aside`, `data-removable`, `data-assistant`): the CSS reads the markup itself, so the two can’t disagree.',
     baseline: 'Widely available (2026-06-19)',
     without: 'Required: no fallback.',
@@ -70,6 +70,20 @@ const ADOPTED = [
     replaces: 'A second block of colour variables per scheme.',
     baseline: 'Newly available (2024-05-13); widely available on 2026-11-13',
     without: 'The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead.',
+  },
+  {
+    feature: '`@page` with `size` and named pages (`page`)',
+    where: 'Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is',
+    replaces: 'Nothing: printing a document took the browser’s default page and margins.',
+    baseline: 'Newly available (2024-12-11); widely available on 2027-06-11',
+    without: 'Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it.',
+  },
+  {
+    feature: '`break-before: page`',
+    where: 'DocumentPage: a page in a flow document (a signature page) starts a new printed page',
+    replaces: 'n/a',
+    baseline: 'Widely available',
+    without: 'Required for print only: on screen the sheet continues.',
   },
   {
     feature: 'Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()`',

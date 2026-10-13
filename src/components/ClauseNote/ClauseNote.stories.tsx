@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../../primitives/Stack/Stack';
 import { Clause } from '../Clause/Clause';
+import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { Text } from '../Text/Text';
 import { ClauseNote } from './ClauseNote';
@@ -32,13 +33,15 @@ export const Kinds: Story = {
 /** On clauses: in the margin when the viewer is wide (75rem and up), under the heading when it is not, as here. */
 export const OnClauses: Story = {
   render: () => (
-    <DocumentViewer label="Master services agreement">
-      <Clause id="liability" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>} conspicuous>
-        <Text size="body-lg">Each Party’s total aggregate liability will not exceed the fees paid in the twelve (12) months before the claim.</Text>
-      </Clause>
-      <Clause id="publicity" title="Publicity" note={<ClauseNote position="seller-favored">Provider may name Customer without asking first</ClauseNote>}>
-        <Text size="body-lg">Provider may use Customer’s name and logo in its customer lists.</Text>
-      </Clause>
+    <DocumentViewer>
+      <Document label="Master services agreement">
+        <Clause id="liability" title="Limitation of Liability" note={<ClauseNote position="balanced">Cap at the fees of the prior 12 months</ClauseNote>} conspicuous>
+          <Text size="body-lg">Each Party’s total aggregate liability will not exceed the fees paid in the twelve (12) months before the claim.</Text>
+        </Clause>
+        <Clause id="publicity" title="Publicity" note={<ClauseNote position="seller-favored">Provider may name Customer without asking first</ClauseNote>}>
+          <Text size="body-lg">Provider may use Customer’s name and logo in its customer lists.</Text>
+        </Clause>
+      </Document>
     </DocumentViewer>
   ),
 };
