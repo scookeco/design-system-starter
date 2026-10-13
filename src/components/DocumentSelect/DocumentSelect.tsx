@@ -30,6 +30,7 @@ export function DocumentSelect({ name, label, showLabel = false, role, required 
     className: 'document-field',
     'data-doc': 'select',
     'data-name': path,
+    'data-value': value === null || value === undefined ? undefined : JSON.stringify(value),
     'data-role': capture.role,
     'data-required': required ? 'true' : undefined,
     'data-label-visible': showLabel ? 'true' : undefined,

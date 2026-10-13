@@ -1,6 +1,6 @@
 import { useContext, useEffect, type ReactNode } from 'react';
 import { HiddenContext, RowContext, useDocumentData } from '../Document/data';
-import { holds } from '../Document/expression';
+import { holds } from '../DocumentRuntime/expression';
 import './Conditional.css';
 
 export interface ConditionalProps {

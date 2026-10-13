@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { DocumentOption } from '../DocumentRadioGroup/DocumentRadioGroup';
@@ -19,9 +20,12 @@ function Clause({ lifecycle }: { lifecycle: 'filled' | 'generated' }) {
   return (
     <DocumentViewer>
       <Document label="Master services agreement" lifecycle={lifecycle} defaultValues={{ law: 'WA' }}>
+        <Parties>
+          <Party role="customer" name="Customer" />
+        </Parties>
         <Text size="body-lg">
           This Agreement is governed by the laws of the State of{' '}
-          <DocumentSelect name="law" label="Governing law">
+          <DocumentSelect name="law" label="Governing law" role="customer">
             <DocumentOption value="WA">Washington</DocumentOption>
             <DocumentOption value="NY">New York</DocumentOption>
             <DocumentOption value="DE">Delaware</DocumentOption>

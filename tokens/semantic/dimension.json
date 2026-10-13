@@ -271,6 +271,10 @@
       "field": {
         "$value": "{size.24}",
         "$description": "Least width of a field to fill in a document, and of the blank line an empty one prints as (DocumentField)."
+      },
+      "barcode": {
+        "$value": "{size.24}",
+        "$description": "Size of a QR code on a document (Barcode), its quiet zone included."
       }
     },
     "signature": {

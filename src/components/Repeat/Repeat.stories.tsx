@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document } from '../Document/Document';
 import { DocumentCheckbox } from '../DocumentCheckbox/DocumentCheckbox';
 import { DocumentField } from '../DocumentField/DocumentField';
@@ -24,8 +25,11 @@ function History({ lifecycle }: { lifecycle: 'filled' | 'generated' }) {
         lifecycle={lifecycle}
         defaultValues={{ employment_history: [{ employer: 'Acme Corp', start: '2021-03-01', current: true }, { employer: 'Globex Inc.', start: '2017-06-12', end: '2021-02-26' }] }}
       >
+        <Parties>
+          <Party role="applicant" name="Applicant" />
+        </Parties>
         <Repeat name="employment_history" min={1} max={5} addLabel="Add employer">
-          <DocumentFieldset legend="Employer">
+          <DocumentFieldset legend="Employer" role="applicant">
             <DocumentField name="employer" label="Employer" showLabel required />
             <DocumentField name="start" label="Start" type="date" showLabel required />
             <DocumentField name="end" label="End" type="date" showLabel />

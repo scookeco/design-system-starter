@@ -18,12 +18,15 @@ function useSigning(role: string, group: 'signature' | 'initials' | 'date_signed
   const data = useDocumentData();
   const capture = useCapture(role);
   const party = useParty(role);
+  const value = valueOf(data.values, group, role);
   return {
-    value: valueOf(data.values, group, role),
+    value,
     party,
     editable: capture.editable,
     common: {
       'data-doc': doc,
+      'data-name': `${group}.${role}`,
+      'data-value': value === null ? undefined : JSON.stringify(value),
       'data-role': role,
       'data-recipient': String(party?.color ?? 1),
     },
@@ -115,7 +118,15 @@ export function SignerDetail({ role, name, tag, signed }: { role: string; name: 
   const party = useParty(role);
   const value = data.values[name];
   return (
-    <span className="signature-field" data-doc="field" data-name={name} data-type="text" data-role={resolved} data-recipient={String(party?.color ?? 1)}>
+    <span
+      className="signature-field"
+      data-doc="field"
+      data-name={name}
+      data-value={typeof value === 'string' ? JSON.stringify(value) : undefined}
+      data-type="text"
+      data-role={resolved}
+      data-recipient={String(party?.color ?? 1)}
+    >
       {signed ? <span className="signature-field__text">{typeof value === 'string' ? value : ''}</span> : <span className="signature-field__tag">{tag}</span>}
     </span>
   );

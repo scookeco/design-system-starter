@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document } from '../Document/Document';
 import { DocumentField } from '../DocumentField/DocumentField';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
@@ -20,12 +21,15 @@ export const Default: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Quote" lifecycle="filled" defaultValues={{ subtotal: 1200000, tax_rate: 0.085 }}>
+        <Parties>
+          <Party role="seller" name="Seller" />
+        </Parties>
         <KeyValue>
           <KeyValueItem label="Subtotal">
-            <DocumentField name="subtotal" label="Subtotal" type="currency" />
+            <DocumentField name="subtotal" label="Subtotal" type="currency" role="seller" />
           </KeyValueItem>
           <KeyValueItem label="Tax rate">
-            <DocumentField name="tax_rate" label="Tax rate" type="number" />
+            <DocumentField name="tax_rate" label="Tax rate" type="number" role="seller" />
           </KeyValueItem>
           <KeyValueItem label="Tax">
             <Computed name="tax" formula="subtotal * tax_rate" format="currency" />
@@ -44,6 +48,9 @@ export const Formats: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Report" values={{ passed: 46, checked: 50 }}>
+        <Parties>
+          <Party role="seller" name="Seller" />
+        </Parties>
         <KeyValue>
           <KeyValueItem label="Pass rate">
             <Computed name="rate" formula="passed / checked" format="percent" />

@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useFormat } from '../../format/LocaleProvider';
 import { areaStyle, type DocumentArea } from '../Document/Document';
 import { RowContext, fullName, useDocumentData, useRegisterComputed } from '../Document/data';
-import { evaluate, parse, type Value } from '../Document/expression';
+import { evaluateExpression, parseExpression, type Value } from '../DocumentRuntime/expression';
 import './Computed.css';
 
 /** How a computed value reads: a plain number, money (integer minor units), a percentage (0.085 → 8.5%), or as it is. */
@@ -33,7 +33,7 @@ export function Computed({ name, formula, format = 'number', currency, area }: C
   let value: Value = null;
   let error: string | null = null;
   try {
-    value = evaluate(parse(formula), (path) => data.lookup(path, row));
+    value = evaluateExpression(parseExpression(formula), (path) => data.lookup(path, row));
   } catch (e) {
     error = e instanceof Error ? e.message : String(e);
   }

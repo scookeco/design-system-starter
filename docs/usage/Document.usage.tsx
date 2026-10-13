@@ -8,6 +8,7 @@ export const usage: UsageDoc = {
     'Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.',
     '`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.',
     'On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph).',
+    'One source, five render targets: the screen (`DocumentViewer`), a fillable form (`lifecycle` filled, `onSubmit`), print/PDF (`npm run document:print -- <story-id>`), an eSignature envelope’s recipients and tabs (`npm run document:envelope`), and a data export (`exportDocument`, or `npm run document:export`). `validateDocument` checks one root, references, roles and areas; `expressionProblems` checks every `when` and `formula`.',
   ],
   whenNotToUse: [
     { situation: 'Showing a document on screen with highlights and the selection menu', instead: '`DocumentViewer` around the `Document`' },

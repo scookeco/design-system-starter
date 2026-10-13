@@ -121,6 +121,10 @@ export { Parties, Party, type PartyProps, type PartyKind, type PartyColor } from
 export { Signature, Initials, DateSigned, type SignatureProps, type InitialsProps, type DateSignedProps } from './Signature/Signature';
 export { RoleRegion, type RoleRegionProps } from './RoleRegion/RoleRegion';
 export { Acknowledge, type AcknowledgeProps } from './Acknowledge/Acknowledge';
+export { Barcode, type BarcodeProps, type BarcodeSymbology } from './Barcode/Barcode';
+export { validateDocument, type DocumentProblems } from './DocumentRuntime/validate';
+export { exportDocument, type DocumentExport } from './DocumentRuntime/collect';
+export { parseExpression, evaluateExpression, expressionProblems, type Expression } from './DocumentRuntime/expression';
 export { SignatureBlock, type SignatureBlockProps } from './SignatureBlock/SignatureBlock';
 export { SignaturePage, SignatureParty, type SignaturePageProps, type SignaturePartyProps } from './SignaturePage/SignaturePage';
 export { Exhibit, type ExhibitProps } from './Exhibit/Exhibit';

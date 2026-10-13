@@ -1,0 +1,6 @@
+@layer components {
+  /* A file input reads at caption size: its button and the chosen file's name sit on the field's line. */
+  .document-attachment__input {
+    font: var(--text-caption);
+  }
+}

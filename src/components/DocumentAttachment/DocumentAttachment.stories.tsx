@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { DocumentAttachment } from './DocumentAttachment';
@@ -18,6 +19,9 @@ export const Default: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Loan application" lifecycle="filled">
+        <Parties>
+          <Party role="applicant" name="Applicant" />
+        </Parties>
         <DocumentAttachment name="proof" label="Proof of address" accept=".pdf,image/*" required role="applicant" />
       </Document>
     </DocumentViewer>
@@ -29,7 +33,10 @@ export const Executed: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Loan application" lifecycle="executed" values={{ proof: ['lease-2026.pdf', 'utility-bill.pdf'] }}>
-        <DocumentAttachment name="proof" label="Proof of address" multiple />
+        <Parties>
+          <Party role="applicant" name="Applicant" />
+        </Parties>
+        <DocumentAttachment name="proof" label="Proof of address" multiple role="applicant" />
       </Document>
     </DocumentViewer>
   ),

@@ -79,7 +79,7 @@ const POWER: Record<BinaryOp, number> = { or: 1, and: 2, '==': 3, '!=': 3, '<': 
 const cache = new Map<string, Expression>();
 
 /** Parses an expression. Throws ExpressionError when it isn't one. */
-export function parse(source: string): Expression {
+export function parseExpression(source: string): Expression {
   const hit = cache.get(source);
   if (hit) return hit;
   const tokens = tokenize(source);
@@ -166,18 +166,18 @@ const truthy = (v: Value): boolean => (Array.isArray(v) ? v.length > 0 : Boolean
 const same = (a: Value, b: Value) => (typeof a === 'number' || typeof b === 'number' ? numeric(a) === numeric(b) && a !== null && b !== null : a === b);
 
 /** Evaluates a parsed expression against a lookup. Missing names are null; arithmetic treats them as 0. */
-export function evaluate(tree: Expression, lookup: Lookup): Value {
+export function evaluateExpression(tree: Expression, lookup: Lookup): Value {
   switch (tree.kind) {
     case 'literal':
       return tree.value;
     case 'name':
       return lookup(tree.path);
     case 'unary': {
-      const v = evaluate(tree.operand, lookup);
+      const v = evaluateExpression(tree.operand, lookup);
       return tree.op === 'not' ? !truthy(v) : -numeric(v);
     }
     case 'call': {
-      const values = list(evaluate(tree.arg, lookup));
+      const values = list(evaluateExpression(tree.arg, lookup));
       if (tree.fn === 'count') return values.filter((v) => v !== null && v !== '').length;
       const numbers = values.filter((v) => v !== null && v !== '').map(numeric);
       if (tree.fn === 'sum') return numbers.reduce((a, b) => a + b, 0);
@@ -185,10 +185,10 @@ export function evaluate(tree: Expression, lookup: Lookup): Value {
       return tree.fn === 'min' ? Math.min(...numbers) : Math.max(...numbers);
     }
     case 'binary': {
-      if (tree.op === 'and') return truthy(evaluate(tree.left, lookup)) && truthy(evaluate(tree.right, lookup));
-      if (tree.op === 'or') return truthy(evaluate(tree.left, lookup)) || truthy(evaluate(tree.right, lookup));
-      const a = evaluate(tree.left, lookup);
-      const b = evaluate(tree.right, lookup);
+      if (tree.op === 'and') return truthy(evaluateExpression(tree.left, lookup)) && truthy(evaluateExpression(tree.right, lookup));
+      if (tree.op === 'or') return truthy(evaluateExpression(tree.left, lookup)) || truthy(evaluateExpression(tree.right, lookup));
+      const a = evaluateExpression(tree.left, lookup);
+      const b = evaluateExpression(tree.right, lookup);
       switch (tree.op) {
         case '==':
           return same(a, b);
@@ -216,4 +216,18 @@ export function evaluate(tree: Expression, lookup: Lookup): Value {
 }
 
 /** Is it true? For a Conditional's `when`. */
-export const holds = (source: string, lookup: Lookup) => truthy(evaluate(parse(source), lookup));
+export const holds = (source: string, lookup: Lookup) => truthy(evaluateExpression(parseExpression(source), lookup));
+
+/** Every Conditional's `when` and Computed's `formula` in a rendered document that doesn't parse. */
+export function expressionProblems(container: Element): string[] {
+  const problems: string[] = [];
+  for (const el of container.querySelectorAll<HTMLElement>('[data-when], [data-formula]')) {
+    const source = el.dataset.when ?? el.dataset.formula ?? '';
+    try {
+      parseExpression(source);
+    } catch (e) {
+      problems.push(e instanceof Error ? e.message : String(e));
+    }
+  }
+  return problems;
+}

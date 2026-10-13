@@ -95,6 +95,7 @@ export function DocumentField({ name, label, showLabel = false, type = 'text', r
     className: 'document-field',
     'data-doc': 'field',
     'data-name': path,
+    'data-value': value === null || value === undefined ? undefined : JSON.stringify(value),
     'data-type': type,
     'data-role': capture.role,
     'data-required': required ? 'true' : undefined,

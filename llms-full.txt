@@ -111,6 +111,7 @@ UI rules (design system v0)
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
+- [Barcode](docs/usage/Barcode.usage.tsx): A QR code for a document's id or a verification link
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Callout](docs/usage/Callout.usage.tsx): A notice inside a document, set apart from its text
@@ -379,7 +380,7 @@ Closed styling API: no `className`/`style`.
 - A fieldset named “Acknowledgement”: the box’s label is the statement agreed to, and the Sign button is named for the party.
 
 Stories: `components-acknowledge--default`.
-Composes: Document, DocumentCheckbox, Icon, Parties, Signature.
+Composes: Document, DocumentCheckbox, DocumentRuntime, Icon, Parties, Signature.
 Tokens read: `border.width.field`, `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.control`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.md`, `space.inset.xs`, `space.page.margin`, `text.caption`, `text.label`, `text.signature`.
 
 ### Address
@@ -430,7 +431,7 @@ Closed styling API: no `className`/`style`.
 - An `address` element with each line on its own line; the label is visible text above it.
 
 Stories: `components-address--default`, `components-address--unlabelled`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body`, `text.caption`.
 
 ### AiMarker
@@ -644,6 +645,53 @@ Stories: `components-banner--info`, `components-banner--success`, `components-ba
 Composes: Icon.
 Tokens read: `color.fg.default`, `color.status.danger.bg`, `color.status.danger.border`, `color.status.danger.fg`, `color.status.info.bg`, `color.status.info.border`, `color.status.info.fg`, `color.status.success.bg`, `color.status.success.border`, `color.status.success.fg`, `color.status.warning.bg`, `color.status.warning.border`, `color.status.warning.fg`, `icon.stroke`, `radius.control`, `radius.surface`, `size.grid-item.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.sm`, `space.gap.xs`, `space.inset.md`, `text.body`, `text.label`.
 
+### Barcode
+
+component · `src/components/Barcode/Barcode.tsx` · usage: `docs/usage/Barcode.usage.tsx`
+
+A QR code for a document's id or a verification link, drawn as SVG from the system's own encoder (no dependency), so it prints sharp. Always dark on light, whatever the theme, so it scans.
+
+Props:
+- `value: string`: What it encodes (a document id, a verification URL), up to 213 bytes. Required.
+- `symbology?: BarcodeSymbology` = `'qr'`: Default qr.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A document’s id or a verification link as a QR code (`symbology` qr), up to 213 bytes: on an invoice, a certificate, a printed form. Encoded by the system itself (no dependency) and drawn as SVG, dark on light in either theme.
+
+**When not to use**
+
+- A link people click on screen → `Link`
+- A 1D barcode (Code 128) for a scanner at a till → not drawn yet: add the symbology when a document needs it
+
+**Do:** The id as a QR code, with its meaning in text beside it.
+
+```tsx
+<Document label="Invoice">
+  <Barcode value="INV-2026-0413" />
+  <Text>Scan to open this invoice.</Text>
+</Document>
+```
+
+**Don't:** A QR code with nothing saying what it opens: people can’t tell whether to trust it.
+
+```tsx
+<Document label="Invoice">
+  <Barcode value="INV-2026-0413" />
+</Document>
+```
+
+**Accessibility**
+
+- An image named “QR code: <value>”, so the value is read out; put what scanning does in text beside it.
+
+Stories: `components-barcode--default`, `components-barcode--link`.
+Composes: Document, DocumentRuntime.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.barcode`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### Breadcrumbs
 
 component · `src/components/Breadcrumbs/Breadcrumbs.tsx` · usage: `docs/usage/Breadcrumbs.usage.tsx`
@@ -803,7 +851,7 @@ Variants: kind (note | warning | instruction).
 - An `aside` with its kind or `title` as its first line; it never announces itself (unlike a Banner), because it is part of the document.
 
 Stories: `components-callout--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `border.width.change-bar`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.status.info.border`, `color.status.warning.border`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `text.body`, `text.caption`.
 
 ### Card
@@ -1246,7 +1294,7 @@ Closed styling API: no `className`/`style`.
 - A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
 
 Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`, `components-clause--unnumbered`.
-Composes: Change, Document, Heading, Margin.
+Composes: Change, Document, DocumentRuntime, Heading, Margin.
 Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### ClauseNote
@@ -1600,7 +1648,7 @@ Variants: format (number | currency | percent | text).
 - An `output` element, read as text; it is never focusable or editable. A formula that doesn’t parse is reported in the console and shows nothing.
 
 Stories: `components-computed--default`, `components-computed--formats`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### Conditional
@@ -1653,7 +1701,7 @@ Closed styling API: no `className`/`style`.
 - An off block is not displayed, so it isn’t read or reachable; what controls it (the checkbox) comes before it in the reading order.
 
 Stories: `components-conditional--default`, `components-conditional--on`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### ContextMenu
@@ -1925,7 +1973,7 @@ Closed styling API: no `className`/`style`.
 - A term defined twice is marked with a wavy underline in the danger colour and reported in the console.
 
 Stories: `components-definitions--default`, `components-definitions--defined-twice`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body-lg`, `text.caption`.
 
 ### Dialog
@@ -2194,6 +2242,7 @@ Closed styling API: no `className`/`style`.
 - Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.
 - `DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.
 - On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph).
+- One source, five render targets: the screen (`DocumentViewer`), a fillable form (`lifecycle` filled, `onSubmit`), print/PDF (`npm run document:print -- <story-id>`), an eSignature envelope’s recipients and tabs (`npm run document:envelope`), and a data export (`exportDocument`, or `npm run document:export`). `validateDocument` checks one root, references, roles and areas; `expressionProblems` checks every `when` and `formula`.
 
 **When not to use**
 
@@ -2231,7 +2280,8 @@ Closed styling API: no `className`/`style`.
 - A grid page is a `section` whose reading order is its source order, never its visual placement: write fields in the order a person fills them.
 - Print is an enhancement: the same markup reads and works without the print stylesheet.
 
-Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`.
+Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`, `components-document--w-4`, `components-document--msa`, `components-document--invoice`.
+Composes: DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### DocumentAttachment
@@ -2286,7 +2336,7 @@ States: multiple, required.
 - A native file input named by its visible label; `required` until a file is attached.
 
 Stories: `components-documentattachment--default`, `components-documentattachment--executed`.
-Composes: Document, DocumentField.
+Composes: Document, DocumentField, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
 
 ### DocumentCheckbox
@@ -2340,7 +2390,7 @@ States: required.
 - A native checkbox inside its label, so the label is its name and clicking it checks the box. Not editable, it shows its state disabled.
 
 Stories: `components-documentcheckbox--default`, `components-documentcheckbox--executed`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### DocumentField
@@ -2407,7 +2457,7 @@ States: showLabel, required.
 - A placeholder is a highlight, never part of a selection; one that fills is announced once in the viewer’s live region.
 
 Stories: `components-documentfield--default`, `components-documentfield--fillable`, `components-documentfield--on-a-form-page`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
 
 ### DocumentFieldset
@@ -2461,7 +2511,7 @@ Closed styling API: no `className`/`style`.
 - A native `fieldset` named by its `legend`, so each field inside is announced with it.
 
 Stories: `components-documentfieldset--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.sm`, `space.page.margin`, `text.caption`.
 
 ### DocumentHeader
@@ -2660,7 +2710,7 @@ Closed styling API: no `className`/`style`.
 - A `fieldset` named by its `legend` (`label`); native radios, so arrow keys move between them. `required` asks for one.
 
 Stories: `components-documentradiogroup--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### DocumentSection
@@ -2721,7 +2771,7 @@ States: numbered.
 - A `section` named by its heading, at the next level of the document’s outline; a reference to it moves focus there.
 
 Stories: `components-documentsection--default`, `components-documentsection--numbered`.
-Composes: Change, Clause, Document, Heading, Margin.
+Composes: Change, Clause, Document, DocumentRuntime, Heading, Margin.
 Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### DocumentSelect
@@ -2783,7 +2833,7 @@ States: showLabel, required.
 - A native select named by `label` (shown with `showLabel`); its first option asks for a choice.
 
 Stories: `components-documentselect--default`, `components-documentselect--generated`.
-Composes: Document, DocumentField, DocumentRadioGroup.
+Composes: Document, DocumentField, DocumentRadioGroup, DocumentRuntime.
 Tokens read: `color.action.primary`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.data-field.bg`, `color.data-field.bg-filled`, `color.data-field.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `ease.exit`, `focus.ring.offset`, `focus.ring.width`, `motion.slow`, `radius.control`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.field`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.mark.overhang`, `space.page.margin`, `text.caption`.
 
 ### DocumentTitle
@@ -2861,7 +2911,7 @@ Closed styling API: no `className`/`style`.
 - The title block is a `header`; recitals are plain paragraphs in reading order.
 
 Stories: `components-documenttitle--default`, `components-documenttitle--amendment`, `components-documenttitle--lettered-recitals`.
-Composes: Document, Heading, Text.
+Composes: Document, DocumentRuntime, Heading, Text.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### DocumentViewer
@@ -2919,7 +2969,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - A placeholder that fills is announced once in a polite live region (“Effective date filled: 14 October 2026”) when `announceAs` is set. Every colour pair passes in light and dark (contrast test).
 
 Stories: `components-documentviewer--default`, `components-documentviewer--placeholders`, `components-documentviewer--placeholders-filled`, `components-documentviewer--with-selection`.
-Composes: Dialog, Document, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
+Composes: Dialog, Document, DocumentRuntime, Icon, Kbd, Shortcuts, Switch, Toolbar, Tooltip.
 Tokens read: `border.width.default`, `color.action.primary`, `color.bg.elevated`, `color.bg.hover`, `color.bg.inverse`, `color.bg.scrim`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.inverse`, `color.fg.muted`, `color.fg.on-action`, `color.status.danger.fg`, `ease.enter`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.slow`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `shadow.modal`, `shadow.popover`, `size.control.md`, `size.control.sm`, `size.dialog.lg`, `size.dialog.md`, `size.dialog.sm`, `size.document.grid-row`, `size.document.measure`, `size.icon.md`, `size.icon.sm`, `size.overlay-max`, `size.page.letter.block`, `size.page.letter.inline`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xl`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-3`, `text.label`, `z.dropdown`, `z.modal`, `z.tooltip`.
 
 ### Drawer
@@ -3105,7 +3155,7 @@ Closed styling API: no `className`/`style`.
 - A reference to an exhibit, or into one, is a link that moves focus to it, with scroll padding clear of sticky content.
 
 Stories: `components-exhibit--default`, `components-exhibit--labelled`.
-Composes: Document, Heading.
+Composes: Document, DocumentRuntime, Heading.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Feedback
@@ -3212,7 +3262,7 @@ Closed styling API: no `className`/`style`.
 - A `figure` with a `figcaption`; the image or chart still needs its own alternative text.
 
 Stories: `components-figure--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### FileUpload
@@ -3639,7 +3689,7 @@ Closed styling API: no `className`/`style`.
 - A `dl`: each label a `dt`, its value the `dd`, grouped in a `div`, so each pair is announced together.
 
 Stories: `components-keyvalue--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.caption`.
 
 ### Letterhead
@@ -3754,7 +3804,7 @@ Closed styling API: no `className`/`style`.
 - A `Table` named by `caption` (visually hidden), with column headers; each input is named by its column’s label, and each Remove by its line.
 
 Stories: `components-lineitems--default`, `components-lineitems--fillable`.
-Composes: Button, Document, Icon, Repeat, Spinner, Table, VisuallyHidden.
+Composes: Button, Document, DocumentRuntime, Icon, Repeat, Spinner, Table, VisuallyHidden.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `radius.surface`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.scroll-region.lg`, `size.scroll-region.md`, `size.scroll-region.sm`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `space.scroll-padding.start`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `z.sticky`.
 
 ### Link
@@ -4473,7 +4523,7 @@ Closed styling API: no `className`/`style`.
 - Not shown and not announced: the document’s own text names its parties. What the reader sees per party (a colour) always comes with its name.
 
 Stories: `components-parties--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### Popover
@@ -4696,7 +4746,7 @@ Closed styling API: no `className`/`style`.
 - Add and Remove are Buttons; each Remove is named with its row (“Remove row 2”). Neither prints.
 
 Stories: `components-repeat--default`, `components-repeat--generated`.
-Composes: Button, Document, Icon, Spinner, VisuallyHidden.
+Composes: Button, Document, DocumentRuntime, Icon, Spinner, VisuallyHidden.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.target-min`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `text.body-lg`, `text.caption`, `text.label`.
 
 ### ResultList
@@ -4895,7 +4945,7 @@ Closed styling API: no `className`/`style`.
 - A plain block: headings and fields inside keep their own semantics; nothing is announced for the role.
 
 Stories: `components-roleregion--default`, `components-roleregion--employee-acting`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### Seal
@@ -4945,7 +4995,7 @@ Closed styling API: no `className`/`style`.
 - An image named “Seal of <issuer>”.
 
 Stories: `components-seal--default`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.document.seal`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### SearchField
@@ -5198,7 +5248,7 @@ Closed styling API: no `className`/`style`.
 - Each tab says what it is in words (Sign, Initial, Date Signed); the colour only groups a party’s tabs.
 
 Stories: `components-signature--default`, `components-signature--with-sign-action`, `components-signature--signed`, `components-signature--initials-each-page`.
-Composes: Document, Icon, Parties.
+Composes: Document, DocumentRuntime, Icon, Parties.
 Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.caption`, `text.label`, `text.signature`.
 
 ### SignatureBlock
@@ -5260,7 +5310,7 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 - A party’s colour is never the only cue: the page names each party over its block, and signed values are text.
 
 Stories: `components-signatureblock--unsigned`, `components-signatureblock--with-sign-action`, `components-signatureblock--signed`, `components-signatureblock--before-and-after`, `components-signatureblock--recipients`.
-Composes: Document, Icon, Parties, Signature.
+Composes: Document, DocumentRuntime, Icon, Parties, Signature.
 Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.body-lg`, `text.caption`, `text.label`, `text.signature`.
 
 ### SignaturePage
@@ -5329,7 +5379,7 @@ Closed styling API: no `className`/`style`.
 - The columns reflow with the space, never by viewport breakpoints, and every SignatureBlock keeps its own accessible names.
 
 Stories: `components-signaturepage--two-parties`, `components-signaturepage--one-party`, `components-signaturepage--three-parties`.
-Composes: Document, Icon, Parties, Signature, SignatureBlock, Text.
+Composes: Document, DocumentRuntime, Icon, Parties, Signature, SignatureBlock, Text.
 Tokens read: `border.width.field`, `color.bg.surface`, `color.border.default`, `color.category.1.bg`, `color.category.1.border`, `color.category.1.fg`, `color.category.2.bg`, `color.category.2.border`, `color.category.2.fg`, `color.category.3.bg`, `color.category.3.border`, `color.category.3.fg`, `color.category.4.bg`, `color.category.4.border`, `color.category.4.fg`, `color.category.5.bg`, `color.category.5.border`, `color.category.5.fg`, `color.category.6.bg`, `color.category.6.border`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `icon.stroke`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.grid-item.md`, `size.icon.md`, `size.icon.sm`, `size.page.letter.block`, `size.page.letter.inline`, `size.signature.slot-block`, `size.signature.slot-inline`, `size.signature.tag-inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.2xs`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.body-lg`, `text.caption`, `text.label`, `text.signature`.
 
 ### Skeleton
@@ -5600,7 +5650,7 @@ States: optional.
 - On a grid page, reading order is source order: write steps and their fields in the order a person fills them.
 
 Stories: `components-step--default`.
-Composes: Document, Heading.
+Composes: Document, DocumentRuntime, Heading.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.body`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Stepper
@@ -6451,7 +6501,7 @@ Closed styling API: no `className`/`style`.
 - A `nav` landmark named “Contents” (or `label`) holding nested ordered lists; each entry is a link that moves focus to its clause.
 
 Stories: `components-toc--default`, `components-toc--top-level-only`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body-lg`, `text.caption`.
 
 ### Toggle
@@ -6702,7 +6752,7 @@ Closed styling API: no `className`/`style`.
 - An image named by its word, read once at the start of the document. Behind the text, it never blocks selecting or reading it.
 
 Stories: `components-watermark--default`, `components-watermark--confidential`, `components-watermark--executed`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`, `text.heading-1`, `z.behind`.
 
 ### Xref
@@ -6768,7 +6818,7 @@ Closed styling API: no `className`/`style`.
 - A reference with no target keeps its text (“Section [pricing?]”) with a wavy underline in the danger colour, so the problem is not shown by colour alone, and is reported in the console.
 
 Stories: `components-xref--default`, `components-xref--broken`.
-Composes: Document.
+Composes: Document, DocumentRuntime.
 Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ## Primitives reference
@@ -7990,6 +8040,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `AvatarSize` (`src/components/Avatar/Avatar.tsx`): `type AvatarSize = 'sm' | 'md' | 'lg'`
 - `BadgeTone` (`src/components/Badge/Badge.tsx`): `type BadgeTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'`
 - `BannerTone` (`src/components/Banner/Banner.tsx`): `type BannerTone = 'info' | 'success' | 'warning' | 'danger'`
+- `BarcodeSymbology` (`src/components/Barcode/Barcode.tsx`): `type BarcodeSymbology = 'qr'` The barcode kinds drawn. QR only for now; 1D symbologies (Code 128) when a document needs one.
 - `BreadcrumbLink` (`src/components/Breadcrumbs/Breadcrumbs.tsx`): `interface BreadcrumbLink { label: string; href: string; }`
 - `ButtonSize` (`src/components/Button/Button.tsx`): `type ButtonSize = 'sm' | 'md' | 'lg'`
 - `ButtonVariant` (`src/components/Button/Button.tsx`): `type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'`
@@ -8010,14 +8061,17 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `DateRange` (`src/components/DatePicker/DatePicker.tsx`): `interface DateRange { start: IsoDate; end: IsoDate; }`
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long' | 'month'` short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period).
 - `DocumentArea` (`src/components/Document/Document.tsx`): `interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }` Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.
+- `DocumentExport` (`src/components/DocumentRuntime/collect.ts`): `interface DocumentExport { type: string | null; version: string | null; lifecycle: string; values: Record<string, unknown>; }` A document's data export: what it is, where it is in its life, and every value by name.
 - `DocumentFieldType` (`src/components/DocumentField/DocumentField.tsx`): `type DocumentFieldType = 'text' | 'number' | 'currency' | 'date' | 'duration' | 'email' | 'phone' | 'ssn' | 'ein' | 'textarea'` What a field holds, which sets its input, its stored value and how it reads.
 - `DocumentLifecycle` (`src/components/Document/documentIndex.ts`): `type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed'` Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed).
 - `DocumentListStyle` (`src/components/DocumentList/DocumentList.tsx`): `type DocumentListStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'disc' | 'none'` How a list marks its items. The numbered ones are an ordered list.
+- `DocumentProblems` (`src/components/DocumentRuntime/validate.ts`): `interface DocumentProblems { errors: string[]; warnings: string[]; }` The document validator: what a rendered Document must hold before it is a template, a form or an envelope. It reads only the DOM (the vocabulary's data-doc attributes), with no imports, so the same function runs in a unit test, in the browser checks (tests/visual) and in the tooling scripts.
 - `DocumentSelection` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSelection { text: string; range: Range; }` The text the reader selected in the document, and the range it covers (to store as a highlight).
 - `DocumentShell` (`src/components/Document/documentIndex.ts`): `type DocumentShell = 'flow' | 'grid'` How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms).
 - `DocumentValues` (`src/components/Document/data.tsx`): `type DocumentValues = Readonly<Record<string, unknown>>` A document's captured values by name. A Repeat's rows are a list of objects under its name.
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
 - `EscapeHatch` (`src/internal/closed-api.ts`): `interface EscapeHatch { UNSAFE_className?: string; UNSAFE_style?: CSSProperties; }` The only styling escape hatch on system components and primitives. The UNSAFE_ prefix makes every use greppable and countable. Consumer code must justify each use with an eslint-disable comment that carries a reason, an owner and a removal condition. A repeated override is a missing variant: propose one.
+- `Expression` (`src/components/DocumentRuntime/expression.ts`): `type Expression = { kind: 'literal'; value: Value; } | { kind: 'name'; path: readonly string[]; } | { kind: 'unary'; op: '-' | 'not'; operand: Expression; } | { kind: 'binary'; op: BinaryOp; left: Expression; right: Expression; } | { kind: 'call'; fn: Aggregate; arg: Expression; }`
 - `FeedbackRating` (`src/components/Feedback/Feedback.tsx`): `type FeedbackRating = 'up' | 'down'`
 - `FeedbackValue` (`src/components/Feedback/Feedback.tsx`): `interface FeedbackValue { rating: FeedbackRating; reason?: string; }`
 - `FileRejection` (`src/components/FileUpload/FileUpload.tsx`): `interface FileRejection { file: File; reason: 'type' | 'size'; message: string; }` A picked or dropped file that broke a limit, with a message ready to show.
@@ -9775,6 +9829,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.dialog.lg` `var(--size-dialog-lg)`: `48rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.md` `var(--size-dialog-md)`: `36rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
 - `size.dialog.sm` `var(--size-dialog-sm)`: `28rem`. Dialog widths: sm for confirmations, md for short forms, lg for longer forms.
+- `size.document.barcode` `var(--size-document-barcode)`: `96px`. Size of a QR code on a document (Barcode), its quiet zone included.
 - `size.document.clause-indent` `var(--size-document-clause-indent)`: `48px`. The gutter a clause number hangs in (Clause); each nested clause indents one more.
 - `size.document.field` `var(--size-document-field)`: `96px`. Least width of a field to fill in a document, and of the blank line an empty one prints as (DocumentField).
 - `size.document.grid-row` `var(--size-document-grid-row)`: `32px`. Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.

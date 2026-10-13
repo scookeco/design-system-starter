@@ -952,6 +952,7 @@
         "composes": [
           "Document",
           "DocumentCheckbox",
+          "DocumentRuntime",
           "Icon",
           "Parties",
           "Signature"
@@ -1119,7 +1120,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -2581,6 +2583,130 @@
       ]
     },
     {
+      "name": "Barcode",
+      "kind": "component",
+      "source": "src/components/Barcode/Barcode.tsx",
+      "status": null,
+      "description": "A QR code for a document's id or a verification link, drawn as SVG from the system's own encoder (no dependency), so it prints sharp. Always dark on light, whatever the theme, so it scans.",
+      "docs": "docs/usage/Barcode.usage.tsx",
+      "props": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "What it encodes (a document id, a verification URL), up to 213 bytes. Required."
+        },
+        {
+          "name": "symbology",
+          "type": "BarcodeSymbology",
+          "required": false,
+          "default": "'qr'",
+          "description": "Default qr."
+        },
+        {
+          "name": "area",
+          "type": "DocumentArea",
+          "required": false,
+          "default": null,
+          "description": "Where it sits on a DocumentGrid."
+        }
+      ],
+      "inherits": [],
+      "closedApi": {
+        "className": false,
+        "style": false,
+        "UNSAFE_className": false,
+        "UNSAFE_style": false
+      },
+      "variants": {},
+      "states": [],
+      "usage": {
+        "whenToUse": [
+          "A document’s id or a verification link as a QR code (`symbology` qr), up to 213 bytes: on an invoice, a certificate, a printed form. Encoded by the system itself (no dependency) and drawn as SVG, dark on light in either theme."
+        ],
+        "whenNotToUse": [
+          {
+            "situation": "A link people click on screen",
+            "instead": "`Link`"
+          },
+          {
+            "situation": "A 1D barcode (Code 128) for a scanner at a till",
+            "instead": "not drawn yet: add the symbology when a document needs it"
+          }
+        ],
+        "do": {
+          "caption": "The id as a QR code, with its meaning in text beside it.",
+          "code": "<Document label=\"Invoice\">\n  <Barcode value=\"INV-2026-0413\" />\n  <Text>Scan to open this invoice.</Text>\n</Document>"
+        },
+        "dont": {
+          "caption": "A QR code with nothing saying what it opens: people can’t tell whether to trust it.",
+          "code": "<Document label=\"Invoice\">\n  <Barcode value=\"INV-2026-0413\" />\n</Document>"
+        },
+        "accessibility": [
+          "An image named “QR code: <value>”, so the value is read out; put what scanning does in text beside it."
+        ]
+      },
+      "unit": {
+        "dir": "src/components/Barcode",
+        "stories": [
+          {
+            "id": "components-barcode--default",
+            "name": "Default"
+          },
+          {
+            "id": "components-barcode--link",
+            "name": "Link"
+          }
+        ],
+        "composes": [
+          "Document",
+          "DocumentRuntime"
+        ],
+        "tokens": [
+          "color.bg.surface",
+          "color.border.default",
+          "color.fg.default",
+          "color.fg.muted",
+          "ratio.page",
+          "ratio.page-landscape",
+          "shadow.card",
+          "size.document.barcode",
+          "size.document.grid-row",
+          "size.page.letter.block",
+          "size.page.letter.inline",
+          "space.document.grid-gap",
+          "space.gap.2xl",
+          "space.gap.2xs",
+          "space.gap.lg",
+          "space.gap.md",
+          "space.gap.sm",
+          "space.gap.xl",
+          "space.gap.xs",
+          "space.page.margin",
+          "text.caption"
+        ]
+      }
+    },
+    {
+      "name": "BarcodeProps",
+      "kind": "type-only",
+      "source": "src/components/Barcode/Barcode.tsx",
+      "status": null,
+      "description": null,
+      "partOf": "Barcode",
+      "propsOf": "Barcode"
+    },
+    {
+      "name": "BarcodeSymbology",
+      "kind": "type-only",
+      "source": "src/components/Barcode/Barcode.tsx",
+      "status": null,
+      "description": "The barcode kinds drawn. QR only for now; 1D symbologies (Code 128) when a document needs one.",
+      "partOf": "Barcode",
+      "definition": "type BarcodeSymbology = 'qr'"
+    },
+    {
       "name": "BellIcon",
       "kind": "utility",
       "source": "src/components/Icon/icons.ts",
@@ -3253,7 +3379,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "border.width.change-bar",
@@ -4838,6 +4965,7 @@
         "composes": [
           "Change",
           "Document",
+          "DocumentRuntime",
           "Heading",
           "Margin"
         ],
@@ -6327,7 +6455,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -6449,7 +6578,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -7724,7 +7854,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -8388,7 +8519,8 @@
           "The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` (\"msa\", \"w-4\"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.",
           "Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.",
           "`DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.",
-          "On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph)."
+          "On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph).",
+          "One source, five render targets: the screen (`DocumentViewer`), a fillable form (`lifecycle` filled, `onSubmit`), print/PDF (`npm run document:print -- <story-id>`), an eSignature envelope’s recipients and tabs (`npm run document:envelope`), and a data export (`exportDocument`, or `npm run document:export`). `validateDocument` checks one root, references, roles and areas; `expressionProblems` checks every `when` and `formula`."
         ],
         "whenNotToUse": [
           {
@@ -8436,9 +8568,23 @@
           {
             "id": "components-document--grid-page-landscape",
             "name": "Grid Page Landscape"
+          },
+          {
+            "id": "components-document--w-4",
+            "name": "W 4"
+          },
+          {
+            "id": "components-document--msa",
+            "name": "Msa"
+          },
+          {
+            "id": "components-document--invoice",
+            "name": "Invoice"
           }
         ],
-        "composes": [],
+        "composes": [
+          "DocumentRuntime"
+        ],
         "tokens": [
           "color.bg.surface",
           "color.border.default",
@@ -8582,7 +8728,8 @@
         ],
         "composes": [
           "Document",
-          "DocumentField"
+          "DocumentField",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -8770,7 +8917,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.action.primary",
@@ -8808,6 +8956,15 @@
       "description": null,
       "partOf": "DocumentCheckbox",
       "propsOf": "DocumentCheckbox"
+    },
+    {
+      "name": "DocumentExport",
+      "kind": "type-only",
+      "source": "src/components/DocumentRuntime/collect.ts",
+      "status": null,
+      "description": "A document's data export: what it is, where it is in its life, and every value by name.",
+      "partOf": "DocumentRuntime",
+      "definition": "interface DocumentExport { type: string | null; version: string | null; lifecycle: string; values: Record<string, unknown>; }"
     },
     {
       "name": "DocumentField",
@@ -8976,7 +9133,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -9125,7 +9283,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -9730,6 +9889,15 @@
       "propsOf": "DocumentPage"
     },
     {
+      "name": "DocumentProblems",
+      "kind": "type-only",
+      "source": "src/components/DocumentRuntime/validate.ts",
+      "status": null,
+      "description": "The document validator: what a rendered Document must hold before it is a template, a form or an envelope. It reads only the DOM (the vocabulary's data-doc attributes), with no imports, so the same function runs in a unit test, in the browser checks (tests/visual) and in the tooling scripts.",
+      "partOf": "DocumentRuntime",
+      "definition": "interface DocumentProblems { errors: string[]; warnings: string[]; }"
+    },
+    {
       "name": "DocumentProps",
       "kind": "type-only",
       "source": "src/components/Document/Document.tsx",
@@ -9836,7 +10004,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.action.primary",
@@ -9970,6 +10139,7 @@
           "Change",
           "Clause",
           "Document",
+          "DocumentRuntime",
           "Heading",
           "Margin"
         ],
@@ -10140,7 +10310,8 @@
         "composes": [
           "Document",
           "DocumentField",
-          "DocumentRadioGroup"
+          "DocumentRadioGroup",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.action.primary",
@@ -10295,6 +10466,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Heading",
           "Text"
         ],
@@ -10438,6 +10610,7 @@
         "composes": [
           "Dialog",
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Kbd",
           "Shortcuts",
@@ -11037,6 +11210,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Heading"
         ],
         "tokens": [
@@ -11081,6 +11255,15 @@
       "description": null,
       "partOf": "Exhibit",
       "propsOf": "Exhibit"
+    },
+    {
+      "name": "Expression",
+      "kind": "type-only",
+      "source": "src/components/DocumentRuntime/expression.ts",
+      "status": null,
+      "description": null,
+      "partOf": "DocumentRuntime",
+      "definition": "type Expression = { kind: 'literal'; value: Value; } | { kind: 'name'; path: readonly string[]; } | { kind: 'unary'; op: '-' | 'not'; operand: Expression; } | { kind: 'binary'; op: BinaryOp; left: Expression; right: Expression; } | { kind: 'call'; fn: Aggregate; arg: Expression; }"
     },
     {
       "name": "EyeIcon",
@@ -11368,7 +11551,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -13410,7 +13594,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -13724,6 +13909,7 @@
         "composes": [
           "Button",
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Repeat",
           "Spinner",
@@ -16282,7 +16468,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -17304,6 +17491,7 @@
         "composes": [
           "Button",
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Spinner",
           "VisuallyHidden"
@@ -17959,7 +18147,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -18095,7 +18284,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -19216,6 +19406,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Parties"
         ],
@@ -19363,6 +19554,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Parties",
           "Signature"
@@ -19512,6 +19704,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Icon",
           "Parties",
           "Signature",
@@ -20927,6 +21120,7 @@
         ],
         "composes": [
           "Document",
+          "DocumentRuntime",
           "Heading"
         ],
         "tokens": [
@@ -23824,7 +24018,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -24692,7 +24887,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -24811,7 +25007,8 @@
           }
         ],
         "composes": [
-          "Document"
+          "Document",
+          "DocumentRuntime"
         ],
         "tokens": [
           "color.bg.surface",
@@ -24880,6 +25077,33 @@
       "signature": "(currency: string) => number"
     },
     {
+      "name": "evaluateExpression",
+      "kind": "utility",
+      "source": "src/components/DocumentRuntime/expression.ts",
+      "status": null,
+      "description": "Evaluates a parsed expression against a lookup. Missing names are null; arithmetic treats them as 0.",
+      "partOf": "DocumentRuntime",
+      "signature": "(tree: Expression, lookup: Lookup) => Value"
+    },
+    {
+      "name": "exportDocument",
+      "kind": "utility",
+      "source": "src/components/DocumentRuntime/collect.ts",
+      "status": null,
+      "description": "Exports a rendered Document (the element holding it, or its root).",
+      "partOf": "DocumentRuntime",
+      "signature": "(container: Element) => DocumentExport"
+    },
+    {
+      "name": "expressionProblems",
+      "kind": "utility",
+      "source": "src/components/DocumentRuntime/expression.ts",
+      "status": null,
+      "description": "Every Conditional's `when` and Computed's `formula` in a rendered document that doesn't parse.",
+      "partOf": "DocumentRuntime",
+      "signature": "(container: Element) => string[]"
+    },
+    {
       "name": "findShortcutConflicts",
       "kind": "utility",
       "source": "src/components/Shortcuts/registry.ts",
@@ -24908,6 +25132,15 @@
       "partOf": "Shortcuts",
       "docs": "docs/usage/ShortcutHelp.usage.tsx",
       "signature": "(keys: string, platform?: KeyPlatform) => boolean"
+    },
+    {
+      "name": "parseExpression",
+      "kind": "utility",
+      "source": "src/components/DocumentRuntime/expression.ts",
+      "status": null,
+      "description": "Parses an expression. Throws ExpressionError when it isn't one.",
+      "partOf": "DocumentRuntime",
+      "signature": "(source: string) => Expression"
     },
     {
       "name": "useActiveShortcuts",
@@ -24957,6 +25190,15 @@
       "partOf": "Toast",
       "docs": "docs/usage/Toast.usage.tsx",
       "signature": "() => (toast: ToastInput) => void"
+    },
+    {
+      "name": "validateDocument",
+      "kind": "utility",
+      "source": "src/components/DocumentRuntime/validate.ts",
+      "status": null,
+      "description": "Checks one rendered document (the element holding it, or the document root itself).",
+      "partOf": "DocumentRuntime",
+      "signature": "(container: Element) => DocumentProblems"
     },
     {
       "name": "vars",
@@ -26949,6 +27191,18 @@
       "chain": [
         "size.dialog.sm",
         "container.md"
+      ],
+      "modes": {}
+    },
+    "size.document.barcode": {
+      "cssVar": "--size-document-barcode",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Size of a QR code on a document (Barcode), its quiet zone included.",
+      "value": "96px",
+      "chain": [
+        "size.document.barcode",
+        "size.24"
       ],
       "modes": {}
     },
