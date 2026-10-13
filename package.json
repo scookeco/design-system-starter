@@ -33,7 +33,10 @@
     "test:wcag22": "npm run build-storybook && playwright test --grep @wcag22",
     "test:visual:changed": "node scripts/test-visual-changed.ts",
     "test:visual:docker": "node scripts/visual-docker.ts",
-    "test:visual:canonical": "node scripts/visual-docker.ts"
+    "test:visual:canonical": "node scripts/visual-docker.ts",
+    "document:print": "node scripts/document/print.ts",
+    "document:envelope": "node scripts/document/envelope.ts",
+    "document:export": "node scripts/document/export.ts"
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",

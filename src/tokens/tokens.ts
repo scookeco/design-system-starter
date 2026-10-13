@@ -267,7 +267,8 @@ export const vars = {
       "note": "var(--size-document-note)",
       "grid-row": "var(--size-document-grid-row)",
       "seal": "var(--size-document-seal)",
-      "field": "var(--size-document-field)"
+      "field": "var(--size-document-field)",
+      "barcode": "var(--size-document-barcode)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",

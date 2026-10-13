@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Computed } from '../Computed/Computed';
 import { Document } from '../Document/Document';
 import { DocumentField } from '../DocumentField/DocumentField';
@@ -27,10 +28,13 @@ function Invoice({ lifecycle }: { lifecycle: 'generated' | 'filled' }) {
   return (
     <DocumentViewer>
       <Document label="Invoice INV-2026-0413" type="invoice" lifecycle={lifecycle} defaultValues={ITEMS}>
+        <Parties>
+          <Party role="vendor" name="Vendor" />
+        </Parties>
         <LineItems name="items" caption="Line items" columns={[{ label: 'Description' }, { label: 'Qty', numeric: true }, { label: 'Unit price', numeric: true }, { label: 'Amount', numeric: true }]}>
-          <DocumentField name="description" label="Description" />
-          <DocumentField name="qty" label="Qty" type="number" />
-          <DocumentField name="unit_price" label="Unit price" type="currency" />
+          <DocumentField name="description" label="Description" role="vendor" />
+          <DocumentField name="qty" label="Qty" type="number" role="vendor" />
+          <DocumentField name="unit_price" label="Unit price" type="currency" role="vendor" />
           <Computed name="amount" formula="qty * unit_price" format="currency" />
         </LineItems>
         <KeyValue>

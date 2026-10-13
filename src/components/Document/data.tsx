@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { evaluate, parse, type Value } from './expression';
+import { evaluateExpression, parseExpression, type Value } from '../DocumentRuntime/expression';
 import type { DocumentLifecycle } from './documentIndex';
 
 /** A document's captured values by name. A Repeat's rows are a list of objects under its name. */
@@ -129,7 +129,7 @@ export function DocumentDataProvider({ lifecycle, values: controlled, defaultVal
       if (evaluating.has(id)) return null; // a formula that reads itself
       evaluating.add(id);
       try {
-        return evaluate(parse(entry.formula), (path) => resolve(path, row));
+        return evaluateExpression(parseExpression(entry.formula), (path) => resolve(path, row));
       } finally {
         evaluating.delete(id);
       }

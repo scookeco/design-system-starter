@@ -21,4 +21,13 @@
       inset-inline-end: calc(100% + var(--space-inset-xl) + var(--space-gap-md));
     }
   }
+
+  /* A margin holding initials for every page: in print, the corner of each page, repeated by the print engine. */
+  @media print {
+    .document-margin:has(> [data-each-page]) {
+      position: fixed;
+      inset-block-end: 0;
+      inset-inline-end: 0;
+    }
+  }
 }

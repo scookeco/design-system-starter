@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dependencies, evaluate, ExpressionError, holds, parse, type Value } from '../../src/components/Document/expression';
+import { dependencies, evaluateExpression, ExpressionError, holds, parseExpression, type Value } from '../../src/components/DocumentRuntime/expression';
 
 const scope =
   (data: Record<string, Value>) =>
@@ -12,7 +12,7 @@ const scope =
     return at;
   };
 
-const run = (source: string, data: Record<string, Value> = {}) => evaluate(parse(source), scope(data));
+const run = (source: string, data: Record<string, Value> = {}) => evaluateExpression(parseExpression(source), scope(data));
 
 describe('document expressions', () => {
   it('does arithmetic with the usual precedence', () => {
@@ -48,12 +48,12 @@ describe('document expressions', () => {
   });
 
   it('names what it reads', () => {
-    expect(dependencies(parse('subtotal + sum(items.amount) * tax_rate'))).toEqual(['subtotal', 'items.amount', 'tax_rate']);
+    expect(dependencies(parseExpression('subtotal + sum(items.amount) * tax_rate'))).toEqual(['subtotal', 'items.amount', 'tax_rate']);
   });
 
   it('refuses anything that is not an expression', () => {
     for (const bad of ['1 +', 'eval(x)', 'a = 1', "'open", 'a b', '(1', 'and']) {
-      expect(() => parse(bad), bad).toThrow(ExpressionError);
+      expect(() => parseExpression(bad), bad).toThrow(ExpressionError);
     }
   });
 });

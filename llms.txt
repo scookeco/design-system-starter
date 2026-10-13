@@ -111,6 +111,7 @@ UI rules (design system v0)
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
+- [Barcode](docs/usage/Barcode.usage.tsx): A QR code for a document's id or a verification link
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
 - [Callout](docs/usage/Callout.usage.tsx): A notice inside a document, set apart from its text

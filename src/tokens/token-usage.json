@@ -192,6 +192,7 @@
       "composesAll": [
         "Document",
         "DocumentCheckbox",
+        "DocumentRuntime",
         "Icon",
         "Parties",
         "Signature"
@@ -768,7 +769,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -3628,6 +3630,226 @@
         }
       ]
     },
+    "Barcode": {
+      "kind": "component",
+      "dir": "src/components/Barcode",
+      "exports": [
+        "Barcode"
+      ],
+      "stylesheets": [
+        "src/components/Barcode/Barcode.css"
+      ],
+      "composes": [
+        "Document"
+      ],
+      "composesAll": [
+        "Document",
+        "DocumentRuntime"
+      ],
+      "tokens": [
+        {
+          "token": "color.bg.surface",
+          "readBy": [
+            {
+              "unit": "Barcode",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.border.default",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.default",
+          "readBy": [
+            {
+              "unit": "Barcode",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "color.fg.muted",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "ratio.page-landscape",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "shadow.card",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.barcode",
+          "readBy": [
+            {
+              "unit": "Barcode",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.document.grid-row",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.block",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "size.page.letter.inline",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.document.grid-gap",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.2xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.lg",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.md",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            },
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.sm",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xl",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.gap.xs",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "prop"
+            }
+          ]
+        },
+        {
+          "token": "space.page.margin",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        },
+        {
+          "token": "text.caption",
+          "readBy": [
+            {
+              "unit": "Document",
+              "how": "css"
+            }
+          ]
+        }
+      ]
+    },
     "Box": {
       "kind": "primitive",
       "dir": "src/primitives/Box",
@@ -4205,7 +4427,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -6001,6 +6224,7 @@
       "composesAll": [
         "Change",
         "Document",
+        "DocumentRuntime",
         "Heading",
         "Margin"
       ],
@@ -8535,10 +8759,12 @@
         "src/components/Computed/Computed.css"
       ],
       "composes": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -8737,10 +8963,12 @@
         "src/components/Conditional/Conditional.css"
       ],
       "composes": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -10239,7 +10467,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -10962,8 +11191,12 @@
       "stylesheets": [
         "src/components/Document/Document.css"
       ],
-      "composes": [],
-      "composesAll": [],
+      "composes": [
+        "DocumentRuntime"
+      ],
+      "composesAll": [
+        "DocumentRuntime"
+      ],
       "tokens": [
         {
           "token": "color.bg.surface",
@@ -11157,14 +11390,17 @@
       "exports": [
         "DocumentAttachment"
       ],
-      "stylesheets": [],
+      "stylesheets": [
+        "src/components/DocumentAttachment/DocumentAttachment.css"
+      ],
       "composes": [
         "Document",
         "DocumentField"
       ],
       "composesAll": [
         "Document",
-        "DocumentField"
+        "DocumentField",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -11466,6 +11702,10 @@
               "how": "css"
             },
             {
+              "unit": "DocumentAttachment",
+              "how": "css"
+            },
+            {
               "unit": "DocumentField",
               "how": "css"
             }
@@ -11486,7 +11726,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -11728,7 +11969,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -12050,7 +12292,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -12402,7 +12645,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -12643,6 +12887,19 @@
         }
       ]
     },
+    "DocumentRuntime": {
+      "kind": "component",
+      "dir": "src/components/DocumentRuntime",
+      "exports": [
+        "evaluateExpression",
+        "expressionProblems",
+        "parseExpression"
+      ],
+      "stylesheets": [],
+      "composes": [],
+      "composesAll": [],
+      "tokens": []
+    },
     "DocumentSection": {
       "kind": "component",
       "dir": "src/components/DocumentSection",
@@ -12661,6 +12918,7 @@
         "Change",
         "Clause",
         "Document",
+        "DocumentRuntime",
         "Heading",
         "Margin"
       ],
@@ -13157,7 +13415,8 @@
       "composesAll": [
         "Document",
         "DocumentField",
-        "DocumentRadioGroup"
+        "DocumentRadioGroup",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -13521,6 +13780,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Heading",
         "Text"
       ],
@@ -13819,6 +14079,7 @@
       "composesAll": [
         "Dialog",
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Kbd",
         "Shortcuts",
@@ -15176,6 +15437,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Heading"
       ],
       "tokens": [
@@ -16372,7 +16634,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -18598,7 +18861,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -18912,6 +19176,7 @@
       "composesAll": [
         "Button",
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Repeat",
         "Spinner",
@@ -23042,7 +23307,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -24321,6 +24587,7 @@
       "composesAll": [
         "Button",
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Spinner",
         "VisuallyHidden"
@@ -25761,7 +26028,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -25971,7 +26239,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -27579,6 +27848,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Parties"
       ],
@@ -28089,6 +28359,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Parties",
         "Signature"
@@ -28620,6 +28891,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Icon",
         "Parties",
         "Signature",
@@ -30422,6 +30694,7 @@
       ],
       "composesAll": [
         "Document",
+        "DocumentRuntime",
         "Heading"
       ],
       "tokens": [
@@ -34173,7 +34446,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -35171,10 +35445,12 @@
         "src/components/Watermark/Watermark.css"
       ],
       "composes": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -35398,7 +35674,8 @@
         "Document"
       ],
       "composesAll": [
-        "Document"
+        "Document",
+        "DocumentRuntime"
       ],
       "tokens": [
         {
@@ -37716,6 +37993,18 @@
       "chain": [
         "size.dialog.sm",
         "container.md"
+      ],
+      "modes": {}
+    },
+    "size.document.barcode": {
+      "cssVar": "--size-document-barcode",
+      "tier": "semantic",
+      "type": "dimension",
+      "description": "Size of a QR code on a document (Barcode), its quiet zone included.",
+      "value": "96px",
+      "chain": [
+        "size.document.barcode",
+        "size.24"
       ],
       "modes": {}
     },

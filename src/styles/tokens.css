@@ -397,6 +397,7 @@
     --size-document-grid-row: var(--size-8);
     --size-document-seal: var(--size-24);
     --size-document-field: var(--size-24);
+    --size-document-barcode: var(--size-24);
     --size-signature-slot-inline: var(--container-3xs);
     --size-signature-slot-block: var(--size-16);
     --size-signature-tag-inline: var(--size-24);

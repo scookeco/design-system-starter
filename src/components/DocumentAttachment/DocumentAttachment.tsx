@@ -3,6 +3,7 @@ import { useFormat } from '../../format/LocaleProvider';
 import { areaStyle, type DocumentArea } from '../Document/Document';
 import { useCapture, useField } from '../Document/data';
 import '../DocumentField/DocumentField.css';
+import './DocumentAttachment.css';
 
 export interface DocumentAttachmentProps {
   /** The data key: the attached files' names. Required. */
@@ -36,6 +37,7 @@ export function DocumentAttachment({ name, label, accept, multiple = false, role
       className="document-field"
       data-doc="attachment"
       data-name={path}
+      data-value={value === null || value === undefined ? undefined : JSON.stringify(value)}
       data-role={capture.role}
       data-required={required ? 'true' : undefined}
       data-label-visible="true"
@@ -49,7 +51,7 @@ export function DocumentAttachment({ name, label, accept, multiple = false, role
         <input
           id={id}
           type="file"
-          className="document-field__input"
+          className="document-field__input document-attachment__input"
           name={path}
           accept={accept}
           multiple={multiple}

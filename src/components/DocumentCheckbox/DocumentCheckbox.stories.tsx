@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { DocumentCheckbox } from './DocumentCheckbox';
@@ -18,7 +19,10 @@ export const Default: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Employee's withholding certificate" lifecycle="filled">
-        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" />
+        <Parties>
+          <Party role="employee" name="Employee" />
+        </Parties>
+        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" role="employee" />
       </Document>
     </DocumentViewer>
   ),
@@ -29,7 +33,10 @@ export const Executed: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Employee's withholding certificate" lifecycle="executed" values={{ multiple_jobs: true }}>
-        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" />
+        <Parties>
+          <Party role="employee" name="Employee" />
+        </Parties>
+        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" role="employee" />
       </Document>
     </DocumentViewer>
   ),

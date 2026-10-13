@@ -27,6 +27,7 @@ export function DocumentCheckbox({ name, label, role, required = false, area }: 
       className="document-checkbox"
       data-doc="checkbox"
       data-name={path}
+      data-value={value === null || value === undefined ? undefined : JSON.stringify(value)}
       data-role={capture.role}
       data-required={required ? 'true' : undefined}
       style={areaStyle(area)}

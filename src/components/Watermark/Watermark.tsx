@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { RowContext, useDocumentData } from '../Document/data';
-import { holds } from '../Document/expression';
+import { holds } from '../DocumentRuntime/expression';
 import './Watermark.css';
 
 export interface WatermarkProps {

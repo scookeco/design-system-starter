@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Document, DocumentGrid, DocumentPage } from '../Document/Document';
 import { DocumentViewer } from '../DocumentViewer/DocumentViewer';
 import { Text } from '../Text/Text';
@@ -20,10 +21,13 @@ function Order({ lifecycle }: { lifecycle: 'generated' | 'filled' }) {
   return (
     <DocumentViewer>
       <Document label="Order form" lifecycle={lifecycle} defaultValues={lifecycle === 'generated' ? VALUES : {}}>
+        <Parties>
+          <Party role="customer" name="Customer" />
+        </Parties>
         <Text size="body-lg">
-          <DocumentField name="customer" label="Customer" /> orders the Services for <DocumentField name="fee" label="Annual fee" type="currency" />, starting{' '}
-          <DocumentField name="start" label="Start date" type="date" /> for <DocumentField name="term" label="Initial term" type="duration" />. Purchase order:{' '}
-          <DocumentField name="po" label="Purchase order number" />.
+          <DocumentField name="customer" label="Customer" role="customer" /> orders the Services for <DocumentField name="fee" label="Annual fee" type="currency" role="customer" />, starting{' '}
+          <DocumentField name="start" label="Start date" type="date" role="customer" /> for <DocumentField name="term" label="Initial term" type="duration" role="customer" />. Purchase order:{' '}
+          <DocumentField name="po" label="Purchase order number" role="customer" />.
         </Text>
       </Document>
     </DocumentViewer>
@@ -41,6 +45,9 @@ export const OnAFormPage: Story = {
   render: () => (
     <DocumentViewer>
       <Document label="Employee's withholding certificate" type="w-4" lifecycle="filled" shell="grid" headingLevel={3}>
+        <Parties>
+          <Party role="employee" name="Employee" />
+        </Parties>
         <DocumentPage>
           <DocumentGrid cols={12}>
             <DocumentField name="first_name" label="First name and middle initial" showLabel required role="employee" area={{ row: 1, column: 1, rowSpan: 2, columnSpan: 5 }} />

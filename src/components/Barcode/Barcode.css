@@ -1,0 +1,16 @@
+@layer components {
+  /* Dark modules on a light ground in every theme: readers expect it, and print always has it. */
+  .barcode {
+    inline-size: var(--size-document-barcode);
+    block-size: var(--size-document-barcode);
+    color-scheme: light;
+  }
+
+  .barcode__ground {
+    fill: var(--color-bg-surface);
+  }
+
+  .barcode__modules {
+    fill: var(--color-fg-default);
+  }
+}

@@ -89,13 +89,4 @@
     padding-inline: var(--space-inset-xs);
     font: var(--text-signature);
   }
-
-  /* Initials on every printed page: the page's corner, repeated by the print engine. */
-  @media print {
-    .signature-field[data-each-page] {
-      position: fixed;
-      inset-block-end: 0;
-      inset-inline-end: 0;
-    }
-  }
 }

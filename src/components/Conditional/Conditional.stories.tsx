@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Parties, Party } from '../Parties/Parties';
 import { Callout } from '../Callout/Callout';
 import { Document } from '../Document/Document';
 import { DocumentCheckbox } from '../DocumentCheckbox/DocumentCheckbox';
@@ -21,11 +22,14 @@ function Form({ multipleJobs }: { multipleJobs: boolean }) {
   return (
     <DocumentViewer>
       <Document label="Employee's withholding certificate" lifecycle="filled" defaultValues={{ multiple_jobs: multipleJobs }}>
-        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" />
+        <Parties>
+          <Party role="employee" name="Employee" />
+        </Parties>
+        <DocumentCheckbox name="multiple_jobs" label="I hold more than one job, or my spouse works" role="employee" />
         <Conditional when="multiple_jobs == true">
           <Step title="Multiple jobs or spouse works" n={2}>
             <Callout kind="instruction">Enter the total from the other jobs’ worksheets.</Callout>
-            <DocumentField name="other_jobs" label="Annual pay from the other jobs" type="currency" showLabel required />
+            <DocumentField name="other_jobs" label="Annual pay from the other jobs" type="currency" showLabel required role="employee" />
           </Step>
         </Conditional>
         <Step title="Sign here" n={5} />
