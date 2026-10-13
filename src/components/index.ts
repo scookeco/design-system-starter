@@ -75,7 +75,9 @@ export {
   DocumentFlow,
   DocumentPage,
   DocumentGrid,
+  DocumentCell,
   type DocumentProps,
+  type DocumentCellProps,
   type DocumentPageProps,
   type DocumentGridProps,
   type DocumentArea,
@@ -96,6 +98,16 @@ export { Definitions, Definition, type DefinitionProps } from './Definitions/Def
 export { DocumentSection, type DocumentSectionProps } from './DocumentSection/DocumentSection';
 export { Step, type StepProps } from './Step/Step';
 export { Toc, type TocProps } from './Toc/Toc';
+export { DocumentHeader, DocumentFooter, type DocumentHeaderProps, type DocumentFooterProps, type RunningPages } from './DocumentHeader/DocumentHeader';
+export { Letterhead, type LetterheadProps } from './Letterhead/Letterhead';
+export { Margin, type MarginProps } from './Margin/Margin';
+export { Watermark, type WatermarkProps } from './Watermark/Watermark';
+export { DocumentList, DocumentListItem, type DocumentListProps, type DocumentListStyle } from './DocumentList/DocumentList';
+export { Callout, type CalloutProps, type CalloutKind } from './Callout/Callout';
+export { KeyValue, KeyValueItem, type KeyValueProps, type KeyValueItemProps } from './KeyValue/KeyValue';
+export { Address, type AddressProps } from './Address/Address';
+export { Figure, type FigureProps } from './Figure/Figure';
+export { Seal, type SealProps } from './Seal/Seal';
 export { SignatureBlock, type SignatureBlockProps, type SignatureRecipient } from './SignatureBlock/SignatureBlock';
 export { SignaturePage, SignatureParty, type SignaturePageProps, type SignaturePartyProps } from './SignaturePage/SignaturePage';
 export { Exhibit, type ExhibitProps } from './Exhibit/Exhibit';

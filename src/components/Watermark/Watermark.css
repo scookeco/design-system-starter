@@ -1,0 +1,25 @@
+@layer components {
+  /* Behind the document's text, filling its sheet; in print, on every page. */
+  .watermark {
+    position: absolute;
+    z-index: var(--z-behind);
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .watermark__mark {
+    inline-size: 100%;
+    max-block-size: 100%;
+    fill: var(--color-border-default);
+    font: var(--text-heading-1);
+  }
+
+  @media print {
+    .watermark {
+      position: fixed;
+    }
+  }
+}

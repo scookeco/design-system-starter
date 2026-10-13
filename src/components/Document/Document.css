@@ -3,7 +3,10 @@
   .document {
     display: flex;
     flex-direction: column;
+    flex-grow: 1; /* fills a viewer's sheet, so a Watermark spans the page */
     gap: var(--space-gap-md);
+    position: relative;
+    isolation: isolate; /* a Watermark sits behind the text, inside the document */
     counter-reset: clause-1 exhibit step; /* every number in the document starts here (Clause, Exhibit, Step) */
   }
 
@@ -40,6 +43,10 @@
   }
 
   /* A form page's coordinate system: fixed-height rows; its columns (a count, so data) are set inline. */
+  .document-cell {
+    min-inline-size: 0;
+  }
+
   .document-grid {
     --document-grid-gap: var(--space-document-grid-gap);
 
@@ -77,6 +84,30 @@
   @page document {
     size: letter;
     margin: var(--space-page-margin);
+
+    /* Running header and footer (DocumentHeader, DocumentFooter set the text): every page but the first… */
+    @top-center {
+      color: var(--color-fg-muted);
+      font: var(--text-caption);
+      content: var(--document-header-rest, none);
+    }
+
+    @bottom-center {
+      color: var(--color-fg-muted);
+      font: var(--text-caption);
+      content: var(--document-footer-rest, none);
+    }
+  }
+
+  /* …and the first page, which a header or footer can skip or keep to itself. */
+  @page document:first {
+    @top-center {
+      content: var(--document-header-first, none);
+    }
+
+    @bottom-center {
+      content: var(--document-footer-first, none);
+    }
   }
 
   @page document-form {

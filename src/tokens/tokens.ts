@@ -265,7 +265,8 @@ export const vars = {
       "measure": "var(--size-document-measure)",
       "clause-indent": "var(--size-document-clause-indent)",
       "note": "var(--size-document-note)",
-      "grid-row": "var(--size-document-grid-row)"
+      "grid-row": "var(--size-document-grid-row)",
+      "seal": "var(--size-document-seal)"
     },
     "signature": {
       "slot-inline": "var(--size-signature-slot-inline)",
@@ -329,6 +330,7 @@ export const vars = {
     "linear": "var(--ease-linear)"
   },
   "z": {
+    "behind": "var(--z-behind)",
     "base": "var(--z-base)",
     "sticky": "var(--z-sticky)",
     "dropdown": "var(--z-dropdown)",

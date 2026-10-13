@@ -1,0 +1,7 @@
+@layer components {
+  .seal {
+    inline-size: var(--size-document-seal);
+    block-size: var(--size-document-seal);
+    object-fit: contain;
+  }
+}

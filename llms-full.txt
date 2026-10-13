@@ -105,12 +105,14 @@ UI rules (design system v0)
 ## Components
 
 - [Accordion](docs/usage/Accordion.usage.tsx): A stack of titled sections that open and close
+- [Address](docs/usage/Address.usage.tsx): A postal address block in a document
 - [AiMarker](docs/usage/AiMarker.usage.tsx): Marks content the AI wrote and a person hasn't accepted or…
 - [Avatar](docs/usage/Avatar.usage.tsx): Showing who: record owners, activity authors
 - [Badge](docs/usage/Badge.usage.tsx): A record’s status in a table row, title or card: a word plus a tone
 - [Banner](docs/usage/Banner.usage.tsx): Ongoing state for a page or region
 - [Breadcrumbs](docs/usage/Breadcrumbs.usage.tsx): Path back up a genuinely nested hierarchy
 - [Button](docs/usage/Button.usage.tsx): To run an action on this page: save, create, delete, open a dialog
+- [Callout](docs/usage/Callout.usage.tsx): A notice inside a document, set apart from its text
 - [Card](docs/usage/Card.usage.tsx): A bounded surface for one titled block of a page
 - [Change](docs/usage/Change.usage.tsx): A tracked change in a document compare view
 - [ChatThread](docs/usage/ChatThread.usage.tsx): The list of turns in a conversation
@@ -130,6 +132,8 @@ UI rules (design system v0)
 - [Disclosure](docs/usage/Disclosure.usage.tsx): One section that shows and hides its details
 - [Divider](docs/usage/Divider.usage.tsx): A hairline between blocks or inline groups
 - [Document](docs/usage/Document.usage.tsx): The root of a document: exactly one per document
+- [DocumentHeader](docs/usage/DocumentHeader.usage.tsx): A running header: on screen, a line above the document
+- [DocumentList](docs/usage/DocumentList.usage.tsx): A list in a document's text that is not part of its…
 - [DocumentSection](docs/usage/DocumentSection.usage.tsx): A titled section of a Document that is not a contract clause
 - [DocumentTitle](docs/usage/DocumentTitle.usage.tsx): The top of an agreement in a Document
 - [DocumentViewer](docs/usage/DocumentViewer.usage.tsx): Shows one Document on screen
@@ -137,13 +141,17 @@ UI rules (design system v0)
 - [EmptyState](docs/usage/EmptyState.usage.tsx): What a list, table or panel shows instead of its content
 - [Exhibit](docs/usage/Exhibit.usage.tsx): An exhibit attached to an agreement in the same Document
 - [Feedback](docs/usage/Feedback.usage.tsx): Thumbs up or down on one AI result
+- [Figure](docs/usage/Figure.usage.tsx): An image, a diagram or a chart in a document, with its caption
 - [FileUpload](docs/usage/FileUpload.usage.tsx): Picks files with a button and, as an enhancement
 - [Heading](docs/usage/Heading.usage.tsx): Page titles and section titles, in outline order
 - [Highlight](docs/usage/Highlight.usage.tsx): A highlighted passage
 - [HoverCard](docs/usage/HoverCard.usage.tsx): A supplementary preview of a link's destination
 - [InlineEdit](docs/usage/InlineEdit.usage.tsx): A value you can change where it's shown
 - [Kbd](docs/usage/Kbd.usage.tsx): A key or a keyboard shortcut, shown as key caps
+- [KeyValue](docs/usage/KeyValue.usage.tsx): Label and value pairs in a document
+- [Letterhead](docs/usage/Letterhead.usage.tsx): The issuer's letterhead at the top of a letter
 - [Link](docs/usage/Link.usage.tsx): An inline or standalone text link
+- [Margin](docs/usage/Margin.usage.tsx): The margin beside the part of the document it is in
 - [Menu](docs/usage/Menu.usage.tsx): Action menu
 - [Message](docs/usage/Message.usage.tsx): One turn in a ChatThread: a header, the content
 - [Meter](docs/usage/Meter.usage.tsx): How much of a limit is used: seats, storage, API calls
@@ -158,6 +166,7 @@ UI rules (design system v0)
 - [RadioGroup](docs/usage/RadioGroup.usage.tsx): One choice from a few visible options
 - [ResultList](docs/usage/ResultList.usage.tsx): A list of results people move through one at a time
 - [ReviewChanges](docs/usage/ReviewChanges.usage.tsx): Changes an AI proposes, reviewed before anything happens
+- [Seal](docs/usage/Seal.usage.tsx): An issuer's official seal or stamp on a certificate
 - [SearchField](docs/usage/SearchField.usage.tsx): A search input: type="search", a search icon
 - [SegmentedControl](docs/usage/SegmentedControl.usage.tsx): One value from a few, always exactly one
 - [Select](docs/usage/Select.usage.tsx): Single-choice list
@@ -184,6 +193,7 @@ UI rules (design system v0)
 - [Toggle](docs/usage/Toggle.usage.tsx): A button that stays pressed
 - [Toolbar](docs/usage/Toolbar.usage.tsx): A row of related controls that is one tab stop
 - [Tooltip](docs/usage/Tooltip.usage.tsx): Tooltip on hover and focus, dismissed with Escape
+- [Watermark](docs/usage/Watermark.usage.tsx): A word across the document, faint behind the text
 - [Xref](docs/usage/Xref.usage.tsx): A cross-reference inside a Document
 
 ## Primitives
@@ -307,6 +317,57 @@ Variants: headingLevel (2 | 3 | 4 | 5 | 6); type (multiple | single).
 Stories: `components-accordion--single`, `components-accordion--multiple`, `components-accordion--all-closed`, `components-accordion--with-disabled-item`.
 Composes: Disclosure, Icon.
 Tokens read: `color.bg.hover`, `color.border.default`, `color.fg.default`, `ease.standard`, `icon.stroke`, `motion.fast`, `radius.control`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.xs`, `text.body`, `text.label`.
+
+### Address
+
+component · `src/components/Address/Address.tsx` · usage: `docs/usage/Address.usage.tsx`
+
+A postal address block in a document: an invoice's bill-to, a letter's recipient, an issuer's address.
+
+Props:
+- `name?: string`: The data key the address belongs to ("bill_to"), for exports and forms that fill it.
+- `label?: string`: What it is, shown above it ("Bill to").
+- `lines: readonly string[]`: The address, one line per item ("Globex Inc.", "1 Main St", "Seattle, WA 98101"). Required.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A postal address in a document: an invoice’s bill-to, a letter’s recipient, an issuer’s address. `lines` in order; `label` above it; `name` is its data key for exports.
+
+**When not to use**
+
+- Collecting an address → the address fields of a form
+- An email address or a phone number alone → text, or a `Link`
+
+**Do:** One line per item, in an address element.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice">
+    <Address label="Bill to" lines={['Globex Inc.', '1 Main Street', 'Seattle, WA 98101']} />
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** An address run into one line of text: it can’t be read as an address or exported.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice">
+    <Text>Bill to: Globex Inc., 1 Main Street, Seattle, WA 98101</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `address` element with each line on its own line; the label is visible text above it.
+
+Stories: `components-address--default`, `components-address--unlabelled`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body`, `text.caption`.
 
 ### AiMarker
 
@@ -627,6 +688,59 @@ States: loading.
 Stories: `components-button--primary`, `components-button--secondary`, `components-button--ghost`, `components-button--danger`, `components-button--small`, `components-button--large`, `components-button--with-icon`, `components-button--loading`, `components-button--disabled`, `components-button--secondary-disabled`.
 Composes: Icon, Spinner.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.bg.subtle`, `color.border.default`, `color.fg.disabled`, `color.fg.muted`, `ease.linear`, `ease.standard`, `focus.ring.width`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body-lg`, `text.label`.
+
+### Callout
+
+component · `src/components/Callout/Callout.tsx` · usage: `docs/usage/Callout.usage.tsx`
+
+A notice inside a document, set apart from its text: a note, a warning, or instructions (a form's “Complete Step 2 only if…”). Part of the document, so it prints with it and never announces itself; for a message about the app, use Banner.
+
+Props:
+- `kind?: CalloutKind` = `'note'`: Default note.
+- `title?: string`: Its own heading instead of the kind's word ("Before you sign").
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: The text. Required.
+
+Closed styling API: no `className`/`style`.
+
+Variants: kind (note | warning | instruction).
+
+**When to use**
+
+- A notice that is part of the document, set apart from its text: a note, a warning, or instructions for whoever fills it in (“Complete Step 2 only if…”). `title` replaces the kind’s word.
+
+**When not to use**
+
+- A message about the app or the task (an error, a save) → `Banner`
+- A note for whoever drafts the document, not part of it → a `ClauseNote` in a `Margin`
+
+**Do:** Instructions in the document, labelled in words, never by colour alone.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form">
+    <Callout kind="instruction">Complete Step 2 only if you hold more than one job.</Callout>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Instructions in bold capitals in the text: they read as part of what is signed.
+
+```tsx
+<DocumentViewer>
+  <Document label="Form">
+    <Text>COMPLETE STEP 2 ONLY IF YOU HOLD MORE THAN ONE JOB.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `aside` with its kind or `title` as its first line; it never announces itself (unlike a Banner), because it is part of the document.
+
+Stories: `components-callout--default`.
+Composes: Document.
+Tokens read: `border.width.change-bar`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.muted`, `color.status.info.border`, `color.status.warning.border`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.sm`, `space.page.margin`, `text.body`, `text.caption`.
 
 ### Card
 
@@ -1001,7 +1115,7 @@ Props:
 - `title?: string`: The clause's heading ("Limitation of liability"). Sub-items such as (a) usually have none.
 - `children: ReactNode`: The clause text: paragraphs, and nested Clauses for its sub-clauses.
 - `numbered?: boolean` = `true`: False for a clause that takes no number (a heading-only part, a preamble): the ones after it don't skip one. Default true.
-- `note?: ReactNode`: A ClauseNote for whoever drafts or reviews it: in the margin when the viewer is wide enough, under the heading when not.
+- `note?: ReactNode`: A ClauseNote for whoever drafts or reviews it, in a Margin: beside the paper when the viewer is wide enough, under the heading when not.
 - `conspicuous?: boolean` = `false`: Sets the clause's own paragraphs in capitals, as contracts set a liability cap or a damages waiver so it stands out.
 - `change?: { kind: ChangeKind; author?: string; color?: ChangeColor }`: In a redline: the whole clause was inserted, deleted or moved (by `author`, in `color`). It keeps its number.
 
@@ -1068,8 +1182,8 @@ Closed styling API: no `className`/`style`.
 - A defined term is a `dfn`, in quotes and bold, so it is announced and seen as the definition.
 
 Stories: `components-clause--default`, `components-clause--renumbered`, `components-clause--unresolved`, `components-clause--unnumbered`.
-Composes: Change, Document, Heading.
-Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Change, Document, Heading, Margin.
+Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### ClauseNote
 
@@ -1636,7 +1750,7 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-definitions--default`, `components-definitions--defined-twice`.
 Composes: Document.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body-lg`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.body-lg`, `text.caption`.
 
 ### Dialog
 
@@ -1847,6 +1961,16 @@ Closed styling API: no `className`/`style`.
 
 Variants: lifecycle (generated | filled | negotiated | executed); shell (flow | grid); headingLevel (2 | 3 | 4).
 
+#### DocumentCell
+
+component, part of Document. Places anything on a DocumentGrid by row and column, for content that takes no `area` itself (a heading, a paragraph).
+
+Props:
+- `area: DocumentArea`: Where it sits on the DocumentGrid. Required.
+- `children: ReactNode`: What sits there: a heading, text, anything without an `area` of its own.
+
+Closed styling API: no `className`/`style`.
+
 #### DocumentFlow
 
 component, part of Document. A normal-flow run of content: it reflows, and in print breaks into pages wherever the text falls.
@@ -1885,6 +2009,7 @@ Closed styling API: no `className`/`style`.
 - The root of every generated document: exactly one `Document` per document, named by `label`, with its `type` ("msa", "w-4"), `version` and `lifecycle` (generated, filled, negotiated, executed). Clauses, exhibits and references number and resolve inside it.
 - Pick the shell: `flow` (the default) for contracts, letters and policies, which reflow and break into pages only in print; `grid` for forms whose layout is the content (a W-4), shown as fixed `DocumentPage`s with a `DocumentGrid` on each.
 - `DocumentPage` in a flow document starts a new printed page (a signature page) and continues the sheet on screen. `DocumentFlow` holds a run of reflowing content.
+- On a `DocumentGrid`, document parts take `area` ({ row, column, rowSpan, columnSpan }); `DocumentCell` places anything else (a heading, a paragraph).
 
 **When not to use**
 
@@ -1923,7 +2048,138 @@ Closed styling API: no `className`/`style`.
 - Print is an enhancement: the same markup reads and works without the print stylesheet.
 
 Stories: `components-document--default`, `components-document--without-viewer`, `components-document--grid-page`, `components-document--grid-page-landscape`.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
+### DocumentHeader
+
+component · `src/components/DocumentHeader/DocumentHeader.tsx` · usage: `docs/usage/DocumentHeader.usage.tsx`
+
+A running header: on screen, a line above the document; in print, the top margin of each page it runs on (`pages`: all, first, or every page but the first).
+
+Props:
+- `pages?: RunningPages` = `'all'`: Which printed pages it runs on. Default all.
+- `children: ReactNode`: The running text ("Master Services Agreement · Confidential"). Text only: print shows it as a string.
+
+Closed styling API: no `className`/`style`.
+
+Variants: pages (all | first | rest).
+
+#### DocumentFooter
+
+component, part of DocumentHeader. A running footer: on screen, a line below the document; in print, the bottom margin of each page it runs on, with the page number when asked (`pageNumber`, from the page counter).
+
+Props:
+- `pages?: RunningPages` = `'all'`: Which printed pages it runs on. Default all.
+- `pageNumber?: 'page' | 'of'`: Adds the page number in print: “Page 2”, or with `of`, “Page 2 of 5”.
+- `children?: ReactNode`: The running text, if any ("Acme Corp · MSA v3.2"). Text only.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Running text on a document’s printed pages: a header (“Master Services Agreement · Confidential”) and a footer, with the page number from `pageNumber` (“Page 2”, or “Page 2 of 5” with "of").
+- `pages` says where it runs: all (the default), first, or rest (every page but the first, under a letterhead). On screen each shows once, above or below the document.
+
+**When not to use**
+
+- The issuer’s block on the first page → `Letterhead`
+- A document’s title → `DocumentTitle`
+- A header for an app page → `PageHeader`
+
+**Do:** Text only, with the page number from the page counter.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <DocumentHeader pages="rest">Master Services Agreement · Confidential</DocumentHeader>
+    <Text>The Agreement.</Text>
+    <DocumentFooter pageNumber="of" />
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** “Page 1” typed into the text: it prints on one page and is wrong on all the others.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>The Agreement.</Text>
+    <Text>Page 1</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `header` and a `footer` inside the document’s `article`, so not page landmarks; read once, in order, on screen.
+- In print they run in the page margins (Chromium page margin boxes, an enhancement: other browsers print without them). They show text only.
+
+Stories: `components-documentheader--default`, `components-documentheader--page-number-only`.
+Tokens read: `color.border.default`, `color.fg.muted`, `space.inset.sm`, `text.caption`.
+
+### DocumentList
+
+component · `src/components/DocumentList/DocumentList.tsx` · usage: `docs/usage/DocumentList.usage.tsx`
+
+A list in a document's text that is not part of its structure: the documents to bring, the conditions that all apply. Numbered styles are an ordered list. For numbered provisions use Clause, so they renumber and can be referred to.
+
+Props:
+- `listStyle?: DocumentListStyle` = `'disc'`: The marker: decimal (1. 2.), lower-alpha (a. b.), upper-alpha, lower-roman, disc (bullets, the default) or none.
+- `children: ReactNode`: One DocumentListItem per item. Required.
+
+Closed styling API: no `className`/`style`.
+
+Variants: listStyle (decimal | lower-alpha | upper-alpha | lower-roman | disc | none).
+
+#### DocumentListItem
+
+component, part of DocumentList. One item of a DocumentList.
+
+Props:
+- `children: ReactNode`
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- A list in a document’s text that is not part of its structure: what to bring, conditions that all apply. `listStyle` sets the marker; numbered styles are an ordered list.
+
+**When not to use**
+
+- Numbered provisions people refer to (“Section 4.1(a)”) → `Clause`, so they renumber and take references
+- Rows of data → `Table`
+
+**Do:** A real list: its items are counted and announced.
+
+```tsx
+<DocumentViewer>
+  <Document label="Offer letter">
+    <DocumentList>
+      <DocumentListItem>a photo identification;</DocumentListItem>
+      <DocumentListItem>your bank details.</DocumentListItem>
+    </DocumentList>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Numbered provisions as a list: nothing can refer to item 2, and inserting one leaves references wrong.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="termination" title="Termination">
+      <Text>Either party may end it: 1. for breach; 2. on insolvency.</Text>
+    </Clause>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `ol` or `ul` with `li` items, so the count and position are announced.
+
+Stories: `components-documentlist--default`, `components-documentlist--decimal`, `components-documentlist--lower-alpha`, `components-documentlist--upper-alpha`, `components-documentlist--lower-roman`, `components-documentlist--no-markers`.
+Tokens read: `color.fg.default`, `size.document.clause-indent`, `space.gap.2xs`, `text.body-lg`.
 
 ### DocumentSection
 
@@ -1983,8 +2239,8 @@ States: numbered.
 - A `section` named by its heading, at the next level of the document’s outline; a reference to it moves focus there.
 
 Stories: `components-documentsection--default`, `components-documentsection--numbered`.
-Composes: Change, Clause, Document, Heading.
-Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Composes: Change, Clause, Document, Heading, Margin.
+Tokens read: `border.width.change-bar`, `color.bg.surface`, `color.border.default`, `color.category.1.fg`, `color.category.2.fg`, `color.category.3.fg`, `color.category.4.fg`, `color.category.5.fg`, `color.category.6.fg`, `color.fg.default`, `color.fg.muted`, `color.focus`, `color.status.danger.fg`, `color.status.success.fg`, `focus.ring.offset`, `focus.ring.width`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.document.note`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.md`, `space.inset.xl`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### DocumentTitle
 
@@ -2317,7 +2573,7 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-exhibit--default`, `components-exhibit--labelled`.
 Composes: Document, Heading.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `color.focus`, `focus.ring.offset`, `focus.ring.width`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.lg`, `space.page.margin`, `space.scroll-padding.end`, `space.scroll-padding.start`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Feedback
 
@@ -2371,6 +2627,60 @@ Closed styling API: no `className`/`style`; `UNSAFE_className`/`UNSAFE_style` es
 Stories: `components-feedback--not-rated`, `components-feedback--rated-helpful`, `components-feedback--rated-not-helpful`, `components-feedback--custom-reasons`.
 Composes: Button, Field, Icon, RadioGroup, Spinner, Toggle.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.action.primary`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `space.inset.xs`, `text.body`, `text.body-lg`, `text.caption`, `text.label`.
+
+### Figure
+
+component · `src/components/Figure/Figure.tsx` · usage: `docs/usage/Figure.usage.tsx`
+
+An image, a diagram or a chart in a document, with its caption.
+
+Props:
+- `caption?: string`: What the figure shows, in a sentence, under it.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: The image, diagram or chart (an SVG chart prints as it is). Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- An image, a diagram or a chart in a document, with its `caption`. Charts are SVG drawn from the chart tokens, so they print as drawn.
+
+**When not to use**
+
+- A chart on an app page → the reports example’s charts
+- An official seal → `Seal`
+
+**Do:** A described image with a caption.
+
+```tsx
+<DocumentViewer>
+  <Document label="Statement of work">
+    <Figure caption="Figure 1. The three phases.">
+      <svg viewBox="0 0 100 10" role="img" aria-label="Three phases">
+        <rect width="100" height="10" fill="var(--color-chart-categorical-1)" />
+      </svg>
+    </Figure>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A caption as separate text: it isn’t tied to its figure.
+
+```tsx
+<DocumentViewer>
+  <Document label="Statement of work">
+    <Text>Figure 1. The three phases.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `figure` with a `figcaption`; the image or chart still needs its own alternative text.
+
+Stories: `components-figure--default`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ### FileUpload
 
@@ -2733,6 +3043,127 @@ Signature: `(keys: string, platform?: KeyPlatform) => string`
 Stories: `components-kbd--mac`, `components-kbd--windows-and-linux`, `components-kbd--shift-chord`, `components-kbd--single-key`, `components-kbd--single-key-shortcut`, `components-kbd--sequence`, `components-kbd--named-keys`, `components-kbd--combination`, `components-kbd--combination-in-notation`.
 Tokens read: `border.width.default`, `color.bg.subtle`, `color.border.default`, `color.border.strong`, `color.fg.muted`, `font.weight.strong`, `radius.control`, `size.icon.md`, `space.gap.2xs`, `space.inset.xs`, `text.caption`.
 
+### KeyValue
+
+component · `src/components/KeyValue/KeyValue.tsx` · usage: `docs/usage/KeyValue.usage.tsx`
+
+Label and value pairs in a document: an invoice's number, date and terms; its subtotal, tax and total. Labels sit beside their values, values aligned at the end.
+
+Props:
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+- `children: ReactNode`: One KeyValueItem per pair. Required.
+
+Closed styling API: no `className`/`style`.
+
+#### KeyValueItem
+
+component, part of KeyValue. One pair of a KeyValue.
+
+Props:
+- `label: string`: The label ("Invoice", "Terms"). Required.
+- `children: ReactNode`: The value: text formatted with useFormat, or a computed value.
+- `emphasis?: boolean` = `false`: Sets the pair in bold, as a total.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- Label and value pairs in a document: an invoice’s number, date and terms; subtotal, tax and total (`emphasis` on the total). Format values with useFormat.
+
+**When not to use**
+
+- A record’s fields in the app → the record page’s field list
+- Defined terms → `Definitions`
+- Rows with several columns → `Table`
+
+**Do:** Pairs as a description list, the total set apart.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice">
+    <KeyValue>
+      <KeyValueItem label="Subtotal">$12,000.00</KeyValueItem>
+      <KeyValueItem label="Total" emphasis>
+        $13,020.00
+      </KeyValueItem>
+    </KeyValue>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** Pairs as text with colons: labels and values can’t be told apart or exported.
+
+```tsx
+<DocumentViewer>
+  <Document label="Invoice">
+    <Text>Subtotal: $12,000.00 Total: $13,020.00</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `dl`: each label a `dt`, its value the `dd`, grouped in a `div`, so each pair is announced together.
+
+Stories: `components-keyvalue--default`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.strong`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.inset.xs`, `space.page.margin`, `text.body`, `text.caption`.
+
+### Letterhead
+
+component · `src/components/Letterhead/Letterhead.tsx` · usage: `docs/usage/Letterhead.usage.tsx`
+
+The issuer's letterhead at the top of a letter, an invoice or a certificate: its mark beside its name and address, above a rule. First page only: running text on later pages is a DocumentHeader.
+
+Props:
+- `logo?: ReactNode`: The issuer's mark: a logo image or an Avatar.
+- `children: ReactNode`: The issuer's block: its name and an Address. Required.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- The issuer’s block at the top of a letter, an invoice or a certificate: its mark (`logo`), name and `Address`, above a rule. First page only.
+
+**When not to use**
+
+- Text that runs on every page → `DocumentHeader`
+- An agreement’s title and parties → `DocumentTitle`
+
+**Do:** The issuer named in text, with its address as an Address.
+
+```tsx
+<DocumentViewer>
+  <Document label="Offer letter">
+    <Letterhead>
+      <Heading level={2} size={4}>
+        Acme Corp
+      </Heading>
+      <Address lines={['500 Pine Street', 'Seattle, WA 98101']} />
+    </Letterhead>
+    <Text>Dear Maya,</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A letterhead that is only an image: its name and address can’t be read, copied or exported.
+
+```tsx
+<DocumentViewer>
+  <Document label="Offer letter">
+    <Text>[Letterhead image]</Text>
+    <Text>Dear Maya,</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- A `header` inside the document’s `article`; the issuer’s name is real text, and a logo image needs its own alternative text.
+
+Stories: `components-letterhead--default`.
+Tokens read: `color.border.default`, `color.fg.default`, `space.gap.2xs`, `space.gap.md`, `space.inset.md`.
+
 ### Link
 
 component · `src/components/Link/Link.tsx` · usage: `docs/usage/Link.usage.tsx`
@@ -2792,6 +3223,62 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-link--standalone`, `components-link--in-running-text`, `components-link--through-link-provider`.
 Tokens read: `color.fg.link`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`.
+
+### Margin
+
+component · `src/components/Margin/Margin.tsx` · usage: `docs/usage/Margin.usage.tsx`
+
+The margin beside the part of the document it is in: a clause's note for whoever drafts it, the per-page initials slot. It sits in the margin beside the paper when the viewer is wide enough, and in the flow, under what it annotates, when it is not.
+
+Props:
+- `side?: 'start' | 'end'` = `'end'`: Which margin: end (the right in left-to-right text, the default) or start.
+- `children: ReactNode`: What sits in the margin: a ClauseNote, an Initials slot.
+
+Closed styling API: no `className`/`style`.
+
+Variants: side (start | end).
+
+**When to use**
+
+- What sits beside the text rather than in it: a clause’s note for whoever drafts or reviews it (Clause `note` puts its ClauseNote in a Margin), and the per-page initials slot.
+- It sits in the margin beside the paper when the viewer is at least 75rem wide, and in the flow under what it annotates when it is narrower. `side` picks the end (default) or start margin.
+
+**When not to use**
+
+- A notice that is part of the document → `Callout`
+- A comment thread on a passage → the review tools around the DocumentViewer
+
+**Do:** A clause note in the margin, through Clause note.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="cap" title="Liability" note={<ClauseNote position="balanced" />}>
+      <Text>Capped at twelve months of fees.</Text>
+    </Clause>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** A note typed into the clause’s text: it prints and gets signed as part of the agreement.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Clause id="cap" title="Liability">
+      <Text>Capped at twelve months of fees. (Note: balanced position.)</Text>
+    </Clause>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An `aside` in source order right after what it annotates, so it is read next to it at any width.
+- Placed by a container query on the viewer’s canvas, not by the viewport.
+
+Stories: `components-margin--default`, `components-margin--start-side`.
+Tokens read: `size.document.note`, `space.gap.md`, `space.gap.xs`, `space.inset.xl`.
 
 ### Menu
 
@@ -3648,6 +4135,56 @@ Stories: `components-reviewchanges--reviewing`, `components-reviewchanges--partl
 Composes: AiMarker, Badge, Button, Icon, Spinner, Toggle.
 Tokens read: `button.danger.bg`, `button.danger.bg-hover`, `button.danger.fg`, `button.ghost.bg-hover`, `button.ghost.fg`, `button.primary.bg`, `button.primary.bg-hover`, `button.primary.fg`, `button.secondary.bg`, `button.secondary.bg-hover`, `button.secondary.border`, `button.secondary.fg`, `color.ai.bg`, `color.ai.border`, `color.ai.fg`, `color.bg.hover`, `color.bg.selected`, `color.bg.subtle`, `color.bg.surface`, `color.border.default`, `color.border.strong`, `color.fg.default`, `color.fg.disabled`, `color.fg.muted`, `color.status.danger.bg`, `color.status.danger.border`, `color.status.danger.fg`, `color.status.info.bg`, `color.status.info.border`, `color.status.info.fg`, `color.status.neutral.bg`, `color.status.neutral.border`, `color.status.neutral.fg`, `color.status.success.bg`, `color.status.success.border`, `color.status.success.fg`, `color.status.warning.bg`, `color.status.warning.border`, `color.status.warning.fg`, `ease.linear`, `ease.standard`, `focus.ring.width`, `font.weight.strong`, `icon.stroke`, `motion.fast`, `motion.spin`, `radius.control`, `radius.pill`, `size.control.lg`, `size.control.md`, `size.control.sm`, `size.icon.md`, `size.icon.sm`, `size.target-min`, `space.gap.2xs`, `space.gap.md`, `space.gap.sm`, `space.gap.xs`, `space.inset.2xs`, `space.inset.lg`, `space.inset.md`, `space.inset.sm`, `text.body`, `text.body-lg`, `text.caption`, `text.heading-4`, `text.label`.
 
+### Seal
+
+component · `src/components/Seal/Seal.tsx` · usage: `docs/usage/Seal.usage.tsx`
+
+An issuer's official seal or stamp on a certificate, a license or a notarised page, named by its issuer.
+
+Props:
+- `issuer: string`: Who issued it ("State of Washington"): names the seal. Required.
+- `src: string`: The seal's image. Required.
+- `area?: DocumentArea`: Where it sits on a DocumentGrid.
+
+Closed styling API: no `className`/`style`.
+
+**When to use**
+
+- An issuer’s official seal or stamp on a certificate, a license or a notarised page, named by its `issuer`, at size.document.seal.
+
+**When not to use**
+
+- A company logo → the `Letterhead` logo
+- A signature → the signature parts
+
+**Do:** The seal named by its issuer.
+
+```tsx
+<DocumentViewer>
+  <Document label="Certificate">
+    <Seal issuer="Acme Training Institute" src={SEAL} />
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** “(SEAL)” as text: nothing shows who issued it.
+
+```tsx
+<DocumentViewer>
+  <Document label="Certificate">
+    <Text>(SEAL)</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An image named “Seal of <issuer>”.
+
+Stories: `components-seal--default`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.document.seal`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
+
 ### SearchField
 
 component · `src/components/SearchField/SearchField.tsx` · usage: `docs/usage/SearchField.usage.tsx`
@@ -4213,7 +4750,7 @@ States: optional.
 
 Stories: `components-step--default`.
 Composes: Document, Heading.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.body`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `font.weight.body`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`, `text.heading-1`, `text.heading-2`, `text.heading-3`, `text.heading-4`.
 
 ### Stepper
 
@@ -5064,7 +5601,7 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-toc--default`, `components-toc--top-level-only`.
 Composes: Document.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body-lg`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.clause-indent`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.body-lg`, `text.caption`.
 
 ### Toggle
 
@@ -5266,6 +5803,58 @@ Stories: `components-tooltip--closed`, `components-tooltip--open`, `components-t
 Composes: Kbd.
 Tokens read: `border.width.default`, `color.bg.inverse`, `color.bg.subtle`, `color.border.default`, `color.border.strong`, `color.fg.inverse`, `color.fg.muted`, `ease.enter`, `font.weight.strong`, `motion.fast`, `radius.control`, `shadow.popover`, `size.icon.md`, `size.overlay-max`, `space.gap.2xs`, `space.gap.sm`, `space.inset.sm`, `space.inset.xs`, `text.caption`, `z.tooltip`.
 
+### Watermark
+
+component · `src/components/Watermark/Watermark.tsx` · usage: `docs/usage/Watermark.usage.tsx`
+
+A word across the document (“DRAFT”), faint behind the text, on every printed page. By default it shows until the document is executed. It is announced once, as an image named by its word.
+
+Props:
+- `text?: string` = `'DRAFT'`: The word across the page ("DRAFT", "CONFIDENTIAL"). Default "DRAFT".
+- `show?: boolean`: Show it. Default: until the document is executed (`lifecycle` other than "executed").
+
+Closed styling API: no `className`/`style`.
+States: show.
+
+**When to use**
+
+- A word across a document that isn’t final (“DRAFT”, “CONFIDENTIAL”), faint behind the text and on every printed page. By default it shows until the `Document` is executed; `show` overrides that.
+
+**When not to use**
+
+- A document’s status in the app (Draft, Sent, Signed) → a `Badge` in the `PageHeader`
+- Marking what changed → `Change`
+
+**Do:** One Watermark, shown by the document’s lifecycle.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement" lifecycle="negotiated">
+    <Watermark />
+    <Text>The Agreement.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Don't:** “DRAFT” typed into the text: it stays after signing unless someone remembers to remove it.
+
+```tsx
+<DocumentViewer>
+  <Document label="Agreement">
+    <Text>DRAFT</Text>
+    <Text>The Agreement.</Text>
+  </Document>
+</DocumentViewer>
+```
+
+**Accessibility**
+
+- An image named by its word, read once at the start of the document. Behind the text, it never blocks selecting or reading it.
+
+Stories: `components-watermark--default`, `components-watermark--confidential`, `components-watermark--executed`.
+Composes: Document.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.muted`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`, `text.heading-1`, `z.behind`.
+
 ### Xref
 
 component · `src/components/Xref/Xref.tsx` · usage: `docs/usage/Xref.usage.tsx`
@@ -5330,7 +5919,7 @@ Closed styling API: no `className`/`style`.
 
 Stories: `components-xref--default`, `components-xref--broken`.
 Composes: Document.
-Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`.
+Tokens read: `color.bg.surface`, `color.border.default`, `color.fg.default`, `color.fg.link`, `color.fg.muted`, `color.status.danger.fg`, `focus.ring.offset`, `focus.ring.width`, `radius.indicator`, `ratio.page`, `ratio.page-landscape`, `shadow.card`, `size.document.grid-row`, `size.page.letter.block`, `size.page.letter.inline`, `space.document.grid-gap`, `space.gap.2xl`, `space.gap.2xs`, `space.gap.lg`, `space.gap.md`, `space.gap.sm`, `space.gap.xl`, `space.gap.xs`, `space.page.margin`, `text.caption`.
 
 ## Primitives reference
 
@@ -6554,6 +7143,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `BreadcrumbLink` (`src/components/Breadcrumbs/Breadcrumbs.tsx`): `interface BreadcrumbLink { label: string; href: string; }`
 - `ButtonSize` (`src/components/Button/Button.tsx`): `type ButtonSize = 'sm' | 'md' | 'lg'`
 - `ButtonVariant` (`src/components/Button/Button.tsx`): `type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'`
+- `CalloutKind` (`src/components/Callout/Callout.tsx`): `type CalloutKind = 'note' | 'warning' | 'instruction'` What a callout is: a note, a warning, or instructions for whoever fills the document in.
 - `ChangeColor` (`src/components/Change/Change.tsx`): `type ChangeColor = 1 | 2 | 3 | 4 | 5 | 6` A reviewer's colour (color.category.*), the same for every change they make (Word's “By author”).
 - `ChangeDecision` (`src/components/ReviewChanges/ReviewChanges.tsx`): `type ChangeDecision = 'accepted' | 'rejected'`
 - `ChangeKind` (`src/components/Change/Change.tsx`): `type ChangeKind = 'insert' | 'delete' | 'move-from' | 'move-to'` What a tracked change did: Word's insertion, deletion and the two ends of a move.
@@ -6570,6 +7160,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `DateStyle` (`src/format/format.ts`): `type DateStyle = 'short' | 'medium' | 'long' | 'month'` short "Sep 12" · medium "Sep 12, 2026" · long "September 12, 2026" · month "Sep 2026" (a chart's axis, a billing period).
 - `DocumentArea` (`src/components/Document/Document.tsx`): `interface DocumentArea { row: number; column: number; rowSpan?: number; columnSpan?: number; }` Where a child of a DocumentGrid sits: 1-based grid lines, as a form's boxes are numbered by row and column.
 - `DocumentLifecycle` (`src/components/Document/documentIndex.ts`): `type DocumentLifecycle = 'generated' | 'filled' | 'negotiated' | 'executed'` Where a document is in its life: generated from data, filled in, negotiated (redlines), or executed (signed).
+- `DocumentListStyle` (`src/components/DocumentList/DocumentList.tsx`): `type DocumentListStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'disc' | 'none'` How a list marks its items. The numbered ones are an ordered list.
 - `DocumentSelection` (`src/components/DocumentViewer/DocumentViewer.tsx`): `interface DocumentSelection { text: string; range: Range; }` The text the reader selected in the document, and the range it covers (to store as a highlight).
 - `DocumentShell` (`src/components/Document/documentIndex.ts`): `type DocumentShell = 'flow' | 'grid'` How a document is laid out: flow reflows (contracts, letters); grid places on fixed pages (forms).
 - `EmptyStateReason` (`src/components/EmptyState/EmptyState.tsx`): `type EmptyStateReason = 'first-use' | 'no-results' | 'error'` Why the region is empty. Decide it from the unfiltered collection, never from the rows on screen: "nothing yet" and "nothing matches" need different words and a different action.
@@ -6603,6 +7194,7 @@ Semantic and component tokens as var() references, for inline custom properties 
 - `ProposedChange` (`src/components/ReviewChanges/ReviewChanges.tsx`): `interface ProposedChange { id: string; target: string; field: string; before: string; after: string; kind?: 'field' | 'text'; reason?: string; blockedReason?: string; }` One proposed change: a field's old and new value, or a text rewrite shown word by word.
 - `RadioOption` (`src/components/RadioGroup/RadioGroup.tsx`): `interface RadioOption { value: string; label: string; description?: string; disabled?: boolean; }`
 - `RatioToken` (`src/tokens/tokens.ts`): `type RatioToken = keyof typeof vars.ratio`
+- `RunningPages` (`src/components/DocumentHeader/DocumentHeader.tsx`): `type RunningPages = 'all' | 'first' | 'rest'` Which printed pages a running header or footer appears on.
 - `ScrollRegionToken` (`src/tokens/tokens.ts`): `type ScrollRegionToken = keyof typeof vars.size['scroll-region']`
 - `SegmentedOption` (`src/components/SegmentedControl/SegmentedControl.tsx`): `interface SegmentedOption { value: string; label: string; }`
 - `SelectOption` (`src/components/Select/Select.tsx`): `interface SelectOption { value: string; label: string; disabled?: boolean; }`
@@ -7721,7 +8313,7 @@ Statuses from web-features 3.40.0, read on 2026-09-29. Check a feature on websta
 | `field-sizing: content` | Composer and Suggestion: text boxes that grow with what’s typed | Measuring scrollHeight in script to grow a text box. | Newly available (2026-06-16) | Ignored: the Composer keeps its minimum height and scrolls; the Suggestion box keeps its rows and its ghost text still lines up (checked with the property turned off). |
 | `box-decoration-break: clone` | Highlight, and a DataField placeholder, that wraps onto a second line | Nothing: the background would break square at the line end. | Limited: Chrome, Edge and Firefox; Safari only as -webkit-box-decoration-break | Ignored: a wrapped highlight keeps its rounded outer ends, and its inner ends are square. Nothing moves. |
 | `light-dark()` | Every semantic colour in the token output | A second block of colour variables per scheme. | Newly available (2024-05-13); widely available on 2026-11-13 | The one required feature that isn’t widely available yet: without it no colour resolves. Adopted with dark mode; if a supported browser lacked it, the token build would write one block per scheme instead. |
-| `@page` with `size` and named pages (`page`) | Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is | Nothing: printing a document took the browser’s default page and margins. | Newly available (2024-12-11); widely available on 2027-06-11 | Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it. |
+| `@page` with `size`, named pages (`page`) and page margin boxes | Document: a flow document prints on letter pages with `space.page.margin`; a grid DocumentPage prints edge to edge on its own named page, landscape when it is. DocumentHeader and DocumentFooter run in the margin boxes (`@top-center`, `@bottom-center`, `counter(page)`), their text handed over in custom properties | Nothing: printing a document took the browser’s default page and margins. | Newly available (2024-12-11); widely available on 2027-06-11 | Print is an enhancement: the document prints on the browser’s default page and margins, and the screen is unchanged. Headless Chromium (the PDF render target) supports it. |
 | Alt text for generated content (`content: … / …`) | Document numbers drawn by counters: Clause (1., 1.1, (a), (i)), Exhibit letters, Step and Recital numbers | Nothing: Chromium leaves counter values out of accessible names, so “1. Definitions” was announced “. Definitions”. The alt text puts the number back in the heading’s name. | Newly available (2024-07-09); widely available on 2027-01-09 | Each rule declares the plain `content` first; a browser without the alt syntax drops the second declaration and still draws the number. tests/visual/document-numbering.spec.ts reads the numbers from the accessibility tree. |
 | `break-before: page` | DocumentPage: a page in a flow document (a signature page) starts a new printed page | n/a | Widely available | Required for print only: on screen the sheet continues. |
 | Cascade layers, container queries, logical properties, `:focus-visible`, `color-scheme`, individual transforms (`translate`), `:dir()` | Everywhere: layer order, responsive layouts, RTL, the focus ring, dark mode, the drawer’s slide | n/a | Widely available | Required: no fallback. |
@@ -8332,6 +8924,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `size.document.grid-row` `var(--size-document-grid-row)`: `32px`. Height of one row in a DocumentGrid: the coordinate system a form page places its fields on.
 - `size.document.measure` `var(--size-document-measure)`: `48rem`. Max inline size of the paper: one continuous surface, centred, no page breaks.
 - `size.document.note` `var(--size-document-note)`: `12rem`. Inline size of a clause note in the margin beside the paper (ClauseNote).
+- `size.document.seal` `var(--size-document-seal)`: `96px`. Size of an issuer's seal or stamp on a certificate or license (Seal).
 - `size.drawer.md` `var(--size-drawer-md)`: `28rem`. Drawer widths: sm for navigation, md for details and filters.
 - `size.drawer.sm` `var(--size-drawer-sm)`: `16rem`. Drawer widths: sm for navigation, md for details and filters.
 - `size.grid-item.lg` `var(--size-grid-item-lg)`: `20rem`. Minimum item width for auto-fit Grid.
@@ -8385,6 +8978,7 @@ Path, CSS custom property, value (and dark value), what it is for. Look up compo
 - `text.label` `var(--text-label)`: `500 0.875rem/1.25 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Form labels, buttons, tabs and navigation.
 - `text.signature` `var(--text-signature)`: `400 1.875rem/1.25 "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive`. A signature drawn on its line (SignatureBlock, signed).
 - `z.base` `var(--z-base)`: `0`. Content in normal flow.
+- `z.behind` `var(--z-behind)`: `-1`. Behind content inside an isolated part: a document’s watermark, under its text.
 - `z.dropdown` `var(--z-dropdown)`: `200`. Panels anchored to a trigger that close on their own: menus, selects, popovers, hover cards.
 - `z.modal` `var(--z-modal)`: `400`. Modal dialogs and drawers with their scrim. Everything below is inert while one is open.
 - `z.overlay` `var(--z-overlay)`: `300`. Layers over part of the page that aren’t modal: the skip link as it appears, an Imposter’s overlay (inside the Imposter’s own stacking context).

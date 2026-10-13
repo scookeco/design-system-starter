@@ -263,6 +263,10 @@
       "grid-row": {
         "$value": "{size.8}",
         "$description": "Height of one row in a DocumentGrid: the coordinate system a form page places its fields on."
+      },
+      "seal": {
+        "$value": "{size.24}",
+        "$description": "Size of an issuer's seal or stamp on a certificate or license (Seal)."
       }
     },
     "signature": {
