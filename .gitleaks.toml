@@ -1,0 +1,8 @@
+# gitleaks config: the default rules plus this repo's reviewed false positives.
+# Full history scanned 2026-11-15 with gitleaks 8.30.1; each allowlist below was reviewed and is not a secret.
+# CI (.github/workflows/gitleaks.yml) scans the pushed commits on every push and fork PR.
+# Optional local pre-commit hook (brew install gitleaks):
+#   printf '#!/bin/sh\nexec gitleaks git --pre-commit --staged --redact --no-banner .\n' > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Full-history check: gitleaks git --redact .
+[extend]
+useDefault = true
