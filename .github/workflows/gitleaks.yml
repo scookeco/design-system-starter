@@ -1,0 +1,31 @@
+name: gitleaks
+# Secret scan of the pushed commits (full history is scanned once by hand; see .gitleaks.toml).
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  scan:
+    # Same-repo PRs are already covered by the push run on their branch.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - name: Install gitleaks
+        run: curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz | tar -xz -C /usr/local/bin gitleaks
+      - name: Scan new commits
+        env:
+          BEFORE: ${{ github.event.before }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          DEFAULT: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ -n "$BASE" ]; then range="$BASE..HEAD"
+          elif [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then range="$BEFORE..HEAD"
+          elif [ "$GITHUB_REF_NAME" != "$DEFAULT" ]; then range="origin/$DEFAULT..HEAD"
+          else range="HEAD~1..HEAD"; fi
+          echo "scanning $range"
+          gitleaks git --no-banner --redact --verbose --log-opts="$range" .
